@@ -12,6 +12,8 @@ namespace P4_Project
         {
             Console.WriteLine("This is a compiler, project complete");
             Console.ReadLine();
+
+            Console.WriteLine("Hey");
         }
     }
 }
