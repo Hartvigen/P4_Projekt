@@ -10,7 +10,7 @@ namespace P4_Project
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("This is a compiler, project complete. NOT!");
+            Console.WriteLine("This is a compiler, project complete Simple");
             Console.ReadLine();
 
             Console.WriteLine("Hey");
