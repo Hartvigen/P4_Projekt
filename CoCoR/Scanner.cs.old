@@ -29,7 +29,7 @@ using System;
 using System.IO;
 using System.Collections;
 
-namespace ScannerParserGen.SyntaxAnalysis {
+namespace P4_Project.Compiler.SyntaxAnalysis {
 
 public class Token {
 	public int kind;    // token kind
@@ -229,8 +229,8 @@ public class UTF8Buffer: Buffer {
 public class Scanner {
 	const char EOL = '\n';
 	const int eofSym = 0; /* pdt */
-	const int maxT = 21;
-	const int noSym = 21;
+	const int maxT = 26;
+	const int noSym = 26;
 
 
 	public Buffer buffer; // scanner buffer
@@ -262,8 +262,12 @@ public class Scanner {
 		start[41] = 12; 
 		start[44] = 13; 
 		start[61] = 14; 
-		start[60] = 15; 
-		start[62] = 16; 
+		start[43] = 15; 
+		start[45] = 16; 
+		start[42] = 17; 
+		start[47] = 18; 
+		start[60] = 19; 
+		start[62] = 20; 
 		start[Buffer.EOF] = -1;
 
 	}
@@ -376,15 +380,16 @@ public class Scanner {
 
 	void CheckLiteral() {
 		switch (t.val) {
-			case "vertex": t.kind = 6; break;
-			case "edge": t.kind = 7; break;
-			case "number": t.kind = 12; break;
-			case "bool": t.kind = 13; break;
-			case "text": t.kind = 14; break;
-			case "list": t.kind = 15; break;
-			case "set": t.kind = 18; break;
-			case "queue": t.kind = 19; break;
-			case "stack": t.kind = 20; break;
+			case "none": t.kind = 4; break;
+			case "vertex": t.kind = 7; break;
+			case "edge": t.kind = 8; break;
+			case "list": t.kind = 17; break;
+			case "set": t.kind = 20; break;
+			case "queue": t.kind = 21; break;
+			case "stack": t.kind = 22; break;
+			case "number": t.kind = 23; break;
+			case "bool": t.kind = 24; break;
+			case "text": t.kind = 25; break;
 			default: break;
 		}
 	}
@@ -447,21 +452,29 @@ public class Scanner {
 				else if (ch == 92) {AddCh(); goto case 7;}
 				else {t.kind = 3; break;}
 			case 9:
-				{t.kind = 4; break;}
-			case 10:
 				{t.kind = 5; break;}
+			case 10:
+				{t.kind = 6; break;}
 			case 11:
-				{t.kind = 8; break;}
-			case 12:
 				{t.kind = 9; break;}
-			case 13:
+			case 12:
 				{t.kind = 10; break;}
-			case 14:
+			case 13:
 				{t.kind = 11; break;}
+			case 14:
+				{t.kind = 12; break;}
 			case 15:
-				{t.kind = 16; break;}
+				{t.kind = 13; break;}
 			case 16:
-				{t.kind = 17; break;}
+				{t.kind = 14; break;}
+			case 17:
+				{t.kind = 15; break;}
+			case 18:
+				{t.kind = 16; break;}
+			case 19:
+				{t.kind = 18; break;}
+			case 20:
+				{t.kind = 19; break;}
 
 		}
 		t.val = new String(tval, 0, tlen);

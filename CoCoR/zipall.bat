@@ -1,1 +1,0 @@
-jar -cfM Taste.zip *.*
