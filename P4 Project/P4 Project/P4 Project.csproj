@@ -7,7 +7,7 @@
     <ProjectGuid>{93AB248B-8C1B-403E-9FAA-23EBC916EE61}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>P4_Project</RootNamespace>
-    <AssemblyName>P4 Project</AssemblyName>
+    <AssemblyName>MagiaC</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compiler\SyntaxAnalysis\Parser.cs" />
+    <Compile Include="Compiler\SyntaxAnalysis\Scanner.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
