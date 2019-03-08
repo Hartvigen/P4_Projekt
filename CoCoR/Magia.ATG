@@ -1,0 +1,117 @@
+COMPILER MAGIA
+
+    const int // types
+        undef = 0, number = 1, boolean = 2, text = 3, vertex = 4, edge = 5, setType = 10, list = 20, queue = 30, stack = 40;
+    
+    
+	const int // object kinds
+        var = 0, proc = 1;
+    
+    /*
+	public SymbolTable   tab;
+	public CodeGenerator gen;
+    */
+  
+/*--------------------------------------------------------------------------*/
+CHARACTERS
+  letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+  digit = "0123456789".
+  cr  = '\r'.
+  lf  = '\n'.
+  tab = '\t'.
+  CharInLine = ANY - '\r' - '\n'.
+  AnyButDoubleQuote = CharInLine - '\"'.
+
+TOKENS
+  IDENT  = letter {letter | digit}.
+  NUMBER = digit {digit} | digit {digit} '.' digit {digit}.
+  TEXT = '"' {AnyButDoubleQuote | "\\\""} '"'.
+  
+COMMENTS FROM "/*" TO "*/" NESTED
+COMMENTS FROM "//" TO lf
+
+IGNORE cr + lf + tab
+
+
+
+PRODUCTIONS
+/*------------------------------------------------------------------------*/
+MAGIA 
+    = {SYNC '[' Head ']'}.
+    
+/*------------------------------------------------------------------------*/
+Head
+    = ("vertex" | "edge") '(' AttrDecls ')'.
+
+/*------------------------------------------------------------------------*/
+AttrDecls
+    = AttrDecl {WEAK ',' AttrDecl}.
+
+/*------------------------------------------------------------------------*/
+AttrDecl
+    = Type IDENT ['=' Expr].
+
+/*------------------------------------------------------------------------*/
+Type
+    = SingleType
+    | CollecType.
+
+/*------------------------------------------------------------------------*/
+SingleType
+    = "number"
+    | "bool"
+    | "text"
+    | "vertex"
+    | "edge".
+
+/*------------------------------------------------------------------------*/
+CollecType
+    = "list" WEAK '<' SingleType WEAK '>'
+    | "set" WEAK '<' SingleType WEAK '>'
+    | "queue" WEAK '<' SingleType WEAK '>'
+    | "stack" WEAK '<' SingleType WEAK '>'.
+
+/*------------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------------*/
+Expr
+    = NUMBER
+    | TEXT
+    | IDENT.
+    
+/*------------------------------------------------------------------------*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+END MAGIA.
