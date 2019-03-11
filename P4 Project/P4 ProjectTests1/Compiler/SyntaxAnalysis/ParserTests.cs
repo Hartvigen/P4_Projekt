@@ -32,6 +32,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             "list", "queue", "set", "stack"
         };
 
+        //Generates a header attribute declaration for vertex and edge where all types are being used.
         [ClassInitialize()]
         public static void ClassInit(TestContext context)
         {
@@ -71,6 +72,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
         }
 
+        //Will identify an ApproriateValue given a type.
         private string identifyApropriateValue(string type)
         {
             if (collectionTypes.Contains(type))
@@ -93,7 +95,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             throw new Exception("Type was neither in type list of collection list.");
         }
 
-
+        //Will identify an in apropriate value given a type.
         private string identifyInApropriateValue(string type)
         {
             if (collectionTypes.Contains(type))
@@ -108,16 +110,17 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             else if (singleTypes.Contains(type))
                 switch (type)
                 {
-                    case "number": return "none";
-                    case "text": return "123";
-                    case "bool": return "\"text\"";
-                    case "vertex": return "true";
-                    case "edge": return "false";
+                    case "number": return "!";
+                    case "text": return "!";
+                    case "bool": return "!";
+                    case "vertex": return "!";
+                    case "edge": return "!";
                     default: throw new Exception(type + " is not added to the switch but is in the list of single types.");
                 }
             throw new Exception("Type was neither in type list of collections list.");
         }
 
+        //The actual parser.
         private bool TryParse(string program)
         {
             Parser parser
