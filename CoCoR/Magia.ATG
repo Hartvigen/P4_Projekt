@@ -27,6 +27,8 @@ TOKENS
   NUMBER = digit {digit} | digit {digit} '.' digit {digit}.
   TEXT = '"' {AnyButDoubleQuote | "\\\""} '"'.
   NONE = "none".
+  TRUE = "true".
+  FALSE = "false".
   
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -81,6 +83,8 @@ Args
 Const
     = NUMBER
     | TEXT
+    | TRUE
+    | FALSE
     | NONE.
 
 /*------------------------------------------------------------------------*/
