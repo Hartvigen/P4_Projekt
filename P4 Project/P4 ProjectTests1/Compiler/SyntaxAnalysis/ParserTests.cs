@@ -13,6 +13,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
     public class ParserTests
     {
         static string validIdentifier = "test123";
+        static string validStringType = "text";
         static string invalidIdentifier = "123test";
 
         static string invalidType = "notAType";
@@ -76,13 +77,15 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         private string identifyApropriateValue(string type)
         {
             if (collectionTypes.Contains(type))
-                switch (type) {
+                switch (type)
+                {
                     case "list": return "";
                     case "set": return "";
                     case "stack": return "";
                     case "queue": return "";
-                    default: throw new Exception( type + " is not added to the switch but is in the list.");
-            }else if(singleTypes.Contains(type))
+                    default: throw new Exception(type + " is not added to the switch but is in the list.");
+                }
+            else if (singleTypes.Contains(type))
                 switch (type)
                 {
                     case "number": return "123";
@@ -142,7 +145,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         //The Empty String Should be good.
         [TestMethod()]
         public void ParseTestSuccess01()
-        {  
+        {
             bool success = TryParse("");
             Assert.IsTrue(success);
         }
@@ -153,7 +156,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         {
             int i = 0;
             bool success = true;
-        
+
             for (i = singleTypes.Count - 1; i >= 0 && success; i--)
                 success = TryParse("[vertex(" + singleTypes[i] + " " + validIdentifier + ")]");
 
@@ -345,6 +348,99 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
             if (success)
                 Console.WriteLine("Should not parse: [edge(" + collectionTypes[i] + " < " + singleTypes[j] + " > " + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[j]) + ")]");
+            Assert.IsFalse(success);
+        }
+
+        //A forgotten close ´"´  on a string should give error.
+        [TestMethod()]
+        public void ParseTestFailure10()
+        {
+            bool success;
+
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
+            Assert.IsFalse(success);
+            success = TryParse("[edge(" + validStringType + " " + validIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
+            Assert.IsFalse(success);
+        }
+
+        //A forgotten ´,´ in a list should give error.
+        [TestMethod()]
+        public void ParseTestFailure11()
+        {
+            bool success;
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "  " + validStringType + " " + validIdentifier + ")]");
+            Assert.IsFalse(success);
+            success = TryParse("[edge(" + validStringType + " " + validIdentifier + "  " + validStringType + " " + validIdentifier + ")]");
+            Assert.IsFalse(success);
+        }
+
+        //A wrong symbol where there should be ´,´ in a list should give error.
+        [TestMethod()]
+        public void ParseTestFailure12()
+        {
+            bool success;
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + ".  " + validStringType + " " + validIdentifier + ")]");
+            Assert.IsFalse(success);
+            success = TryParse("[edge(" + validStringType + " " + validIdentifier + ".  " + validStringType + " " + validIdentifier + ")]");
+            Assert.IsFalse(success);
+        }
+
+        //A forgotten close ´]´ symbol should give error.
+        [TestMethod()]
+        public void ParseTestFailure13()
+        {
+            bool success;
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + ")");
+            Assert.IsFalse(success);
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + ")");
+            Assert.IsFalse(success);
+        }
+
+        //A forgotten close ´)´ symbol should give error.
+        [TestMethod()]
+        public void ParseTestFailure14()
+        {
+            bool success;
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "]");
+            Assert.IsFalse(success);
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "]");
+            Assert.IsFalse(success);
+        }
+
+        //A forgotten close ´)]´ symbol should give error.
+        [TestMethod()]
+        public void ParseTestFailure15()
+        {
+            bool success;
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
+            Assert.IsFalse(success);
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
+            Assert.IsFalse(success);
+        }
+
+        //A forgotten start ´(´ symbol after "vertex" or "edge" should give error.
+        [TestMethod()]
+        public void ParseTestFailure16()
+        {
+            bool success;
+            success = TryParse("[vertex " + validStringType + " " + validIdentifier + ")]");
+            Assert.IsFalse(success);
+            success = TryParse("[edge " + validStringType + " " + validIdentifier + ")]");
+            Assert.IsFalse(success);
+            success = TryParse("[vertex" + validStringType + " " + validIdentifier + ")]");
+            Assert.IsFalse(success);
+            success = TryParse("[edge" + validStringType + " " + validIdentifier + ")]");
+            Assert.IsFalse(success);
+        }
+
+        //A forgotten start ´(´ symbol after "vertex" or "edge" should give error.
+        [TestMethod()]
+        public void ParseTestFailure17()
+        {
+            bool success;
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
+            Assert.IsFalse(success);
+            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
             Assert.IsFalse(success);
         }
     }
