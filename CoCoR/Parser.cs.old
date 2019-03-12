@@ -105,9 +105,7 @@ const int // types
 			Head();
 			Expect(8);
 		}
-		while (StartOf(1)) {
-			Stmts();
-		}
+		Stmts();
 		while (la.kind == 14) {
 			FuncDecl();
 		}
@@ -125,7 +123,8 @@ const int // types
 	}
 
 	void Stmts() {
-		while (StartOf(2)) {
+		while (StartOf(1)) {
+			while (!(StartOf(2))) {SynErr(47); Get();}
 			Stmt();
 		}
 	}
@@ -161,7 +160,7 @@ const int // types
 			SingleType();
 		} else if (StartOf(6)) {
 			CollecType();
-		} else SynErr(47);
+		} else SynErr(48);
 	}
 
 	void Assign() {
@@ -172,7 +171,7 @@ const int // types
 			Get();
 			Args();
 			Expect(16);
-		} else SynErr(48);
+		} else SynErr(49);
 	}
 
 	void FuncParam() {
@@ -198,7 +197,7 @@ const int // types
 		} else if (la.kind == 17) {
 			Get();
 			Expr();
-		} else SynErr(49);
+		} else SynErr(50);
 	}
 
 	void FullDecl() {
@@ -214,7 +213,7 @@ const int // types
 			Expect(16);
 		} else if (la.kind == 11) {
 			VtxDecl();
-		} else SynErr(50);
+		} else SynErr(51);
 	}
 
 	void IdentCont() {
@@ -224,13 +223,15 @@ const int // types
 			Get();
 			Args();
 			Expect(12);
-			Member();
+			if (la.kind == 18) {
+				Member();
+			}
 		} else if (la.kind == 20 || la.kind == 21 || la.kind == 22) {
 			EdgeOpr();
 			EdgeOneOrMore();
-		} else if (StartOf(8)) {
+		} else if (la.kind == 18) {
 			Member();
-		} else SynErr(51);
+		} else SynErr(52);
 	}
 
 	void Expr() {
@@ -240,18 +241,16 @@ const int // types
 	void Args() {
 		if (StartOf(7)) {
 			Expr();
-			while (WeakSeparator(13,7,9) ) {
+			while (WeakSeparator(13,7,8) ) {
 				Expr();
 			}
 		}
 	}
 
 	void Member() {
-		if (la.kind == 18) {
-			Get();
-			Expect(1);
-			IdentCont();
-		}
+		Expect(18);
+		Expect(1);
+		IdentCont();
 	}
 
 	void EdgeOpr() {
@@ -261,7 +260,7 @@ const int // types
 			Get();
 		} else if (la.kind == 22) {
 			Get();
-		} else SynErr(52);
+		} else SynErr(53);
 	}
 
 	void EdgeOneOrMore() {
@@ -273,7 +272,7 @@ const int // types
 			Get();
 			EdgeDecls();
 			Expect(16);
-		} else SynErr(53);
+		} else SynErr(54);
 	}
 
 	void VtxDecls() {
@@ -344,7 +343,7 @@ const int // types
 
 	void ExprRel() {
 		ExprPlus();
-		if (StartOf(10)) {
+		if (StartOf(9)) {
 			if (la.kind == 27) {
 				Get();
 			} else if (la.kind == 28) {
@@ -399,11 +398,11 @@ const int // types
 			Get();
 			Expr();
 			Expect(12);
-		} else if (StartOf(11)) {
+		} else if (StartOf(10)) {
 			Const();
 		} else if (la.kind == 1) {
 			CallOrID();
-		} else SynErr(54);
+		} else SynErr(55);
 	}
 
 	void Const() {
@@ -417,7 +416,7 @@ const int // types
 			Get();
 		} else if (la.kind == 4) {
 			Get();
-		} else SynErr(55);
+		} else SynErr(56);
 	}
 
 	void CallOrID() {
@@ -440,31 +439,31 @@ const int // types
 			Get();
 		} else if (la.kind == 10) {
 			Get();
-		} else SynErr(56);
+		} else SynErr(57);
 	}
 
 	void CollecType() {
 		if (la.kind == 37) {
 			Get();
-			ExpectWeak(27, 12);
+			ExpectWeak(27, 11);
 			SingleType();
-			ExpectWeak(28, 13);
+			ExpectWeak(28, 12);
 		} else if (la.kind == 38) {
 			Get();
-			ExpectWeak(27, 12);
+			ExpectWeak(27, 11);
 			SingleType();
-			ExpectWeak(28, 13);
+			ExpectWeak(28, 12);
 		} else if (la.kind == 39) {
 			Get();
-			ExpectWeak(27, 12);
+			ExpectWeak(27, 11);
 			SingleType();
-			ExpectWeak(28, 13);
+			ExpectWeak(28, 12);
 		} else if (la.kind == 40) {
 			Get();
-			ExpectWeak(27, 12);
+			ExpectWeak(27, 11);
 			SingleType();
-			ExpectWeak(28, 13);
-		} else SynErr(57);
+			ExpectWeak(28, 12);
+		} else SynErr(58);
 	}
 
 
@@ -479,20 +478,19 @@ const int // types
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_T,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _x,_x},
-		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x},
-		{_x,_T,_T,_T, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_T,_T,_x,_x, _x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_T,_x, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_T,_T,_T, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_x,_x,_T,_T, _T,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x},
-		{_T,_x,_x,_x, _x,_x,_x,_T, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x},
-		{_T,_T,_x,_x, _x,_x,_x,_T, _x,_x,_x,_T, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x}
+		{T,T,x,x, x,x,x,T, x,T,T,x, x,x,x,x, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, T,T,T,T, x,x},
+		{x,T,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, T,T,T,T, x,x},
+		{T,T,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, T,T,T,T, x,x},
+		{x,x,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, T,T,T,T, x,x},
+		{x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x},
+		{x,x,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, x,x},
+		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, T,x,x,x, x,x},
+		{x,T,T,T, T,T,T,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, T,x,x,x, x,x,x,x, x,x},
+		{x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x},
+		{x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,T, T,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x},
+		{x,x,T,T, T,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x},
+		{T,T,x,x, x,x,x,T, x,T,T,x, x,x,x,x, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, T,T,T,T, x,x},
+		{T,T,x,x, x,x,x,T, x,T,T,T, x,x,x,T, x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,T,T,T, T,T,T,T, x,x}
 
 	};
 } // end Parser
@@ -553,17 +551,18 @@ public class Errors {
 			case 44: s = "??? expected"; break;
 			case 45: s = "this symbol not expected in MAGIA"; break;
 			case 46: s = "invalid Head"; break;
-			case 47: s = "invalid Type"; break;
-			case 48: s = "invalid Assign"; break;
-			case 49: s = "invalid Stmt"; break;
-			case 50: s = "invalid FullDecl"; break;
-			case 51: s = "invalid IdentCont"; break;
-			case 52: s = "invalid EdgeOpr"; break;
-			case 53: s = "invalid EdgeOneOrMore"; break;
-			case 54: s = "invalid Factor"; break;
-			case 55: s = "invalid Const"; break;
-			case 56: s = "invalid SingleType"; break;
-			case 57: s = "invalid CollecType"; break;
+			case 47: s = "this symbol not expected in Stmts"; break;
+			case 48: s = "invalid Type"; break;
+			case 49: s = "invalid Assign"; break;
+			case 50: s = "invalid Stmt"; break;
+			case 51: s = "invalid FullDecl"; break;
+			case 52: s = "invalid IdentCont"; break;
+			case 53: s = "invalid EdgeOpr"; break;
+			case 54: s = "invalid EdgeOneOrMore"; break;
+			case 55: s = "invalid Factor"; break;
+			case 56: s = "invalid Const"; break;
+			case 57: s = "invalid SingleType"; break;
+			case 58: s = "invalid CollecType"; break;
 
 			default: s = "error " + n; break;
 		}
