@@ -76,20 +76,20 @@ Stmts
 StrucStmt
     = "while" '(' Expr ')' '{' Stmts '}'
     | "for" '(' Stmt ',' Expr ',' Stmt ')' '{' Stmts '}'
-    | "foreach" '(' HalfDecl "in" CallOrID ')' '{' Stmts '}'
+    | "foreach" '(' HalfDecl "in" Expr ')' '{' Stmts '}'
     | "if" '(' Expr ')' '{' Stmts '}' {"elseif" '(' Expr ')' '{' Stmts '}'} ["else" '{' Stmts '}'].
 
 /*------------------------------------------------------------------------*/
 Stmt
-    = (FullDecl | IDENT IdentCont | "return" Expr).
+    = (FullDecl | CallOrID {Member} IdentCont | "return" Expr).
 
 /*------------------------------------------------------------------------*/
 IdentCont
-    = Assign | '(' Args ')' [Member] | EdgeOpr EdgeOneOrMore | Member.
+    = Assign | EdgeOpr EdgeOneOrMore.
 
 /*------------------------------------------------------------------------*/
 Member
-    = WEAK '.' IDENT IdentCont.
+    = WEAK '.' CallOrID.
 
 /*------------------------------------------------------------------------*/
 FullDecl
@@ -163,7 +163,8 @@ ExprNot
 
 /*------------------------------------------------------------------------*/
 Factor
-    = '(' Expr ')' | Const | CallOrID.
+    = Const | ('(' Expr ')' | CallOrID) {Member}.
+
 
 /*------------------------------------------------------------------------*/
 CallOrID
