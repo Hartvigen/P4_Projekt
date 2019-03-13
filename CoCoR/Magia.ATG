@@ -1,15 +1,8 @@
 COMPILER MAGIA
 
-    const int // types
-        undef = 0, number = 1, boolean = 2, text = 3, vertex = 4, edge = 5, setType = 10, list = 20, queue = 30, stack = 40;
-    
-    
-	const int // object kinds
-        var = 0, proc = 1;
-    
     /*
-	public SymbolTable   tab;
-	public CodeGenerator gen;
+    public SymbolTable   tab;
+    public CodeGenerator gen;
     */
   
 /*--------------------------------------------------------------------------*/
@@ -29,6 +22,7 @@ TOKENS
   NONE = "none".
   TRUE = "true".
   FALSE = "false".
+  RPAREN = ')'.
   
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -39,12 +33,20 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
-MAGIA 
-    = {SYNC '[' Head ']'} Stmts {FuncDecl}.
+MAGIA =                             (. HeadNode headNode; mainNode = new MAGIA(); .)
+    {SYNC Head<out headNode>        (. mainNode.Add(headNode);                    .)
+    } 
+    Stmts 
+    {FuncDecl}.
     
 /*------------------------------------------------------------------------*/
-Head
-    = ("vertex" | "edge") '(' AttrDecls ')'.
+Head<out HeadNode headNode> (. headNode = null; .) 
+    = '[' 
+    ( "vertex"              (. headNode = new HeadNode(HeadNode.VERTEX); .)
+    | "edge"                (. headNode = new HeadNode(HeadNode.EDGE);   .)
+    ) 
+    WEAK '(' AttrDecls      (. int i = 1; .)
+    WEAK ')' ']'.
 
 /*------------------------------------------------------------------------*/
 AttrDecls
@@ -57,15 +59,11 @@ AttrDecl
 
 /*------------------------------------------------------------------------*/
 FuncDecl
-    = SYNC "func" IDENT '(' FuncParam ')' '{' Stmts '}'.
+    = SYNC "func" IDENT '(' [IF(la.kind != _RPAREN) FuncParams] ')' SYNC '{' Stmts SYNC '}'.
 
 /*------------------------------------------------------------------------*/
-FuncParam
-    = [HalfDecl {WEAK ',' HalfDecl}].
-
-/*------------------------------------------------------------------------*/
-HalfDecl
-    = Type IDENT.
+FuncParams
+    = Type IDENT {SYNC ',' Type IDENT}.
 
 
 /*------------------------------------------------------------------------*/
@@ -76,7 +74,7 @@ Stmts
 StrucStmt
     = "while" '(' Expr ')' '{' Stmts '}'
     | "for" '(' Stmt ',' Expr ',' Stmt ')' '{' Stmts '}'
-    | "foreach" '(' HalfDecl "in" Expr ')' '{' Stmts '}'
+    | "foreach" '(' Type IDENT "in" Expr ')' '{' Stmts '}'
     | "if" '(' Expr ')' '{' Stmts '}' {"elseif" '(' Expr ')' '{' Stmts '}'} ["else" '{' Stmts '}'].
 
 /*------------------------------------------------------------------------*/

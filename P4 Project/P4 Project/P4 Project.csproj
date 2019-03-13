@@ -42,10 +42,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AST\Commands\Command.cs" />
+    <Compile Include="AST\Commands\HeadNode.cs" />
+    <Compile Include="AST\Commands\Stmts\Decls\Decl.cs" />
+    <Compile Include="AST\Commands\Stmts\Decls\VarDecl.cs" />
+    <Compile Include="AST\Commands\Stmts\Stmt.cs" />
+    <Compile Include="AST\MAGIA.cs" />
+    <Compile Include="AST\Node.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\Parser.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\Scanner.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

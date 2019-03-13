@@ -1,4 +1,5 @@
-﻿using P4_Project.Compiler.SyntaxAnalysis;
+﻿using P4_Project.AST;
+using P4_Project.Compiler.SyntaxAnalysis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,6 +36,7 @@ namespace P4_Project
         {
             Parser parser = new Parser(new Scanner(filePath));
             parser.Parse();
+            MAGIA AST = parser.mainNode;
 
             return parser.errors.count == 0;
         }
