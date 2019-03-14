@@ -46,6 +46,7 @@
     <Compile Include="AST\Commands\HeadNode.cs" />
     <Compile Include="AST\Commands\Stmts\AssignNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\DeclNode.cs" />
+    <Compile Include="AST\Commands\Stmts\Decls\FuncDeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\VarDeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\StmtNode.cs" />
     <Compile Include="AST\Expressions\BinExprNode.cs" />

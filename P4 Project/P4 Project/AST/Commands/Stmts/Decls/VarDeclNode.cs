@@ -9,11 +9,13 @@ namespace P4_Project.AST.Commands.Stmts.Decls
 {
     class VarDeclNode : DeclNode
     {
-        ExprNode expr;
+        public int type;
+        public ExprNode expr;
 
         public VarDeclNode(int _type, string _symbolName, ExprNode _expr)
-            : base(_type, _symbolName)
+            : base(_symbolName)
         {
+            type = _type;
             expr = _expr;
         }
     }

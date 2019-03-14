@@ -70,8 +70,13 @@ FuncDecl
     = SYNC "func" IDENT '(' [IF(la.kind != _RPAREN) FuncParams] ')' SYNC '{' Stmts SYNC '}'.
 
 /*------------------------------------------------------------------------*/
-FuncParams
-    = Type IDENT {SYNC ',' Type IDENT}.
+FuncParams<ref FuncDeclNode funcNode> = (. int typ = 0;  .)
+    Type<out typ> 
+    IDENT                               (. funcNode.AddParam(new VarDeclNode(typ, t.val, null)); .)
+    {
+        SYNC ',' Type<out typ>
+        IDENT                           (. funcNode.AddParam(new VarDeclNode(typ, t.val, null)); .)
+    }.
 
 
 /*------------------------------------------------------------------------*/
@@ -220,38 +225,42 @@ Args<out CollecConst collec> =      (. collec = new CollecConst(); Expr expr; .)
 
 
 /*------------------------------------------------------------------------*/
-Const<out ExprNode e>       (. e = null; .)
-    = NUMBER				(. e = new NumConst(Convert.ToInt32(t.val)); .)
-    | TEXT					(. e = new TextConst(t.val); .)
+Identifier<out IdentNode identNode> = (. identNode = null; .)
+    (
+        IDENT                         (. identNode = new IdentNode(t.val); .)
+    ).
+
+/*------------------------------------------------------------------------*/
+Const<out ExprNode e> =     (. e = null; .)
+    ( NUMBER				(. e = new NumConst(Convert.ToInt32(t.val));    .)
+    | TEXT					(. e = new TextConst(t.val);                    .)
     | TRUE					(. e = new BoolConst(Convert.ToBoolean(t.val)); .)
     | FALSE					(. e = new BoolConst(Convert.ToBoolean(t.val)); .)
-    | NONE.					(. e = new NoneConst(); .)
-Identifier<out IdentNode ident> (. ident = null; .)
-    = IDENT                     (. ident = new IdentNode(t.val);
-	.)
-
+    | NONE					(. e = new NoneConst();                         .)
+    ).
 
 /*------------------------------------------------------------------------*/
+Type<out int type> =
+    ( SingleType<out type>				
+    | CollecType<out type>
+    ).
 
 /*------------------------------------------------------------------------*/
-Type<out int type>
-    = SingleType<out type>				
-    | CollecType<out type>.
-
+CollecType<out int type> =                                     (. type = 0; subType = 0; .)
+    ( "list" WEAK '<' SingleType<out subType> WEAK '>'	       (. type = Types.list + subType; .)
+    | "set" WEAK '<' SingleType<out subType> WEAK '>'           (. type = Types.set + subType; .)
+    | "queue" WEAK '<' SingleType<out subType> WEAK '>'        (. type = Types.queue + subType; .)
+    | "stack" WEAK '<' SingleType<out subType> WEAK '>'        (. type = Types.stack + subType; .)
+    ).
 /*------------------------------------------------------------------------*/
-CollecType<out int type>
-    = "list" WEAK '<' SingleType WEAK '>'			(. type = Types.list; .)
-    | "set" WEAK '<' SingleType WEAK '>'			(. type = Types.set; .)
-    | "queue" WEAK '<' SingleType WEAK '>'			(. type = Types.queue; .)
-    | "stack" WEAK '<' SingleType WEAK '>'.			(. type = Types.stack; .)
+SingleType<out int type> = (. type = 0; .)
+    ( "number"             (. type = Types.number;.)
+    | "bool"			   (. type = Types.boolean;.)
+    | "text"			   (. type = Types.text; .)
+    | "vertex"             (. type = Types.vertex; .)
+    | "edge"               (. type = Types.edge; .)
+    ).
 
-/*------------------------------------------------------------------------*/
-SingleType<out int type>
-    = "number"                      (. type = Types.number;.)
-    | "bool"						(. type = Types.boolean;.)
-    | "text"						(. type = Types.text; .)
-    | "vertex"						(. type = Types.vertex; .)
-    | "edge".						(. type = Types.edge; .)
 /*------------------------------------------------------------------------*/
 
 END MAGIA.
