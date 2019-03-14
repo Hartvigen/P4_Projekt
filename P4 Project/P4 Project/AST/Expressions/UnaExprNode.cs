@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions
 {
-    class UnaExprNode
+    class UnaExprNode : ExprNode
     {
         public ExprNode expr;
         int operatorType;

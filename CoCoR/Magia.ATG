@@ -33,11 +33,13 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
-MAGIA =                             (. HeadNode headNode; mainNode = new MAGIA(); .)
-    {SYNC Head<out headNode>        (. mainNode.Add(headNode);                    .)
+MAGIA =                                     (. mainNode = null; Block mainBlock = new Block(); .)
+    {SYNC Head<out HeadNode headNode>       (. mainBlock.Add(headNode); .)
     } 
-    Stmts 
-    {FuncDecl}.
+    Stmts<ref mainBlock>
+    { FuncDecl<out FuncDeclNode funcNode>   (. mainBlock.Add(funcNode); .)
+    }                                       (. mainNode = new MAGIA(mainBlock); .)
+    .
     
 /*------------------------------------------------------------------------*/
 Head<out HeadNode headNode>              (. headNode = null; .) 
@@ -49,10 +51,10 @@ Head<out HeadNode headNode>              (. headNode = null; .)
     WEAK ')' ']'.
 
 /*------------------------------------------------------------------------*/
-AttrDecls<ref HeadNode headNode>
-    = AttrDecl<out varDecl>              (. headNode.AddAttr(varDecl); .)
+AttrDecls<ref HeadNode headNode> =      (. VarDeclNode varDecl; .)
+    AttrDecl<out varDecl>               (. headNode?.AddAttr(varDecl); .)
     {
-        WEAK ',' AttrDecl<out varDecl>   (. headNode.AddAttr(varDecl); .)
+        WEAK ',' AttrDecl<out varDecl>  (. headNode?.AddAttr(varDecl); .)
     }.
 
 /*------------------------------------------------------------------------*/
@@ -60,12 +62,23 @@ AttrDecl<out VarDeclNode varDecl> = (. varDecl = null; .)
     Type<out int typ>
     IDENT
     [
-        Assign<>
+        Assign<out AssignNode assign>
     ]
     .
 
 
 /*------------------------------------------------------------------------*/
+FuncDecl<out FuncDeclNode funcNode> =                               (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
+    SYNC "func" IDENT                                           (. funcName = t.val; .)
+    '(' 
+        [
+            IF(la.kind != _RPAREN) FuncParams<ref paramBlock>
+        ] 
+    ')' 
+    SYNC '{' 
+        Stmts<ref stmtBlock>                                    
+    SYNC '}'                                                    (. funcNode = new FuncDeclNode(funcName, paramBlock, stmtBlock); .)
+    .
 /*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters
 or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters,
 so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called
@@ -75,18 +88,21 @@ FuncDecl
     = SYNC "func" IDENT '(' [IF(la.kind != _RPAREN) FuncParams] ')' SYNC '{' Stmts SYNC '}'.
 
 /*------------------------------------------------------------------------*/
-FuncParams<ref FuncDeclNode funcNode> = (. int typ = 0;  .)
+FuncParams<ref Block paramBlock> =      (. int typ = 0; .)
     Type<out typ> 
-    IDENT                               (. funcNode.AddParam(new VarDeclNode(typ, t.val, null)); .)
+    IDENT                               (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
     {
         SYNC ',' Type<out typ>
-        IDENT                           (. funcNode.AddParam(new VarDeclNode(typ, t.val, null)); .)
+        IDENT                           (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
     }.
 
 
 /*------------------------------------------------------------------------*/
-Stmts
-    = SYNC {Stmt | StrucStmt}.
+Stmts<ref Block block> =            (. StmtNode stmtNode; .)
+    SYNC {
+        Stmt<out stmtNode>          (. block.Add(stmtNode); .)
+        | StrucStmt<out stmtNode>   (. block.Add(stmtNode); .)
+    }.
 
 /*------------------------------------------------------------------------*/
 StrucStmt<out StmtNode s>			(. s = null; .)
@@ -128,26 +144,26 @@ StmtIf<out IfNode i>									(. i = null; ExprNode e = null; Block b = new Block
 		'}'].
 
 /*------------------------------------------------------------------------*/
-Stmt
-    = (FullDecl | CallOrID {Member} IdentCont | "return" Expr).
+Stmt<out StmtNode stmtNode> =                                   (. stmtNode = null; .)
+    (FullDecl | CallOrID<out IdentNode i> {Member} IdentCont | "return" Expr<out ExprNode expr>).
 
 /*------------------------------------------------------------------------*/
 IdentCont
-    = Assign | EdgeOpr EdgeOneOrMore.
+    = Assign<out AssignNode assign> | EdgeOpr EdgeOneOrMore.
 
 /*------------------------------------------------------------------------*/
 Member
-    = WEAK '.' CallOrID.
+    = WEAK '.' CallOrID<out IdentNode i>.
 
 /*------------------------------------------------------------------------*/
-FullDecl
-    = Type (IDENT [Assign] | '{' VtxDecls '}' | VtxDecl).
+FullDecl =
+    Type<out int typ> (IDENT [Assign<out AssignNode assign>] | '{' VtxDecls '}' | VtxDecl).
 
 /*------------------------------------------------------------------------*/
-Assign<out AssignNode assign>           (.  .)
+Assign<out AssignNode assign>           (. assign = null; .)
     = '=' 
-    (Expr<out Expr expr>                (.  .)
-    | '{' Args<out CollecConst collec> 
+    (Expr<out ExprNode expr>                (. assign = new AssignNode(); .)
+    | '{' Args<out CollecConst collec>  (. assign = new AssignNode(); .)
     '}'
     ).
 
@@ -165,7 +181,7 @@ EdgeOpr
 
 /*------------------------------------------------------------------------*/
 EdgeOneOrMore
-    = (Identifier | EdgeDecl | '{' EdgeDecls '}').
+    = (Identifier<out IdentNode identNode> | EdgeDecl | '{' EdgeDecls '}').
 
 /*------------------------------------------------------------------------*/
 EdgeDecls 
@@ -178,11 +194,11 @@ EdgeDecl
 
 /*------------------------------------------------------------------------*/
 VEParams
-    = {WEAK ',' Identifier Assign}.
+    = {WEAK ',' Identifier<out IdentNode identNode> Assign<out AssignNode assign>}.
 
 
 /*------------------------------------------------------------------------*/
-Expr<out Expr e> (. e = null; .)
+Expr<out ExprNode e> (. e = null; .)
     = ExprOR<out e>.
     
 /*------------------------------------------------------------------------*/
@@ -214,7 +230,7 @@ ExprRel<out ExprNode e>					(. e = null; int op = 0; .)
 	| '>'								(. op = Operators.GREATER; .)
 	| "<="								(. op = Operators.LESSEQ; .)
 	| ">="								(. op = Operators.GREATEQ; .)
-	) ExprPlus<out ExprNode e2>		(. e = new BinExprNode(e, op, e2); .)
+	) ExprPlus<out ExprNode e2>		    (. e = new BinExprNode(e, op, e2); .)
 	].
 
 /*------------------------------------------------------------------------*/
@@ -223,7 +239,7 @@ ExprPlus<out ExprNode e>				(. e = null; bool b = false; int op = 0; .)
 	] ExprMult<out ExprNode e1>			(. if(b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1; .)
 	{('+'								(. op = Operators.PLUS; .)
 	| '-'								(. op = Operators.BIMIN; .)
-	) ExprMult<out ExprNode>			(. e = new BinExprNode(e, op, e2); .)
+	) ExprMult<out ExprNode e2>			(. e = new BinExprNode(e, op, e2); .)
 	}.
 
 /*------------------------------------------------------------------------*/
@@ -244,15 +260,15 @@ ExprNot<out ExprNode e>			(. e = null; bool b = false;.)
 /*------------------------------------------------------------------------*/
 Factor<out ExprNode e>			(. e = null; .)
     = Const<out e>				              
-	| ('(' Expr<out e> ')' | CallOrID<out e>) {Member}.		
+	| ('(' Expr<out e> ')' | CallOrID<out IdentNode i>) {Member}.		
 
 
 /*------------------------------------------------------------------------*/
 CallOrID<out IdentNode i>
-    = Identifier ['(' Args<out CollecConst collec> ')'].
+    = Identifier<out i> ['(' Args<out CollecConst collec> ')'].
 
 /*------------------------------------------------------------------------*/
-Args<out CollecConst collec> =      (. collec = new CollecConst(); Expr expr; .)
+Args<out CollecConst collec> =      (. collec = new CollecConst(); ExprNode expr; .)
     [
         Expr<out expr>              (. collec.Add(expr); .)
         {
@@ -264,7 +280,7 @@ Args<out CollecConst collec> =      (. collec = new CollecConst(); Expr expr; .)
 /*------------------------------------------------------------------------*/
 Identifier<out IdentNode identNode> = (. identNode = null; .)
     (
-        IDENT                         (. identNode = new IdentNode(t.val); .)
+        IDENT                         (. identNode = new IdentNode(); .)
     ).
 
 /*------------------------------------------------------------------------*/
@@ -277,13 +293,13 @@ Const<out ExprNode e> =     (. e = null; .)
     ).
 
 /*------------------------------------------------------------------------*/
-Type<out int type> =
+Type<out int type> =        (. type = 0; .)
     ( SingleType<out type>				
     | CollecType<out type>
     ).
 
 /*------------------------------------------------------------------------*/
-CollecType<out int type> =                                     (. type = 0; subType = 0; .)
+CollecType<out int type> =                                     (. type = 0; int subType = 0; .)
     ( "list" WEAK '<' SingleType<out subType> WEAK '>'	       (. type = Types.list + subType; .)
     | "set" WEAK '<' SingleType<out subType> WEAK '>'           (. type = Types.set + subType; .)
     | "queue" WEAK '<' SingleType<out subType> WEAK '>'        (. type = Types.queue + subType; .)
