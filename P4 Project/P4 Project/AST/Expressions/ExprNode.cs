@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions
 {
-    abstract class ExprNode : Node
+    public abstract class ExprNode : Node
     {
 
     }

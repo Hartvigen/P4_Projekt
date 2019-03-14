@@ -33,11 +33,13 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
-MAGIA =                             (. HeadNode headNode; mainNode = new MAGIA(); .)
-    {SYNC Head<out headNode>        (. mainNode.Add(headNode);                    .)
+MAGIA =                             (. HeadNode headNode; mainNode = null; Block mainBlock = new Block(); .)
+    {SYNC Head<out headNode>        (. mainBlock.Add(headNode); .)
     } 
-    Stmts 
-    {FuncDecl}.
+    Stmts<ref mainBlock>
+    { FuncDecl<out funcNode>        (. mainBlock.Add(funcNode); .)
+    }                               (. mainNode = new MAGIA(mainBlock); .)
+    .
     
 /*------------------------------------------------------------------------*/
 Head<out HeadNode headNode>              (. headNode = null; .) 
@@ -66,8 +68,17 @@ AttrDecl<out VarDeclNode varDecl> = (. varDecl = null; .)
 
 
 /*------------------------------------------------------------------------*/
-FuncDecl
-    = SYNC "func" IDENT '(' [IF(la.kind != _RPAREN) FuncParams] ')' SYNC '{' Stmts SYNC '}'.
+FuncDecl<out FuncDecl funcNode> =                               (. funcNode = null; string funcName = ""; Block stmtBlock = new Block(); .)
+    SYNC "func" IDENT                                           (. funcName = t.val; .)
+    '(' 
+        [
+            IF(la.kind != _RPAREN) FuncParams<out Block paramBlock>
+        ] 
+    ')' 
+    SYNC '{' 
+        Stmts<ref stmtBlock>                                    
+    SYNC '}'                                                    (. funcNode = new FuncDeclNode(funcName, paramBlock, stmtBlock); .)
+    .
 
 /*------------------------------------------------------------------------*/
 FuncParams<ref FuncDeclNode funcNode> = (. int typ = 0;  .)
@@ -80,8 +91,11 @@ FuncParams<ref FuncDeclNode funcNode> = (. int typ = 0;  .)
 
 
 /*------------------------------------------------------------------------*/
-Stmts
-    = SYNC {Stmt | StrucStmt}.
+Stmts<ref Block block> =            (. StmtNode stmtNode; .)
+    SYNC {
+        Stmt<out stmtNode>          (. block.Add(stmtNode) .)
+        | StrucStmt<out stmtNode>   (. block.Add(stmtNode) .)
+    }.
 
 /*------------------------------------------------------------------------*/
 StrucStmt

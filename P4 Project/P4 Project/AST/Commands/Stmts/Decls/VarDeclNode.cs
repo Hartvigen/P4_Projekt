@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Commands.Stmts.Decls
 {
-    class VarDeclNode : DeclNode
+    public class VarDeclNode : DeclNode
     {
         public int type;
         public ExprNode expr;

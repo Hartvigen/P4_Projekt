@@ -6,24 +6,16 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Commands.Stmts.Decls
 {
-    class FuncDeclNode : DeclNode
+    public class FuncDeclNode : DeclNode
     {
-        List<VarDeclNode> funcParams = new List<VarDeclNode>();
-        List<StmtNode> funcStmts = new List<StmtNode>();
+        public Block paramBlock;
+        public Block stmtBlock;
 
 
-        public FuncDeclNode(string _symbolName) : base(_symbolName)
-        { }
-
-
-        public void AddParam(VarDeclNode param)
+        public FuncDeclNode(string _symbolName, Block _paramBlock, Block _stmtBlock) : base(_symbolName)
         {
-            funcParams.Add(param);
-        }
-
-        public void AddStmt(StmtNode stmt)
-        {
-            funcStmts.Add(stmt);
+            paramBlock = _paramBlock;
+            stmtBlock = _stmtBlock;
         }
     }
 }

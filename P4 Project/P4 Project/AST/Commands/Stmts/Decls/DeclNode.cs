@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Commands.Stmts.Decls
 {
-    class DeclNode : StmtNode
+    public class DeclNode : StmtNode
     {
         string symbolName;
 
