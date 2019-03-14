@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P4_Project.SymbolTable;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
-    class TextConst : ExprNode
+    class IdentNode
     {
-        string val;
+        Reference reference;
 
-        public TextConst(string _val)
+        public IdentNode()
         {
-            val = _val;
+
         }
     }
 }

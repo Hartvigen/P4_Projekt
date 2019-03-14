@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
-    class CollecConst
+    class CollecConst : ExprNode
     {
         List<ExprNode> exprs = new List<ExprNode>();
 

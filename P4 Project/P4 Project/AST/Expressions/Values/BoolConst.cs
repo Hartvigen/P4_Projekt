@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
-    class BoolConst
+    class BoolConst:ExprNode
     {
         bool val;
 

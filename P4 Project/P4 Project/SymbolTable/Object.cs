@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_Project.AST.Expressions.Values
+namespace P4_Project.SymbolTable
 {
-    class NoneConst : ExprNode
+    class Object
     {
-        readonly object val = null;
     }
 }

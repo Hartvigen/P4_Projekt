@@ -16,7 +16,7 @@ namespace P4_Project
             text = 3, 
             vertex = 4, 
             edge = 5, 
-            setType = 10, 
+            set = 10, 
             list = 20, 
             queue = 30, 
             stack = 40;
