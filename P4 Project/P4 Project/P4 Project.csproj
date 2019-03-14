@@ -42,13 +42,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AST\Block.cs" />
     <Compile Include="AST\Commands\CommandNode.cs" />
     <Compile Include="AST\Commands\HeadNode.cs" />
     <Compile Include="AST\Commands\Stmts\AssignNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\DeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\FuncDeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\VarDeclNode.cs" />
+    <Compile Include="AST\Commands\Stmts\ForeachNode.cs" />
+    <Compile Include="AST\Commands\Stmts\ForNode.cs" />
+    <Compile Include="AST\Commands\Stmts\IfNode.cs" />
     <Compile Include="AST\Commands\Stmts\StmtNode.cs" />
+    <Compile Include="AST\Commands\Stmts\WhileNode.cs" />
     <Compile Include="AST\Expressions\BinExprNode.cs" />
     <Compile Include="AST\Expressions\MemberNode.cs" />
     <Compile Include="AST\Expressions\Values\BoolConst.cs" />

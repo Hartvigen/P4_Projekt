@@ -33,13 +33,11 @@ IGNORE cr + lf + tab
 
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
-MAGIA =                             (. HeadNode headNode; mainNode = null; Block mainBlock = new Block(); .)
-    {SYNC Head<out headNode>        (. mainBlock.Add(headNode); .)
+MAGIA =                             (. HeadNode headNode; mainNode = new MAGIA(); .)
+    {SYNC Head<out headNode>        (. mainNode.Add(headNode);                    .)
     } 
-    Stmts<ref mainBlock>
-    { FuncDecl<out funcNode>        (. mainBlock.Add(funcNode); .)
-    }                               (. mainNode = new MAGIA(mainBlock); .)
-    .
+    Stmts 
+    {FuncDecl}.
     
 /*------------------------------------------------------------------------*/
 Head<out HeadNode headNode>              (. headNode = null; .) 
@@ -68,17 +66,13 @@ AttrDecl<out VarDeclNode varDecl> = (. varDecl = null; .)
 
 
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDecl funcNode> =                               (. funcNode = null; string funcName = ""; Block stmtBlock = new Block(); .)
-    SYNC "func" IDENT                                           (. funcName = t.val; .)
-    '(' 
-        [
-            IF(la.kind != _RPAREN) FuncParams<out Block paramBlock>
-        ] 
-    ')' 
-    SYNC '{' 
-        Stmts<ref stmtBlock>                                    
-    SYNC '}'                                                    (. funcNode = new FuncDeclNode(funcName, paramBlock, stmtBlock); .)
-    .
+/*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters
+or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters,
+so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called
+and any eventual errors will be handled there*/
+
+FuncDecl
+    = SYNC "func" IDENT '(' [IF(la.kind != _RPAREN) FuncParams] ')' SYNC '{' Stmts SYNC '}'.
 
 /*------------------------------------------------------------------------*/
 FuncParams<ref FuncDeclNode funcNode> = (. int typ = 0;  .)
@@ -91,18 +85,47 @@ FuncParams<ref FuncDeclNode funcNode> = (. int typ = 0;  .)
 
 
 /*------------------------------------------------------------------------*/
-Stmts<ref Block block> =            (. StmtNode stmtNode; .)
-    SYNC {
-        Stmt<out stmtNode>          (. block.Add(stmtNode) .)
-        | StrucStmt<out stmtNode>   (. block.Add(stmtNode) .)
-    }.
+Stmts
+    = SYNC {Stmt | StrucStmt}.
 
 /*------------------------------------------------------------------------*/
-StrucStmt
-    = "while" '(' Expr ')' '{' Stmts '}'
-    | "for" '(' Stmt ',' Expr ',' Stmt ')' '{' Stmts '}'
-    | "foreach" '(' Type Identifier "in" Expr ')' '{' Stmts '}'
-    | "if" '(' Expr ')' '{' Stmts '}' {"elseif" '(' Expr ')' '{' Stmts '}'} ["else" '{' Stmts '}'].
+StrucStmt<out StmtNode s>			(. s = null; .)
+    = StmtWhile<out s>				
+	| StmtFor<out s>				
+	| StmtForeach<out s>			
+	| StmtIf<out s>.
+
+/*------------------------------------------------------------------------*/
+StmtWhile<out WhileNode w>				(. w = null; Block b = new Block(); .)
+	= "while" '(' Expr<out ExprNode e>	
+		')' '{' Stmts<ref b>			(. w = new WhileNode(e, b); .)
+		'}'.
+
+/*------------------------------------------------------------------------*/
+StmtFor<out ForNode f>						(. f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); .)
+	= "for" '(' Stmt<out StmtNode s1>		(. init = s1; .)
+		',' Expr<out ExprNode e1>			(. e = e1;  .)
+		',' Stmt<out StmtNode s2>			(. iter = s2; .)
+		')' '{' Stmts<ref b>				(. f = new ForNode(init, e, iter, b); .)
+		'}'.
+
+/*------------------------------------------------------------------------*/
+StmtForeach<out ForeachNode f>				(. f = null; Block b = new Block();, VarDeclNode v = null; .)
+	= "foreach" '(' Type<out int typ>
+		IDENT								(. v = new VarDeclNode(typ, t.val, null); .)
+		"in" Expr<out ExprNode e1>			(.  .)
+		')' '{' Stmts<ref b>				(. f = new ForeachNode(v, e1, b); .)
+		'}'.
+
+/*------------------------------------------------------------------------*/
+StmtIf<out IfNode i>									(. i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; Ifnode k = null; .)
+	= "if" '(' Expr<out ExprNode ie1>					(. e = ie1; .)
+		')' '{' Stmts<ref b>							(. i = new IfNode(e, b); j = i; .)
+		'}' {"elseif" '(' Expr<out ExprNode ie2>		(. e = ie2; b = new Block(); .)
+		')' '{' Stmts<ref b>							(. k = new IfNode(e, b); j.SetElse(k); j = k;  .)
+		'}'} ["else"									(. b = new Block(); .)
+		'{' Stmts<ref b>							    (. ; k = new IfNode(new BoolConst(true), b); j.SetElse(k).)
+		'}'].
 
 /*------------------------------------------------------------------------*/
 Stmt
