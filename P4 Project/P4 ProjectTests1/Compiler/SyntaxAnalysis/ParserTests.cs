@@ -124,7 +124,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //The actual parser.
-        private bool TryParse(string program)
+        protected bool TryParse(string program)
         {
             Parser parser
                 = new Parser(
@@ -142,7 +142,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             return new MemoryStream(Encoding.UTF8.GetBytes(str));
         }
 
-        //The Empty String Should be good.
+        //The Empty String Should be good.  
         [TestMethod()]
         public void ParseTestSuccess01()
         {
