@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AST\Commands\CommandNode.cs" />
     <Compile Include="AST\Commands\HeadNode.cs" />
+    <Compile Include="AST\Commands\Stmts\AssignNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\DeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\VarDeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\StmtNode.cs" />
