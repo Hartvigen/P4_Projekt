@@ -40,10 +40,10 @@ MAGIA =                             (. HeadNode headNode; mainNode = new MAGIA()
     {FuncDecl}.
     
 /*------------------------------------------------------------------------*/
-Head<out HeadNode headNode>                 (. headNode = null; .) 
+Head<out HeadNode headNode>              (. headNode = null; .) 
     = '[' 
-    ( "vertex"                              (. headNode = new HeadNode(HeadNode.VERTEX); .)
-    | "edge"                                (. headNode = new HeadNode(HeadNode.EDGE);   .)
+    ( "vertex"                           (. headNode = new HeadNode(HeadNode.VERTEX); .)
+    | "edge"                             (. headNode = new HeadNode(HeadNode.EDGE);   .)
     ) 
     WEAK '(' AttrDecls<ref headNode>
     WEAK ')' ']'.
@@ -56,11 +56,11 @@ AttrDecls<ref HeadNode headNode>
     }.
 
 /*------------------------------------------------------------------------*/
-AttrDecl<out VarDeclNode varDecl> = (. int type = 0; string ident = ""; .)
-    Type 
-    IDENT 
+AttrDecl<out VarDeclNode varDecl> = (. varDecl = null; .)
+    Type<out int typ>
+    IDENT
     [
-        Assign
+        Assign<>
     ]
     .
 
@@ -82,7 +82,7 @@ Stmts
 StrucStmt
     = "while" '(' Expr ')' '{' Stmts '}'
     | "for" '(' Stmt ',' Expr ',' Stmt ')' '{' Stmts '}'
-    | "foreach" '(' Type IDENT "in" Expr ')' '{' Stmts '}'
+    | "foreach" '(' Type Identifier "in" Expr ')' '{' Stmts '}'
     | "if" '(' Expr ')' '{' Stmts '}' {"elseif" '(' Expr ')' '{' Stmts '}'} ["else" '{' Stmts '}'].
 
 /*------------------------------------------------------------------------*/
@@ -102,8 +102,12 @@ FullDecl
     = Type (IDENT [Assign] | '{' VtxDecls '}' | VtxDecl).
 
 /*------------------------------------------------------------------------*/
-Assign
-    = '=' (Expr | '{' Args '}').
+Assign<out AssignNode assign>           (.  .)
+    = '=' 
+    (Expr<out Expr expr>                (.  .)
+    | '{' Args<out CollecConst collec> 
+    '}'
+    ).
 
 /*------------------------------------------------------------------------*/
 VtxDecls
@@ -119,7 +123,7 @@ EdgeOpr
 
 /*------------------------------------------------------------------------*/
 EdgeOneOrMore
-    = (IDENT | EdgeDecl | '{' EdgeDecls '}').
+    = (Identifier | EdgeDecl | '{' EdgeDecls '}').
 
 /*------------------------------------------------------------------------*/
 EdgeDecls 
@@ -132,11 +136,11 @@ EdgeDecl
 
 /*------------------------------------------------------------------------*/
 VEParams
-    = {WEAK ',' IDENT Assign}.
+    = {WEAK ',' Identifier Assign}.
 
 
 /*------------------------------------------------------------------------*/
-Expr
+Expr<out Expr expr> (. expr = null; .)
     = ExprOR.
     
 /*------------------------------------------------------------------------*/
@@ -174,11 +178,21 @@ Factor
 
 /*------------------------------------------------------------------------*/
 CallOrID
-    = IDENT ['(' Args ')'].
+    = Identifier ['(' Args<out CollecConst collec> ')'].
 
 /*------------------------------------------------------------------------*/
-Args
-    = [Expr {WEAK ',' Expr}].
+Args<out CollecConst collec> =      (. collec = new CollecConst(); Expr expr; .)
+    [
+        Expr<out expr>              (. collec.Add(expr); .)
+        {
+            WEAK ',' Expr<out expr> (. collec.Add(expr); .)
+        }
+    ].
+
+
+/*------------------------------------------------------------------------*/
+Identifier<out IdentNode ident> (. ident = null; .)
+    = IDENT                     (. ident = new IdentNode(t.val); .)
 
 
 /*------------------------------------------------------------------------*/

@@ -2,6 +2,7 @@
 using System;
 using P4_Project.AST;
 using P4_Project.AST.Commands;
+using P4_Project.AST.Commands.Stmts.Decls;
 
 namespace P4_Project.Compiler.SyntaxAnalysis
 {
@@ -136,8 +137,8 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
             else SynErr(53);
             ExpectWeak(11, 1);
-            AttrDecls();
-            int i = 1;
+            AttrDecls(ref headNode);
+
             ExpectWeak(7, 2);
             Expect(12);
         }
@@ -176,17 +177,20 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Expect(16);
         }
 
-        void AttrDecls()
+        void AttrDecls(ref HeadNode headNode)
         {
-            AttrDecl();
+            AttrDecl(out varDecl);
+
             while (WeakSeparator(13, 6, 7))
             {
-                AttrDecl();
+                AttrDecl(out varDecl);
+
             }
         }
 
-        void AttrDecl()
+        void AttrDecl(out VarDeclNode varDecl)
         {
+            int type = 0; string ident = "";
             Type();
             Expect(1);
             if (la.kind == 26)
