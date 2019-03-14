@@ -8,7 +8,7 @@ namespace P4_Project.AST.Expressions
 {
     class UnaExprNode
     {
-        ExprNode expr;
+        public ExprNode expr;
         int operatorType;
 
         public UnaExprNode(int _operatorType, ExprNode _expr)

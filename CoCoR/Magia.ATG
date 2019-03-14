@@ -140,36 +140,64 @@ VEParams
 
 
 /*------------------------------------------------------------------------*/
-Expr<out Expr expr> (. expr = null; .)
-    = ExprOR.
+Expr<out Expr e> (. e = null; .)
+    = ExprOR<out e>.
     
 /*------------------------------------------------------------------------*/
-ExprOR
-    = ExprAnd {"||" ExprAnd}.
+ExprOR<out ExprNode e>					(. e = null; int op = 0; .)
+    = ExprAnd<out ExprNode e1>			(. e = e1; .)
+	{"||"								(. op  = Operators.OR; .)
+	ExprAnd<out ExprNode e2> 			(. e = new BinExprNode(e, op, e2); .)								
+	}.
 
 /*------------------------------------------------------------------------*/
-ExprAnd
-    = ExprEQ {"&&" ExprEQ}.
+ExprAnd<out ExprNode e>					(. e = null; int op = 0; .)
+    = ExprEQ<out ExprNode e1>			(. e = e1; .)
+	{"&&"								(. op = Operators.EQ; .)
+	ExprEQ<out ExprNode e2> 			(. e = new BinExprNode(e, op, e2); .)
+	}.
 
 /*------------------------------------------------------------------------*/
-ExprEQ
-    = ExprRel [("==" | "!=") ExprRel].
+ExprEQ<out ExprNode e>					(. e = null; int op = 0; .)
+    = ExprRel<out ExprNode e1>			(. e = e1; .)
+	[("=="								(. op = Operators.EQ; .)
+	| "!="								(. op = Operators.NEQ; .)
+	) ExprRel<out ExprNode e2>	    (. e = new BinExprNode(e, op, e2); .)
+	].
 
 /*------------------------------------------------------------------------*/
-ExprRel
-    = ExprPlus [('<' | '>' | "<=" | ">=") ExprPlus].
+ExprRel<out ExprNode e>					(. e = null; int op = 0; .)
+    = ExprPlus<out ExprNode e1>			(. e = e1; .)
+	[('<'								(. op = Operators.LESS; .)
+	| '>'								(. op = Operators.GREATER; .)
+	| "<="								(. op = Operators.LESSEQ; .)
+	| ">="								(. op = Operators.GREATEQ; .)
+	) ExprPlus<out ExprNode e2>		(. e = new BinExprNode(e, op, e2); .)
+	].
 
 /*------------------------------------------------------------------------*/
-ExprPlus
-    = ['-'] ExprMult {('+' | '-') ExprMult}.
+ExprPlus<out ExprNode e>				(. e = null; bool b = false; int op = 0; .)
+    = ['-'								(. b = true; .)
+	] ExprMult<out ExprNode e1>			(. if(b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1; .)
+	{('+'								(. op = Operators.PLUS; .)
+	| '-'								(. op = Operators.BIMIN; .)
+	) ExprMult<out ExprNode>			(. e = new BinExprNode(e, op, e2); .)
+	}.
 
 /*------------------------------------------------------------------------*/
-ExprMult
-    = ExprNot {('*' | '/' | '%') ExprNot}.
+ExprMult<out ExprNode e>				(. e = null; int op = 0;.)
+    = ExprNot<out ExprNode e1>			(. e = e1; .)
+	{('*'								(. op = Operators.MULT; .)
+	| '/'								(. op = Operators.DIV; .)
+	| '%'								(. op = Operators.MOD; .)
+	) ExprNot<out ExprNode e2>		(. e = new BinExprNode(e, op, e2); .)
+	}.
 
 /*------------------------------------------------------------------------*/
-ExprNot
-    = ['!'] Factor.
+ExprNot<out ExprNode e>			(. e = null; bool b = false;.)
+    = ['!'                      (. b = true; .)
+	] Factor<out e>            (. if(b) e = new UnaExprNode(Operators.NOT, e); .)
+	.
 
 /*------------------------------------------------------------------------*/
 Factor<out ExprNode e>			(. e = null; .)
@@ -199,7 +227,8 @@ Const<out ExprNode e>       (. e = null; .)
     | FALSE					(. e = new BoolConst(Convert.ToBoolean(t.val)); .)
     | NONE.					(. e = new NoneConst(); .)
 Identifier<out IdentNode ident> (. ident = null; .)
-    = IDENT                     (. ident = new IdentNode(t.val); .)
+    = IDENT                     (. ident = new IdentNode(t.val);
+	.)
 
 
 /*------------------------------------------------------------------------*/
