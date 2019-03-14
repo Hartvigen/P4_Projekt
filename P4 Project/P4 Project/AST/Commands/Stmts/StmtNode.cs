@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_Project.AST.Commands
+namespace P4_Project.AST.Commands.Stmts
 {
-    public abstract class Command : Node
+    public abstract class StmtNode : CommandNode
     {
+
     }
 }

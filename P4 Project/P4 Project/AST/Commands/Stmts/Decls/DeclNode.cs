@@ -6,11 +6,16 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Commands.Stmts.Decls
 {
-    class VarDecl : Decl
+    class DeclNode : StmtNode
     {
-        public VarDecl(int _type, string _symbolName) // Add parameter for the assigning expression 
-            : base(_type, _symbolName)
+        int type;
+        string symbolName;
+
+        public DeclNode(int _type, string _symbolName)
         {
+            type = _type;
+            symbolName = _symbolName;
         }
+
     }
 }

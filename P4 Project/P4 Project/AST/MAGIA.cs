@@ -9,13 +9,13 @@ namespace P4_Project.AST
 {
     public class MAGIA : Node
     {
-        List<Command> commands = new List<Command>();
+        List<CommandNode> commands = new List<CommandNode>();
 
 
         public MAGIA()
         { }
 
-        public void Add(Command com)
+        public void Add(CommandNode com)
         {
             commands.Add(com);
         }

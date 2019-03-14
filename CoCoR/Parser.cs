@@ -114,8 +114,8 @@ public class Parser {
 			headNode = new HeadNode(HeadNode.EDGE);   
 		} else SynErr(53);
 		ExpectWeak(11, 1);
-		AttrDecls();
-		int i = 1; 
+		AttrDecls(ref headNode);
+		
 		ExpectWeak(7, 2);
 		Expect(12);
 	}
@@ -147,14 +147,17 @@ public class Parser {
 		Expect(16);
 	}
 
-	void AttrDecls() {
-		AttrDecl();
+	void AttrDecls(ref HeadNode headNode) {
+		AttrDecl(out varDecl);
+		
 		while (WeakSeparator(13,6,7) ) {
-			AttrDecl();
+			AttrDecl(out varDecl);
+			
 		}
 	}
 
-	void AttrDecl() {
+	void AttrDecl(out VarDeclNode varDecl) {
+		int type = 0; string ident = ""; 
 		Type();
 		Expect(1);
 		if (la.kind == 26) {

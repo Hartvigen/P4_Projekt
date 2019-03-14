@@ -31,18 +31,6 @@ public class Parser {
 
 	public MAGIA mainNode;
 
-const int // types
-        undef = 0, number = 1, boolean = 2, text = 3, vertex = 4, edge = 5, setType = 10, list = 20, queue = 30, stack = 40;
-    
-    const int // object kinds
-        var = 0, proc = 1;
-
-    /*
-    public SymbolTable   tab;
-    public CodeGenerator gen;
-    */
-  
-/*--------------------------------------------------------------------------*/
 
 
 	public Parser(Scanner scanner) {
@@ -127,6 +115,7 @@ const int // types
 		} else SynErr(53);
 		ExpectWeak(11, 1);
 		AttrDecls();
+		int i = 1; 
 		ExpectWeak(7, 2);
 		Expect(12);
 	}

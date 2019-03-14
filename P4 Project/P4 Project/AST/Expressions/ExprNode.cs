@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_Project.AST.Commands.Stmts
+namespace P4_Project.AST.Expressions
 {
-    public abstract class Stmt : Command
+    abstract class ExprNode : Node
     {
 
     }

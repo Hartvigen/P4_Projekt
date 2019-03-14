@@ -16,7 +16,7 @@ CHARACTERS
   AnyButDoubleQuote = CharInLine - '\"'.
 
 TOKENS
-  IDENT  = letter {letter | digit}.
+  IDENT  = letter {letter | digit | '_'}.
   NUMBER = digit {digit} | digit {digit} '.' digit {digit}.
   TEXT = '"' {AnyButDoubleQuote | "\\\""} '"'.
   NONE = "none".
@@ -40,21 +40,29 @@ MAGIA =                             (. HeadNode headNode; mainNode = new MAGIA()
     {FuncDecl}.
     
 /*------------------------------------------------------------------------*/
-Head<out HeadNode headNode> (. headNode = null; .) 
+Head<out HeadNode headNode>                 (. headNode = null; .) 
     = '[' 
-    ( "vertex"              (. headNode = new HeadNode(HeadNode.VERTEX); .)
-    | "edge"                (. headNode = new HeadNode(HeadNode.EDGE);   .)
+    ( "vertex"                              (. headNode = new HeadNode(HeadNode.VERTEX); .)
+    | "edge"                                (. headNode = new HeadNode(HeadNode.EDGE);   .)
     ) 
-    WEAK '(' AttrDecls      (. int i = 1; .)
+    WEAK '(' AttrDecls<ref headNode>
     WEAK ')' ']'.
 
 /*------------------------------------------------------------------------*/
-AttrDecls
-    = AttrDecl {WEAK ',' AttrDecl}.
+AttrDecls<ref HeadNode headNode>
+    = AttrDecl<out varDecl>              (. headNode.AddAttr(varDecl); .)
+    {
+        WEAK ',' AttrDecl<out varDecl>   (. headNode.AddAttr(varDecl); .)
+    }.
 
 /*------------------------------------------------------------------------*/
-AttrDecl
-    = Type IDENT [Assign].
+AttrDecl<out VarDeclNode varDecl> = (. int type = 0; string ident = ""; .)
+    Type 
+    IDENT 
+    [
+        Assign
+    ]
+    .
 
 
 /*------------------------------------------------------------------------*/
