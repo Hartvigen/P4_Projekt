@@ -237,7 +237,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsTrue(TryParse(func));
         }
 
-        //tests the syntax of using operators on numbers
+        //tests the syntax of using operators on numbers, both within and out of function declarations
         [TestMethod()]
         public void ParseTestSuccess8()
         {
@@ -247,6 +247,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
             string func2 = "func FuncDecl(number x){x = 4 * 5 + 3 - 3}";
             Assert.IsTrue(TryParse(func2));
+
+            string func3 = "func FuncDecl(number x, number y){if(-!x > y){x = y}}";
+            Assert.IsTrue(TryParse(func3));
         }
 
         //Empty brackets should be bad.
