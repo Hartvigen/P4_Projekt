@@ -218,6 +218,23 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsTrue(TryParse(headerWithAllTypesVertex + headerWithAllTypesEdge));
         }
 
+        [TestMethod()]
+        public void ParseTestSuccess6()
+        {
+            string func = "[vertex(bool what = true)] func FuncDecl(number x){vertex(v1, what = false)}";
+            Assert.IsTrue(TryParse(func));
+
+            string func2 = "[vertex(bool tst = true)] [edge(number weight = 0)] func FuncDecl(number x, bool boulian){vertex{(v1, tst = false), (v2, tst = true)} v1 -> (v2, weight = 10)}";
+            Assert.IsTrue(TryParse(func2));
+        }
+
+        [TestMethod()]
+        public void ParseTestSuccess7()
+        {
+            string func = "func FuncDecl(number x){x = 5 return x}";
+            Assert.IsTrue(TryParse(func));
+        }
+
         //Empty brackets should be bad.
         [TestMethod()]
         public void ParseTestFailure01()
@@ -442,6 +459,13 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsFalse(success);
             success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
             Assert.IsFalse(success);
+        }
+
+        [TestMethod()]
+        public void ParseTestFailure18()
+        {
+            string func = "FuncDecl(number x){x = 5 return x}";
+            Assert.IsFalse(TryParse(func));
         }
     }
 }
