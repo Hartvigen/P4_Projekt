@@ -272,12 +272,12 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             start = new Hashtable(128);
             for (int i = 65; i <= 90; ++i) start[i] = 1;
             for (int i = 97; i <= 122; ++i) start[i] = 1;
-            for (int i = 48; i <= 57; ++i) start[i] = 6;
+            for (int i = 48; i <= 57; ++i) start[i] = 7;
             start[34] = 4;
-            start[91] = 9;
-            start[93] = 10;
+            start[41] = 6;
+            start[91] = 10;
             start[40] = 11;
-            start[41] = 12;
+            start[93] = 12;
             start[44] = 13;
             start[123] = 14;
             start[125] = 15;
@@ -492,7 +492,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                     } // NextCh already done
                 case 1:
                     recEnd = pos; recKind = 1;
-                    if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z') { AddCh(); goto case 1; }
+                    if (ch >= '0' && ch <= '9' || ch >= 'A' && ch <= 'Z' || ch == '_' || ch >= 'a' && ch <= 'z') { AddCh(); goto case 1; }
                     else { t.kind = 1; t.val = new String(tval, 0, tlen); CheckLiteral(); return t; }
                 case 2:
                     if (ch >= '0' && ch <= '9') { AddCh(); goto case 3; }
@@ -504,28 +504,28 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case 4:
                     if (ch <= 9 || ch >= 11 && ch <= 12 || ch >= 14 && ch <= '!' || ch >= '#' && ch <= '[' || ch >= ']' && ch <= 65535) { AddCh(); goto case 4; }
                     else if (ch == '"') { AddCh(); goto case 5; }
-                    else if (ch == 92) { AddCh(); goto case 7; }
+                    else if (ch == 92) { AddCh(); goto case 8; }
                     else { goto case 0; }
                 case 5:
                     { t.kind = 3; break; }
                 case 6:
+                    { t.kind = 7; break; }
+                case 7:
                     recEnd = pos; recKind = 2;
-                    if (ch >= '0' && ch <= '9') { AddCh(); goto case 6; }
+                    if (ch >= '0' && ch <= '9') { AddCh(); goto case 7; }
                     else if (ch == '.') { AddCh(); goto case 2; }
                     else { t.kind = 2; break; }
-                case 7:
-                    if (ch <= 9 || ch >= 11 && ch <= 12 || ch >= 14 && ch <= '!' || ch >= '#' && ch <= '[' || ch >= ']' && ch <= 65535) { AddCh(); goto case 4; }
-                    else if (ch == '"') { AddCh(); goto case 8; }
-                    else if (ch == 92) { AddCh(); goto case 7; }
-                    else { goto case 0; }
                 case 8:
+                    if (ch <= 9 || ch >= 11 && ch <= 12 || ch >= 14 && ch <= '!' || ch >= '#' && ch <= '[' || ch >= ']' && ch <= 65535) { AddCh(); goto case 4; }
+                    else if (ch == '"') { AddCh(); goto case 9; }
+                    else if (ch == 92) { AddCh(); goto case 8; }
+                    else { goto case 0; }
+                case 9:
                     recEnd = pos; recKind = 3;
                     if (ch <= 9 || ch >= 11 && ch <= 12 || ch >= 14 && ch <= '!' || ch >= '#' && ch <= '[' || ch >= ']' && ch <= 65535) { AddCh(); goto case 4; }
                     else if (ch == '"') { AddCh(); goto case 5; }
-                    else if (ch == 92) { AddCh(); goto case 7; }
+                    else if (ch == 92) { AddCh(); goto case 8; }
                     else { t.kind = 3; break; }
-                case 9:
-                    { t.kind = 7; break; }
                 case 10:
                     { t.kind = 8; break; }
                 case 11:

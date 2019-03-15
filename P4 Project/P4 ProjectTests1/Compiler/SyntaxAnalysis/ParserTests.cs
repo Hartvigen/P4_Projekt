@@ -211,7 +211,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
         //header with all possible types used at same time should be good.
         [TestMethod()]
-        public void ParseTestSuccess5()
+        public void ParseTestSuccess05()
         {
             Assert.IsTrue(TryParse(headerWithAllTypesEdge));
             Assert.IsTrue(TryParse(headerWithAllTypesVertex));

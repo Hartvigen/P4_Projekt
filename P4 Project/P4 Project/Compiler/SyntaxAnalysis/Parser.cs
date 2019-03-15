@@ -1,5 +1,11 @@
 ﻿
 using System;
+using P4_Project.AST;
+using P4_Project.AST.Commands;
+using P4_Project.AST.Commands.Stmts;
+using P4_Project.AST.Commands.Stmts.Decls;
+using P4_Project.AST.Expressions;
+using P4_Project.AST.Expressions.Values;
 
 namespace P4_Project.Compiler.SyntaxAnalysis
 {
@@ -15,6 +21,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         public const int _NONE = 4;
         public const int _TRUE = 5;
         public const int _FALSE = 6;
+        public const int _RPAREN = 7;
         public const int maxT = 51;
 
         const bool T = true;
@@ -28,19 +35,8 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         public Token la;   // lookahead token
         int errDist = minErrDist;
 
-        const int // types
-                undef = 0, number = 1, boolean = 2, text = 3, vertex = 4, edge = 5, setType = 10, list = 20, queue = 30, stack = 40;
+        public MAGIA mainNode;
 
-
-        const int // object kinds
-            var = 0, proc = 1;
-
-        /*
-        public SymbolTable   tab;
-        public CodeGenerator gen;
-        */
-
-        /*--------------------------------------------------------------------------*/
 
 
         public Parser(Scanner scanner)
@@ -114,243 +110,302 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void MAGIA()
         {
-            while (la.kind == 7)
+            mainNode = null; Block mainBlock = new Block();
+            while (la.kind == 8)
             {
-                while (!(la.kind == 0 || la.kind == 7)) { SynErr(52); Get(); }
-                Get();
-                Head();
-                Expect(8);
+                while (!(la.kind == 0 || la.kind == 8)) { SynErr(52); Get(); }
+                Head(out HeadNode headNode);
+                mainBlock.Add(headNode);
             }
-            Stmts();
+            Stmts(ref mainBlock);
             while (la.kind == 14)
             {
-                FuncDecl();
+                FuncDecl(out FuncDeclNode funcNode);
+                mainBlock.Add(funcNode);
             }
+            mainNode = new MAGIA(mainBlock);
         }
 
-        void Head()
+        void Head(out HeadNode headNode)
         {
+            headNode = null;
+            Expect(8);
             if (la.kind == 9)
             {
                 Get();
+                headNode = new HeadNode(HeadNode.VERTEX);
             }
             else if (la.kind == 10)
             {
                 Get();
+                headNode = new HeadNode(HeadNode.EDGE);
             }
             else SynErr(53);
-            Expect(11);
-            AttrDecls();
+            ExpectWeak(11, 1);
+            AttrDecls(ref headNode);
+            ExpectWeak(7, 2);
             Expect(12);
         }
 
-        void Stmts()
+        void Stmts(ref Block block)
         {
-            while (!(StartOf(1))) { SynErr(54); Get(); }
-            while (StartOf(2))
+            StmtNode stmtNode;
+            while (!(StartOf(3))) { SynErr(54); Get(); }
+            while (StartOf(4))
             {
-                if (StartOf(3))
+                if (StartOf(5))
                 {
-                    Stmt();
+                    Stmt(out stmtNode);
+                    block.Add(stmtNode);
                 }
                 else
                 {
-                    StrucStmt();
+                    StrucStmt(out stmtNode);
+                    block.Add(stmtNode);
                 }
             }
         }
 
-        void FuncDecl()
+        void FuncDecl(out FuncDeclNode funcNode)
         {
+            funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block();
             while (!(la.kind == 0 || la.kind == 14)) { SynErr(55); Get(); }
             Expect(14);
             Expect(1);
+            funcName = t.val;
             Expect(11);
-            FuncParam();
-            Expect(12);
+            if (la.kind != _RPAREN)
+            {
+                FuncParams(ref paramBlock);
+            }
+            Expect(7);
+            while (!(la.kind == 0 || la.kind == 15)) { SynErr(56); Get(); }
             Expect(15);
-            Stmts();
+            Stmts(ref stmtBlock);
+            while (!(la.kind == 0 || la.kind == 16)) { SynErr(57); Get(); }
             Expect(16);
+            funcNode = new FuncDeclNode(funcName, paramBlock, stmtBlock);
         }
 
-        void AttrDecls()
+        void AttrDecls(ref HeadNode headNode)
         {
-            AttrDecl();
-            while (WeakSeparator(13, 4, 5))
+            VarDeclNode varDecl;
+            AttrDecl(out varDecl);
+            headNode?.AddAttr(varDecl);
+            while (WeakSeparator(13, 6, 7))
             {
-                AttrDecl();
+                AttrDecl(out varDecl);
+                headNode?.AddAttr(varDecl);
             }
         }
 
-        void AttrDecl()
+        void AttrDecl(out VarDeclNode varDecl)
         {
-            Type();
+            varDecl = null;
+            Type(out int typ);
             Expect(1);
             if (la.kind == 26)
             {
-                Assign();
+                Assign(out AssignNode assign);
             }
         }
 
-        void Type()
+        void Type(out int type)
         {
-            if (StartOf(6))
-            {
-                SingleType();
-            }
-            else if (StartOf(7))
-            {
-                CollecType();
-            }
-            else SynErr(56);
-        }
-
-        void Assign()
-        {
-            Expect(26);
+            type = 0;
             if (StartOf(8))
             {
-                Expr();
+                SingleType(out type);
+            }
+            else if (StartOf(9))
+            {
+                CollecType(out type);
+            }
+            else SynErr(58);
+        }
+
+        void Assign(out AssignNode assign)
+        {
+            assign = null;
+            Expect(26);
+            if (StartOf(10))
+            {
+                Expr(out ExprNode expr);
+                assign = new AssignNode();
             }
             else if (la.kind == 15)
             {
                 Get();
-                Args();
+                Args(out CollecConst collec);
+                assign = new AssignNode();
                 Expect(16);
             }
-            else SynErr(57);
+            else SynErr(59);
         }
 
-        void FuncParam()
+        void FuncParams(ref Block paramBlock)
         {
-            if (StartOf(4))
+            int typ = 0;
+            Type(out typ);
+            Expect(1);
+            paramBlock.Add(new VarDeclNode(typ, t.val, null));
+            while (la.kind == 13)
             {
-                HalfDecl();
-                while (WeakSeparator(13, 4, 5))
-                {
-                    HalfDecl();
-                }
+                while (!(la.kind == 0 || la.kind == 13)) { SynErr(60); Get(); }
+                Get();
+                Type(out typ);
+                Expect(1);
+                paramBlock.Add(new VarDeclNode(typ, t.val, null));
             }
         }
 
-        void HalfDecl()
+        void Stmt(out StmtNode stmtNode)
         {
-            Type();
-            Expect(1);
-        }
-
-        void Stmt()
-        {
-            if (StartOf(4))
+            stmtNode = null;
+            if (StartOf(6))
             {
                 FullDecl();
             }
             else if (la.kind == 1)
             {
-                Get();
+                CallOrID(out IdentNode i);
+                while (la.kind == 25)
+                {
+                    Member();
+                }
                 IdentCont();
             }
             else if (la.kind == 24)
             {
                 Get();
-                Expr();
+                Expr(out ExprNode expr);
             }
-            else SynErr(58);
+            else SynErr(61);
         }
 
-        void StrucStmt()
+        void StrucStmt(out StmtNode s)
         {
+            s = null;
             if (la.kind == 17)
             {
-                Get();
-                Expect(11);
-                Expr();
-                Expect(12);
-                Expect(15);
-                Stmts();
-                Expect(16);
+                StmtWhile(out s);
             }
             else if (la.kind == 18)
             {
-                Get();
-                Expect(11);
-                Stmt();
-                Expect(13);
-                Expr();
-                Expect(13);
-                Stmt();
-                Expect(12);
-                Expect(15);
-                Stmts();
-                Expect(16);
+                StmtFor(out s);
             }
             else if (la.kind == 19)
             {
-                Get();
-                Expect(11);
-                HalfDecl();
-                Expect(20);
-                CallOrID();
-                Expect(12);
-                Expect(15);
-                Stmts();
-                Expect(16);
+                StmtForeach(out s);
             }
             else if (la.kind == 21)
             {
-                Get();
-                Expect(11);
-                Expr();
-                Expect(12);
-                Expect(15);
-                Stmts();
-                Expect(16);
-                while (la.kind == 22)
-                {
-                    Get();
-                    Expect(11);
-                    Expr();
-                    Expect(12);
-                    Expect(15);
-                    Stmts();
-                    Expect(16);
-                }
-                if (la.kind == 23)
-                {
-                    Get();
-                    Expect(15);
-                    Stmts();
-                    Expect(16);
-                }
+                StmtIf(out s);
             }
-            else SynErr(59);
+            else SynErr(62);
         }
 
-        void Expr()
+        void StmtWhile(out StmtNode w)
         {
-            ExprOR();
+            w = null; Block b = new Block();
+            Expect(17);
+            Expect(11);
+            Expr(out ExprNode e);
+            Expect(7);
+            Expect(15);
+            Stmts(ref b);
+            w = new WhileNode(e, b);
+            Expect(16);
         }
 
-        void CallOrID()
+        void StmtFor(out StmtNode f)
         {
+            f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block();
+            Expect(18);
+            Expect(11);
+            Stmt(out StmtNode s1);
+            init = s1;
+            Expect(13);
+            Expr(out ExprNode e1);
+            e = e1;
+            Expect(13);
+            Stmt(out StmtNode s2);
+            iter = s2;
+            Expect(7);
+            Expect(15);
+            Stmts(ref b);
+            f = new ForNode(init, e, iter, b);
+            Expect(16);
+        }
+
+        void StmtForeach(out StmtNode f)
+        {
+            f = null; Block b = new Block(); VarDeclNode v = null;
+            Expect(19);
+            Expect(11);
+            Type(out int typ);
             Expect(1);
-            if (la.kind == 11)
+            v = new VarDeclNode(typ, t.val, null);
+            Expect(20);
+            Expr(out ExprNode e1);
+
+            Expect(7);
+            Expect(15);
+            Stmts(ref b);
+            f = new ForeachNode(v, e1, b);
+            Expect(16);
+        }
+
+        void StmtIf(out StmtNode i)
+        {
+            i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; IfNode k = null;
+            Expect(21);
+            Expect(11);
+            Expr(out ExprNode ie1);
+            e = ie1;
+            Expect(7);
+            Expect(15);
+            Stmts(ref b);
+            i = new IfNode(e, b); j = (IfNode)i;
+            Expect(16);
+            while (la.kind == 22)
             {
                 Get();
-                Args();
-                Expect(12);
+                Expect(11);
+                Expr(out ExprNode ie2);
+                e = ie2; b = new Block();
+                Expect(7);
+                Expect(15);
+                Stmts(ref b);
+                k = new IfNode(e, b); j.SetElse(k); j = k;
+                Expect(16);
             }
+            if (la.kind == 23)
+            {
+                Get();
+                b = new Block();
+                Expect(15);
+                Stmts(ref b);
+                k = new IfNode(new BoolConst(true), b); j.SetElse(k);
+                Expect(16);
+            }
+        }
+
+        void Expr(out ExprNode e)
+        {
+            e = null;
+            ExprOR(out e);
         }
 
         void FullDecl()
         {
-            Type();
+            Type(out int typ);
             if (la.kind == 1)
             {
                 Get();
                 if (la.kind == 26)
                 {
-                    Assign();
+                    Assign(out AssignNode assign);
                 }
             }
             else if (la.kind == 15)
@@ -363,54 +418,38 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             {
                 VtxDecl();
             }
-            else SynErr(60);
+            else SynErr(63);
+        }
+
+        void CallOrID(out IdentNode i)
+        {
+            Identifier(out i);
+            if (la.kind == 11)
+            {
+                Get();
+                Args(out CollecConst collec);
+                Expect(7);
+            }
+        }
+
+        void Member()
+        {
+            ExpectWeak(25, 1);
+            CallOrID(out IdentNode i);
         }
 
         void IdentCont()
         {
             if (la.kind == 26)
             {
-                Assign();
-            }
-            else if (la.kind == 11)
-            {
-                Get();
-                Args();
-                Expect(12);
-                if (la.kind == 25)
-                {
-                    Member();
-                }
+                Assign(out AssignNode assign);
             }
             else if (la.kind == 27 || la.kind == 28 || la.kind == 29)
             {
                 EdgeOpr();
                 EdgeOneOrMore();
             }
-            else if (la.kind == 25)
-            {
-                Member();
-            }
-            else SynErr(61);
-        }
-
-        void Args()
-        {
-            if (StartOf(8))
-            {
-                Expr();
-                while (WeakSeparator(13, 8, 9))
-                {
-                    Expr();
-                }
-            }
-        }
-
-        void Member()
-        {
-            ExpectWeak(25, 10);
-            Expect(1);
-            IdentCont();
+            else SynErr(64);
         }
 
         void EdgeOpr()
@@ -427,14 +466,14 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             {
                 Get();
             }
-            else SynErr(62);
+            else SynErr(65);
         }
 
         void EdgeOneOrMore()
         {
             if (la.kind == 1)
             {
-                Get();
+                Identifier(out IdentNode identNode);
             }
             else if (la.kind == 11)
             {
@@ -446,7 +485,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 EdgeDecls();
                 Expect(16);
             }
-            else SynErr(63);
+            else SynErr(66);
         }
 
         void VtxDecls()
@@ -463,16 +502,38 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Expect(11);
             Expect(1);
             VEParams();
-            Expect(12);
+            Expect(7);
+        }
+
+        void Args(out CollecConst collec)
+        {
+            collec = new CollecConst(); ExprNode expr;
+            if (StartOf(10))
+            {
+                Expr(out expr);
+                collec.Add(expr);
+                while (WeakSeparator(13, 10, 13))
+                {
+                    Expr(out expr);
+                    collec.Add(expr);
+                }
+            }
         }
 
         void VEParams()
         {
-            while (WeakSeparator(13, 13, 5))
+            while (WeakSeparator(13, 14, 7))
             {
-                Expect(1);
-                Assign();
+                Identifier(out IdentNode identNode);
+                Assign(out AssignNode assign);
             }
+        }
+
+        void Identifier(out IdentNode identNode)
+        {
+            identNode = null;
+            Expect(1);
+            identNode = new IdentNode();
         }
 
         void EdgeDecl()
@@ -480,7 +541,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Expect(11);
             Expect(1);
             VEParams();
-            Expect(12);
+            Expect(7);
         }
 
         void EdgeDecls()
@@ -492,219 +553,279 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
         }
 
-        void ExprOR()
+        void ExprOR(out ExprNode e)
         {
-            ExprAnd();
+            e = null; int op = 0;
+            ExprAnd(out ExprNode e1);
+            e = e1;
             while (la.kind == 30)
             {
                 Get();
-                ExprAnd();
+                op = Operators.OR;
+                ExprAnd(out ExprNode e2);
+                e = new BinExprNode(e, op, e2);
             }
         }
 
-        void ExprAnd()
+        void ExprAnd(out ExprNode e)
         {
-            ExprEQ();
+            e = null; int op = 0;
+            ExprEQ(out ExprNode e1);
+            e = e1;
             while (la.kind == 31)
             {
                 Get();
-                ExprEQ();
+                op = Operators.EQ;
+                ExprEQ(out ExprNode e2);
+                e = new BinExprNode(e, op, e2);
             }
         }
 
-        void ExprEQ()
+        void ExprEQ(out ExprNode e)
         {
-            ExprRel();
+            e = null; int op = 0;
+            ExprRel(out ExprNode e1);
+            e = e1;
             if (la.kind == 32 || la.kind == 33)
             {
                 if (la.kind == 32)
                 {
                     Get();
+                    op = Operators.EQ;
                 }
                 else
                 {
                     Get();
+                    op = Operators.NEQ;
                 }
-                ExprRel();
+                ExprRel(out ExprNode e2);
+                e = new BinExprNode(e, op, e2);
             }
         }
 
-        void ExprRel()
+        void ExprRel(out ExprNode e)
         {
-            ExprPlus();
-            if (StartOf(14))
+            e = null; int op = 0;
+            ExprPlus(out ExprNode e1);
+            e = e1;
+            if (StartOf(15))
             {
                 if (la.kind == 34)
                 {
                     Get();
+                    op = Operators.LESS;
                 }
                 else if (la.kind == 35)
                 {
                     Get();
+                    op = Operators.GREATER;
                 }
                 else if (la.kind == 36)
                 {
                     Get();
+                    op = Operators.LESSEQ;
                 }
                 else
                 {
                     Get();
+                    op = Operators.GREATEQ;
                 }
-                ExprPlus();
+                ExprPlus(out ExprNode e2);
+                e = new BinExprNode(e, op, e2);
             }
         }
 
-        void ExprPlus()
+        void ExprPlus(out ExprNode e)
         {
+            e = null; bool b = false; int op = 0;
             if (la.kind == 38)
             {
                 Get();
+                b = true;
             }
-            ExprMult();
+            ExprMult(out ExprNode e1);
+            if (b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1;
             while (la.kind == 38 || la.kind == 39)
             {
                 if (la.kind == 39)
                 {
                     Get();
+                    op = Operators.PLUS;
                 }
                 else
                 {
                     Get();
+                    op = Operators.BIMIN;
                 }
-                ExprMult();
+                ExprMult(out ExprNode e2);
+                e = new BinExprNode(e, op, e2);
             }
         }
 
-        void ExprMult()
+        void ExprMult(out ExprNode e)
         {
-            ExprNot();
+            e = null; int op = 0;
+            ExprNot(out ExprNode e1);
+            e = e1;
             while (la.kind == 40 || la.kind == 41 || la.kind == 42)
             {
                 if (la.kind == 40)
                 {
                     Get();
+                    op = Operators.MULT;
                 }
                 else if (la.kind == 41)
                 {
                     Get();
+                    op = Operators.DIV;
                 }
                 else
                 {
                     Get();
+                    op = Operators.MOD;
                 }
-                ExprNot();
+                ExprNot(out ExprNode e2);
+                e = new BinExprNode(e, op, e2);
             }
         }
 
-        void ExprNot()
+        void ExprNot(out ExprNode e)
         {
+            e = null; bool b = false;
             if (la.kind == 43)
             {
                 Get();
+                b = true;
             }
-            Factor();
+            Factor(out e);
+            if (b) e = new UnaExprNode(Operators.NOT, e);
         }
 
-        void Factor()
+        void Factor(out ExprNode e)
         {
-            if (la.kind == 11)
+            e = null;
+            if (StartOf(16))
             {
-                Get();
-                Expr();
-                Expect(12);
+                Const(out e);
             }
-            else if (StartOf(15))
+            else if (la.kind == 1 || la.kind == 11)
             {
-                Const();
+                if (la.kind == 11)
+                {
+                    Get();
+                    Expr(out e);
+                    Expect(7);
+                }
+                else
+                {
+                    CallOrID(out IdentNode i);
+                }
+                while (la.kind == 25)
+                {
+                    Member();
+                }
             }
-            else if (la.kind == 1)
-            {
-                CallOrID();
-            }
-            else SynErr(64);
+            else SynErr(67);
         }
 
-        void Const()
+        void Const(out ExprNode e)
         {
+            e = null;
             if (la.kind == 2)
             {
                 Get();
+                e = new NumConst(Convert.ToInt32(t.val));
             }
             else if (la.kind == 3)
             {
                 Get();
+                e = new TextConst(t.val);
             }
             else if (la.kind == 5)
             {
                 Get();
+                e = new BoolConst(Convert.ToBoolean(t.val));
             }
             else if (la.kind == 6)
             {
                 Get();
+                e = new BoolConst(Convert.ToBoolean(t.val));
             }
             else if (la.kind == 4)
             {
                 Get();
+                e = new NoneConst();
             }
-            else SynErr(65);
+            else SynErr(68);
         }
 
-        void SingleType()
+        void SingleType(out int type)
         {
+            type = 0;
             if (la.kind == 48)
             {
                 Get();
+                type = Types.number;
             }
             else if (la.kind == 49)
             {
                 Get();
+                type = Types.boolean;
             }
             else if (la.kind == 50)
             {
                 Get();
+                type = Types.text;
             }
             else if (la.kind == 9)
             {
                 Get();
+                type = Types.vertex;
             }
             else if (la.kind == 10)
             {
                 Get();
+                type = Types.edge;
             }
-            else SynErr(66);
+            else SynErr(69);
         }
 
-        void CollecType()
+        void CollecType(out int type)
         {
+            type = 0; int subType = 0;
             if (la.kind == 44)
             {
                 Get();
-                ExpectWeak(34, 10);
-                SingleType();
-                ExpectWeak(35, 16);
+                ExpectWeak(34, 1);
+                SingleType(out subType);
+                ExpectWeak(35, 17);
+                type = Types.list + subType;
             }
             else if (la.kind == 45)
             {
                 Get();
-                ExpectWeak(34, 10);
-                SingleType();
-                ExpectWeak(35, 16);
+                ExpectWeak(34, 1);
+                SingleType(out subType);
+                ExpectWeak(35, 17);
+                type = Types.set + subType;
             }
             else if (la.kind == 46)
             {
                 Get();
-                ExpectWeak(34, 10);
-                SingleType();
-                ExpectWeak(35, 16);
+                ExpectWeak(34, 1);
+                SingleType(out subType);
+                ExpectWeak(35, 17);
+                type = Types.queue + subType;
             }
             else if (la.kind == 47)
             {
                 Get();
-                ExpectWeak(34, 10);
-                SingleType();
-                ExpectWeak(35, 16);
+                ExpectWeak(34, 1);
+                SingleType(out subType);
+                ExpectWeak(35, 17);
+                type = Types.stack + subType;
             }
-            else SynErr(67);
+            else SynErr(70);
         }
 
 
@@ -720,23 +841,24 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         }
 
         static readonly bool[,] set = {
-        {T,T,x,x, x,x,x,T, x,T,T,x, x,x,T,x, T,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
+        {T,T,x,x, x,x,x,x, T,T,T,x, x,T,T,T, T,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
+        {T,T,x,x, x,x,x,x, T,T,T,x, x,T,T,T, T,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
+        {T,T,x,x, x,x,x,x, T,T,T,x, T,T,T,T, T,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
         {T,T,x,x, x,x,x,x, x,T,T,x, x,x,T,x, T,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
         {x,T,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
         {x,T,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
         {x,x,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
-        {x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
+        {x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
         {x,x,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,x, x},
         {x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, x,x,x,x, x},
         {x,T,T,T, T,T,T,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x,x,T, x,x,x,x, x,x,x,x, x},
-        {x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
-        {T,T,x,x, x,x,x,T, x,T,T,x, x,x,T,x, T,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x},
         {x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
         {x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
+        {x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
         {x,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
         {x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, T,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
         {x,x,T,T, T,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
-        {T,T,x,x, x,x,x,T, x,T,T,T, x,x,T,T, T,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x}
+        {T,T,x,x, x,x,x,x, T,T,T,T, x,T,T,T, T,T,T,T, x,T,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, T,T,T,x, x}
 
     };
     } // end Parser
@@ -760,12 +882,12 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case 4: s = "NONE expected"; break;
                 case 5: s = "TRUE expected"; break;
                 case 6: s = "FALSE expected"; break;
-                case 7: s = "\"[\" expected"; break;
-                case 8: s = "\"]\" expected"; break;
+                case 7: s = "RPAREN expected"; break;
+                case 8: s = "\"[\" expected"; break;
                 case 9: s = "\"vertex\" expected"; break;
                 case 10: s = "\"edge\" expected"; break;
                 case 11: s = "\"(\" expected"; break;
-                case 12: s = "\")\" expected"; break;
+                case 12: s = "\"]\" expected"; break;
                 case 13: s = "\",\" expected"; break;
                 case 14: s = "\"func\" expected"; break;
                 case 15: s = "\"{\" expected"; break;
@@ -809,18 +931,21 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case 53: s = "invalid Head"; break;
                 case 54: s = "this symbol not expected in Stmts"; break;
                 case 55: s = "this symbol not expected in FuncDecl"; break;
-                case 56: s = "invalid Type"; break;
-                case 57: s = "invalid Assign"; break;
-                case 58: s = "invalid Stmt"; break;
-                case 59: s = "invalid StrucStmt"; break;
-                case 60: s = "invalid FullDecl"; break;
-                case 61: s = "invalid IdentCont"; break;
-                case 62: s = "invalid EdgeOpr"; break;
-                case 63: s = "invalid EdgeOneOrMore"; break;
-                case 64: s = "invalid Factor"; break;
-                case 65: s = "invalid Const"; break;
-                case 66: s = "invalid SingleType"; break;
-                case 67: s = "invalid CollecType"; break;
+                case 56: s = "this symbol not expected in FuncDecl"; break;
+                case 57: s = "this symbol not expected in FuncDecl"; break;
+                case 58: s = "invalid Type"; break;
+                case 59: s = "invalid Assign"; break;
+                case 60: s = "this symbol not expected in FuncParams"; break;
+                case 61: s = "invalid Stmt"; break;
+                case 62: s = "invalid StrucStmt"; break;
+                case 63: s = "invalid FullDecl"; break;
+                case 64: s = "invalid IdentCont"; break;
+                case 65: s = "invalid EdgeOpr"; break;
+                case 66: s = "invalid EdgeOneOrMore"; break;
+                case 67: s = "invalid Factor"; break;
+                case 68: s = "invalid Const"; break;
+                case 69: s = "invalid SingleType"; break;
+                case 70: s = "invalid CollecType"; break;
 
                 default: s = "error " + n; break;
             }
