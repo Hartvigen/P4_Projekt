@@ -142,19 +142,34 @@ StmtIf<out StmtNode i>									(. i = null; ExprNode e = null; Block b = new Blo
 
 /*------------------------------------------------------------------------*/
 Stmt<out StmtNode stmtNode> =                                   (. stmtNode = null; .)
-    (FullDecl | CallOrID<out IdentNode i> {Member} IdentCont | "return" Expr<out ExprNode expr>).
+    (FullDecl
+	| CallOrID<out IdentNode i>
+	{Member
+	} IdentCont
+	| "return" Expr<out ExprNode expr>
+	).
 
 /*------------------------------------------------------------------------*/
 IdentCont
-    = Assign<out AssignNode assign> | EdgeOpr EdgeOneOrMore.
+    = Assign<out AssignNode assign>
+	| EdgeOpr 
+	EdgeOneOrMore
+	.
+
 
 /*------------------------------------------------------------------------*/
 Member
-    = WEAK '.' CallOrID<out IdentNode i>.
+    = WEAK '.' CallOrID<out IdentNode i>
+	.
 
 /*------------------------------------------------------------------------*/
 FullDecl =
-    Type<out int typ> (IDENT [Assign<out AssignNode assign>] | '{' VtxDecls '}' | VtxDecl).
+    Type<out int typ>
+	(IDENT 
+	[Assign<out AssignNode assign>
+	] | '{' VtxDecls
+	'}' | VtxDecl
+	).
 
 /*------------------------------------------------------------------------*/
 Assign<out AssignNode assign>           (. assign = null; .)
@@ -165,33 +180,50 @@ Assign<out AssignNode assign>           (. assign = null; .)
     ).
 
 /*------------------------------------------------------------------------*/
-VtxDecls
-    = VtxDecl {WEAK ',' VtxDecl}.
+VtxDecls<ref Block b>							
+    = VtxDecl<out VEDeclNode v1>					(. b.Add(v1); .)
+	{WEAK ',' VtxDecl<out VEDeclNode v2>			(. b.Add(v2); .)
+	}.
 
 /*------------------------------------------------------------------------*/
-VtxDecl
-    = '(' IDENT VEParams ')'.
+VtxDecl<out VEDeclNode v>					(. v = null; .)
+    = '(' IDENT			(. v = new VEDeclNode(Types.vertex, t.val); .)
+	VEParams<out AssignNode a>			(. v.AddAttr(a); .)
+	')'.
+
 
 /*------------------------------------------------------------------------*/
-EdgeOpr
-    = ("<-" | "--" | "->").
+EdgeOpr<out int op>			(. op = 0;					 .)
+    = ("<-"					(. op = Operator.LEFTARR;	 .)
+	| "--"					(. op = Operator.NONARR;	 .)
+	| "->"					(. op = Operator.RIGHTARR;	 .)
+	).
 
 /*------------------------------------------------------------------------*/
 EdgeOneOrMore
-    = (Identifier<out IdentNode identNode> | EdgeDecl | '{' EdgeDecls '}').
+    = (Identifier<out IdentNode identNode>
+	| EdgeDecl
+	| '{' EdgeDecls
+	'}').
 
 /*------------------------------------------------------------------------*/
 EdgeDecls 
-    = EdgeDecl {WEAK ',' EdgeDecl}.
+    = EdgeDecl
+	{WEAK ',' EdgeDecl
+	}.
 
 /*------------------------------------------------------------------------*/
 EdgeDecl 
-    = '(' IDENT VEParams ')'.
+    = '(' IDENT
+	VEParams
+	')'.
 
 
 /*------------------------------------------------------------------------*/
 VEParams
-    = {WEAK ',' Identifier<out IdentNode identNode> Assign<out AssignNode assign>}.
+    = {WEAK ',' Identifier<out IdentNode identNode>
+	Assign<out AssignNode assign>
+	}.
 
 
 /*------------------------------------------------------------------------*/
