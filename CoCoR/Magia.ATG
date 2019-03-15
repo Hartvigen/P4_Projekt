@@ -67,6 +67,10 @@ AttrDecl<out VarDeclNode varDecl> = (. varDecl = null; .)
     .
 
 
+/*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters
+or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters,
+so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called
+and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
 FuncDecl<out FuncDeclNode funcNode> =                               (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
     SYNC "func" IDENT                                           (. funcName = t.val; .)
@@ -79,13 +83,6 @@ FuncDecl<out FuncDeclNode funcNode> =                               (. funcNode 
         Stmts<ref stmtBlock>                                    
     SYNC '}'                                                    (. funcNode = new FuncDeclNode(funcName, paramBlock, stmtBlock); .)
     .
-/*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters
-or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters,
-so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called
-and any eventual errors will be handled there*/
-
-FuncDecl
-    = SYNC "func" IDENT '(' [IF(la.kind != _RPAREN) FuncParams] ')' SYNC '{' Stmts SYNC '}'.
 
 /*------------------------------------------------------------------------*/
 FuncParams<ref Block paramBlock> =      (. int typ = 0; .)
@@ -112,13 +109,13 @@ StrucStmt<out StmtNode s>			(. s = null; .)
 	| StmtIf<out s>.
 
 /*------------------------------------------------------------------------*/
-StmtWhile<out WhileNode w>				(. w = null; Block b = new Block(); .)
+StmtWhile<out StmtNode w>				(. w = null; Block b = new Block(); .)
 	= "while" '(' Expr<out ExprNode e>	
 		')' '{' Stmts<ref b>			(. w = new WhileNode(e, b); .)
 		'}'.
 
 /*------------------------------------------------------------------------*/
-StmtFor<out ForNode f>						(. f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); .)
+StmtFor<out StmtNode f>						(. f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); .)
 	= "for" '(' Stmt<out StmtNode s1>		(. init = s1; .)
 		',' Expr<out ExprNode e1>			(. e = e1;  .)
 		',' Stmt<out StmtNode s2>			(. iter = s2; .)
@@ -126,7 +123,7 @@ StmtFor<out ForNode f>						(. f = null; StmtNode init = null; ExprNode e = null
 		'}'.
 
 /*------------------------------------------------------------------------*/
-StmtForeach<out ForeachNode f>				(. f = null; Block b = new Block();, VarDeclNode v = null; .)
+StmtForeach<out StmtNode f>				(. f = null; Block b = new Block(); VarDeclNode v = null; .)
 	= "foreach" '(' Type<out int typ>
 		IDENT								(. v = new VarDeclNode(typ, t.val, null); .)
 		"in" Expr<out ExprNode e1>			(.  .)
@@ -134,13 +131,13 @@ StmtForeach<out ForeachNode f>				(. f = null; Block b = new Block();, VarDeclNo
 		'}'.
 
 /*------------------------------------------------------------------------*/
-StmtIf<out IfNode i>									(. i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; Ifnode k = null; .)
+StmtIf<out StmtNode i>									(. i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; IfNode k = null; .)
 	= "if" '(' Expr<out ExprNode ie1>					(. e = ie1; .)
-		')' '{' Stmts<ref b>							(. i = new IfNode(e, b); j = i; .)
+		')' '{' Stmts<ref b>							(. i = new IfNode(e, b); j = (IfNode)i; .)
 		'}' {"elseif" '(' Expr<out ExprNode ie2>		(. e = ie2; b = new Block(); .)
 		')' '{' Stmts<ref b>							(. k = new IfNode(e, b); j.SetElse(k); j = k;  .)
 		'}'} ["else"									(. b = new Block(); .)
-		'{' Stmts<ref b>							    (. ; k = new IfNode(new BoolConst(true), b); j.SetElse(k).)
+		'{' Stmts<ref b>							    (. k = new IfNode(new BoolConst(true), b); j.SetElse(k); .)
 		'}'].
 
 /*------------------------------------------------------------------------*/

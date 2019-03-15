@@ -246,8 +246,8 @@ namespace P4_Project.Compiler.SyntaxAnalysis
     {
         const char EOL = '\n';
         const int eofSym = 0; /* pdt */
-        const int maxT = 44;
-        const int noSym = 44;
+        const int maxT = 51;
+        const int noSym = 51;
 
 
         public Buffer buffer; // scanner buffer
@@ -444,14 +444,21 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case "vertex": t.kind = 9; break;
                 case "edge": t.kind = 10; break;
                 case "func": t.kind = 14; break;
-                case "return": t.kind = 17; break;
-                case "list": t.kind = 37; break;
-                case "set": t.kind = 38; break;
-                case "queue": t.kind = 39; break;
-                case "stack": t.kind = 40; break;
-                case "number": t.kind = 41; break;
-                case "bool": t.kind = 42; break;
-                case "text": t.kind = 43; break;
+                case "while": t.kind = 17; break;
+                case "for": t.kind = 18; break;
+                case "foreach": t.kind = 19; break;
+                case "in": t.kind = 20; break;
+                case "if": t.kind = 21; break;
+                case "elseif": t.kind = 22; break;
+                case "else": t.kind = 23; break;
+                case "return": t.kind = 24; break;
+                case "list": t.kind = 44; break;
+                case "set": t.kind = 45; break;
+                case "queue": t.kind = 46; break;
+                case "stack": t.kind = 47; break;
+                case "number": t.kind = 48; break;
+                case "bool": t.kind = 49; break;
+                case "text": t.kind = 50; break;
                 default: break;
             }
         }
@@ -532,61 +539,61 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case 15:
                     { t.kind = 16; break; }
                 case 16:
-                    { t.kind = 18; break; }
+                    { t.kind = 25; break; }
                 case 17:
-                    { t.kind = 20; break; }
+                    { t.kind = 27; break; }
                 case 18:
-                    { t.kind = 21; break; }
+                    { t.kind = 28; break; }
                 case 19:
-                    { t.kind = 22; break; }
+                    { t.kind = 29; break; }
                 case 20:
                     if (ch == '|') { AddCh(); goto case 21; }
                     else { goto case 0; }
                 case 21:
-                    { t.kind = 23; break; }
+                    { t.kind = 30; break; }
                 case 22:
                     if (ch == '&') { AddCh(); goto case 23; }
                     else { goto case 0; }
                 case 23:
-                    { t.kind = 24; break; }
+                    { t.kind = 31; break; }
                 case 24:
-                    { t.kind = 25; break; }
-                case 25:
-                    { t.kind = 26; break; }
-                case 26:
-                    { t.kind = 29; break; }
-                case 27:
-                    { t.kind = 30; break; }
-                case 28:
                     { t.kind = 32; break; }
-                case 29:
+                case 25:
                     { t.kind = 33; break; }
+                case 26:
+                    { t.kind = 36; break; }
+                case 27:
+                    { t.kind = 37; break; }
+                case 28:
+                    { t.kind = 39; break; }
+                case 29:
+                    { t.kind = 40; break; }
                 case 30:
-                    { t.kind = 34; break; }
+                    { t.kind = 41; break; }
                 case 31:
-                    { t.kind = 35; break; }
+                    { t.kind = 42; break; }
                 case 32:
-                    recEnd = pos; recKind = 19;
+                    recEnd = pos; recKind = 26;
                     if (ch == '=') { AddCh(); goto case 24; }
-                    else { t.kind = 19; break; }
+                    else { t.kind = 26; break; }
                 case 33:
-                    recEnd = pos; recKind = 27;
+                    recEnd = pos; recKind = 34;
                     if (ch == '-') { AddCh(); goto case 17; }
                     else if (ch == '=') { AddCh(); goto case 26; }
-                    else { t.kind = 27; break; }
+                    else { t.kind = 34; break; }
                 case 34:
-                    recEnd = pos; recKind = 31;
+                    recEnd = pos; recKind = 38;
                     if (ch == '-') { AddCh(); goto case 18; }
                     else if (ch == '>') { AddCh(); goto case 19; }
-                    else { t.kind = 31; break; }
+                    else { t.kind = 38; break; }
                 case 35:
-                    recEnd = pos; recKind = 36;
+                    recEnd = pos; recKind = 43;
                     if (ch == '=') { AddCh(); goto case 25; }
-                    else { t.kind = 36; break; }
+                    else { t.kind = 43; break; }
                 case 36:
-                    recEnd = pos; recKind = 28;
+                    recEnd = pos; recKind = 35;
                     if (ch == '=') { AddCh(); goto case 27; }
-                    else { t.kind = 28; break; }
+                    else { t.kind = 35; break; }
 
             }
             t.val = new String(tval, 0, tlen);
