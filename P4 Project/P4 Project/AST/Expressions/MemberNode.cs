@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions
 {
-    class MemberNode
+    class MemberNode : Node
     {
         string name;
         ExprNode source;
