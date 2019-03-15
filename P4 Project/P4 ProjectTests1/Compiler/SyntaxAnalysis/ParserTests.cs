@@ -218,6 +218,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsTrue(TryParse(headerWithAllTypesVertex + headerWithAllTypesEdge));
         }
 
+        //tests if functions are functional with a body and use of parameters
         [TestMethod()]
         public void ParseTestSuccess6()
         {
@@ -228,11 +229,24 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsTrue(TryParse(func2));
         }
 
+        //tests if return is accepted
         [TestMethod()]
         public void ParseTestSuccess7()
         {
             string func = "func FuncDecl(number x){x = 5 return x}";
             Assert.IsTrue(TryParse(func));
+        }
+
+        //tests the syntax of using operators on numbers
+        [TestMethod()]
+        public void ParseTestSuccess8()
+        {
+            string func = "number x " +
+                "x = 4 * 5 + 3 - 3";
+            Assert.IsTrue(TryParse(func));
+
+            string func2 = "func FuncDecl(number x){x = 4 * 5 + 3 - 3}";
+            Assert.IsTrue(TryParse(func2));
         }
 
         //Empty brackets should be bad.
@@ -461,10 +475,19 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsFalse(success);
         }
 
+        // a forgotten func before FuncDecl should give error
         [TestMethod()]
         public void ParseTestFailure18()
         {
             string func = "FuncDecl(number x){x = 5 return x}";
+            Assert.IsFalse(TryParse(func));
+        }
+
+        // a forgotten FuncDecl before func should give error
+        [TestMethod()]
+        public void ParseTestFailure19()
+        {
+            string func = "func(number x){x = 5}";
             Assert.IsFalse(TryParse(func));
         }
     }

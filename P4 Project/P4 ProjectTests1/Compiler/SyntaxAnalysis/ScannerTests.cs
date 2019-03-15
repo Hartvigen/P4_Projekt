@@ -31,6 +31,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         
+        //grammatical error should give error
         [TestMethod()]
         public void ScanTest()
         {
@@ -39,6 +40,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsFalse(success);
         }
 
+        //Tab, space and newline should all be read the same and thus allow an empty program to be run succesfully
         [TestMethod()]
         public void ScanTest2()
         {
@@ -47,6 +49,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsTrue(success);
         }
 
+        //nothing here yet :DDDDDD
         [TestMethod()]
         public void ScanTest3()
         {
