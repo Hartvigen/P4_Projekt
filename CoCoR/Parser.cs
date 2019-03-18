@@ -5,6 +5,7 @@ using P4_Project.AST.Commands;
 using P4_Project.AST.Commands.Stmts;
 using P4_Project.AST.Commands.Stmts.Decls;
 using P4_Project.AST.Expressions;
+using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 
 namespace P4_Project.Compiler.SyntaxAnalysis {
@@ -240,7 +241,7 @@ public class Parser {
 		if (la.kind == 1) {
 			CallOrID(out IdentNode i);
 			while (la.kind == 25) {
-				Member();
+				Member(i, out ExprNode member);
 			}
 			IdentCont();
 		} else if (la.kind == 24) {
@@ -302,7 +303,6 @@ public class Parser {
 		v = new VarDeclNode(typ, t.val, null); 
 		Expect(20);
 		Expr(out ExprNode e1);
-		
 		Expect(7);
 		Expect(15);
 		Stmts(ref b);
@@ -329,7 +329,7 @@ public class Parser {
 			Expect(7);
 			Expect(15);
 			Stmts(ref b);
-			k = new IfNode(e, b); j.SetElse(k); j = k;  
+			k = new IfNode(e, b); j.SetElse(k); j = k; 
 			Expect(16);
 		}
 		if (la.kind == 23) {
@@ -348,17 +348,22 @@ public class Parser {
 	}
 
 	void CallOrID(out IdentNode i) {
-		Identifier(out i);
+		i = null; 
+		Identifier(out VarNode varNode);
+		i = varNode; 
 		if (la.kind == 11) {
 			Get();
 			Args(out CollecConst collec);
+			i = new CallNode(i.identifier, collec); 
 			Expect(7);
 		}
 	}
 
-	void Member() {
+	void Member(ExprNode source, out ExprNode expr) {
+		expr = null; 
 		ExpectWeak(25, 1);
 		CallOrID(out IdentNode i);
+		expr = new MemberNode(source, i); 
 	}
 
 	void IdentCont() {
@@ -371,22 +376,22 @@ public class Parser {
 	}
 
 	void EdgeOpr(out int op) {
-		op = 0;					 
+		op = 0;                     
 		if (la.kind == 27) {
 			Get();
-			op = Operators.LEFTARR;	 
+			op = Operators.LEFTARR;     
 		} else if (la.kind == 28) {
 			Get();
-			op = Operators.NONARR;	 
+			op = Operators.NONARR;     
 		} else if (la.kind == 29) {
 			Get();
-			op = Operators.RIGHTARR;	 
+			op = Operators.RIGHTARR;     
 		} else SynErr(65);
 	}
 
 	void EdgeOneOrMore() {
 		if (la.kind == 1) {
-			Identifier(out IdentNode identNode);
+			Identifier(out VarNode varNode);
 		} else if (la.kind == 11) {
 			EdgeDecl();
 		} else if (la.kind == 15) {
@@ -430,15 +435,15 @@ public class Parser {
 	void VEParams(out AssignNode assign) {
 		assign = null; 
 		while (WeakSeparator(13,13,6) ) {
-			Identifier(out IdentNode identNode);
-			Assign(out ExprNode assign);
+			Identifier(out VarNode varNode);
+			Assign(out ExprNode ass);
 		}
 	}
 
-	void Identifier(out IdentNode identNode) {
-		identNode = null; 
+	void Identifier(out VarNode varNode) {
+		varNode = null; 
 		Expect(1);
-		identNode = new IdentNode(); 
+		varNode = new VarNode(t.val); 
 	}
 
 	void EdgeDecl() {
@@ -580,10 +585,12 @@ public class Parser {
 				Expr(out e);
 				Expect(7);
 			} else {
-				CallOrID(out IdentNode i);
+				CallOrID(out IdentNode ident);
+				e = ident; 
 			}
 			while (la.kind == 25) {
-				Member();
+				Member(e, out ExprNode member);
+				e = member; 
 			}
 		} else SynErr(67);
 	}
@@ -612,10 +619,10 @@ public class Parser {
 		type = 0; 
 		if (la.kind == 48) {
 			Get();
-			type = Types.number;
+			type = Types.number; 
 		} else if (la.kind == 49) {
 			Get();
-			type = Types.boolean;
+			type = Types.boolean; 
 		} else if (la.kind == 50) {
 			Get();
 			type = Types.text; 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P4_Project.AST.Expressions.Identifier;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,13 +9,13 @@ namespace P4_Project.AST.Expressions
 {
     class MemberNode : ExprNode
     {
-        string name;
         ExprNode source;
+        IdentNode memberIdent;
 
-        public MemberNode(string _name, ExprNode _source)
+        public MemberNode(ExprNode _source, IdentNode _memberIdent)
         {
-            name = _name;
             source = _source;
+            memberIdent = _memberIdent;
         }
     }
 }

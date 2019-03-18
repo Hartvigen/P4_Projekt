@@ -1,4 +1,6 @@
-﻿using System;
+﻿using P4_Project.AST.Expressions;
+using P4_Project.AST.Expressions.Identifier;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +10,9 @@ namespace P4_Project.AST.Commands.Stmts
 {
     class AssignNode : StmtNode
     {
+        VarNode variable;
+        ExprNode value;
+
 
     }
 }

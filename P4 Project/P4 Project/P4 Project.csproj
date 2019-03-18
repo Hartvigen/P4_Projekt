@@ -56,12 +56,14 @@
     <Compile Include="AST\Commands\Stmts\StmtNode.cs" />
     <Compile Include="AST\Commands\Stmts\WhileNode.cs" />
     <Compile Include="AST\Expressions\BinExprNode.cs" />
+    <Compile Include="AST\Expressions\Identifier\CallNode.cs" />
+    <Compile Include="AST\Expressions\Identifier\VarNode.cs" />
     <Compile Include="AST\Expressions\MemberNode.cs" />
     <Compile Include="AST\Expressions\Values\BoolConst.cs" />
     <Compile Include="AST\Expressions\Values\CollecConst.cs" />
     <Compile Include="AST\Expressions\Values\NoneConst.cs" />
     <Compile Include="AST\Expressions\Values\NumConst.cs" />
-    <Compile Include="AST\Expressions\Values\IdentNode.cs" />
+    <Compile Include="AST\Expressions\Identifier\IdentNode.cs" />
     <Compile Include="AST\Expressions\Values\TextConst.cs" />
     <Compile Include="AST\Expressions\ExprNode.cs" />
     <Compile Include="AST\Expressions\UnaExprNode.cs" />
@@ -82,6 +84,7 @@
   <ItemGroup>
     <Folder Include="Compiler\CodeGeneration\" />
     <Folder Include="Compiler\SemanticAnalysis\" />
+    <Folder Include="Visitor\PrettyPrinter\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
