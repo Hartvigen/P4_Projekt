@@ -378,6 +378,7 @@ public class Parser {
 		op = 0;                     
 		if (la.kind == 27) {
 			Get();
+<<<<<<< Updated upstream
 			op = Operators.LEFTARR;     
 		} else if (la.kind == 28) {
 			Get();
@@ -385,6 +386,15 @@ public class Parser {
 		} else if (la.kind == 29) {
 			Get();
 			op = Operators.RIGHTARR;     
+=======
+			op = Operators.LEFTARR;	 
+		} else if (la.kind == 28) {
+			Get();
+			op = Operators.NONARR;	 
+		} else if (la.kind == 29) {
+			Get();
+			op = Operators.RIGHTARR;	 
+>>>>>>> Stashed changes
 		} else SynErr(65);
 	}
 
@@ -434,8 +444,13 @@ public class Parser {
 	void VEParams(out AssignNode assign) {
 		assign = null; 
 		while (WeakSeparator(13,13,6) ) {
+<<<<<<< Updated upstream
 			Identifier(out VarNode varNode);
 			Assign(out ExprNode ass);
+=======
+			Identifier(out IdentNode identNode);
+			Assign(out ExprNode aassign);
+>>>>>>> Stashed changes
 		}
 	}
 
