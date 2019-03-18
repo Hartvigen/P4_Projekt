@@ -10,18 +10,18 @@ namespace P4_Project.AST.Commands.Stmts
     class IfNode : StmtNode
     {
         ExprNode condition;
-        Block ifstmts;
-        IfNode elsestmt = null;
+        Block stmtBody;
+        IfNode elseNode = null;
 
         public IfNode(ExprNode e, Block b)
         {
             condition = e;
-            ifstmts = b;
+            stmtBody = b;
         }
 
         public void SetElse(IfNode i)
         {
-            elsestmt = i;
+            elseNode = i;
         }
     }
 }

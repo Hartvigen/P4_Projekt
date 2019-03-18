@@ -49,6 +49,7 @@
     <Compile Include="AST\Commands\Stmts\Decls\DeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\FuncDeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\Decls\VarDeclNode.cs" />
+    <Compile Include="AST\Commands\Stmts\Decls\VEDeclNode.cs" />
     <Compile Include="AST\Commands\Stmts\ForeachNode.cs" />
     <Compile Include="AST\Commands\Stmts\ForNode.cs" />
     <Compile Include="AST\Commands\Stmts\IfNode.cs" />

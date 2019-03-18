@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
-    class IdentNode : Node
+    class IdentNode : ExprNode
     {
         Reference reference;
 

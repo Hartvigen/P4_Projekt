@@ -149,18 +149,16 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void Stmts(ref Block block)
         {
-            StmtNode stmtNode;
             while (!(StartOf(3))) { SynErr(54); Get(); }
             while (StartOf(4))
             {
                 if (StartOf(5))
                 {
-                    Stmt(out stmtNode);
-                    block.Add(stmtNode);
+                    Stmt(ref block);
                 }
                 else
                 {
-                    StrucStmt(out stmtNode);
+                    StrucStmt(out StmtNode stmtNode);
                     block.Add(stmtNode);
                 }
             }
@@ -189,25 +187,27 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void AttrDecls(ref HeadNode headNode)
         {
-            VarDeclNode varDecl;
-            AttrDecl(out varDecl);
-            headNode?.AddAttr(varDecl);
+            VarDeclNode attrDecl;
+            AttrDecl(out attrDecl);
+            headNode?.AddAttr(attrDecl);
             while (WeakSeparator(13, 6, 7))
             {
-                AttrDecl(out varDecl);
-                headNode?.AddAttr(varDecl);
+                AttrDecl(out attrDecl);
+                headNode?.AddAttr(attrDecl);
             }
         }
 
-        void AttrDecl(out VarDeclNode varDecl)
+        void AttrDecl(out VarDeclNode attrDecl)
         {
-            varDecl = null;
+            attrDecl = null; string name = ""; ExprNode val = null;
             Type(out int typ);
             Expect(1);
+            name = t.val;
             if (la.kind == 26)
             {
-                Assign(out AssignNode assign);
+                Assign(out val);
             }
+            attrDecl = new VarDeclNode(typ, name, val);
         }
 
         void Type(out int type)
@@ -224,20 +224,19 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             else SynErr(58);
         }
 
-        void Assign(out AssignNode assign)
+        void Assign(out ExprNode expr)
         {
-            assign = null;
+            expr = null;
             Expect(26);
             if (StartOf(10))
             {
-                Expr(out ExprNode expr);
-                assign = new AssignNode();
+                Expr(out expr);
             }
             else if (la.kind == 15)
             {
                 Get();
                 Args(out CollecConst collec);
-                assign = new AssignNode();
+                expr = collec;
                 Expect(16);
             }
             else SynErr(59);
@@ -259,12 +258,11 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
         }
 
-        void Stmt(out StmtNode stmtNode)
+        void Stmt(ref Block block)
         {
-            stmtNode = null;
             if (StartOf(6))
             {
-                FullDecl();
+                FullDecl(ref block);
             }
             else if (la.kind == 1)
             {
@@ -397,26 +395,29 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             ExprOR(out e);
         }
 
-        void FullDecl()
+        void FullDecl(ref Block block)
         {
             Type(out int typ);
             if (la.kind == 1)
             {
                 Get();
+                string name = t.val; ExprNode expr = null;
                 if (la.kind == 26)
                 {
-                    Assign(out AssignNode assign);
+                    Assign(out expr);
                 }
+                block.Add(new VarDeclNode(typ, name, expr));
             }
             else if (la.kind == 15)
             {
                 Get();
-                VtxDecls();
+                VtxDecls(ref block);
                 Expect(16);
             }
             else if (la.kind == 11)
             {
-                VtxDecl();
+                VtxDecl(out VEDeclNode veDecl);
+                block.Add(veDecl);
             }
             else SynErr(63);
         }
@@ -442,29 +443,33 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         {
             if (la.kind == 26)
             {
-                Assign(out AssignNode assign);
+                Assign(out ExprNode assign);
             }
             else if (la.kind == 27 || la.kind == 28 || la.kind == 29)
             {
-                EdgeOpr();
+                EdgeOpr(out int i);
                 EdgeOneOrMore();
             }
             else SynErr(64);
         }
 
-        void EdgeOpr()
+        void EdgeOpr(out int op)
         {
+            op = 0;
             if (la.kind == 27)
             {
                 Get();
+                op = Operators.LEFTARR;
             }
             else if (la.kind == 28)
             {
                 Get();
+                op = Operators.NONARR;
             }
             else if (la.kind == 29)
             {
                 Get();
+                op = Operators.RIGHTARR;
             }
             else SynErr(65);
         }
@@ -488,20 +493,25 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             else SynErr(66);
         }
 
-        void VtxDecls()
+        void VtxDecls(ref Block b)
         {
-            VtxDecl();
+            VtxDecl(out VEDeclNode v1);
+            b.Add(v1);
             while (WeakSeparator(13, 11, 12))
             {
-                VtxDecl();
+                VtxDecl(out VEDeclNode v2);
+                b.Add(v2);
             }
         }
 
-        void VtxDecl()
+        void VtxDecl(out VEDeclNode v)
         {
+            v = null;
             Expect(11);
             Expect(1);
-            VEParams();
+            v = new VEDeclNode(Types.vertex, t.val);
+            VEParams(out AssignNode a);
+            v.AddAttr(a);
             Expect(7);
         }
 
@@ -520,12 +530,13 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
         }
 
-        void VEParams()
+        void VEParams(out AssignNode assign)
         {
+            assign = null;
             while (WeakSeparator(13, 14, 7))
             {
                 Identifier(out IdentNode identNode);
-                Assign(out AssignNode assign);
+                Assign(out ExprNode assign);
             }
         }
 
@@ -540,7 +551,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         {
             Expect(11);
             Expect(1);
-            VEParams();
+            VEParams(out AssignNode assign);
             Expect(7);
         }
 

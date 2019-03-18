@@ -1,4 +1,5 @@
-﻿using P4_Project.AST.Commands.Stmts.Decls;
+﻿using P4_Project.AST.Commands.Stmts;
+using P4_Project.AST.Commands.Stmts.Decls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace P4_Project.AST.Commands
         public const int VERTEX = 1, EDGE = 2;
 
         public int type;
-        public List<VarDeclNode> attrDecls = new List<VarDeclNode>();
+        public Block attrDeclBlock = new Block();
 
 
         public HeadNode(int _type)
@@ -22,7 +23,7 @@ namespace P4_Project.AST.Commands
 
         public void AddAttr(VarDeclNode attrDecl)
         {
-            attrDecls.Add(attrDecl);
+            attrDeclBlock.Add(attrDecl);
         }
     }
 }

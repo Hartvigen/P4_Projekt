@@ -51,19 +51,19 @@ Head<out HeadNode headNode>              (. headNode = null; .)
     WEAK ')' ']'.
 
 /*------------------------------------------------------------------------*/
-AttrDecls<ref HeadNode headNode> =      (. VarDeclNode varDecl; .)
-    AttrDecl<out varDecl>               (. headNode?.AddAttr(varDecl); .)
+AttrDecls<ref HeadNode headNode> =      (. VarDeclNode attrDecl; .)
+    AttrDecl<out attrDecl>               (. headNode?.AddAttr(attrDecl); .)
     {
-        WEAK ',' AttrDecl<out varDecl>  (. headNode?.AddAttr(varDecl); .)
+        WEAK ',' AttrDecl<out attrDecl>  (. headNode?.AddAttr(attrDecl); .)
     }.
 
 /*------------------------------------------------------------------------*/
-AttrDecl<out VarDeclNode varDecl> = (. varDecl = null; .)
+AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprNode val = null; .)
     Type<out int typ>
-    IDENT
+    IDENT                            (. name = t.val; .)
     [
-        Assign<out AssignNode assign>
-    ]
+        Assign<out val> 
+    ]                                (. attrDecl = new VarDeclNode(typ, name, val); .)
     .
 
 
@@ -72,7 +72,7 @@ or if it is simply an empty pair of parenthisis. If a right parenthisis is read,
 so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called
 and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =                               (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
+FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
     SYNC "func" IDENT                                           (. funcName = t.val; .)
     '(' 
         [
@@ -85,33 +85,34 @@ FuncDecl<out FuncDeclNode funcNode> =                               (. funcNode 
     .
 
 /*------------------------------------------------------------------------*/
-FuncParams<ref Block paramBlock> =      (. int typ = 0; .)
+FuncParams<ref Block paramBlock> =          (. int typ = 0; .)
     Type<out typ> 
-    IDENT                               (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
+    IDENT                                   (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
     {
         SYNC ',' Type<out typ>
-        IDENT                           (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
+        IDENT                               (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
     }.
 
 
 /*------------------------------------------------------------------------*/
-Stmts<ref Block block> =            (. StmtNode stmtNode; .)
+Stmts<ref Block block> =
     SYNC {
-        Stmt<out stmtNode>          (. block.Add(stmtNode); .)
-        | StrucStmt<out stmtNode>   (. block.Add(stmtNode); .)
+          FullDecl<ref block>
+        | Stmt<out StmtNode stmtNode>       (. block.Add(stmtNode); .)
+        | StrucStmt<out StmtNode stmtNode>  (. block.Add(stmtNode); .)
     }.
 
 /*------------------------------------------------------------------------*/
-StrucStmt<out StmtNode s>			(. s = null; .)
+StrucStmt<out StmtNode s>			        (. s = null; .)
     = StmtWhile<out s>				
 	| StmtFor<out s>				
 	| StmtForeach<out s>			
 	| StmtIf<out s>.
 
 /*------------------------------------------------------------------------*/
-StmtWhile<out StmtNode w>				(. w = null; Block b = new Block(); .)
+StmtWhile<out StmtNode w>				    (. w = null; Block b = new Block(); .)
 	= "while" '(' Expr<out ExprNode e>	
-		')' '{' Stmts<ref b>			(. w = new WhileNode(e, b); .)
+		')' '{' Stmts<ref b>			    (. w = new WhileNode(e, b); .)
 		'}'.
 
 /*------------------------------------------------------------------------*/
@@ -123,7 +124,7 @@ StmtFor<out StmtNode f>						(. f = null; StmtNode init = null; ExprNode e = nul
 		'}'.
 
 /*------------------------------------------------------------------------*/
-StmtForeach<out StmtNode f>				(. f = null; Block b = new Block(); VarDeclNode v = null; .)
+StmtForeach<out StmtNode f>				    (. f = null; Block b = new Block(); VarDeclNode v = null; .)
 	= "foreach" '(' Type<out int typ>
 		IDENT								(. v = new VarDeclNode(typ, t.val, null); .)
 		"in" Expr<out ExprNode e1>			(.  .)
@@ -141,20 +142,20 @@ StmtIf<out StmtNode i>									(. i = null; ExprNode e = null; Block b = new Blo
 		'}'].
 
 /*------------------------------------------------------------------------*/
-Stmt<out StmtNode stmtNode> =                                   (. stmtNode = null; .)
-    (FullDecl
-	| CallOrID<out IdentNode i>
-	{Member
-	} IdentCont
-	| "return" Expr<out ExprNode expr>
+Stmt<out StmtNode stmtNode> =               (. stmtNode = null; .)
+    ( 
+        CallOrID<out IdentNode i>
+        { 
+            Member
+        } 
+        IdentCont
+	| 
+        "return" Expr<out ExprNode expr>
 	).
 
 /*------------------------------------------------------------------------*/
 IdentCont
-    = Assign<out AssignNode assign>
-	| EdgeOpr 
-	EdgeOneOrMore
-	.
+    = Assign<out ExprNode assign> | EdgeOpr<out int i> EdgeOneOrMore.
 
 
 /*------------------------------------------------------------------------*/
@@ -163,40 +164,47 @@ Member
 	.
 
 /*------------------------------------------------------------------------*/
-FullDecl =
-    Type<out int typ>
-	(IDENT 
-	[Assign<out AssignNode assign>
-	] | '{' VtxDecls
-	'}' | VtxDecl
-	).
+FullDecl<ref Block block> =
+    Type<out int typ> 
+    (
+        IDENT                               (. string name = t.val; ExprNode expr = null; .)
+        [
+            Assign<out expr>
+        ]                                   (. block.Add(new VarDeclNode(typ, name, expr)); .)
+    | 
+        '{' 
+            VtxDecls<ref block>
+        '}' 
+    | 
+        VtxDecl<out VEDeclNode veDecl>      (. block.Add(veDecl); .)
+    ).
 
 /*------------------------------------------------------------------------*/
-Assign<out AssignNode assign>           (. assign = null; .)
+Assign<out ExprNode expr>                   (. expr = null; .)
     = '=' 
-    (Expr<out ExprNode expr>                (. assign = new AssignNode(); .)
-    | '{' Args<out CollecConst collec>  (. assign = new AssignNode(); .)
+    (Expr<out expr>
+    | '{' Args<out CollecConst collec>      (. expr = collec; .)
     '}'
     ).
 
 /*------------------------------------------------------------------------*/
 VtxDecls<ref Block b>							
-    = VtxDecl<out VEDeclNode v1>					(. b.Add(v1); .)
-	{WEAK ',' VtxDecl<out VEDeclNode v2>			(. b.Add(v2); .)
+    = VtxDecl<out VEDeclNode v1>		    (. b.Add(v1); .)
+	{WEAK ',' VtxDecl<out VEDeclNode v2>	(. b.Add(v2); .)
 	}.
 
 /*------------------------------------------------------------------------*/
 VtxDecl<out VEDeclNode v>					(. v = null; .)
-    = '(' IDENT			(. v = new VEDeclNode(Types.vertex, t.val); .)
-	VEParams<out AssignNode a>			(. v.AddAttr(a); .)
+    = '(' IDENT			                    (. v = new VEDeclNode(Types.vertex, t.val); .)
+	VEParams<out AssignNode a>			    (. v.AddAttr(a); .)
 	')'.
 
 
 /*------------------------------------------------------------------------*/
 EdgeOpr<out int op>			(. op = 0;					 .)
-    = ("<-"					(. op = Operator.LEFTARR;	 .)
-	| "--"					(. op = Operator.NONARR;	 .)
-	| "->"					(. op = Operator.RIGHTARR;	 .)
+    = ("<-"					(. op = Operators.LEFTARR;	 .)
+	| "--"					(. op = Operators.NONARR;	 .)
+	| "->"					(. op = Operators.RIGHTARR;	 .)
 	).
 
 /*------------------------------------------------------------------------*/
@@ -215,15 +223,13 @@ EdgeDecls
 /*------------------------------------------------------------------------*/
 EdgeDecl 
     = '(' IDENT
-	VEParams
+	VEParams<out AssignNode assign>
 	')'.
 
 
 /*------------------------------------------------------------------------*/
-VEParams
-    = {WEAK ',' Identifier<out IdentNode identNode>
-	Assign<out AssignNode assign>
-	}.
+VEParams<out AssignNode assign>     (. assign = null; .)
+    = {WEAK ',' Identifier<out IdentNode identNode> Assign<out ExprNode assign>}.
 
 
 /*------------------------------------------------------------------------*/

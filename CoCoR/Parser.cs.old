@@ -126,14 +126,12 @@ public class Parser {
 	}
 
 	void Stmts(ref Block block) {
-		StmtNode stmtNode; 
 		while (!(StartOf(3))) {SynErr(54); Get();}
 		while (StartOf(4)) {
 			if (StartOf(5)) {
-				Stmt(out stmtNode);
-				block.Add(stmtNode); 
+				Stmt(ref block);
 			} else {
-				StrucStmt(out stmtNode);
+				StrucStmt(out StmtNode stmtNode);
 				block.Add(stmtNode); 
 			}
 		}
@@ -159,22 +157,24 @@ public class Parser {
 	}
 
 	void AttrDecls(ref HeadNode headNode) {
-		VarDeclNode varDecl; 
-		AttrDecl(out varDecl);
-		headNode?.AddAttr(varDecl); 
+		VarDeclNode attrDecl; 
+		AttrDecl(out attrDecl);
+		headNode?.AddAttr(attrDecl); 
 		while (WeakSeparator(13,6,7) ) {
-			AttrDecl(out varDecl);
-			headNode?.AddAttr(varDecl); 
+			AttrDecl(out attrDecl);
+			headNode?.AddAttr(attrDecl); 
 		}
 	}
 
-	void AttrDecl(out VarDeclNode varDecl) {
-		varDecl = null; 
+	void AttrDecl(out VarDeclNode attrDecl) {
+		attrDecl = null; string name = ""; ExprNode val = null; 
 		Type(out int typ);
 		Expect(1);
+		name = t.val; 
 		if (la.kind == 26) {
-			Assign(out AssignNode assign);
+			Assign(out val);
 		}
+		attrDecl = new VarDeclNode(typ, name, val); 
 	}
 
 	void Type(out int type) {
@@ -186,16 +186,15 @@ public class Parser {
 		} else SynErr(58);
 	}
 
-	void Assign(out AssignNode assign) {
-		assign = null; 
+	void Assign(out ExprNode expr) {
+		expr = null; 
 		Expect(26);
 		if (StartOf(10)) {
-			Expr(out ExprNode expr);
-			assign = new AssignNode(); 
+			Expr(out expr);
 		} else if (la.kind == 15) {
 			Get();
 			Args(out CollecConst collec);
-			assign = new AssignNode(); 
+			expr = collec; 
 			Expect(16);
 		} else SynErr(59);
 	}
@@ -214,10 +213,9 @@ public class Parser {
 		}
 	}
 
-	void Stmt(out StmtNode stmtNode) {
-		stmtNode = null; 
+	void Stmt(ref Block block) {
 		if (StartOf(6)) {
-			FullDecl();
+			FullDecl(ref block);
 		} else if (la.kind == 1) {
 			CallOrID(out IdentNode i);
 			while (la.kind == 25) {
@@ -328,19 +326,22 @@ public class Parser {
 		ExprOR(out e);
 	}
 
-	void FullDecl() {
+	void FullDecl(ref Block block) {
 		Type(out int typ);
 		if (la.kind == 1) {
 			Get();
+			string name = t.val; ExprNode expr = null; 
 			if (la.kind == 26) {
-				Assign(out AssignNode assign);
+				Assign(out expr);
 			}
+			block.Add(new VarDeclNode(typ, name, expr)); 
 		} else if (la.kind == 15) {
 			Get();
-			VtxDecls();
+			VtxDecls(ref block);
 			Expect(16);
 		} else if (la.kind == 11) {
-			VtxDecl();
+			VtxDecl(out VEDeclNode veDecl);
+			block.Add(veDecl); 
 		} else SynErr(63);
 	}
 
@@ -360,20 +361,24 @@ public class Parser {
 
 	void IdentCont() {
 		if (la.kind == 26) {
-			Assign(out AssignNode assign);
+			Assign(out ExprNode assign);
 		} else if (la.kind == 27 || la.kind == 28 || la.kind == 29) {
-			EdgeOpr();
+			EdgeOpr(out int i);
 			EdgeOneOrMore();
 		} else SynErr(64);
 	}
 
-	void EdgeOpr() {
+	void EdgeOpr(out int op) {
+		op = 0;					 
 		if (la.kind == 27) {
 			Get();
+			op = Operator.LEFTARR;	 
 		} else if (la.kind == 28) {
 			Get();
+			op = Operator.NONARR;	 
 		} else if (la.kind == 29) {
 			Get();
+			op = Operator.RIGHTARR;	 
 		} else SynErr(65);
 	}
 
@@ -389,17 +394,22 @@ public class Parser {
 		} else SynErr(66);
 	}
 
-	void VtxDecls() {
-		VtxDecl();
+	void VtxDecls(ref Block b) {
+		VtxDecl(out VEDeclNode v1);
+		b.Add(v1); 
 		while (WeakSeparator(13,11,12) ) {
-			VtxDecl();
+			VtxDecl(out VEDeclNode v2);
+			b.Add(v2); 
 		}
 	}
 
-	void VtxDecl() {
+	void VtxDecl(out VEDeclNode v) {
+		v = null; 
 		Expect(11);
 		Expect(1);
-		VEParams();
+		v = new VEDeclNode(Types.vertex, t.val); 
+		VEParams(out AssignNode a);
+		v.AddAttr(a); 
 		Expect(7);
 	}
 
@@ -415,10 +425,11 @@ public class Parser {
 		}
 	}
 
-	void VEParams() {
+	void VEParams(out AssignNode assign) {
+		assign = null; 
 		while (WeakSeparator(13,14,7) ) {
 			Identifier(out IdentNode identNode);
-			Assign(out AssignNode assign);
+			Assign(out ExprNode assign);
 		}
 	}
 
@@ -431,7 +442,7 @@ public class Parser {
 	void EdgeDecl() {
 		Expect(11);
 		Expect(1);
-		VEParams();
+		VEParams(out AssignNode assign);
 		Expect(7);
 	}
 
