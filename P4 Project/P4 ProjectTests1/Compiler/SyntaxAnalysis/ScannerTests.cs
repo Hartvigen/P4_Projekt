@@ -40,13 +40,25 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsFalse(success);
         }
 
-        //Tab, space and newline should all be read the same and thus allow an empty program to be run succesfully
+        //Tests involving tab space and newline
         [TestMethod()]
         public void ScanTest2()
         {
+            //we should be able to parse a file with nothing but with tabs, space and newline without causing a compilation error
             bool success;
             success = TryParse("    \n");
             Assert.IsTrue(success);
+
+            //a simple program in normal form which should be able to run
+            success = TryParse("[vertex(number num = 4, bool val = true)]");
+            Assert.IsTrue(success);
+
+            //We should be able to parse the same string with any number of tabs, spaces or newlines. As well as without spacing, except for when declaring types
+            success = TryParse("[           vertex       (     number          num      = \n\n   4,  bool     val    =   true    )         ]");
+            Assert.IsTrue(success);
+            success = TryParse("[vertex(number num=4,bool val=true)]");
+            Assert.IsTrue(success);
+
         }
 
         //nothing here yet :DDDDDD

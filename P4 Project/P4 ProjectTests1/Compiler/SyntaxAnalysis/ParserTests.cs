@@ -248,8 +248,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             string func2 = "func FuncDecl(number x){x = 4 * 5 + 3 - 3}";
             Assert.IsTrue(TryParse(func2));
 
-            string func3 = "func FuncDecl(number x, number y){if(-!x > y){x = y}}";
+            string func3 = "func FuncDecl(number x, number y){if(-x > y){x = y}}";
             Assert.IsTrue(TryParse(func3));
+
         }
 
         //Empty brackets should be bad.
@@ -467,14 +468,14 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsFalse(success);
         }
 
-        //A forgotten start ´(´ symbol after "vertex" or "edge" should give error.
+        //A forgotten end ´(´ symbol after "vertex" or "edge" should give error.
         [TestMethod()]
         public void ParseTestFailure17()
         {
             bool success;
             success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
             Assert.IsFalse(success);
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
+            success = TryParse("[edge(" + validStringType + " " + validIdentifier + "");
             Assert.IsFalse(success);
         }
 
