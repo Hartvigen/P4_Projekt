@@ -285,7 +285,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
             else if (la.kind == 11)
             {
-                VtxDecl(out VEDeclNode veDecl);
+                VtxDecl(out VertexDeclNode veDecl);
                 block.Add(veDecl);
             }
             else SynErr(61);
@@ -502,21 +502,21 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void VtxDecls(ref Block b)
         {
-            VtxDecl(out VEDeclNode v1);
+            VtxDecl(out VertexDeclNode v1);
             b.Add(v1);
             while (WeakSeparator(13, 10, 11))
             {
-                VtxDecl(out VEDeclNode v2);
+                VtxDecl(out VertexDeclNode v2);
                 b.Add(v2);
             }
         }
 
-        void VtxDecl(out VEDeclNode v)
+        void VtxDecl(out VertexDeclNode v)
         {
             v = null;
             Expect(11);
             Expect(1);
-            v = new VEDeclNode(Types.vertex, t.val);
+            v = new VertexDeclNode(Types.vertex, t.val);
             VEParams(out AssignNode a);
             v.AddAttr(a);
             Expect(7);

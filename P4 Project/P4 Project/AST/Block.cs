@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST
 {
-    public class Block : Node
+    public class Block : StmtNode
     {
         public List<CommandNode> commands = new List<CommandNode>();
 

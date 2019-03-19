@@ -8,7 +8,7 @@ namespace P4_Project.AST.Commands.Stmts.Decls
 {
     public class DeclNode : StmtNode
     {
-        string symbolName;
+        public string symbolName;
 
         public DeclNode(string _symbolName)
         {
