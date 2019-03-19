@@ -10,9 +10,13 @@ namespace P4_Project.AST.Commands.Stmts
 {
     class AssignNode : StmtNode
     {
-        VarNode variable;
+        IdentNode target;
         ExprNode value;
 
-
+        public AssignNode(IdentNode _target, ExprNode _value)
+        {
+            target = _target;
+            value = _value; 
+        }
     }
 }
