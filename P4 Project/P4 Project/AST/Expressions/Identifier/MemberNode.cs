@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions
 {
-    class MemberNode : ExprNode
+    class MemberNode : IdentNode
     {
         ExprNode source;
         IdentNode memberIdent;
 
-        public MemberNode(ExprNode _source, IdentNode _memberIdent)
+        public MemberNode(ExprNode _source, IdentNode _memberIdent) :base(_memberIdent.identifier)
         {
             source = _source;
             memberIdent = _memberIdent;

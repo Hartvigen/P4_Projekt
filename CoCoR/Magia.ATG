@@ -144,26 +144,27 @@ StmtIf<out StmtNode i>                                  (. i = null; ExprNode e 
 /*------------------------------------------------------------------------*/
 Stmt<out StmtNode stmtNode> =                       (. stmtNode = null; .)
     ( 
-        CallOrID<out IdentNode i>
+        CallOrID<out IdentNode i>                   (. stmtNode = new LoneCallNode(i); .)
         { 
-            Member<i, out ExprNode member>
+            Member<i, out MemberNode member>        (. i = member; stmtNode = new LoneCallNode(i); .)
         } 
-        IdentCont<i, out StmtNode stmt>
+        [IdentCont<i, out StmtNode stmt>            (. stmtNode = stmt; .)
+        ]            
     | 
-        "return" Expr<out ExprNode expr>
+        "return" Expr<out ExprNode expr>            (. stmtNode = new ReturnNode(expr); .)
     ).
 
 /*------------------------------------------------------------------------*/
-IdentCont<IdentNode i, out StmtNode s>                      (. Block b = new Block(); .)
-    = Assign<out ExprNode assign>                     (.  .)
+IdentCont<IdentNode i, out StmtNode s>                      (. s = null; Block b = new Block(); .)
+    = Assign<out ExprNode expr>                     (. s = new AssignNode(i, expr); .)
      | EdgeOpr<out int op>                      
      EdgeOneOrMore<i, op, ref b>                          (. s = b; .)
      .
 
 
 /*------------------------------------------------------------------------*/
-Member<ExprNode source, out ExprNode expr> =    (. expr = null; .)
-    WEAK '.' CallOrID<out IdentNode i>          (. expr = new MemberNode(source, i); .)
+Member<ExprNode source, out MemberNode mem> =    (. mem = null; .)
+    WEAK '.' CallOrID<out IdentNode i>          (. mem = new MemberNode(source, i); .)
     .
 
 /*------------------------------------------------------------------------*/
@@ -199,7 +200,7 @@ VtxDecls<ref Block b>
 /*------------------------------------------------------------------------*/
 VtxDecl<out VertexDeclNode v>                    (. v = null; .)
     = '(' IDENT                              (. v = new VertexDeclNode(Types.vertex, t.val); .)
-    VEParams<ref v>               
+    VEParams<v>               
     ')'.
 
 
@@ -218,7 +219,7 @@ EdgeOneOrMore<IdentNode left, int op, ref Block b>
     '}').
 
 /*------------------------------------------------------------------------*/
-EdgeDecls<left, op, ref b>
+EdgeDecls<IdentNode left, int op, ref Block b>
     = EdgeDecl<left, op, out EdgeDeclNode e1>                (. b.Add(e1); .)
     {WEAK ',' EdgeDecl<left, op, out EdgeDeclNode e2>        (. b.Add(e2); .)
     }.
@@ -226,12 +227,12 @@ EdgeDecls<left, op, ref b>
 /*------------------------------------------------------------------------*/
 EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge>   (. edge = null; .)
     = '(' Identifier<out VarNode right>                   (. edge = new EdgeDeclNode(left, right, op); .)
-    VEParams<ref edge>                           
+    VEParams<edge>                           
     ')'.
 
 
 /*------------------------------------------------------------------------*/
-VEParams<ref VEDeclNode ve>                             
+VEParams<VEDeclNode ve>                             
     = {WEAK ',' Identifier<out VarNode varNode>         
      Assign<out ExprNode expr>                       (. ve.AddAttr(new AssignNode(varNode, expr)); .)
      }.
@@ -310,7 +311,7 @@ Factor<out ExprNode e>                                  (. e = null; .)
         CallOrID<out IdentNode ident>                    (. e = ident; .)
     ) 
     {
-        Member<e, out ExprNode member>                   (. e = member; .)
+        Member<e, out MemberNode member>                   (. e = member; .)
     }
     .        
 
@@ -342,7 +343,7 @@ Identifier<out VarNode varNode> =   (. varNode = null; .)
 
 /*------------------------------------------------------------------------*/
 Const<out ExprNode e> =     (. e = null; .)
-    ( NUMBER                (. e = new NumConst(Convert.ToInt32(t.val));    .)
+    ( NUMBER                (. e = new NumConst(Convert.ToDouble(t.val));    .)
     | TEXT                  (. e = new TextConst(t.val);                    .)
     | TRUE                  (. e = new BoolConst(Convert.ToBoolean(t.val)); .)
     | FALSE                 (. e = new BoolConst(Convert.ToBoolean(t.val)); .)

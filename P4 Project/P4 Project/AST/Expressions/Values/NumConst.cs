@@ -8,11 +8,12 @@ namespace P4_Project.AST.Expressions.Values
 {
     class NumConst : ExprNode
     {
-        int val;
+        double val;
 
-        public NumConst(int _val)
+        public NumConst(double _val)
         {
             val = _val;
         }
+
     }
 }

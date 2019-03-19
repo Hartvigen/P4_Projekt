@@ -285,8 +285,8 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
             else if (la.kind == 11)
             {
-                VtxDecl(out VertexDeclNode veDecl);
-                block.Add(veDecl);
+                VtxDecl(out VertexDeclNode VertexDecl);
+                block.Add(VertexDecl);
             }
             else SynErr(61);
         }
@@ -297,16 +297,23 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             if (la.kind == 1)
             {
                 CallOrID(out IdentNode i);
+                stmtNode = new LoneCallNode(i);
                 while (la.kind == 25)
                 {
-                    Member(i, out ExprNode member);
+                    Member(i, out MemberNode member);
+                    i = member; stmtNode = new LoneCallNode(i);
                 }
-                IdentCont();
+                if (StartOf(10))
+                {
+                    IdentCont(i, out StmtNode stmt);
+                    stmtNode = stmt;
+                }
             }
             else if (la.kind == 24)
             {
                 Get();
                 Expr(out ExprNode expr);
+                stmtNode = new ReturnNode(expr);
             }
             else SynErr(62);
         }
@@ -438,24 +445,27 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
         }
 
-        void Member(ExprNode source, out ExprNode expr)
+        void Member(ExprNode source, out MemberNode mem)
         {
-            expr = null;
+            mem = null;
             ExpectWeak(25, 1);
             CallOrID(out IdentNode i);
-            expr = new MemberNode(source, i);
+            mem = new MemberNode(source, i);
         }
 
-        void IdentCont()
+        void IdentCont(IdentNode i, out StmtNode s)
         {
+            s = null; Block b = new Block();
             if (la.kind == 26)
             {
-                Assign(out ExprNode assign);
+                Assign(out ExprNode expr);
+                s = new AssignNode(i, expr);
             }
             else if (la.kind == 27 || la.kind == 28 || la.kind == 29)
             {
-                EdgeOpr(out int i);
-                EdgeOneOrMore();
+                EdgeOpr(out int op);
+                EdgeOneOrMore(i, op, ref b);
+                s = b;
             }
             else SynErr(64);
         }
@@ -481,20 +491,22 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             else SynErr(65);
         }
 
-        void EdgeOneOrMore()
+        void EdgeOneOrMore(IdentNode left, int op, ref Block b)
         {
             if (la.kind == 1)
             {
                 Identifier(out VarNode varNode);
+                b.Add(new EdgeDeclNode(left, varNode, op));
             }
             else if (la.kind == 11)
             {
-                EdgeDecl();
+                EdgeDecl(left, op, out EdgeDeclNode edge);
+                b.Add(edge);
             }
             else if (la.kind == 15)
             {
                 Get();
-                EdgeDecls();
+                EdgeDecls(left, op, ref b);
                 Expect(16);
             }
             else SynErr(66);
@@ -504,7 +516,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         {
             VtxDecl(out VertexDeclNode v1);
             b.Add(v1);
-            while (WeakSeparator(13, 10, 11))
+            while (WeakSeparator(13, 11, 12))
             {
                 VtxDecl(out VertexDeclNode v2);
                 b.Add(v2);
@@ -517,8 +529,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Expect(11);
             Expect(1);
             v = new VertexDeclNode(Types.vertex, t.val);
-            VEParams(out AssignNode a);
-            v.AddAttr(a);
+            VEParams(v);
             Expect(7);
         }
 
@@ -529,7 +540,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             {
                 Expr(out expr);
                 collec.Add(expr);
-                while (WeakSeparator(13, 9, 12))
+                while (WeakSeparator(13, 9, 13))
                 {
                     Expr(out expr);
                     collec.Add(expr);
@@ -537,13 +548,13 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
         }
 
-        void VEParams(out AssignNode assign)
+        void VEParams(VEDeclNode ve)
         {
-            assign = null;
-            while (WeakSeparator(13, 13, 6))
+            while (WeakSeparator(13, 14, 6))
             {
                 Identifier(out VarNode varNode);
-                Assign(out ExprNode ass);
+                Assign(out ExprNode expr);
+                ve.AddAttr(new AssignNode(varNode, expr));
             }
         }
 
@@ -554,20 +565,24 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             varNode = new VarNode(t.val);
         }
 
-        void EdgeDecl()
+        void EdgeDecl(IdentNode left, int op, out EdgeDeclNode edge)
         {
+            edge = null;
             Expect(11);
-            Expect(1);
-            VEParams(out AssignNode assign);
+            Identifier(out VarNode right);
+            edge = new EdgeDeclNode(left, right, op);
+            VEParams(edge);
             Expect(7);
         }
 
-        void EdgeDecls()
+        void EdgeDecls(IdentNode left, int op, ref Block b)
         {
-            EdgeDecl();
-            while (WeakSeparator(13, 10, 11))
+            EdgeDecl(left, op, out EdgeDeclNode e1);
+            b.Add(e1);
+            while (WeakSeparator(13, 11, 12))
             {
-                EdgeDecl();
+                EdgeDecl(left, op, out EdgeDeclNode e2);
+                b.Add(e2);
             }
         }
 
@@ -626,7 +641,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             e = null; int op = 0;
             ExprPlus(out ExprNode e1);
             e = e1;
-            if (StartOf(14))
+            if (StartOf(15))
             {
                 if (la.kind == 34)
                 {
@@ -722,7 +737,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         void Factor(out ExprNode e)
         {
             e = null;
-            if (StartOf(15))
+            if (StartOf(16))
             {
                 Const(out e);
             }
@@ -741,7 +756,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 }
                 while (la.kind == 25)
                 {
-                    Member(e, out ExprNode member);
+                    Member(e, out MemberNode member);
                     e = member;
                 }
             }
@@ -754,7 +769,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             if (la.kind == 2)
             {
                 Get();
-                e = new NumConst(Convert.ToInt32(t.val));
+                e = new NumConst(Convert.ToDouble(t.val));
             }
             else if (la.kind == 3)
             {
@@ -818,7 +833,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 Get();
                 ExpectWeak(34, 1);
                 SingleType(out subType);
-                ExpectWeak(35, 16);
+                ExpectWeak(35, 17);
                 type = Types.list + subType;
             }
             else if (la.kind == 45)
@@ -826,7 +841,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 Get();
                 ExpectWeak(34, 1);
                 SingleType(out subType);
-                ExpectWeak(35, 16);
+                ExpectWeak(35, 17);
                 type = Types.set + subType;
             }
             else if (la.kind == 46)
@@ -834,7 +849,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 Get();
                 ExpectWeak(34, 1);
                 SingleType(out subType);
-                ExpectWeak(35, 16);
+                ExpectWeak(35, 17);
                 type = Types.queue + subType;
             }
             else if (la.kind == 47)
@@ -842,7 +857,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 Get();
                 ExpectWeak(34, 1);
                 SingleType(out subType);
-                ExpectWeak(35, 16);
+                ExpectWeak(35, 17);
                 type = Types.stack + subType;
             }
             else SynErr(70);
@@ -871,6 +886,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         {x,x,x,x, x,x,x,x, x,T,T,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,x, x},
         {x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,T,T,T, x,x,x,x, x},
         {x,T,T,T, T,T,T,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,x, x,x,x,T, x,x,x,x, x,x,x,x, x},
+        {x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,T,T, T,T,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
         {x,x,x,x, x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
         {x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},
         {x,x,x,x, x,x,x,T, x,x,x,x, x,x,x,x, T,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x,x,x,x, x},

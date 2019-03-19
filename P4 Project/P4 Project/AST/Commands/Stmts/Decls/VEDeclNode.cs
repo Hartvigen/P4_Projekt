@@ -13,5 +13,10 @@ namespace P4_Project.AST.Commands.Stmts.Decls
         protected VEDeclNode(string _symbolName) : base(_symbolName)
         {
         }
+
+        public void AddAttr(AssignNode assign)
+        {
+            attributes.Add(assign);
+        }
     }
 }
