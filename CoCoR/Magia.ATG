@@ -155,39 +155,39 @@ Stmt<out StmtNode stmtNode> =                       (. stmtNode = null; .)
     ).
 
 /*------------------------------------------------------------------------*/
-IdentCont<IdentNode i, out StmtNode s>                      (. s = null; Block b = new Block(); .)
+IdentCont<IdentNode i, out StmtNode s>              (. s = null; Block b = new Block(); .)
     = Assign<out ExprNode expr>                     (. s = new AssignNode(i, expr); .)
      | EdgeOpr<out int op>                      
-     EdgeOneOrMore<i, op, ref b>                          (. s = b; .)
+     EdgeOneOrMore<i, op, ref b>                    (. s = b; .)
      .
 
 
 /*------------------------------------------------------------------------*/
-Member<ExprNode source, out MemberNode mem> =    (. mem = null; .)
-    WEAK '.' CallOrID<out IdentNode i>          (. mem = new MemberNode(source, i); .)
+Member<ExprNode source, out MemberNode mem> =       (. mem = null; .)
+    WEAK '.' CallOrID<out IdentNode i>              (. mem = new MemberNode(source, i); .)
     .
 
 /*------------------------------------------------------------------------*/
 FullDecl<ref Block block> =
     Type<out int typ> 
     (
-        IDENT                               (. string name = t.val; ExprNode expr = null; .)
+        IDENT                                   (. string name = t.val; ExprNode expr = null; .)
         [
             Assign<out expr>
-        ]                                   (. block.Add(new VarDeclNode(typ, name, expr)); .)
+        ]                                       (. block.Add(new VarDeclNode(typ, name, expr)); .)
     | 
         '{' 
             VtxDecls<ref block>
         '}' 
     | 
-        VtxDecl<out VertexDeclNode VertexDecl>      (. block.Add(VertexDecl); .)
+        VtxDecl<out VertexDeclNode VertexDecl>  (. block.Add(VertexDecl); .)
     ).
 
 /*------------------------------------------------------------------------*/
-Assign<out ExprNode expr>                   (. expr = null; .)
+Assign<out ExprNode expr>                       (. expr = null; .)
     = '=' 
     (Expr<out expr>
-    | '{' Args<out CollecConst collec>      (. expr = collec; .)
+    | '{' Args<out CollecConst collec>          (. expr = collec; .)
     '}'
     ).
 
@@ -198,43 +198,43 @@ VtxDecls<ref Block b>
     }.
 
 /*------------------------------------------------------------------------*/
-VtxDecl<out VertexDeclNode v>                    (. v = null; .)
-    = '(' IDENT                              (. v = new VertexDeclNode(Types.vertex, t.val); .)
+VtxDecl<out VertexDeclNode v>                   (. v = null; .)
+    = '(' IDENT                                 (. v = new VertexDeclNode(Types.vertex, t.val); .)
     VEParams<v>               
     ')'.
 
 
 /*------------------------------------------------------------------------*/
-EdgeOpr<out int op>            (. op = 0; .)
-    = ("<-"                    (. op = Operators.LEFTARR;     .)
-    | "--"                    (. op = Operators.NONARR;     .)
-    | "->"                    (. op = Operators.RIGHTARR;     .)
+EdgeOpr<out int op> (. op = 0;                  .)
+    = ("<-"         (. op = Operators.LEFTARR;  .)
+    | "--"          (. op = Operators.NONARR;   .)
+    | "->"          (. op = Operators.RIGHTARR; .)
     ).
 
 /*------------------------------------------------------------------------*/
 EdgeOneOrMore<IdentNode left, int op, ref Block b>  
-    = (Identifier<out VarNode varNode>              (. b.Add(new EdgeDeclNode(left, varNode, op)); .)
-    | EdgeDecl<left, op, out EdgeDeclNode edge>     (. b.Add(edge); .)
+    = (Identifier<out VarNode varNode>                  (. b.Add(new EdgeDeclNode(left, varNode, op)); .)
+    | EdgeDecl<left, op, out EdgeDeclNode edge>         (. b.Add(edge); .)
     | '{' EdgeDecls<left, op, ref b>                
     '}').
 
 /*------------------------------------------------------------------------*/
 EdgeDecls<IdentNode left, int op, ref Block b>
-    = EdgeDecl<left, op, out EdgeDeclNode e1>                (. b.Add(e1); .)
-    {WEAK ',' EdgeDecl<left, op, out EdgeDeclNode e2>        (. b.Add(e2); .)
+    = EdgeDecl<left, op, out EdgeDeclNode e1>           (. b.Add(e1); .)
+    {WEAK ',' EdgeDecl<left, op, out EdgeDeclNode e2>   (. b.Add(e2); .)
     }.
 
 /*------------------------------------------------------------------------*/
-EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge>   (. edge = null; .)
-    = '(' Identifier<out VarNode right>                   (. edge = new EdgeDeclNode(left, right, op); .)
+EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge> (. edge = null; .)
+    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); .)
     VEParams<edge>                           
     ')'.
 
 
 /*------------------------------------------------------------------------*/
-VEParams<VEDeclNode ve>                             
-    = {WEAK ',' Identifier<out VarNode varNode>         
-     Assign<out ExprNode expr>                       (. ve.AddAttr(new AssignNode(varNode, expr)); .)
+VEParams<VEDeclNode ve>
+    = {WEAK ',' Identifier<out VarNode varNode>
+     Assign<out ExprNode expr>                          (. ve.AddAttr(new AssignNode(varNode, expr)); .)
      }.
 
 
@@ -252,7 +252,7 @@ ExprOR<out ExprNode e>              (. e = null; int op = 0; .)
 /*------------------------------------------------------------------------*/
 ExprAnd<out ExprNode e>             (. e = null; int op = 0; .)
     = ExprEQ<out ExprNode e1>       (. e = e1; .)
-    {"&&"                           (. op = Operators.EQ; .)
+    {"&&"                           (. op = Operators.AND; .)
     ExprEQ<out ExprNode e2>         (. e = new BinExprNode(e, op, e2); .)
     }.
 
@@ -299,7 +299,7 @@ ExprNot<out ExprNode e>             (. e = null; bool b = false;.)
     .
 
 /*------------------------------------------------------------------------*/
-Factor<out ExprNode e>                                  (. e = null; .)
+Factor<out ExprNode e>                      (. e = null; .)
     =
     Const<out e>
     | 
@@ -308,10 +308,10 @@ Factor<out ExprNode e>                                  (. e = null; .)
             Expr<out e> 
         ')' 
         | 
-        CallOrID<out IdentNode ident>                    (. e = ident; .)
+        CallOrID<out IdentNode ident>       (. e = ident; .)
     ) 
     {
-        Member<e, out MemberNode member>                   (. e = member; .)
+        Member<e, out MemberNode member>    (. e = member; .)
     }
     .        
 
@@ -366,7 +366,7 @@ CollecType<out int type> =                                     (. type = 0; int 
 /*------------------------------------------------------------------------*/
 SingleType<out int type> = (. type = 0; .)
     ( "number"             (. type = Types.number; .)
-    | "bool"               (. type = Types.boolean; .)
+    | "boolean"               (. type = Types.boolean; .)
     | "text"               (. type = Types.text; .)
     | "vertex"             (. type = Types.vertex; .)
     | "edge"               (. type = Types.edge; .)

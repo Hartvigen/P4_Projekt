@@ -12,7 +12,8 @@ namespace P4_Project.AST.Expressions
         ExprNode source;
         IdentNode memberIdent;
 
-        public MemberNode(ExprNode _source, IdentNode _memberIdent) :base(_memberIdent.identifier)
+        public MemberNode(ExprNode _source, IdentNode _memberIdent) 
+            : base(_memberIdent.identifier)
         {
             source = _source;
             memberIdent = _memberIdent;
