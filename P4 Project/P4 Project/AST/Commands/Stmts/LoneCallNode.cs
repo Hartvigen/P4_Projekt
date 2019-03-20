@@ -10,10 +10,12 @@ namespace P4_Project.AST.Commands.Stmts
     class LoneCallNode : StmtNode
     {
         private IdentNode call;
-
+        
+        
         public LoneCallNode(IdentNode call)
         {
             this.call = call;
+            
         }
     }
 }

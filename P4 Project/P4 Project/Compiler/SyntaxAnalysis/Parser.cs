@@ -216,6 +216,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             attrDecl = new VarDeclNode(typ, name, val);
         }
 
+
         void Type(out int type)
         {
             type = 0;
@@ -608,7 +609,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             while (la.kind == 31)
             {
                 Get();
-                op = Operators.EQ;
+                op = Operators.AND;
                 ExprEQ(out ExprNode e2);
                 e = new BinExprNode(e, op, e2);
             }
@@ -769,7 +770,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             if (la.kind == 2)
             {
                 Get();
-                e = new NumConst(Convert.ToDouble(t.val));
+                e = new NumConst(Convert.ToDouble(t.val, System.Globalization.CultureInfo.InvariantCulture));
             }
             else if (la.kind == 3)
             {
