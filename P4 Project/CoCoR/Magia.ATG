@@ -1,4 +1,18 @@
-COMPILER MAGIA
+/* This file contains the Token specification and Grammar which COCO/R uses to construct the scanner
+and parser. COCO/R uses Extend Bacus-Naur form (EBNF) for the grammar, as well as its own series of commands
+which will be explained when met first in context.  */
+
+/* The EBNF uses the following extensions: */
+/* [] Brackets mean that the string is written zero or one times.  */
+
+/* {} Curly brackets mean that the string is repeated zero or more times  */
+
+/* () is a grouping used alongside |. The parenthesis contains a series of strings seperated by |. */
+/* This means that exactly one of the strings is chosen. */
+
+/* The required start of a COCO/R grammar file, while the "MAGIA" part specifies */
+/* the starting symbol of the grammar.*/
+COMPILER MAGIA   
 
     /*
     public SymbolTable   tab;
@@ -6,39 +20,52 @@ COMPILER MAGIA
     */
   
 /*--------------------------------------------------------------------------*/
+/* The following section contains the token specification of MAGIA.*/
 CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
   digit = "0123456789".
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
-  CharInLine = ANY - '\r' - '\n'.
+  CharInLine = ANY - '\r' - '\n'.       /* 'ANY' refers to all chars in UTF-8.  */
   AnyButDoubleQuote = CharInLine - '\"'.
 
 TOKENS
   IDENT  = letter {letter | digit | '_'}.
   NUMBER = digit {digit} | digit {digit} '.' digit {digit}.
-  TEXT = '"' {AnyButDoubleQuote | "\\\""} '"'.
-  NONE = "none".
+  TEXT = '"' {AnyButDoubleQuote | "\\\""} '"'. /* The string \\\" is an escaped double qoute */
+  NONE = "none".                            /* Is functionally the same as null in C# */
   TRUE = "true".
   FALSE = "false".
-  RPAREN = ')'.
+  RPAREN = ')'.                 /* Only ')' is specified as a token as it is needed for a check in FuncDecl  */
   
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
 
 IGNORE cr + lf + tab
 
-
+/* The rest of the file contains the grammar for MAGIA.  */
 
 PRODUCTIONS
 /*------------------------------------------------------------------------*/
+/* The starting rule of MAGIA contains quite a few COCO/R-specific features. The code written */
+/* in (. .) is C# code that is injected into the generated parser code. */
 MAGIA =                                     (. mainNode = null; Block mainBlock = new Block(); .)
+/* The keyword 'SYNC' specifies that the parser will skip tokens untill it discovers a token that */
+/* should follow the SYNC statement. If the next token is already valid, the SYNC is skipped. */
+
+/*<> contains the attributes of the grammar production which can be injected into and out of the production. */
+/* The keyword 'out' indicates that whatever happens to the variable 'headNode' inside the Head */
+/* production will reflect on the variable in this production. The parameter MUST be initialized */
+/* inside the Head production through semantic operations. */
     {SYNC Head<out HeadNode headNode>       (. mainBlock.Add(headNode); .)
     } 
+/* The keyword 'ref' is simply "pass by reference", so that changes to the members of the parameter */
+/* also happen to the variable outside the Stmts production */
     Stmts<ref mainBlock>
     { FuncDecl<out FuncDeclNode funcNode>   (. mainBlock.Add(funcNode); .)
     }                                       (. mainNode = new MAGIA(mainBlock); .)
+/* All productions end with a dot. */
     .
     
 /*------------------------------------------------------------------------*/
@@ -47,11 +74,14 @@ Head<out HeadNode headNode>              (. headNode = null; .)
     ( "vertex"                           (. headNode = new HeadNode(HeadNode.VERTEX); .)
     | "edge"                             (. headNode = new HeadNode(HeadNode.EDGE);   .)
     ) 
+/* The keyword 'WEAK' declares that the parser should expect some token T, but if some other token */
+/* is encountered instead, it should give an error as usual, but continue as if nothing is wrong. */
     WEAK '(' AttrDecls<ref headNode>
     WEAK ')' ']'.
 
 /*------------------------------------------------------------------------*/
 AttrDecls<ref HeadNode headNode> =          (. VarDeclNode attrDecl; .)
+/* The keyword '?' after headNode indicates that a null-check should be performed before attempting to call the function */
     AttrDecl<out attrDecl>                  (. headNode?.AddAttr(attrDecl); .)
     {
         WEAK ',' AttrDecl<out attrDecl>     (. headNode?.AddAttr(attrDecl); .)
@@ -60,6 +90,7 @@ AttrDecls<ref HeadNode headNode> =          (. VarDeclNode attrDecl; .)
 /*------------------------------------------------------------------------*/
 AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprNode val = null; .)
     Type<out int typ>
+    /* The expression t.val contains the scanned string value of the most recently parsed token.*/
     IDENT                            (. name = t.val; .)
     [
         Assign<out val> 
@@ -67,10 +98,7 @@ AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprN
     .
 
 
-/*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters
-or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters,
-so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called
-and any eventual errors will be handled there*/
+/*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters, so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
 FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
     SYNC "func" IDENT                                           (. funcName = t.val; .)
@@ -155,6 +183,7 @@ Stmt<out StmtNode stmtNode> =                       (. stmtNode = null; .)
     ).
 
 /*------------------------------------------------------------------------*/
+/* More than one parameter can be injected into a production, such as with IdentCont and EdgeOneOrMore */
 IdentCont<IdentNode i, out StmtNode s>              (. s = null; Block b = new Block(); .)
     = Assign<out ExprNode expr>                     (. s = new AssignNode(i, expr); .)
      | EdgeOpr<out int op>                      
@@ -205,6 +234,7 @@ VtxDecl<out VertexDeclNode v>                   (. v = null; .)
 
 
 /*------------------------------------------------------------------------*/
+/* Operators is a class in the solution, containing enumerate values for all operators in MAGIA. */
 EdgeOpr<out int op> (. op = 0;                  .)
     = ("<-"         (. op = Operators.LEFTARR;  .)
     | "--"          (. op = Operators.NONARR;   .)
@@ -343,7 +373,7 @@ Identifier<out VarNode varNode> =   (. varNode = null; .)
 
 /*------------------------------------------------------------------------*/
 Const<out ExprNode e> =     (. e = null; .)
-    ( NUMBER                (. e = new NumConst(Convert.ToDouble(t.val));    .)
+    ( NUMBER                (. e = new NumConst(Convert.ToDouble(t.val, System.Globalization.CultureInfo.InvariantCulture));    .)
     | TEXT                  (. e = new TextConst(t.val);                    .)
     | TRUE                  (. e = new BoolConst(Convert.ToBoolean(t.val)); .)
     | FALSE                 (. e = new BoolConst(Convert.ToBoolean(t.val)); .)
@@ -357,6 +387,7 @@ Type<out int type> =        (. type = 0; .)
     ).
 
 /*------------------------------------------------------------------------*/
+/* Types is, like Operators, a file in the solution containing enumerate values for all types. */
 CollecType<out int type> =                                     (. type = 0; int subType = 0; .)
     ( "list" WEAK '<' SingleType<out subType> WEAK '>'         (. type = Types.list + subType; .)
     | "set" WEAK '<' SingleType<out subType> WEAK '>'          (. type = Types.set + subType; .)

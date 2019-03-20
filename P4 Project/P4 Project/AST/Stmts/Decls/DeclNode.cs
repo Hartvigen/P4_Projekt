@@ -4,16 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_Project.AST.Commands.Stmts.Decls
+namespace P4_Project.AST.Stmts.Decls
 {
+    /// <summary>
+    /// The "DeclNode" is the common type for all declarations.
+    /// </summary>
     public class DeclNode : StmtNode
     {
         public string symbolName;
+
+        public DeclNode() { }
 
         public DeclNode(string _symbolName)
         {
             symbolName = _symbolName;
         }
-
     }
 }

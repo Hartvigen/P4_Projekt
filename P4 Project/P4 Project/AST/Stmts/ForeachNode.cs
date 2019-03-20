@@ -1,4 +1,4 @@
-﻿using P4_Project.AST.Commands.Stmts.Decls;
+﻿using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using System;
 using System.Collections.Generic;
@@ -6,20 +6,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_Project.AST.Commands.Stmts
+namespace P4_Project.AST.Stmts
 {
+    /// <summary>
+    /// The "ForeachNode" represents the structure of a foreach statement.
+    /// </summary>
     class ForeachNode : StmtNode
     {
-        VarDeclNode var;
+        VarDeclNode iterationVar;
         ExprNode iterator;
 
-        Block stmts;
+        Block body;
+
+        public ForeachNode() { }
 
         public ForeachNode(VarDeclNode v, ExprNode e, Block b)
         {
-            var = v;
+            iterationVar = v;
             iterator = e;
-            stmts = b;
+            body = b;
         }
     }
 }

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_Project.AST
-{   
+namespace P4_Project.AST.Stmts
+{
     /// <summary>
-    /// This abstract class represents, as the name suggests, the basic node from which all inherits.
+    /// The "StmtNode" is the common type for all statements.
     /// </summary>
-    public abstract class Node
+    public abstract class StmtNode : Node
     { }
 }

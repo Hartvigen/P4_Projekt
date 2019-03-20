@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using P4_Project.AST.Expressions.Identifier;
 
-namespace P4_Project.AST.Commands.Stmts.Decls
+namespace P4_Project.AST.Stmts.Decls
 {
-    class EdgeDeclNode: VEDeclNode
+    /// <summary>
+    /// The "EdgeDeclNode" represents the declaration of an edge between two vertices
+    /// </summary>
+    class EdgeDeclNode : VEDeclNode
     {
         private IdentNode start, end;
-
 
         private int Operator;
 

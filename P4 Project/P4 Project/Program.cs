@@ -1,11 +1,8 @@
 ﻿using P4_Project.AST;
 using P4_Project.Compiler.SyntaxAnalysis;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace P4_Project
 {
@@ -15,8 +12,26 @@ namespace P4_Project
         {
             if (args.Length > 0)
             {
-                Console.WriteLine("Compiling input file: " + args[0]);
-                Console.WriteLine(TryParse(args[0]) ? "Compile succeeded!" : "Compile failed!");
+                switch (args[0])
+                {
+                    case "-h":
+                    case "--help":
+                        Console.WriteLine("Usage: MagiaC.exe [filePath]");
+                        Console.WriteLine("For help: MagiaC.exe -h");
+                        Console.WriteLine("For help: MagiaC.exe --help");
+                        Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath]");
+                        Console.WriteLine("PrettyPrint AST: MagiaC.exe --prettyprint [filepath]");
+                        break;
+                    case "-p":
+                    case "--prettyprint":
+                        Console.WriteLine("Compiling input file and printing PrettyPrinting it: " + args[1]);
+                        Console.WriteLine(TryParseAndDebug(args[1]) ? "Compile asucceeded!" : "Compile failed!");
+                        break;
+                    default:
+                        Console.WriteLine("Compiling input file: " + args[0]);
+                        Console.WriteLine(TryParse(args[0]) ? "Compile succeeded!" : "Compile failed!");
+                        break;
+                }
             }
             else if (File.Exists("MAGIAFile.txt"))
             {
@@ -25,18 +40,29 @@ namespace P4_Project
             }
             else
             {
-                Console.WriteLine("-- No input file selected. Usage: MagiaC.exe [filePath]");
+                Console.WriteLine("for help type: MagiaC.exe --help");
             }
-
             Console.ReadKey();
         }
-        
+
 
         private static bool TryParse(string filePath)
         {
             Parser parser = new Parser(new Scanner(filePath));
             parser.Parse();
             MAGIA AST = parser.mainNode;
+
+            return parser.errors.count == 0;
+        }
+
+        private static bool TryParseAndDebug(string filePath)
+        {
+            Parser parser = new Parser(new Scanner(filePath));
+            parser.Parse();
+            MAGIA AST = parser.mainNode;
+
+            XmlSerializer x = new XmlSerializer(AST.GetType());
+            x.Serialize(Console.Out, AST);
 
             return parser.errors.count == 0;
         }

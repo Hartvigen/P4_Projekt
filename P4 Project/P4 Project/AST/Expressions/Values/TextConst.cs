@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
+    /// <summary>
+    /// As the name suggests, this node represents a constant of the type 'text'.
+    /// </summary>
     class TextConst : ExprNode
     {
-        string val;
+        string value;
 
-        public TextConst(string _val)
+        public TextConst() { }
+
+        public TextConst(string _value)
         {
-            val = _val;
+            value = _value;
         }
     }
 }

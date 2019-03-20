@@ -27,9 +27,8 @@ Coco/R itself) does not fall under the GNU General Public License.
 -->begin
 using System;
 using P4_Project.AST;
-using P4_Project.AST.Commands;
-using P4_Project.AST.Commands.Stmts;
-using P4_Project.AST.Commands.Stmts.Decls;
+using P4_Project.AST.Stmts;
+using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
@@ -53,7 +52,7 @@ public class Parser {
 
 -->declarations
 
-	public Parser(Scanner scanner) {
+	public Parser(Scanner scanner, Boolean generateAST) {
 		this.scanner = scanner;
 		errors = new Errors();
 	}

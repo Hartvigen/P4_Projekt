@@ -5,16 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using P4_Project.AST.Expressions;
 
-namespace P4_Project.AST.Commands.Stmts
+namespace P4_Project.AST.Stmts
 {
-    class ReturnNode:StmtNode
+    /// <summary>
+    /// The "ReturnNode" represents a return statement.
+    /// </summary>
+    class ReturnNode : StmtNode
     {
         ExprNode ret;
+
+        public ReturnNode() { }
 
         public ReturnNode(ExprNode _ret)
         {
             ret = _ret;
         }
-
     }
 }

@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
-    class BoolConst:ExprNode
+    /// <summary>
+    /// As the name suggests, this node represents a constant of the type 'boolean'.
+    /// </summary>
+    class BoolConst : ExprNode
     {
         bool val;
+
+        public BoolConst() { }
 
         public BoolConst(bool _val)
         {

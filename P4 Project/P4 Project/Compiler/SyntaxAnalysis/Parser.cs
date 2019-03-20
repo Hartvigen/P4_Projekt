@@ -1,9 +1,8 @@
 ﻿
 using System;
 using P4_Project.AST;
-using P4_Project.AST.Commands;
-using P4_Project.AST.Commands.Stmts;
-using P4_Project.AST.Commands.Stmts.Decls;
+using P4_Project.AST.Stmts;
+using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
@@ -215,6 +214,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
             attrDecl = new VarDeclNode(typ, name, val);
         }
+
 
         void Type(out int type)
         {
@@ -608,7 +608,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             while (la.kind == 31)
             {
                 Get();
-                op = Operators.EQ;
+                op = Operators.AND;
                 ExprEQ(out ExprNode e2);
                 e = new BinExprNode(e, op, e2);
             }
@@ -769,7 +769,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             if (la.kind == 2)
             {
                 Get();
-                e = new NumConst(Convert.ToDouble(t.val));
+                e = new NumConst(Convert.ToDouble(t.val, System.Globalization.CultureInfo.InvariantCulture));
             }
             else if (la.kind == 3)
             {

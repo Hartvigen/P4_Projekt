@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
+    /// <summary>
+    /// As the name suggests, this node represents a constant of the type 'number'.
+    /// </summary>
     class NumConst : ExprNode
     {
-        double val;
+        double value;
 
-        public NumConst(double _val)
+        public NumConst() { }
+
+        public NumConst(double _value)
         {
-            val = _val;
+            value = _value;
         }
 
     }
