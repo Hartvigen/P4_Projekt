@@ -11,11 +11,11 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     class TextConst : ExprNode
     {
-        string val;
+        string value;
 
-        public TextConst(string _val)
+        public TextConst(string _value)
         {
-            val = _val;
+            value = _value;
         }
     }
 }

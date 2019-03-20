@@ -10,7 +10,5 @@ namespace P4_Project.AST.Expressions.Values
     /// As MAGIA uses none instead of null, this const represents the none constant.
     /// </summary>
     class NoneConst : ExprNode
-    {
-        readonly object val = null;
-    }
+    { }
 }

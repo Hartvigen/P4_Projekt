@@ -1,9 +1,8 @@
 ﻿
 using System;
 using P4_Project.AST;
-using P4_Project.AST.Commands;
-using P4_Project.AST.Commands.Stmts;
-using P4_Project.AST.Commands.Stmts.Decls;
+using P4_Project.AST.Stmts;
+using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;

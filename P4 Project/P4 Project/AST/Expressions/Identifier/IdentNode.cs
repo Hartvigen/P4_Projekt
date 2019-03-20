@@ -12,7 +12,6 @@ namespace P4_Project.AST.Expressions.Identifier
     /// </summary>
     public abstract class IdentNode : ExprNode
     {
-
         /// <summary>
         /// The identifier is the string value of the identifier, and the reference is a reference directly to the symbol table.
         /// </summary>

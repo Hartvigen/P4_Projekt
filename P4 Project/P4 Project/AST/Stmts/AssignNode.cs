@@ -6,8 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_Project.AST.Commands.Stmts
+namespace P4_Project.AST.Stmts
 {
+    /// <summary>
+    /// The "AssignNode" represents the structure of an assignment operation (giving some target identifier a value)
+    /// </summary>
     class AssignNode : StmtNode
     {
         IdentNode target;

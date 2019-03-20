@@ -9,7 +9,7 @@ namespace P4_Project.AST.Expressions.Values
     /// <summary>
     /// As the name suggests, this node represents a constant of the type 'boolean'.
     /// </summary>
-    class BoolConst :ExprNode
+    class BoolConst : ExprNode
     {
         bool val;
 

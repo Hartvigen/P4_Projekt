@@ -13,9 +13,10 @@ namespace P4_Project.AST.Expressions
     class MemberNode : IdentNode
     {
         /// <summary>
-        /// memIdent is the name of the field or method that is being accessed, while source is the location of said field or method./// </summary>
-        ExprNode source;
-        IdentNode memberIdent;
+        /// memIdent is the name of the field or method that is being accessed, while source is the location of said field or method.
+        /// </summary>
+        public ExprNode source;
+        public IdentNode memberIdent;
 
         public MemberNode(ExprNode _source, IdentNode _memberIdent) 
             : base(_memberIdent.identifier)

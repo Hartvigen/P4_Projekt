@@ -12,12 +12,12 @@ namespace P4_Project.AST.Expressions.Identifier
     /// </summary>
     class CallNode : IdentNode
     {
-        CollecConst collec;
+        public CollecConst parameters;
 
-        public CallNode(string _identifier, CollecConst _collec) 
+        public CallNode(string _identifier, CollecConst _parameters) 
             : base(_identifier)
         {
-            collec = _collec;
+            parameters = _parameters;
         }
     }
 }
