@@ -1,5 +1,6 @@
 ﻿using P4_Project.AST;
 using P4_Project.AST.Stmts;
+using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,11 @@ namespace P4_Project.AST.Stmts
         public void Add(StmtNode com)
         {
             commands.Add(com);
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

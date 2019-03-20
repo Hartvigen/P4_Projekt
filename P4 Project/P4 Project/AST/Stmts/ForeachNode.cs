@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts
 {
     /// <summary>
     /// The "ForeachNode" represents the structure of a foreach statement.
     /// </summary>
-    class ForeachNode : StmtNode
+    public class ForeachNode : StmtNode
     {
         VarDeclNode iterationVar;
         ExprNode iterator;
@@ -25,6 +26,11 @@ namespace P4_Project.AST.Stmts
             iterationVar = v;
             iterator = e;
             body = b;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

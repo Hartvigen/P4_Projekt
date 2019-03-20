@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P4_Project.Visitors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,11 @@ namespace P4_Project.AST.Stmts.Decls
         {
             parameters = _parameters;
             body = _body;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

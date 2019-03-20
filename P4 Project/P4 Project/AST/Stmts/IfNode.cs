@@ -1,4 +1,5 @@
 ﻿using P4_Project.AST.Expressions;
+using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace P4_Project.AST.Stmts
     /// <summary>
     /// The "IfNode" represents the structure of an if statement.
     /// </summary>
-    class IfNode : StmtNode
+    public class IfNode : StmtNode
     {
         ExprNode condition;
         Block stmtBody;
@@ -27,6 +28,11 @@ namespace P4_Project.AST.Stmts
         public void SetElse(IfNode i)
         {
             elseNode = i;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

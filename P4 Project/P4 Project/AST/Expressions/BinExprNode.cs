@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P4_Project.Visitors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace P4_Project.AST.Expressions
     /// <summary>
     /// An expression where the expression contains two expressions(which might be factors) and an operator between them. 
     /// </summary>
-    class BinExprNode : ExprNode
+    public class BinExprNode : ExprNode
     {
         ExprNode left, right;
         int operatorType;
@@ -21,6 +22,11 @@ namespace P4_Project.AST.Expressions
             left = _left;
             right = _right;
             operatorType = _operatorType;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P4_Project.Visitors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace P4_Project.AST.Expressions.Values
     /// <summary>
     /// As the name suggests, this node represents a constant of the type 'text'.
     /// </summary>
-    class TextConst : ExprNode
+    public class TextConst : ExprNode
     {
         string value;
 
@@ -18,6 +19,11 @@ namespace P4_Project.AST.Expressions.Values
         public TextConst(string _value)
         {
             value = _value;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

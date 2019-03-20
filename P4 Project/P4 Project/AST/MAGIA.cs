@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using P4_Project.AST.Stmts;
+using P4_Project.Visitors;
 
 namespace P4_Project.AST
 {
@@ -23,6 +24,11 @@ namespace P4_Project.AST
         public MAGIA(Block _block)
         {
             block = _block;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

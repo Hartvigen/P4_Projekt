@@ -9,7 +9,7 @@ namespace P4_Project.AST.Stmts.Decls
     /// <summary>
     /// The "DeclNode" is the common type for all declarations.
     /// </summary>
-    public class DeclNode : StmtNode
+    public abstract class DeclNode : StmtNode
     {
         public string symbolName;
 

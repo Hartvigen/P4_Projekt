@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.Visitors;
 
 namespace P4_Project.AST.Expressions.Values
 {
@@ -10,7 +11,7 @@ namespace P4_Project.AST.Expressions.Values
     /// As the name suggests, this node represents a collection of expressions,
     /// made with the syntax collec<type> = {expr1, ..., exprn}, symbolizing the {expr1, ..., exprn} part.
     /// </summary>
-    class CollecConst : ExprNode
+    public class CollecConst : ExprNode
     {
         List<ExprNode> exprs = new List<ExprNode>();
 
@@ -19,6 +20,11 @@ namespace P4_Project.AST.Expressions.Values
         public void Add(ExprNode expr)
         {
             exprs.Add(expr);
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

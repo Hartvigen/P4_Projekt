@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P4_Project.Visitors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace P4_Project.AST.Expressions.Values
     /// <summary>
     /// As the name suggests, this node represents a constant of the type 'boolean'.
     /// </summary>
-    class BoolConst : ExprNode
+    public class BoolConst : ExprNode
     {
         bool val;
 
@@ -18,6 +19,11 @@ namespace P4_Project.AST.Expressions.Values
         public BoolConst(bool _val)
         {
             val = _val;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }
