@@ -7,6 +7,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P4 Project", "P4 Project\P4
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P4 ProjectTests", "P4 ProjectTests1\P4 ProjectTests.csproj", "{466156B2-B7E6-46EF-A234-9554D142BCA8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "!CocoR", "!CocoR", "{BEAE65D5-DEE9-4517-9871-6429FD0509EA}"
+	ProjectSection(SolutionItems) = preProject
+		CoCoR\coc.bat = CoCoR\coc.bat
+		CoCoR\Coco.exe = CoCoR\Coco.exe
+		CoCoR\Magia.ATG = CoCoR\Magia.ATG
+		CoCoR\Parser.cs = CoCoR\Parser.cs
+		CoCoR\Parser.cs.old = CoCoR\Parser.cs.old
+		CoCoR\Parser.frame = CoCoR\Parser.frame
+		CoCoR\Scanner.cs = CoCoR\Scanner.cs
+		CoCoR\Scanner.cs.old = CoCoR\Scanner.cs.old
+		CoCoR\Scanner.frame = CoCoR\Scanner.frame
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples from taste", "Examples from taste", "{DE415D61-6E9E-45E3-8A42-D550354C484D}"
+	ProjectSection(SolutionItems) = preProject
+		CoCoR\Examples from taste\CodeGen.cs = CoCoR\Examples from taste\CodeGen.cs
+		CoCoR\Examples from taste\SymTab.cs = CoCoR\Examples from taste\SymTab.cs
+		CoCoR\Examples from taste\Taste.cs = CoCoR\Examples from taste\Taste.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +44,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DE415D61-6E9E-45E3-8A42-D550354C484D} = {BEAE65D5-DEE9-4517-9871-6429FD0509EA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E10E6D4-8A85-4325-BB4E-D5082E4F7797}
