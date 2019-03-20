@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("P4 ProjectTests")]
+[assembly: AssemblyTitle("P4 ProjectTests1")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hewlett-Packard Company")]
-[assembly: AssemblyProduct("P4 ProjectTests")]
+[assembly: AssemblyProduct("P4 ProjectTests1")]
 [assembly: AssemblyCopyright("Copyright © Hewlett-Packard Company 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("d5a4fb88-fa5d-4953-b1fb-202b10485d8c")]
+[assembly: Guid("466156b2-b7e6-46ef-a234-9554d142bca8")]
 
 // Version information for an assembly consists of the following four values:
 //
