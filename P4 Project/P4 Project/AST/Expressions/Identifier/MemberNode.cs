@@ -18,6 +18,8 @@ namespace P4_Project.AST.Expressions
         public ExprNode source;
         public IdentNode memberIdent;
 
+        public MemberNode() { }
+
         public MemberNode(ExprNode _source, IdentNode _memberIdent) 
             : base(_memberIdent.identifier)
         {

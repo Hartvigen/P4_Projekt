@@ -18,6 +18,8 @@ namespace P4_Project.AST.Expressions.Identifier
         Reference reference;
         public string identifier;
 
+        public IdentNode() { }
+
         public IdentNode(string _identifier)
         {
             identifier = _identifier;

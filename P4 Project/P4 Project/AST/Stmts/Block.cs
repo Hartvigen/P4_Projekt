@@ -16,10 +16,7 @@ namespace P4_Project.AST.Stmts
     {
         public List<StmtNode> commands = new List<StmtNode>();
 
-
-        public Block()
-        { }
-
+        public Block() { }
 
         public void Add(StmtNode com)
         {

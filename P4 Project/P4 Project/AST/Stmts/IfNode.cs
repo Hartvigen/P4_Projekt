@@ -16,6 +16,8 @@ namespace P4_Project.AST.Stmts
         Block stmtBody;
         IfNode elseNode = null;
 
+        public IfNode() { }
+
         public IfNode(ExprNode e, Block b)
         {
             condition = e;

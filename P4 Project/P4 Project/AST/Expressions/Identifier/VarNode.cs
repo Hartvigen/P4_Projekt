@@ -11,6 +11,8 @@ namespace P4_Project.AST.Expressions.Identifier
     /// </summary>
     class VarNode : IdentNode
     {
+        public VarNode() { }
+
         public VarNode(string _identifier) 
             : base(_identifier)
         { }

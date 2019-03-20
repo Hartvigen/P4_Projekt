@@ -14,6 +14,8 @@ namespace P4_Project.AST.Stmts.Decls
     {
         Block attributes = new Block();
 
+        public VEDeclNode() { }
+
         protected VEDeclNode(string _symbolName) : base(_symbolName)
         {
         }

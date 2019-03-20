@@ -13,6 +13,8 @@ namespace P4_Project.AST.Stmts.Decls
     {
         public string symbolName;
 
+        public DeclNode() { }
+
         public DeclNode(string _symbolName)
         {
             symbolName = _symbolName;

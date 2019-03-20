@@ -15,6 +15,8 @@ namespace P4_Project.AST.Stmts.Decls
         public int type;
         public ExprNode expr; // If the variable should have a default value, this value is stored in "expr".
 
+        public VarDeclNode() { }
+
         public VarDeclNode(int _type, string _symbolName, ExprNode _expr)
             : base(_symbolName)
         {

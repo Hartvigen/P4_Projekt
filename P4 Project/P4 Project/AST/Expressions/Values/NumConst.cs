@@ -13,6 +13,8 @@ namespace P4_Project.AST.Expressions.Values
     {
         double value;
 
+        public NumConst() { }
+
         public NumConst(double _value)
         {
             value = _value;

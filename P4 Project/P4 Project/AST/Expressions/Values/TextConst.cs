@@ -13,6 +13,8 @@ namespace P4_Project.AST.Expressions.Values
     {
         string value;
 
+        public TextConst() { }
+
         public TextConst(string _value)
         {
             value = _value;

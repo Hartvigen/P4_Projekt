@@ -18,6 +18,8 @@ namespace P4_Project.AST.Stmts
 
         Block body;
 
+        public ForeachNode() { }
+
         public ForeachNode(VarDeclNode v, ExprNode e, Block b)
         {
             iterationVar = v;

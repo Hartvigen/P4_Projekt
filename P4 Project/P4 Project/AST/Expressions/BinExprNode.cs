@@ -14,6 +14,8 @@ namespace P4_Project.AST.Expressions
         ExprNode left, right;
         int operatorType;
 
+        public BinExprNode() { }
+
         public BinExprNode(ExprNode _left, int _operatorType, ExprNode _right)
         {
             left = _left;

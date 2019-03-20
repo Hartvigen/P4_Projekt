@@ -13,6 +13,8 @@ namespace P4_Project.AST.Expressions.Values
     {
         bool val;
 
+        public BoolConst() { }
+
         public BoolConst(bool _val)
         {
             val = _val;

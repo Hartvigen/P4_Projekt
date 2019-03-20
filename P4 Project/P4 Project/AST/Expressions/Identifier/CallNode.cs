@@ -14,6 +14,10 @@ namespace P4_Project.AST.Expressions.Identifier
     {
         public CollecConst parameters;
 
+        public CallNode()
+            : base("")
+        { }
+
         public CallNode(string _identifier, CollecConst _parameters) 
             : base(_identifier)
         {

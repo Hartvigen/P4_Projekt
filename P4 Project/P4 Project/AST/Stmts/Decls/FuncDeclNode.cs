@@ -14,6 +14,7 @@ namespace P4_Project.AST.Stmts.Decls
         public Block parameters;
         public Block body;
 
+        public FuncDeclNode() { }
 
         public FuncDeclNode(string _symbolName, Block _parameters, Block _body) : base(_symbolName)
         {

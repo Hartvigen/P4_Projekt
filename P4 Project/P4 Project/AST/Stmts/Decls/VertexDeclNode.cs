@@ -14,6 +14,8 @@ namespace P4_Project.AST.Stmts.Decls
     {
         int type;
 
+        public VertexDeclNode() { }
+
         public VertexDeclNode(int _type, string _symbolName) 
             : base(_symbolName)
         {

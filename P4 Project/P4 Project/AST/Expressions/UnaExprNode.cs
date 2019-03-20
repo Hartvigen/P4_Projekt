@@ -14,6 +14,8 @@ namespace P4_Project.AST.Expressions
         public ExprNode expr;
         int operatorType;
 
+        public UnaExprNode() { }
+
         public UnaExprNode(int _operatorType, ExprNode _expr)
         {
             operatorType = _operatorType;

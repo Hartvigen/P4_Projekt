@@ -14,10 +14,11 @@ namespace P4_Project.AST.Stmts
     {
         ExprNode ret;
 
+        public ReturnNode() { }
+
         public ReturnNode(ExprNode _ret)
         {
             ret = _ret;
         }
-
     }
 }

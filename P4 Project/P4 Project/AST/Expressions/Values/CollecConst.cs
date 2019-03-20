@@ -14,8 +14,7 @@ namespace P4_Project.AST.Expressions.Values
     {
         List<ExprNode> exprs = new List<ExprNode>();
 
-        public CollecConst()
-        { }
+        public CollecConst(){ }
 
         public void Add(ExprNode expr)
         {

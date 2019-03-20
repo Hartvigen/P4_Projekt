@@ -16,6 +16,8 @@ namespace P4_Project.AST.Stmts
         IdentNode target;
         ExprNode value;
 
+        public AssignNode() { }
+
         public AssignNode(IdentNode _target, ExprNode _value)
         {
             target = _target;
