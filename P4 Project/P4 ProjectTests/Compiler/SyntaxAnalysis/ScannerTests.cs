@@ -80,7 +80,46 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Scanner test = scannerFromString("a2)");
             Assert.IsTrue(test.Scan().kind == Parser._IDENT);
             Assert.IsTrue(test.Scan().kind == Parser._RPAREN);
-
         }
+
+        //test to see if we can correctly recognize token values
+        [TestMethod()]
+        public void ScanTest4()
+        {
+            Assert.IsTrue(scannerFromString("a2").Scan().val == "a2");
+
+            Assert.IsTrue(scannerFromString("a2$").Scan().val == "a2");
+
+            Assert.IsTrue(scannerFromString("2k k").Scan().val == "2");
+
+            Assert.IsTrue(scannerFromString("()").Scan().val == "(");
+
+            Assert.IsTrue(scannerFromString("vertex fur").Scan().val == "vertex");
+
+            Assert.IsTrue(scannerFromString("edge ry").Scan().val == "edge");
+
+            Assert.IsTrue(scannerFromString("number x = 10").Scan().val == "number");
+
+            Assert.IsTrue(scannerFromString("bool flag = true").Scan().val == "bool");
+        }
+
+        //test to see if we find the correct token values when scanning through a header
+        [TestMethod()]
+        public void ScanTest5()
+        {
+            Assert.IsTrue(TryParse("[vertex(number x = 10)]"));
+
+            Scanner test = scannerFromString("[vertex(number x = 10)]");
+            Assert.IsTrue(test.Scan().val == "[");
+            Assert.IsTrue(test.Scan().val == "vertex");
+            Assert.IsTrue(test.Scan().val == "(");
+            Assert.IsTrue(test.Scan().val == "number");
+            Assert.IsTrue(test.Scan().val == "x");
+            Assert.IsTrue(test.Scan().val == "=");
+            Assert.IsTrue(test.Scan().val == "10");
+            Assert.IsTrue(test.Scan().val == ")");
+            Assert.IsTrue(test.Scan().val == "]");
+        }
+  
     }
 }
