@@ -19,11 +19,17 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
                     new Scanner(
                         StreamFromString(program)
                 ));
-
             parser.Parse();
 
             return parser.errors.count == 0;
         }
+
+        private Scanner scannerFromString(string s)
+        {
+            return new Scanner(StreamFromString(s));
+        }
+
+
 
         private MemoryStream StreamFromString(string str)
         {
@@ -61,11 +67,19 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
         }
 
-        //nothing here yet :DDDDDD
+        //checking if tokens are read correctly by the scanner
         [TestMethod()]
         public void ScanTest3()
         {
-            bool success;
+            Assert.IsTrue(scannerFromString(" )").Scan().kind == Parser._RPAREN);
+
+            Assert.IsTrue(scannerFromString("a2").Scan().kind == Parser._IDENT);
+
+            Assert.IsFalse(scannerFromString(")a2").Scan().kind == Parser._IDENT);
+
+            Scanner test = scannerFromString("a2)");
+            Assert.IsTrue(test.Scan().kind == Parser._IDENT);
+            Assert.IsTrue(test.Scan().kind == Parser._RPAREN);
 
         }
     }
