@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P4 Project", "P4 Project\P4 Project.csproj", "{93AB248B-8C1B-403E-9FAA-23EBC916EE61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P4 ProjectTests", "P4 ProjectTests1\P4 ProjectTests.csproj", "{466156B2-B7E6-46EF-A234-9554D142BCA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P4 ProjectTests", "P4 ProjectTests\P4 ProjectTests.csproj", "{466156B2-B7E6-46EF-A234-9554D142BCA8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "!CocoR", "!CocoR", "{BEAE65D5-DEE9-4517-9871-6429FD0509EA}"
 	ProjectSection(SolutionItems) = preProject
