@@ -1,5 +1,6 @@
 ﻿using P4_Project.AST;
 using P4_Project.Compiler.SyntaxAnalysis;
+using P4_Project.Visitors;
 using System;
 using System.IO;
 using System.Xml.Serialization;
@@ -36,7 +37,7 @@ namespace P4_Project
             else if (File.Exists("MAGIAFile.txt"))
             {
                 Console.WriteLine("Compiling standard file: MAGIAFile.txt");
-                Console.WriteLine(TryParse("MAGIAFile.txt") ? "Compile succeeded!" : "Compile failed!");
+                Console.WriteLine(TryParseAndDebug("MAGIAFile.txt") ? "Compile succeeded!" : "Compile failed!");
             }
             else
             {
@@ -61,8 +62,9 @@ namespace P4_Project
             parser.Parse();
             MAGIA AST = parser.mainNode;
 
-            XmlSerializer x = new XmlSerializer(AST.GetType());
-            x.Serialize(Console.Out, AST);
+            SerializerVisitor visitor = new SerializerVisitor();
+            AST.Accept(visitor);
+            string str = visitor.ast.ToString();
 
             return parser.errors.count == 0;
         }

@@ -1,4 +1,5 @@
 ﻿using P4_Project.AST.Expressions.Values;
+using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace P4_Project.AST.Expressions.Identifier
     /// <summary>
     /// This node represents a specialization of IdentNode representing a call to a function or method.
     /// </summary>
-    class CallNode : IdentNode
+    public class CallNode : IdentNode
     {
         public CollecConst parameters;
 
@@ -22,6 +23,11 @@ namespace P4_Project.AST.Expressions.Identifier
             : base(_identifier)
         {
             parameters = _parameters;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

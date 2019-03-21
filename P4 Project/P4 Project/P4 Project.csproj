@@ -80,6 +80,8 @@
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
+    <Compile Include="Visitors\SerializerVisitor.cs" />
+    <Compile Include="Visitors\Visitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -89,8 +91,6 @@
   <ItemGroup>
     <Folder Include="Compiler\CodeGeneration\" />
     <Folder Include="Compiler\SemanticAnalysis\" />
-    <Folder Include="Visitor\PrettyPrinter\" />
-    <Folder Include="AST\Stmts\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

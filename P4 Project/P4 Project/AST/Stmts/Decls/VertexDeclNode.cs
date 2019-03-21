@@ -1,4 +1,5 @@
 ﻿using P4_Project.AST.Expressions;
+using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace P4_Project.AST.Stmts.Decls
     /// <summary>
     /// The "VertexDeclNode" represents the declaration of a vertex.
     /// </summary>
-    class VertexDeclNode : VEDeclNode
+    public class VertexDeclNode : VEDeclNode
     {
         int type;
 
@@ -20,6 +21,11 @@ namespace P4_Project.AST.Stmts.Decls
             : base(_symbolName)
         {
             type = _type;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

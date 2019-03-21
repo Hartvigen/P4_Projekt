@@ -1,4 +1,5 @@
 ﻿using P4_Project.SymbolTable;
+using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,11 @@ namespace P4_Project.AST.Expressions.Identifier
         public IdentNode(string _identifier)
         {
             identifier = _identifier;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

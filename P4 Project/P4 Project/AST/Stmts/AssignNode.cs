@@ -1,5 +1,6 @@
 ﻿using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
+using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace P4_Project.AST.Stmts
     /// <summary>
     /// The "AssignNode" represents the structure of an assignment operation (giving some target identifier a value)
     /// </summary>
-    class AssignNode : StmtNode
+    public class AssignNode : StmtNode
     {
         IdentNode target;
         ExprNode value;
@@ -22,6 +23,11 @@ namespace P4_Project.AST.Stmts
         {
             target = _target;
             value = _value; 
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

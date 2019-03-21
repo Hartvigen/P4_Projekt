@@ -1,4 +1,5 @@
-﻿using System;
+﻿using P4_Project.Visitors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace P4_Project.AST.Stmts.Decls
     /// The "VEDeclNode" is the base class for vertex and edge declarations. 
     /// This class exist because the declaration of vertices and edges have some common aspects.
     /// </summary>
-    abstract class VEDeclNode : DeclNode
+    public abstract class VEDeclNode : DeclNode
     {
         Block attributes = new Block();
 

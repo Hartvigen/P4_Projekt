@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using P4_Project.AST.Expressions.Identifier;
+using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts
 {
@@ -11,15 +12,19 @@ namespace P4_Project.AST.Stmts
     /// Since a function call is an expression it cannot be called as is. 
     /// Therefore "LoneCallNode" is a statement and container for a CallNode to allow calling a function as a statement
     /// </summary>
-    class LoneCallNode : StmtNode
+    public class LoneCallNode : StmtNode
     {
         private IdentNode call;
         
         
         public LoneCallNode(IdentNode call)
         {
-            this.call = call;
-            
+            this.call = call;   
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

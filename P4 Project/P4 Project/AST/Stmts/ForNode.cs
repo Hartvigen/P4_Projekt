@@ -1,4 +1,5 @@
 ﻿using P4_Project.AST.Expressions;
+using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace P4_Project.AST.Stmts
     /// <summary>
     /// The "ForNode" represents the structure of a for statement
     /// </summary>
-    class ForNode : StmtNode
+    public class ForNode : StmtNode
     {
         public StmtNode initializer;
         public ExprNode condition;
@@ -24,6 +25,11 @@ namespace P4_Project.AST.Stmts
             condition = con;
             iterator = iter;
             body = _body;
+        }
+
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }
