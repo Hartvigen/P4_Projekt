@@ -25,5 +25,24 @@ namespace P4_Project
         public const int 
             var = 0, 
             proc = 1;
+
+
+        public static string getCodeFromInt(int i)
+        {
+            switch (i)
+            {
+                case 0: return nameof(undef);
+                case 1: return nameof(number);
+                case 2: return nameof(boolean);
+                case 3: return nameof(text);
+                case 4: return nameof(vertex);
+                case 5: return nameof(edge);
+                case 10: return nameof(set);
+                case 20: return nameof(list);
+                case 30: return nameof(queue);
+                case 40: return nameof(stack);
+                default: throw new Exception("Not vaild type");
+            }
+        }
     }
 }
