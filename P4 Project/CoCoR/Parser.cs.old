@@ -243,7 +243,7 @@ public class Parser {
 			stmtNode = new LoneCallNode(i); 
 			while (la.kind == 25) {
 				Member(i, out MemberNode member);
-				i = member; 
+				i = member; stmtNode = new LoneCallNode(i); 
 			}
 			if (StartOf(10)) {
 				IdentCont(i, out StmtNode stmt);

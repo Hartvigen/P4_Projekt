@@ -14,10 +14,10 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class ForeachNode : StmtNode
     {
-        VarDeclNode iterationVar;
-        ExprNode iterator;
+        public VarDeclNode iterationVar;
+        public ExprNode iterator;
 
-        Block body;
+        public Block body;
 
         public ForeachNode() { }
 

@@ -12,7 +12,7 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class TextConst : ExprNode
     {
-        string value;
+        public string value;
 
         public TextConst() { }
 
