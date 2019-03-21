@@ -80,6 +80,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Scanner test = scannerFromString("a2)");
             Assert.IsTrue(test.Scan().kind == Parser._IDENT);
             Assert.IsTrue(test.Scan().kind == Parser._RPAREN);
+            Assert.IsTrue(test.Scan().kind == Parser._EOF);
         }
 
         //test to see if we can correctly recognize token values
