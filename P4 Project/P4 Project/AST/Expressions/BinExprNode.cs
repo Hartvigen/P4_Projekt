@@ -29,10 +29,14 @@ namespace P4_Project.AST.Expressions
             vi.Visit(this);
         }
 
-        public String getString()
+        public String getNameOfOperator()
         {
-            String value = Operators.getStringFromInt(operatorType);
-            return value;
+            return Operators.getNameFromInt(operatorType);
+        }
+
+        public String getCodeofOperator()
+        {
+            return Operators.getCodeFromInt(operatorType);
         }
     }
 }

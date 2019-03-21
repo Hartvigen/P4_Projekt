@@ -32,7 +32,7 @@ namespace P4_Project
             NONARR = 17,
             RIGHTARR = 18;
 
-        public static String getStringFromInt(int i) {
+        public static String getNameFromInt(int i) {
             switch (i)
             {
                 case 1: return nameof(OR);
@@ -53,8 +53,38 @@ namespace P4_Project
                 case 16: return nameof(LEFTARR);
                 case 17: return nameof(NONARR);
                 case 18: return nameof(RIGHTARR);
-                default: throw new Exception("Operator type: " + i + " does not have a name associated");
+                default: throw new Exception("Operator type: " + i + " does not have a Name associated");
             }; 
+
+        }
+
+        public static String getCodeFromInt(int i)
+        {
+            //&lt; is replaced in xml as < is a keyword in XML.
+            //&gt; is replaced in xml as < is a keyword in XML.
+            //&amp; is replaced in xml as & is a keyword in XML.
+            switch (i)
+            {
+                case 1: return "||";
+                case 2: return "&amp;&amp;";
+                case 3: return "==";
+                case 4: return "!=";
+                case 5: return "&lt;";
+                case 6: return "&gt;";  
+                case 7: return "&lt;=";
+                case 8: return "&gt;=";
+                case 9: return "-";
+                case 10: return "+";
+                case 11: return "-";
+                case 12: return "*";
+                case 13: return "/";
+                case 14: return "%";
+                case 15: return "!";
+                case 16: return "&lt;-";
+                case 17: return "--";
+                case 18: return "-&gt;";
+                default: throw new Exception("Operator type: " + i + " does not have a Code associated");
+            };
 
         }
     }

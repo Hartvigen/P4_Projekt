@@ -36,5 +36,15 @@ namespace P4_Project.AST.Stmts
         {
             vi.Visit(this);
         }
+
+        public String getName()
+        {
+            if (type == 1)
+                return "Vertex";
+            else if (type == 2)
+                return "Edge";
+
+            throw new Exception("type: " + type + " Is not supported");
+        }
     }
 }

@@ -29,5 +29,10 @@ namespace P4_Project.AST.Stmts.Decls
         {
             vi.Visit(this);
         }
+
+        public String getVarType()
+        {
+            return Types.getCodeFromInt(type);
+        }
     }
 }

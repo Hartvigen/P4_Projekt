@@ -29,7 +29,7 @@ namespace P4_Project
                     case "-p":
                     case "--prettyprint":
                         Console.WriteLine("Compiling input file and printing PrettyPrinting it: " + args[1]);
-                        Console.WriteLine(TryParseAndDebug(args[1]) ? "Compile asucceeded!" : "Compile failed!");
+                        Console.WriteLine(TryParseAndDebug(args[1]) ? "Compile succeeded!" : "Compile failed!");
                         break;
                     default:
                         Console.WriteLine("Compiling input file: " + args[0]);

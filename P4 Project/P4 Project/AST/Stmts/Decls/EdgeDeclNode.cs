@@ -29,5 +29,15 @@ namespace P4_Project.AST.Stmts.Decls
         {
             vi.Visit(this);
         }
+
+        public String getNameOfOperator()
+        {
+            return Operators.getNameFromInt(Operator);
+        }
+
+        public String getCodeofOperator()
+        {
+            return Operators.getCodeFromInt(Operator);
+        }
     }
 }
