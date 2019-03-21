@@ -139,7 +139,7 @@ namespace P4_Project.Visitors
         public override void Visit(VarDeclNode node)
         {
             //ast.AppendLine($"<{node.GetType().Name}>");
-            ast.Append(node.symbolName);
+            ast.Append(node.getVarType() + " " + node.symbolName);
             if (node.expr != null)
             {
                 ast.Append(" = ");
