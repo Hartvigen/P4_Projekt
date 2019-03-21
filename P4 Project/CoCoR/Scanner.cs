@@ -380,7 +380,7 @@ public class Scanner {
 			case "queue": t.kind = 46; break;
 			case "stack": t.kind = 47; break;
 			case "number": t.kind = 48; break;
-			case "bool": t.kind = 49; break;
+			case "boolean": t.kind = 49; break;
 			case "text": t.kind = 50; break;
 			default: break;
 		}

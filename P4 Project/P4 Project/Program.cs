@@ -11,17 +11,20 @@ namespace P4_Project
     {
         static void Main(string[] args)
         {
+            String defualtFile = "MAGIAFile.txt";
+
             if (args.Length > 0)
             {
                 switch (args[0])
                 {
                     case "-h":
                     case "--help":
-                        Console.WriteLine("Usage: MagiaC.exe [filePath]");
+                        Console.WriteLine("Compile file: MagiaC.exe [filePath]");
                         Console.WriteLine("For help: MagiaC.exe -h");
                         Console.WriteLine("For help: MagiaC.exe --help");
                         Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath]");
                         Console.WriteLine("PrettyPrint AST: MagiaC.exe --prettyprint [filepath]");
+                        Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defualtFile + "\" in its directory and compile complie that.");
                         break;
                     case "-p":
                     case "--prettyprint":
@@ -34,14 +37,14 @@ namespace P4_Project
                         break;
                 }
             }
-            else if (File.Exists("MAGIAFile.txt"))
+            else if (File.Exists(defualtFile))
             {
-                Console.WriteLine("Compiling standard file: MAGIAFile.txt");
-                Console.WriteLine(TryParseAndDebug("MAGIAFile.txt") ? "Compile succeeded!" : "Compile failed!");
+                Console.WriteLine("Compiling standard file: " + defualtFile);
+                Console.WriteLine(TryParseAndDebug(defualtFile) ? "Compile succeeded!" : "Compile failed!");
             }
             else
             {
-                Console.WriteLine("for help type: MagiaC.exe --help");
+                Console.WriteLine("for help type: MagiaC.exe --help or: MagiaC.exe -h");
             }
             Console.ReadKey();
         }
@@ -65,6 +68,8 @@ namespace P4_Project
             SerializerVisitor visitor = new SerializerVisitor();
             AST.Accept(visitor);
             string str = visitor.ast.ToString();
+
+            File.WriteAllText("ast.xml", str);
 
             return parser.errors.count == 0;
         }

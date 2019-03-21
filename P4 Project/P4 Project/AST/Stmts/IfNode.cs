@@ -13,16 +13,16 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class IfNode : StmtNode
     {
-        ExprNode condition;
-        Block stmtBody;
-        IfNode elseNode = null;
+        public ExprNode condition;
+        public Block body;
+        public IfNode elseNode = null;
 
         public IfNode() { }
 
         public IfNode(ExprNode e, Block b)
         {
             condition = e;
-            stmtBody = b;
+            body = b;
         }
 
         public void SetElse(IfNode i)

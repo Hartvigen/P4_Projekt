@@ -27,5 +27,9 @@ namespace P4_Project.AST.Expressions
         {
             vi.Visit(this);
         }
+
+        public String getString() {
+            return Operators.getStringFromInt(operatorType);
+        }
     }
 }

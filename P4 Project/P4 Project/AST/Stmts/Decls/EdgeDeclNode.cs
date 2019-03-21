@@ -13,7 +13,7 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class EdgeDeclNode : VEDeclNode
     {
-        private IdentNode start, end;
+        public IdentNode start, end;
 
         private int Operator;
 

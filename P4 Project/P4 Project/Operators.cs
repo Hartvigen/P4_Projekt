@@ -32,7 +32,7 @@ namespace P4_Project
             NONARR = 17,
             RIGHTARR = 18;
 
-        public String getStringFromInt(int i) {
+        public static String getStringFromInt(int i) {
             switch (i)
             {
                 case 1: return nameof(OR);
@@ -44,7 +44,7 @@ namespace P4_Project
                 case 7: return nameof(LESSEQ);
                 case 8: return nameof(GREATEQ);
                 case 9: return nameof(UMIN);
-                case 10: return nameof(PLUS;
+                case 10: return nameof(PLUS);
                 case 11: return nameof(BIMIN);
                 case 12: return nameof(MULT);
                 case 13: return nameof(DIV);
@@ -53,6 +53,7 @@ namespace P4_Project
                 case 16: return nameof(LEFTARR);
                 case 17: return nameof(NONARR);
                 case 18: return nameof(RIGHTARR);
+                default: throw new Exception("Operator type: " + i + " does not have a name associated");
             }; 
 
         }
