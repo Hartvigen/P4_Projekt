@@ -15,13 +15,13 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class Block : StmtNode
     {
-        public List<StmtNode> commands = new List<StmtNode>();
+        public List<StmtNode> statements = new List<StmtNode>();
 
         public Block() { }
 
         public void Add(StmtNode com)
         {
-            commands.Add(com);
+            statements.Add(com);
         }
 
         public override void Accept(Visitor vi)

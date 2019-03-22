@@ -25,5 +25,9 @@ namespace P4_Project.AST.Expressions.Values
         {
             vi.Visit(this);
         }
+
+        public String getString() {
+            return val ? "true" : "false";
+        }
     }
 }

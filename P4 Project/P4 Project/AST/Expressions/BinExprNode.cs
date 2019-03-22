@@ -12,7 +12,7 @@ namespace P4_Project.AST.Expressions
     /// </summary>
     public class BinExprNode : ExprNode
     {
-        ExprNode left, right;
+        public ExprNode left, right;
         int operatorType;
 
         public BinExprNode() { }
@@ -27,6 +27,16 @@ namespace P4_Project.AST.Expressions
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
+        }
+
+        public String getNameOfOperator()
+        {
+            return Operators.getNameFromInt(operatorType);
+        }
+
+        public String getCodeofOperator()
+        {
+            return Operators.getCodeFromInt(operatorType);
         }
     }
 }

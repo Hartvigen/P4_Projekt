@@ -14,7 +14,7 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class LoneCallNode : StmtNode
     {
-        private IdentNode call;
+        public IdentNode call;
         
         
         public LoneCallNode(IdentNode call)

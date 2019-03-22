@@ -27,5 +27,15 @@ namespace P4_Project.AST.Expressions
         {
             vi.Visit(this);
         }
+
+        public String getNameOfOperator()
+        {
+            return Operators.getNameFromInt(operatorType);
+        }
+
+        public String getCodeofOperator()
+        {
+            return Operators.getCodeFromInt(operatorType);
+        }
     }
 }

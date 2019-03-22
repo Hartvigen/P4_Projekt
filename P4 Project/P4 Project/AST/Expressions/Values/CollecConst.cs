@@ -13,7 +13,7 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class CollecConst : ExprNode
     {
-        List<ExprNode> exprs = new List<ExprNode>();
+        public List<ExprNode> exprs = new List<ExprNode>();
 
         public CollecConst(){ }
 

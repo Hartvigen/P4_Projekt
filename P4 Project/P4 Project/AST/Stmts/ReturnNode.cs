@@ -13,7 +13,7 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class ReturnNode : StmtNode
     {
-        ExprNode ret;
+        public ExprNode ret;
 
         public ReturnNode() { }
 

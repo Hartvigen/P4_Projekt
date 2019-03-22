@@ -13,7 +13,7 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public abstract class VEDeclNode : DeclNode
     {
-        Block attributes = new Block();
+        public Block attributes = new Block();
 
         public VEDeclNode() { }
 

@@ -13,7 +13,7 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class EdgeDeclNode : VEDeclNode
     {
-        private IdentNode start, end;
+        public IdentNode start, end;
 
         private int Operator;
 
@@ -28,6 +28,16 @@ namespace P4_Project.AST.Stmts.Decls
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
+        }
+
+        public String getNameOfOperator()
+        {
+            return Operators.getNameFromInt(Operator);
+        }
+
+        public String getCodeofOperator()
+        {
+            return Operators.getCodeFromInt(Operator);
         }
     }
 }
