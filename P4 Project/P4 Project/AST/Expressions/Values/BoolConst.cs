@@ -12,7 +12,7 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class BoolConst : ExprNode
     {
-        bool val;
+        public bool val;
 
         public BoolConst() { }
 
