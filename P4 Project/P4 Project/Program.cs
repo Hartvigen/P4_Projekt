@@ -68,6 +68,7 @@ namespace P4_Project
             SerializerVisitor visitor = new SerializerVisitor();
             AST.Accept(visitor);
             string str = visitor.ast.ToString();
+            Console.WriteLine(str);
 
             File.WriteAllText("ast.xml", str);
 

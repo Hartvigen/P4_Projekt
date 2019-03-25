@@ -56,6 +56,8 @@
     <Compile Include="AST\Expressions\UnaExprNode.cs" />
     <Compile Include="AST\MAGIA.cs" />
     <Compile Include="AST\Node.cs" />
+    <Compile Include="AST\Stmts\BreakNode.cs" />
+    <Compile Include="AST\Stmts\ContinueNode.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\Parser.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\Scanner.cs" />
     <Compile Include="Operators.cs" />

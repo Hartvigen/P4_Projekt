@@ -37,7 +37,6 @@ TOKENS
   NONE = "none".                            /* Is functionally the same as null in C# */
   TRUE = "true".
   FALSE = "false".
-  RPAREN = ')'.                 /* Only ')' is specified as a token as it is needed for a check in FuncDecl  */
   
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
@@ -104,7 +103,7 @@ FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = nu
     SYNC "func" IDENT                                           (. funcName = t.val; .)
     '(' 
         [
-            IF(la.kind != _RPAREN) FuncParams<ref paramBlock>
+            IF(la.val != ")") FuncParams<ref paramBlock>
         ] 
     ')' 
     SYNC '{' 
@@ -166,7 +165,7 @@ StmtIf<out StmtNode i>                                  (. i = null; ExprNode e 
         '}' {"elseif" '(' Expr<out ExprNode ie2>        (. e = ie2; b = new Block(); .)
         ')' '{' Stmts<ref b>                            (. k = new IfNode(e, b); j.SetElse(k); j = k; .)
         '}'} ["else"                                    (. b = new Block(); .)
-        '{' Stmts<ref b>                                (. k = new IfNode(new BoolConst(true), b); j.SetElse(k); .)
+        '{' Stmts<ref b>                                (. k = new IfNode(null, b); j.SetElse(k); .)
         '}'].
 
 /*------------------------------------------------------------------------*/
@@ -180,6 +179,10 @@ Stmt<out StmtNode stmtNode> =                       (. stmtNode = null; .)
         ]            
     | 
         "return" Expr<out ExprNode expr>            (. stmtNode = new ReturnNode(expr); .)
+    |
+        "break"                                     (. stmtNode = new BreakNode(); .)
+    |
+        "continue"                                  (. stmtNode = new ContinueNode(); .)
     ).
 
 /*------------------------------------------------------------------------*/
@@ -197,7 +200,7 @@ Member<ExprNode source, out MemberNode mem> =       (. mem = null; .)
     .
 
 /*------------------------------------------------------------------------*/
-FullDecl<ref Block block> =
+FullDecl<ref Block block> = 
     Type<out int typ> 
     (
         IDENT                                   (. string name = t.val; ExprNode expr = null; .)
