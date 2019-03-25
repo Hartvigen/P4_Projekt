@@ -342,7 +342,7 @@ public class Parser {
 			b = new Block(); 
 			Expect(15);
 			Stmts(ref b);
-			k = new IfNode(new BoolConst(true), b); j.SetElse(k); 
+			k = new IfNode(null, b); j.SetElse(k); 
 			Expect(16);
 		}
 	}
