@@ -338,7 +338,7 @@ Factor<out ExprNode e>                      (. e = null; .)
     | 
     (
         '(' 
-            Expr<out e> 
+            Expr<out e>                     (. e.inParenthesis = true; .)
         ')' 
         | 
         CallOrID<out IdentNode ident>       (. e = ident; .)
