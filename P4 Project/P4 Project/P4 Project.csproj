@@ -82,7 +82,8 @@
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
-    <Compile Include="Visitors\SerializerVisitor.cs" />
+    <Compile Include="Visitors\XmlTreeBuilder.cs" />
+    <Compile Include="Visitors\PrettyPrinter.cs" />
     <Compile Include="Visitors\Visitor.cs" />
   </ItemGroup>
   <ItemGroup>

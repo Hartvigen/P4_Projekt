@@ -31,12 +31,12 @@ namespace P4_Project
         {
             String s = i.ToString();
 
-            if (s.Length == 1)
+            if (i < 10)
                 return getStringFromInt(i);
 
             String collectiontype;
-            collectiontype = getStringFromInt(Int32.Parse(s.Substring(0,1)));
-            collectiontype += "<" + getStringFromInt(Int32.Parse(s.Substring(1, 1))) + ">";
+            collectiontype = getStringFromInt((i / 10) * 10);
+            collectiontype += "<" + getStringFromInt(i % 10) + ">";
             return collectiontype;
         }
 

@@ -7,7 +7,7 @@ using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts
 {
-    class BreakNode : StmtNode
+    public class BreakNode : StmtNode
     {
         public BreakNode()
         {
@@ -15,9 +15,7 @@ namespace P4_Project.AST.Stmts
 
         public override void Accept(Visitor vi)
         {
-            //throw new NotImplementedException();
+            vi.Visit(this);
         }
-
-        
     }
 }

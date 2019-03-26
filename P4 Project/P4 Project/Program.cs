@@ -24,15 +24,22 @@ namespace P4_Project
                         Console.WriteLine("For help: MagiaC.exe --help");
                         Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath]");
                         Console.WriteLine("PrettyPrint AST: MagiaC.exe --prettyprint [filepath]");
+                        Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath]");
+                        Console.WriteLine("XmlTree AST: MagiaC.exe --xmlprint [filepath]");
                         Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defualtFile + "\" in its directory and compile complie that.");
                         break;
                     case "-p":
                     case "--prettyprint":
-                        Console.WriteLine("Compiling input file and printing PrettyPrinting it: " + args[1]);
-                        Console.WriteLine(TryParseAndDebug(args[1]) ? "Compile succeeded!" : "Compile failed!");
+                        Console.WriteLine("Parsing input file and PrettyPrinting: " + args[1]);
+                        Console.WriteLine(TryParseAndPrettyPrint(args[1]) ? "Compile succeeded!" : "Compile failed!");
+                        break;
+                    case "-x":
+                    case "--xmlprint":
+                        Console.WriteLine("Parsing input file and printing XML: " + args[1]);
+                        Console.WriteLine(TryParseAndCreateXml(args[1]) ? "Compile succeeded!" : "Compile failed!");
                         break;
                     default:
-                        Console.WriteLine("Compiling input file: " + args[0]);
+                        Console.WriteLine("Parsing input file: " + args[0]);
                         Console.WriteLine(TryParse(args[0]) ? "Compile succeeded!" : "Compile failed!");
                         break;
                 }
@@ -40,7 +47,7 @@ namespace P4_Project
             else if (File.Exists(defualtFile))
             {
                 Console.WriteLine("Compiling standard file: " + defualtFile);
-                Console.WriteLine(TryParseAndDebug(defualtFile) ? "Compile succeeded!" : "Compile failed!");
+                Console.WriteLine(TryParse(defualtFile) ? "Compile succeeded!" : "Compile failed!");
             }
             else
             {
@@ -59,18 +66,31 @@ namespace P4_Project
             return parser.errors.count == 0;
         }
 
-        private static bool TryParseAndDebug(string filePath)
+        private static bool TryParseAndPrettyPrint(string filePath)
         {
             Parser parser = new Parser(new Scanner(filePath));
             parser.Parse();
             MAGIA AST = parser.mainNode;
 
-            SerializerVisitor visitor = new SerializerVisitor();
+            PrettyPrinter visitor = new PrettyPrinter();
             AST.Accept(visitor);
-            string str = visitor.ast.ToString();
-            Console.WriteLine(str);
 
-            File.WriteAllText("ast.xml", str);
+            File.WriteAllText("prettyprint.txt", visitor.str.ToString());
+
+            return parser.errors.count == 0;
+        }
+
+        private static bool TryParseAndCreateXml(string filePath)
+        {
+            Parser parser = new Parser(new Scanner(filePath));
+            parser.Parse();
+
+            MAGIA AST = parser.mainNode;
+
+            XmlTreeBuilder visitor = new XmlTreeBuilder();
+            AST.Accept(visitor);
+
+            File.WriteAllText("xmltree.xml", visitor.ast.ToString());
 
             return parser.errors.count == 0;
         }

@@ -30,7 +30,6 @@ namespace P4_Project.Visitors
         public abstract void Visit(EdgeDeclNode node);
         public abstract void Visit(FuncDeclNode node);
         public abstract void Visit(VarDeclNode node);
-        public abstract void Visit(VEDeclNode node);
         public abstract void Visit(VertexDeclNode node);
 
         //Stmts
@@ -42,8 +41,9 @@ namespace P4_Project.Visitors
         public abstract void Visit(IfNode node);
         public abstract void Visit(LoneCallNode node);
         public abstract void Visit(ReturnNode node);
-        public abstract void Visit(StmtNode node);
         public abstract void Visit(WhileNode node);
+        public abstract void Visit(BreakNode node);
+        public abstract void Visit(ContinueNode node);
 
         //AST
         public abstract void Visit(MAGIA node);

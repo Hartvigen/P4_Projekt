@@ -21,8 +21,8 @@ public class Parser {
 	public const int _FALSE = 6;
 	public const int maxT = 53;
 
-	const bool T = true;
-	const bool x = false;
+	const bool _T = true;
+	const bool _x = false;
 	const int minErrDist = 2;
 	
 	public Scanner scanner;
@@ -347,7 +347,7 @@ public class Parser {
 			b = new Block(); 
 			Expect(15);
 			Stmts(ref b);
-			k = new IfNode(new BoolConst(true), b); j.SetElse(k); 
+			k = new IfNode(null, b); j.SetElse(k); 
 			Expect(16);
 		}
 	}
@@ -601,6 +601,7 @@ public class Parser {
 			if (la.kind == 10) {
 				Get();
 				Expr(out e);
+				e.inParenthesis = true; 
 				Expect(11);
 			} else {
 				CallOrID(out IdentNode ident);

@@ -7,7 +7,7 @@ using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts
 {
-    class ContinueNode :StmtNode
+    public class ContinueNode : StmtNode
     {
         public ContinueNode()
         {
@@ -15,7 +15,7 @@ namespace P4_Project.AST.Stmts
 
         public override void Accept(Visitor vi)
         {
-            //throw new NotImplementedException();
+            vi.Visit(this);
         }
     }
 }
