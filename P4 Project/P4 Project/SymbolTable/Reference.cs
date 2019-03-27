@@ -31,7 +31,7 @@ namespace P4_Project.SymbolTable
         {
             foreach (Obj s in ScopeDisplay)
             {
-                _prevSym = s.GetVar();
+                _prevSym = s.Var;
                 DeleteSymbol(s);
                 if (_prevSym == null)
                     AddSymbol(_prevSym);
@@ -50,9 +50,9 @@ namespace P4_Project.SymbolTable
 
             while (sym != null)
             {
-                if (sym.GetName() == name)
+                if (sym.Name == name)
                     return sym;
-                sym.SetHash(name.GetHashCode().ToString()); //Default hash function. (maybe change later?)
+                sym.Hash = (name.GetHashCode().ToString()); //Default hash function. (maybe change later?)
             }
             return null;
         }
@@ -64,12 +64,12 @@ namespace P4_Project.SymbolTable
         void EnterSymbol(string name, Type type)
         {
             Obj oldsym = new Obj(RetrieveSymbol(name));
-            if (oldsym != null && oldsym.GetDepth() == 1) //replace 1 with current depth level.
+            if (oldsym != null && oldsym.Depth == 1) //replace 1 with current depth level.
             { }// Call error("Dublicate definition of " + name);
             Obj newsym = new Obj(CreateNewSymbol(name, type)); //Create CreateNewSymbol();
             // add to scopedisplay
-            newsym.SetLevel(1); //replace 1 with scopeDisplay[depth]
-            newsym.SetDepth(1); //replace 1 with current depth level.
+            newsym.Level = 1; //replace 1 with scopeDisplay[depth]
+            newsym.Depth = 1; //replace 1 with current depth level.
             //scopeDisplay[depth] <- newsym
             //add to hash table
             if (oldsym == null)
@@ -79,7 +79,7 @@ namespace P4_Project.SymbolTable
                 DeleteSymbol(oldsym);
                 AddSymbol(newsym);
             }
-            newsym.SetVar(oldsym);  //newsym.var <- oldsym (Not sure)
+            newsym.Var = oldsym;  //newsym.var <- oldsym (Not sure)
         }
 
         /*delete(sym) removes the symbol table entry sym from the collision chain

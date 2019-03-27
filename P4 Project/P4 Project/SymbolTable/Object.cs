@@ -23,24 +23,24 @@ namespace P4_Project.SymbolTable
         public int Level { get => _level; set => _level = value; }
         public int Depth { get => _depth; set => _depth = value; }
 
-        public Obj(string name, Type type, string hash, Object var, int level, int depth)
+        public Obj(string name, Type type, string hash, Obj var, int level, int depth)
         {
-            this.Name = name;
-            this.Type = type;
-            this.Hash = hash;
-            this.Var = var;
-            this.Level = level;
-            this.Depth = depth;
+            this._name = name;
+            this._type = type;
+            this._hash = hash;
+            this._var = var;
+            this._level = level;
+            this._depth = depth;
         }
 
         public Obj(object hashTableObject)
         {
-            this.name = hashTableObject.GetType().GetProperty("name").ToString();
-            this.type = hashTableObject.GetType().GetProperty("type").GetType();
-            this.hash = hashTableObject.GetType().GetProperty("hash").ToString();
-            this.var = null;
-            this.level = Convert.ToInt32(hashTableObject.GetType().GetProperty("level"));
-            this.depth = Convert.ToInt32(hashTableObject.GetType().GetProperty("depth"));
+            this._name = hashTableObject.GetType().GetProperty("name").ToString();
+            this._type = hashTableObject.GetType().GetProperty("type").GetType();
+            this._hash = hashTableObject.GetType().GetProperty("hash").ToString();
+            this._var = null;
+            this._level = Convert.ToInt32(hashTableObject.GetType().GetProperty("level"));
+            this._depth = Convert.ToInt32(hashTableObject.GetType().GetProperty("depth"));
         }
     }
     public class SymbolTableClass
@@ -51,7 +51,7 @@ namespace P4_Project.SymbolTable
         {
         }
 
-        public SymbolTableClass(string name, Type type, string hash, Symbol var, int level, int depth)
+        public SymbolTableClass(string name, Type type, string hash, Obj var, int level, int depth)
         {
             this.hashtable.Add(name, new Obj(name, type, hash, var, level, depth));
         }
