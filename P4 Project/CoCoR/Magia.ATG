@@ -27,26 +27,23 @@ CHARACTERS
   cr  = '\r'.
   lf  = '\n'.
   tab = '\t'.
-  CharInLine = ANY - '\r' - '\n'.       /* 'ANY' refers to all chars in UTF-8.  */
-  AnyButDoubleQuote = CharInLine - '\"'.
+  CharInLine = ANY - cr - lf.                   /* 'ANY' refers to all chars in UTF-8. */
+  AnyButDoubleQuote = CharInLine - '\"'.        /* Any char that is not a double quote or new-line */
 
 TOKENS
   IDENT  = letter {letter | digit | '_'}.
-  NUMBER = digit {digit} | digit {digit} '.' digit {digit}.
-  TEXT = '"' {AnyButDoubleQuote | "\\\""} '"'. /* The string \\\" is an escaped double qoute */
-  NONE = "none".                            /* Is functionally the same as null in C# */
-  TRUE = "true".
-  FALSE = "false".
+  NUMBER = digit {digit} ['.' digit {digit}].
+  TEXT = '"' {AnyButDoubleQuote | "\\\""} '"'.  /* The string  \\\"  is an escaped backslash (\\) and double qoute (\") */
   
-COMMENTS FROM "/*" TO "*/" NESTED
+COMMENTS FROM "/*" TO "*/" NESTED               /* Nested means: "There can be comments inside comments" */
 COMMENTS FROM "//" TO lf
 
-IGNORE cr + lf + tab
+IGNORE cr + lf + tab                            /* These characters are ignored by the scanner */
 
-/* The rest of the file contains the grammar for MAGIA.  */
 
-PRODUCTIONS
 /*------------------------------------------------------------------------*/
+/* The rest of the file contains the grammar for MAGIA.  */
+PRODUCTIONS
 /* The starting rule of MAGIA contains quite a few COCO/R-specific features. The code written */
 /* in (. .) is C# code that is injected into the generated parser code. */
 MAGIA =                                     (. mainNode = null; Block mainBlock = new Block(); .)
@@ -338,7 +335,7 @@ Factor<out ExprNode e>                      (. e = null; .)
     | 
     (
         '(' 
-            Expr<out e>                     (. e.inParentheses = true; .)
+            Expr<out e> 
         ')' 
         | 
         CallOrID<out IdentNode ident>       (. e = ident; .)
@@ -378,9 +375,9 @@ Identifier<out VarNode varNode> =   (. varNode = null; .)
 Const<out ExprNode e> =     (. e = null; .)
     ( NUMBER                (. e = new NumConst(Convert.ToDouble(t.val, System.Globalization.CultureInfo.InvariantCulture));    .)
     | TEXT                  (. e = new TextConst(t.val);                    .)
-    | TRUE                  (. e = new BoolConst(Convert.ToBoolean(t.val)); .)
-    | FALSE                 (. e = new BoolConst(Convert.ToBoolean(t.val)); .)
-    | NONE                  (. e = new NoneConst();                         .)
+    | "true"                (. e = new BoolConst(Convert.ToBoolean(t.val)); .)
+    | "false"               (. e = new BoolConst(Convert.ToBoolean(t.val)); .)
+    | "none"                (. e = new NoneConst();                         .)
     ).
 
 /*------------------------------------------------------------------------*/
@@ -400,7 +397,7 @@ CollecType<out int type> =                                     (. type = 0; int 
 /*------------------------------------------------------------------------*/
 SingleType<out int type> = (. type = 0; .)
     ( "number"             (. type = Types.number; .)
-    | "boolean"               (. type = Types.boolean; .)
+    | "boolean"            (. type = Types.boolean; .)
     | "text"               (. type = Types.text; .)
     | "vertex"             (. type = Types.vertex; .)
     | "edge"               (. type = Types.edge; .)
