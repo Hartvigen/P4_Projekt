@@ -32,14 +32,15 @@ namespace P4_Project.SymbolTable
         for name. If no declaration for name is currently in effect, then a null
         pointer is returned.*/
 
-        object RetrieveSymbol(String name)
+        object RetrieveSymbol(string name)
         {
-            object sym = test.hashtable[name];
+            Symbol sym = new Symbol(test.hashtable[name]);
+
             while (sym != null)
             {
-                if (sym.GetType().GetProperty("name").GetValue(this).ToString() == name)
+                if (sym.GetName() == name)
                     return sym;
-                sym = sym.GetHashCode(); //Default hash function. (maybe change later?)
+                sym.SetHash(name.GetHashCode().ToString()); //Default hash function. (maybe change later?)
             }
             return null;
         }
@@ -48,15 +49,15 @@ namespace P4_Project.SymbolTable
         /*enters name in the symbol table’s current scope.
         The parameter type conveys the data type and access attributes of name’s
         declaration.*/
-        void EnterSymbol(String name, Type type)
+        void EnterSymbol(string name, Type type)
         {
-            object oldsym = RetrieveSymbol(name);
-            if(oldsym != null && Convert.ToInt32(oldsym.GetType().GetProperty("depth").GetValue(this)) == 1) //replace 1 with current depth level.
+            Symbol oldsym = new Symbol(RetrieveSymbol(name));
+            if(oldsym != null && oldsym.GetDepth() == 1) //replace 1 with current depth level.
                 {}// Call error("Dublicate definition of " + name);
-            object newsym = CreateNewSymbol(name, type); //Create CreateNewSymbol();
+            Symbol newsym = new Symbol(CreateNewSymbol(name, type)); //Create CreateNewSymbol();
             // add to scopedisplay
-            newsym.GetType().GetProperty("level").SetValue(this, 1); //replace 1 with scopeDisplay[depth]
-            newsym.GetType().GetProperty("depth").SetValue(this, 1); //replace 1 with current depth level.
+            newsym.SetLevel(1); //replace 1 with scopeDisplay[depth]
+            newsym.SetDepth(1); //replace 1 with current depth level.
             //scopeDisplay[depth] <- newsym
             //add to hash table
             if (oldsym == null)
@@ -66,7 +67,7 @@ namespace P4_Project.SymbolTable
                 DeleteSymbol(oldsym);
                 AddSymbol(newsym);
             }
-            newsym.GetType().GetProperty("var").SetValue(this, oldsym); //newsym.var <- oldsym (Not sure)
+            newsym.SetVar(oldsym.GetVar());  //newsym.var <- oldsym (Not sure)
         }
 
         /*delete(sym) removes the symbol table entry sym from the collision chain
@@ -92,7 +93,7 @@ namespace P4_Project.SymbolTable
 
         /*tests whether name is present in the symbol table’s
         current (innermost) scope. If it is, true is returned. If name is in an*/
-        Boolean DeclaredLocally(String name)
+        Boolean DeclaredLocally(string name)
         {
             return false;
         }
