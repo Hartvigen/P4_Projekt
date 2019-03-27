@@ -7,7 +7,7 @@ using System.Collections;
 
 namespace P4_Project.SymbolTable
 {
-    public class Symbol
+    public class Obj
     {
         private string name;
         private Type type;
@@ -32,7 +32,7 @@ namespace P4_Project.SymbolTable
         public void SetLevel(int level) {  this.level = level; }
         public void SetDepth(int depth) {  this.depth = depth; }
 
-        public Symbol(string name, Type type, string hash, int var, int level, int depth)
+        public Obj(string name, Type type, string hash, int var, int level, int depth)
         {
             this.name = name;
             this.type = type;
@@ -42,7 +42,7 @@ namespace P4_Project.SymbolTable
             this.depth = depth;
         }
 
-        public Symbol(object hashTableObject)
+        public Obj(object hashTableObject)
         {
             this.name = hashTableObject.GetType().GetProperty("name").ToString();
             this.type = hashTableObject.GetType().GetProperty("type").GetType();
@@ -62,7 +62,7 @@ namespace P4_Project.SymbolTable
 
         public SymbolTableClass(string name, Type type, string hash, int var, int level, int depth)
         {
-            this.hashtable.Add(name, new Symbol(name, type, hash, var, level, depth));
+            this.hashtable.Add(name, new Obj(name, type, hash, var, level, depth));
         }
     }
 }
