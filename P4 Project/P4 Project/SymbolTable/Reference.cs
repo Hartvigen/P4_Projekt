@@ -31,7 +31,7 @@ namespace P4_Project.SymbolTable
         {
             foreach (Symbol s in ScopeDisplay)
             {
-                _prevSym = s.var;
+                _prevSym = s.GetVar();
                 DeleteSymbol(s);
                 if (_prevSym == null)
                     AddSymbol(_prevSym);
@@ -46,12 +46,13 @@ namespace P4_Project.SymbolTable
 
         object RetrieveSymbol(String name)
         {
-            object sym = test.hashtable[name];
+            Symbol sym = new Symbol(test.hashtable[name]);
+
             while (sym != null)
             {
-                if (sym.GetType().GetProperty("name").GetValue(this).ToString() == name)
+                if (sym.GetName() == name)
                     return sym;
-                sym = sym.GetHashCode(); //Default hash function. (maybe change later?)
+                sym.SetHash(name.GetHashCode().ToString()); //Default hash function. (maybe change later?)
             }
             return null;
         }
@@ -60,15 +61,15 @@ namespace P4_Project.SymbolTable
         /*enters name in the symbol table’s current scope.
         The parameter type conveys the data type and access attributes of name’s
         declaration.*/
-        void EnterSymbol(String name, Type type)
+        void EnterSymbol(string name, Type type)
         {
-            object oldsym = RetrieveSymbol(name);
-            if(oldsym != null && Convert.ToInt32(oldsym.GetType().GetProperty("depth").GetValue(this)) == 1) //replace 1 with current depth level.
-                {}// Call error("Dublicate definition of " + name);
-            object newsym = CreateNewSymbol(name, type); //Create CreateNewSymbol();
+            Symbol oldsym = new Symbol(RetrieveSymbol(name));
+            if (oldsym != null && oldsym.GetDepth() == 1) //replace 1 with current depth level.
+            { }// Call error("Dublicate definition of " + name);
+            Symbol newsym = new Symbol(CreateNewSymbol(name, type)); //Create CreateNewSymbol();
             // add to scopedisplay
-            newsym.GetType().GetProperty("level").SetValue(this, 1); //replace 1 with scopeDisplay[depth]
-            newsym.GetType().GetProperty("depth").SetValue(this, 1); //replace 1 with current depth level.
+            newsym.SetLevel(1); //replace 1 with scopeDisplay[depth]
+            newsym.SetDepth(1); //replace 1 with current depth level.
             //scopeDisplay[depth] <- newsym
             //add to hash table
             if (oldsym == null)
