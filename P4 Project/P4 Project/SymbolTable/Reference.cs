@@ -9,7 +9,11 @@ namespace P4_Project.SymbolTable
 {
     class Reference
     {
-        SymbolTableClass test = new SymbolTableClass();
+        private int _depth = 1;
+        private Symbol _prevSym;
+        private Symbol _nextSym;
+        private SymbolTableClass test = new SymbolTableClass();
+        private List<Symbol> ScopeDisplay = new List<Symbol>();
         
         /*tests whether name is present in the symbol table’s
         current (innermost) scope. If it is, true is returned. If name is in an*/
@@ -17,6 +21,7 @@ namespace P4_Project.SymbolTable
 
         void OpenScope()
         {
+            _depth++;
 
         }
 
@@ -24,7 +29,14 @@ namespace P4_Project.SymbolTable
         Symbol references subsequently revert to outer scopes*/
         void CloseScope()
         {
-           
+            foreach (Symbol s in ScopeDisplay)
+            {
+                _prevSym = s.var;
+                DeleteSymbol(s);
+                if (_prevSym == null)
+                    AddSymbol(_prevSym);
+            }
+            _depth--;
         }
 
 
@@ -32,15 +44,14 @@ namespace P4_Project.SymbolTable
         for name. If no declaration for name is currently in effect, then a null
         pointer is returned.*/
 
-        object RetrieveSymbol(string name)
+        object RetrieveSymbol(String name)
         {
-            Symbol sym = new Symbol(test.hashtable[name]);
-
+            object sym = test.hashtable[name];
             while (sym != null)
             {
-                if (sym.GetName() == name)
+                if (sym.GetType().GetProperty("name").GetValue(this).ToString() == name)
                     return sym;
-                sym.SetHash(name.GetHashCode().ToString()); //Default hash function. (maybe change later?)
+                sym = sym.GetHashCode(); //Default hash function. (maybe change later?)
             }
             return null;
         }
@@ -49,15 +60,15 @@ namespace P4_Project.SymbolTable
         /*enters name in the symbol table’s current scope.
         The parameter type conveys the data type and access attributes of name’s
         declaration.*/
-        void EnterSymbol(string name, Type type)
+        void EnterSymbol(String name, Type type)
         {
-            Symbol oldsym = new Symbol(RetrieveSymbol(name));
-            if(oldsym != null && oldsym.GetDepth() == 1) //replace 1 with current depth level.
+            object oldsym = RetrieveSymbol(name);
+            if(oldsym != null && Convert.ToInt32(oldsym.GetType().GetProperty("depth").GetValue(this)) == 1) //replace 1 with current depth level.
                 {}// Call error("Dublicate definition of " + name);
-            Symbol newsym = new Symbol(CreateNewSymbol(name, type)); //Create CreateNewSymbol();
+            object newsym = CreateNewSymbol(name, type); //Create CreateNewSymbol();
             // add to scopedisplay
-            newsym.SetLevel(1); //replace 1 with scopeDisplay[depth]
-            newsym.SetDepth(1); //replace 1 with current depth level.
+            newsym.GetType().GetProperty("level").SetValue(this, 1); //replace 1 with scopeDisplay[depth]
+            newsym.GetType().GetProperty("depth").SetValue(this, 1); //replace 1 with current depth level.
             //scopeDisplay[depth] <- newsym
             //add to hash table
             if (oldsym == null)
@@ -93,7 +104,7 @@ namespace P4_Project.SymbolTable
 
         /*tests whether name is present in the symbol table’s
         current (innermost) scope. If it is, true is returned. If name is in an*/
-        Boolean DeclaredLocally(string name)
+        Boolean DeclaredLocally(String name)
         {
             return false;
         }
