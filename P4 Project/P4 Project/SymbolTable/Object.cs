@@ -35,12 +35,12 @@ namespace P4_Project.SymbolTable
 
         public Obj(object hashTableObject)
         {
-            this.Name = hashTableObject.GetType().GetProperty("name").ToString();
-            this.Type = hashTableObject.GetType().GetProperty("type").GetType();
-            this.Hash = hashTableObject.GetType().GetProperty("hash").ToString();
-            this.Var = hashTableObject;
-            this.Level = Convert.ToInt32(hashTableObject.GetType().GetProperty("level"));
-            this.Depth = Convert.ToInt32(hashTableObject.GetType().GetProperty("depth"));
+            this.name = hashTableObject.GetType().GetProperty("name").ToString();
+            this.type = hashTableObject.GetType().GetProperty("type").GetType();
+            this.hash = hashTableObject.GetType().GetProperty("hash").ToString();
+            this.var = null;
+            this.level = Convert.ToInt32(hashTableObject.GetType().GetProperty("level"));
+            this.depth = Convert.ToInt32(hashTableObject.GetType().GetProperty("depth"));
         }
     }
     public class SymbolTableClass
@@ -51,7 +51,7 @@ namespace P4_Project.SymbolTable
         {
         }
 
-        public SymbolTableClass(string name, Type type, string hash, Object var, int level, int depth)
+        public SymbolTableClass(string name, Type type, string hash, Symbol var, int level, int depth)
         {
             this.hashtable.Add(name, new Obj(name, type, hash, var, level, depth));
         }
