@@ -67,7 +67,7 @@ namespace P4_Project.SymbolTable
                 DeleteSymbol(oldsym);
                 AddSymbol(newsym);
             }
-            newsym.SetVar(oldsym.GetVar());  //newsym.var <- oldsym (Not sure)
+            newsym.SetVar(oldsym);  //newsym.var <- oldsym (Not sure)
         }
 
         /*delete(sym) removes the symbol table entry sym from the collision chain
