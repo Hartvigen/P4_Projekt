@@ -10,10 +10,10 @@ namespace P4_Project.SymbolTable
     class Reference
     {
         private int _depth = 1;
-        private Symbol _prevSym;
-        private Symbol _nextSym;
+        private Obj _prevSym;
+        private Obj _nextSym;
         private SymbolTableClass test = new SymbolTableClass();
-        private List<Symbol> ScopeDisplay = new List<Symbol>();
+        private List<Obj> ScopeDisplay = new List<Obj>();
         
         /*tests whether name is present in the symbol table’s
         current (innermost) scope. If it is, true is returned. If name is in an*/
@@ -29,7 +29,7 @@ namespace P4_Project.SymbolTable
         Symbol references subsequently revert to outer scopes*/
         void CloseScope()
         {
-            foreach (Symbol s in ScopeDisplay)
+            foreach (Obj s in ScopeDisplay)
             {
                 _prevSym = s.GetVar();
                 DeleteSymbol(s);
@@ -46,7 +46,7 @@ namespace P4_Project.SymbolTable
 
         object RetrieveSymbol(String name)
         {
-            Symbol sym = new Symbol(test.hashtable[name]);
+            Obj sym = new Obj(test.hashtable[name]);
 
             while (sym != null)
             {
@@ -63,10 +63,10 @@ namespace P4_Project.SymbolTable
         declaration.*/
         void EnterSymbol(string name, Type type)
         {
-            Symbol oldsym = new Symbol(RetrieveSymbol(name));
+            Obj oldsym = new Obj(RetrieveSymbol(name));
             if (oldsym != null && oldsym.GetDepth() == 1) //replace 1 with current depth level.
             { }// Call error("Dublicate definition of " + name);
-            Symbol newsym = new Symbol(CreateNewSymbol(name, type)); //Create CreateNewSymbol();
+            Obj newsym = new Obj(CreateNewSymbol(name, type)); //Create CreateNewSymbol();
             // add to scopedisplay
             newsym.SetLevel(1); //replace 1 with scopeDisplay[depth]
             newsym.SetDepth(1); //replace 1 with current depth level.
