@@ -7,107 +7,93 @@ using System.Threading.Tasks;
 
 namespace P4_Project.SymbolTable
 {
-    class Reference
+    class SymbolTable
     {
-        private int _depth = 1;
-        private Obj _prevSym;
-        private Obj _nextSym;
-        private SymbolTableClass test = new SymbolTableClass();
-        private List<Obj> ScopeDisplay = new List<Obj>();
+        const int undef = 0, number = 1, boolean = 2, text = 3, vertex = 4, edge = 5, set = 10, list = 20, queue = 30, stack = 40;
+
+        const int var = 0, proc = 1, scope = 2;
+
+        public int curLevel;
+        public Obj undefObj;
+        public Obj topScope;
+
+        Compiler.SyntaxAnalysis.Parser parser;
         
-        /*tests whether name is present in the symbol table’s
-        current (innermost) scope. If it is, true is returned. If name is in an*/
 
 
+        //open a new scope and make it the current (topScope)
         void OpenScope()
         {
-            _depth++;
-
+            Obj scop = new Obj("", scope, null, topScope, 0);
+            topScope = scop;
+            curLevel++;
         }
 
-        /*closes the most recently opened scope in the symbol table.
-        Symbol references subsequently revert to outer scopes*/
+        //close the current scope
         void CloseScope()
         {
-            foreach (Obj s in ScopeDisplay)
-            {
-                _prevSym = s.Var;
-                DeleteSymbol(s);
-                if (_prevSym == null)
-                    AddSymbol(_prevSym);
-            }
-            _depth--;
+            topScope = topScope.Next;
+            curLevel--;
         }
 
-
-        /*returns the symbol table’s currently valid declaration
-        for name. If no declaration for name is currently in effect, then a null
-        pointer is returned.*/
-
-        object RetrieveSymbol(String name)
+        //creates a new Object in the current scope
+        public Obj NewObj(string name, int kind, int type)
         {
-            Obj sym = new Obj(test.hashtable[name]);
+            Obj p, last, obj = new Obj();
+            obj.Name = name; obj.Kind = kind; obj.Type = type;
+            obj.Level = curLevel;
 
-            while (sym != null)
+            p = topScope.Locals;
+            last = null;
+
+            while (p != null)
             {
-                if (sym.Name == name)
-                    return sym;
-                sym.Hash = (name.GetHashCode().ToString()); //Default hash function. (maybe change later?)
+                if (p.Name == name)
+                    parser.SemErr("name declared twice");
+                last = p;
+                p = p.Next;
             }
-            return null;
-        }
 
-
-        /*enters name in the symbol table’s current scope.
-        The parameter type conveys the data type and access attributes of name’s
-        declaration.*/
-        void EnterSymbol(string name, Type type)
-        {
-            Obj oldsym = new Obj(RetrieveSymbol(name));
-            if (oldsym != null && oldsym.Depth == 1) //replace 1 with current depth level.
-            { }// Call error("Dublicate definition of " + name);
-            Obj newsym = new Obj(CreateNewSymbol(name, type)); //Create CreateNewSymbol();
-            // add to scopedisplay
-            newsym.Level = 1; //replace 1 with scopeDisplay[depth]
-            newsym.Depth = 1; //replace 1 with current depth level.
-            //scopeDisplay[depth] <- newsym
-            //add to hash table
-            if (oldsym == null)
-                AddSymbol(oldsym);
+            if (last == null)
+                topScope.Locals = obj;
             else
+                last.Next = obj;
+
+            if (kind == var)
+                obj.Adr = topScope.NextAdr++;
+
+            return obj;
+        }
+
+        //search for a name in all open scopes and return its object node
+        public Obj Find(string name)
+        {
+            Obj obj, scope;
+            scope = topScope;
+            while(scope != null)
             {
-                DeleteSymbol(oldsym);
-                AddSymbol(newsym);
+                obj = scope.Locals;
+                while(obj != null)
+                {
+                    if(obj.Name == name)
+                    {
+                        return obj;
+                    }
+                    obj = obj.Next;
+                }
+                scope = scope.Next;
             }
-            newsym.Var = oldsym;  //newsym.var <- oldsym (Not sure)
+            parser.SemErr(name + " is undeclared");
+            return undefObj;
         }
 
-        /*delete(sym) removes the symbol table entry sym from the collision chain
-        found at HashTable.get(sym.name). The symbol is not destroyed—it is
-        simply removed from the collision chain.In particular, its var and level
-        fields remain intact.
-        add(sym) addsthe symbol sym tothe collision chain at HashTable.get(sym.name).
-        Prior to the call to add, there is no entry in the table for sym.*/
-        private void AddSymbol(object newsym)
+        //Constructor for the symbol table
+        public SymbolTable(Compiler.SyntaxAnalysis.Parser parser)
         {
-            throw new NotImplementedException();
-        }
-
-        private void DeleteSymbol(object oldsym)
-        {
-            throw new NotImplementedException();
-        }
-
-        private object CreateNewSymbol(string name, Type type)
-        {
-            throw new NotImplementedException();
-        }
-
-        /*tests whether name is present in the symbol table’s
-        current (innermost) scope. If it is, true is returned. If name is in an*/
-        Boolean DeclaredLocally(String name)
-        {
-            return false;
+            this.parser = parser;
+            topScope = null;
+            curLevel = -1;
+            undefObj = new Obj("undef", var, null, 0, undef, 0);
         }
 
     }
