@@ -16,7 +16,6 @@ namespace P4_Project.AST.Expressions.Identifier
         /// <summary>
         /// The identifier is the string value of the identifier, and the reference is a reference directly to the symbol table.
         /// </summary>
-        Reference reference;
         public string identifier;
 
         public IdentNode() { }

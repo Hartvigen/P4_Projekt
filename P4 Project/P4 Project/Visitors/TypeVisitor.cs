@@ -14,7 +14,6 @@ namespace P4_Project.Visitors
 {
     class TypeVisitor : Visitor
     {
-        SymbolTable.Reference
 
         public override void Visit(CallNode node)
         { 

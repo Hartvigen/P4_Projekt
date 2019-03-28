@@ -63,8 +63,8 @@
     <Compile Include="Operators.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SymbolTable\Object.cs" />
-    <Compile Include="SymbolTable\Reference.cs" />
+    <Compile Include="SymbolTable\Obj.cs" />
+    <Compile Include="SymbolTable\SymbolTable.cs" />
     <Compile Include="Types.cs" />
     <Compile Include="AST\Stmts\AssignNode.cs" />
     <Compile Include="AST\Stmts\Block.cs" />
