@@ -87,10 +87,14 @@ AttrDecls<ref HeadNode headNode> =          (. VarDeclNode attrDecl; .)
     }.
 
 /*------------------------------------------------------------------------*/
-AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprNode val = null; .)
+AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; Obj obj; string name = ""; ExprNode val = null; .)
     Type<out int typ>
     /* The expression t.val contains the scanned string value of the most recently parsed token.*/
-    IDENT                            (. name = t.val; .)
+    IDENT                            (. name = t.val;  obj = tab.Find(name); type = obj.type;
+										 if (obj.kind == var) {
+											if (obj.level == 0) gen.Emit(Op.LOADG, obj.adr);
+										 else gen.Emit(Op.LOAD, obj.adr);} 
+										 else SemErr("variable expected"); .)
     [
         Assign<out val> 
     ]                                (. attrDecl = new VarDeclNode(typ, name, val); .)
