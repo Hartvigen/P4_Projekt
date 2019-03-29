@@ -83,6 +83,19 @@ namespace P4_Project
             return parser.errors.count == 0;
         }
 
+        private static bool TryParseAndSymbolCheck(string filePath)
+        {
+            Parser parser = new Parser(new Scanner(filePath));
+            parser.Parse();
+
+            MAGIA AST = parser.mainNode;
+
+            TypeVisitor visitor = new TypeVisitor();
+            AST.Accept(visitor);
+
+            return parser.errors.count == 0;
+        }
+
         private static bool TryParseAndCreateXml(string filePath)
         {
             Parser parser = new Parser(new Scanner(filePath));
