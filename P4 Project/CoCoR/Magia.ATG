@@ -14,10 +14,10 @@ which will be explained when met first in context.  */
 /* the starting symbol of the grammar.*/
 COMPILER MAGIA   
 
-    /*
-    public SymbolTable   tab;
-    public CodeGenerator gen;
-    */
+    
+public SymbolTable tab;
+/*public CodeGenerator gen;*/
+    
   
 /*--------------------------------------------------------------------------*/
 /* The following section contains the token specification of MAGIA.*/
@@ -87,14 +87,10 @@ AttrDecls<ref HeadNode headNode> =          (. VarDeclNode attrDecl; .)
     }.
 
 /*------------------------------------------------------------------------*/
-AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; Obj obj; string name = ""; ExprNode val = null; .)
+AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprNode val = null; .)
     Type<out int typ>
     /* The expression t.val contains the scanned string value of the most recently parsed token.*/
-    IDENT                            (. name = t.val;  obj = tab.Find(name); type = obj.type;
-										 if (obj.kind == var) {
-											if (obj.level == 0) gen.Emit(Op.LOADG, obj.adr);
-										 else gen.Emit(Op.LOAD, obj.adr);} 
-										 else SemErr("variable expected"); .)
+    IDENT                            (. name = t.val; .)
     [
         Assign<out val> 
     ]                                (. attrDecl = new VarDeclNode(typ, name, val); .)
@@ -103,9 +99,9 @@ AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; Obj obj; string name = 
 
 /*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters, so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
-    SYNC "func" IDENT                                           (. funcName = t.val; .)
-    '(' 
+FuncDecl<out FuncDeclNode funcNode> =                           (. Obj obj; funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
+    SYNC "func" IDENT                                           (. funcName = t.val; obj = tab.NewObj(t.val, t.kind, null);.)
+    '('														
         [
             IF(la.val != ")") FuncParams<ref paramBlock>
         ] 
@@ -116,13 +112,13 @@ FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = nu
     .
 
 /*------------------------------------------------------------------------*/
-FuncParams<ref Block paramBlock> =          (. int typ = 0; .)
-    Type<out typ> 
+FuncParams<ref Block paramBlock> =          (. int typ = 0; Obj obj; .)
+    Type<out typ>							(. obj = tab.NewObj(t.val, t.kind, typ); .)
     IDENT                                   (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
     {
         SYNC ',' Type<out typ>
         IDENT                               (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
-    }.
+    }.										
 
 
 /*------------------------------------------------------------------------*/
@@ -204,8 +200,8 @@ Member<ExprNode source, out MemberNode mem> =       (. mem = null; .)
     .
 
 /*------------------------------------------------------------------------*/
-FullDecl<ref Block block> = 
-    Type<out int typ> 
+FullDecl<ref Block block> =						(. Obj obj; .)
+    Type<out int typ>							(. obj = tab.NewObj(t.val, t.kind, typ); .)
     (
         IDENT                                   (. string name = t.val; ExprNode expr = null; .)
         [
@@ -234,8 +230,8 @@ VtxDecls<ref Block b>
     }.
 
 /*------------------------------------------------------------------------*/
-VtxDecl<out VertexDeclNode v>                   (. v = null; .)
-    = '(' IDENT                                 (. v = new VertexDeclNode(Types.vertex, t.val); .)
+VtxDecl<out VertexDeclNode v>                   (. v = null; Obj obj; .)
+    = '(' IDENT                                 (. v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, t.kind, null); .)
     VEParams<v>               
     ')'.
 
@@ -262,8 +258,8 @@ EdgeDecls<IdentNode left, int op, ref Block b>
     }.
 
 /*------------------------------------------------------------------------*/
-EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge> (. edge = null; .)
-    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); .)
+EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge> (. edge = null; Obj obj; .)
+    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, t.kind, null); .)
     VEParams<edge>                           
     ')'.
 

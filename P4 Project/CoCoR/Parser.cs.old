@@ -6,6 +6,7 @@ using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
+using P4_Project.SymbolTable;
 
 namespace P4_Project.Compiler.SyntaxAnalysis {
 
@@ -34,6 +35,12 @@ public class Parser {
 
 	public MAGIA mainNode;
 
+public SymbolTable tab;
+/*public CodeGenerator gen;*/
+    
+  
+/*--------------------------------------------------------------------------*/
+/* The following section contains the token specification of MAGIA.*/
 
 
 	public Parser(Scanner scanner) {
@@ -140,11 +147,11 @@ public class Parser {
 	}
 
 	void FuncDecl(out FuncDeclNode funcNode) {
-		funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); 
+		Obj obj; funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); 
 		while (!(la.kind == 0 || la.kind == 14)) {SynErr(57); Get();}
 		Expect(14);
 		Expect(1);
-		funcName = t.val; 
+		funcName = t.val; obj = tab.NewObj(t.val, t.kind, typ);
 		Expect(10);
 		if (la.val != ")") {
 			FuncParams(ref paramBlock);
@@ -202,8 +209,9 @@ public class Parser {
 	}
 
 	void FuncParams(ref Block paramBlock) {
-		int typ = 0; 
+		int typ = 0; Obj obj; 
 		Type(out typ);
+		obj = tab.NewObj(t.val, t.kind, typ); 
 		Expect(1);
 		paramBlock.Add(new VarDeclNode(typ, t.val, null)); 
 		while (la.kind == 13) {
@@ -216,7 +224,9 @@ public class Parser {
 	}
 
 	void FullDecl(ref Block block) {
+		Obj obj; 
 		Type(out int typ);
+		obj = tab.NewObj(t.val, t.kind, typ); 
 		if (la.kind == 1) {
 			Get();
 			string name = t.val; ExprNode expr = null; 
@@ -426,10 +436,10 @@ public class Parser {
 	}
 
 	void VtxDecl(out VertexDeclNode v) {
-		v = null; 
+		v = null; Obj obj; 
 		Expect(10);
 		Expect(1);
-		v = new VertexDeclNode(Types.vertex, t.val); 
+		v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, t.kind, typ); 
 		VEParams(v);
 		Expect(11);
 	}
@@ -461,10 +471,10 @@ public class Parser {
 	}
 
 	void EdgeDecl(IdentNode left, int op, out EdgeDeclNode edge) {
-		edge = null; 
+		edge = null; Obj obj; 
 		Expect(10);
 		Identifier(out VarNode right);
-		edge = new EdgeDeclNode(left, right, op); 
+		edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, t.kind, typ); 
 		VEParams(edge);
 		Expect(11);
 	}
@@ -601,7 +611,7 @@ public class Parser {
 			if (la.kind == 10) {
 				Get();
 				Expr(out e);
-				e.inParenthesis = true; 
+				e.inParentheses = true; 
 				Expect(11);
 			} else {
 				CallOrID(out IdentNode ident);
