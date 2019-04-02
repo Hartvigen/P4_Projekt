@@ -73,10 +73,8 @@ namespace P4_Project
         {
             Parser parser = new Parser(new Scanner(filePath));
             parser.Parse();
-            MAGIA AST = parser.mainNode;
-
             PrettyPrinter visitor = new PrettyPrinter();
-            AST.Accept(visitor);
+            parser.mainNode.Accept(visitor);
 
             File.WriteAllText("prettyprint.txt", visitor.str.ToString());
 

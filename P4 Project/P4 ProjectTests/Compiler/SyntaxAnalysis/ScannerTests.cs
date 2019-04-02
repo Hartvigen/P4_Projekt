@@ -51,18 +51,19 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ScanTest2()
         {
             //we should be able to parse a file with nothing but with tabs, space and newline without causing a compilation error
-            bool success;
-            success = TryParse("    \n");
+            bool success = true;
+
+            success = TryParse(" " + Environment.NewLine + "	");
             Assert.IsTrue(success);
 
             //a simple program in normal form which should be able to run
-            success = TryParse("[vertex(number num = 4, bool val = true)]");
+            success = TryParse("[vertex(number num = 4, boolean val = true)]");
             Assert.IsTrue(success);
 
             //We should be able to parse the same string with any number of tabs, spaces or newlines. As well as without spacing, except for when declaring types
-            success = TryParse("[           vertex       (     number          num      = \n\n   4,  bool     val    =   true    )         ]");
+            success = TryParse("[           vertex       (     number          num      = " + Environment.NewLine + Environment.NewLine + "   4,  boolean     val    =   true    )         ]");
             Assert.IsTrue(success);
-            success = TryParse("[vertex(number num=4,bool val=true)]");
+            success = TryParse("[vertex(number num=4,boolean val=true)]");
             Assert.IsTrue(success);
 
         }
@@ -77,6 +78,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
             Scanner test = scannerFromString("a2)");
             Assert.IsTrue(test.Scan().kind == Parser._IDENT);
+            test.Scan();
             Assert.IsTrue(test.Scan().kind == Parser._EOF);
         }
 
