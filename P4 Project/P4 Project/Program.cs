@@ -3,7 +3,7 @@ using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.Visitors;
 using System;
 using System.IO;
-using System.Xml.Serialization;
+using P4_Project.Graphviz;
 
 namespace P4_Project
 {
@@ -20,12 +20,10 @@ namespace P4_Project
                     case "-h":
                     case "--help":
                         Console.WriteLine("Compile file: MagiaC.exe [filePath]");
-                        Console.WriteLine("For help: MagiaC.exe -h");
-                        Console.WriteLine("For help: MagiaC.exe --help");
-                        Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath]");
-                        Console.WriteLine("PrettyPrint AST: MagiaC.exe --prettyprint [filepath]");
-                        Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath]");
-                        Console.WriteLine("XmlTree AST: MagiaC.exe --xmlprint [filepath]");
+                        Console.WriteLine("For help: MagiaC.exe -h || MagiaC.exe --help");
+                        Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath] || MagiaC.exe --prettyprint [filepath]");
+                        Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath] || --xmlprint [filepath]");
+                        Console.WriteLine("Create Test Png: MagiaC.exe -t || MagiaC.exe --test");
                         Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defualtFile + "\" in its directory and compile complie that.");
                         break;
                     case "-p":
@@ -37,6 +35,11 @@ namespace P4_Project
                     case "--xmlprint":
                         Console.WriteLine("Parsing input file and printing XML: " + args[1]);
                         Console.WriteLine(TryParseAndCreateXml(args[1]) ? "Compile succeeded!" : "Compile failed!");
+                        break;
+                    case "-t":
+                    case "--test":
+                        Console.WriteLine("Printing test png called: testgraph.png ");
+                        Console.WriteLine(TestPrint() ? "succeeded!" : "failed!");
                         break;
                     default:
                         Console.WriteLine("Parsing input file: " + args[0]);
@@ -93,6 +96,14 @@ namespace P4_Project
             File.WriteAllText("xmltree.xml", visitor.ast.ToString());
 
             return parser.errors.count == 0;
+        }
+
+        public static bool TestPrint()
+        {
+            DotToPng dotToPng = new DotToPng();
+            if (dotToPng.getIsDone())
+                return true;
+            else return false;
         }
     }
 }
