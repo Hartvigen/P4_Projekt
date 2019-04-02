@@ -4,18 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static P4_Project.Types;
 
 namespace P4_Project.SymbolTable
 {
     class SymbolTable
     {
-        const int undef = 0, number = 1, boolean = 2, text = 3, vertex = 4, edge = 5, set = 10, list = 20, queue = 30, stack = 40;
-
         const int var = 0, proc = 1, scope = 2;
 
         public int curLevel;
         public Obj undefObj;
         public Obj topScope;
+       //public SymbolTable vertexTable = new SymbolTable();
+       //public SymbolTable edgeTable = new SymbolTable();
+
 
         Compiler.SyntaxAnalysis.Parser parser;
 
@@ -37,7 +39,7 @@ namespace P4_Project.SymbolTable
         }
 
         //open a new scope and make it the current (topScope)
-        void OpenScope()
+        public void OpenScope()
         {
             Obj scop = new Obj("", scope, null, topScope, 0);
             topScope = scop;
@@ -45,10 +47,15 @@ namespace P4_Project.SymbolTable
         }
 
         //close the current scope
-        void CloseScope()
+        public void CloseScope()
         {
             topScope = topScope.Next;
             curLevel--;
+        }
+
+        public Obj NewObj(Obj obj)
+        {
+            return NewObj(obj.Name, obj.Kind, obj.Type);
         }
 
         //creates a new Object in the current scope
