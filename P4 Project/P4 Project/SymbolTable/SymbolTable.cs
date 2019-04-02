@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static P4_Project.Types;
 
 namespace P4_Project.SymbolTable
 {
     class SymbolTable
     {
-        const int undef = 0, number = 1, boolean = 2, text = 3, vertex = 4, edge = 5, set = 10, list = 20, queue = 30, stack = 40;
-
-        const int var = 0, proc = 1, scope = 2;
+        public const int var = 0, func = 1, scope = 2;
 
         public int curLevel;
         public Obj undefObj;
