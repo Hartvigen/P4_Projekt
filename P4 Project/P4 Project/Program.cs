@@ -11,12 +11,20 @@ namespace P4_Project
     {
         static void Main(string[] args)
         {
-            String defualtFile = "MAGIAFile.txt";
+            String defaultFile = "MAGIAFile.txt";
+
+            Console.WriteLine("Parsing input file and assigning variables: ");
+            Console.WriteLine(TryParseAndSymbolCheck(defaultFile) ? "Compile Succeeded!" : "Compile failed!");
 
             if (args.Length > 0)
             {
                 switch (args[0])
                 {
+                    case "-s":
+                    case "--symbolprint":
+                        Console.WriteLine("Parsing input file and assigning variables: " + args[1]);
+                        Console.WriteLine(TryParseAndSymbolCheck(args[1]) ? "Compile Succeeded!" : "Compile failed!");
+                        break;
                     case "-h":
                     case "--help":
                         Console.WriteLine("Compile file: MagiaC.exe [filePath]");
@@ -24,7 +32,7 @@ namespace P4_Project
                         Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath] || MagiaC.exe --prettyprint [filepath]");
                         Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath] || --xmlprint [filepath]");
                         Console.WriteLine("Create Test Png: MagiaC.exe -t || MagiaC.exe --test");
-                        Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defualtFile + "\" in its directory and compile complie that.");
+                        Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defaultFile + "\" in its directory and compile complie that.");
                         break;
                     case "-p":
                     case "--prettyprint":
@@ -47,10 +55,10 @@ namespace P4_Project
                         break;
                 }
             }
-            else if (File.Exists(defualtFile))
+            else if (File.Exists(defaultFile))
             {
-                Console.WriteLine("Compiling standard file: " + defualtFile);
-                Console.WriteLine(TryParse(defualtFile) ? "Compile succeeded!" : "Compile failed!");
+                Console.WriteLine("Compiling standard file: " + defaultFile);
+                Console.WriteLine(TryParse(defaultFile) ? "Compile succeeded!" : "Compile failed!");
             }
             else
             {
@@ -79,6 +87,19 @@ namespace P4_Project
             AST.Accept(visitor);
 
             File.WriteAllText("prettyprint.txt", visitor.str.ToString());
+
+            return parser.errors.count == 0;
+        }
+
+        private static bool TryParseAndSymbolCheck(string filePath)
+        {
+            Parser parser = new Parser(new Scanner(filePath));
+            parser.Parse();
+
+            MAGIA AST = parser.mainNode;
+
+            TypeVisitor visitor = new TypeVisitor();
+            AST.Accept(visitor);
 
             return parser.errors.count == 0;
         }

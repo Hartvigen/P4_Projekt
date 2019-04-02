@@ -15,13 +15,31 @@ namespace P4_Project.SymbolTable
         public int curLevel;
         public Obj undefObj;
         public Obj topScope;
+       //public SymbolTable vertexTable = new SymbolTable();
+       //public SymbolTable edgeTable = new SymbolTable();
+
 
         Compiler.SyntaxAnalysis.Parser parser;
-        
 
+        //Constructor for visitor (no parser argument)
+        public SymbolTable()
+        {
+            topScope = null;
+            curLevel = -1;
+            undefObj = new Obj("undef", var, null, 0, undef, 0);
+        }
+
+        //Constructor for ATG
+        public SymbolTable(Compiler.SyntaxAnalysis.Parser parser)
+        {
+            this.parser = parser;
+            topScope = null;
+            curLevel = -1;
+            undefObj = new Obj("undef", var, null, 0, undef, 0);
+        }
 
         //open a new scope and make it the current (topScope)
-        void OpenScope()
+        public void OpenScope()
         {
             Obj scop = new Obj("", scope, null, topScope, 0);
             topScope = scop;
@@ -29,10 +47,15 @@ namespace P4_Project.SymbolTable
         }
 
         //close the current scope
-        void CloseScope()
+        public void CloseScope()
         {
             topScope = topScope.Next;
             curLevel--;
+        }
+
+        public Obj NewObj(Obj obj)
+        {
+            return NewObj(obj.Name, obj.Kind, obj.Type);
         }
 
         //creates a new Object in the current scope
@@ -84,15 +107,6 @@ namespace P4_Project.SymbolTable
             }
             parser.SemErr(name + " is undeclared");
             return undefObj;
-        }
-
-        //Constructor for the symbol table
-        public SymbolTable(Compiler.SyntaxAnalysis.Parser parser)
-        {
-            this.parser = parser;
-            topScope = null;
-            curLevel = -1;
-            undefObj = new Obj("undef", var, null, 0, undef, 0);
         }
 
     }

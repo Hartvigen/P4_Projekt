@@ -9,11 +9,16 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
+using static P4_Project.Types;
 
 namespace P4_Project.Visitors
 {
     class TypeVisitor : Visitor
     {
+
+        SymbolTable.SymbolTable symbolTable = new SymbolTable.SymbolTable();
+        SymbolTable.Obj obj = new SymbolTable.Obj();
+
 
         public override void Visit(CallNode node)
         { 
@@ -22,6 +27,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(IdentNode node)
         {
+            
         }
 
         public override void Visit(MemberNode node)
@@ -32,12 +38,12 @@ namespace P4_Project.Visitors
 
         public override void Visit(VarNode node)
         {
-    
+
         }
 
         public override void Visit(BoolConst node)
         {
-            
+
         }
 
         public override void Visit(CollecConst node)
@@ -47,7 +53,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(NoneConst node)
         {
-   
+
         }
 
         public override void Visit(NumConst node)
@@ -86,6 +92,12 @@ namespace P4_Project.Visitors
 
         public override void Visit(VarDeclNode node)
         {
+            obj.Name = node.symbolName;
+            obj.Type = node.type;
+            obj.Kind = var;
+            symbolTable.NewObj(obj);
+            obj = new SymbolTable.Obj();
+
             if (node.expr != null)
                 node.expr.Accept(this);
         }
@@ -108,18 +120,22 @@ namespace P4_Project.Visitors
         }
 
         public override void Visit(ForeachNode node)
-        { 
+        {
+            symbolTable.OpenScope();
             node.iterationVar.Accept(this);
             node.iterator.Accept(this);
-            node.body.Accept(this);    
+            node.body.Accept(this);
+            symbolTable.CloseScope();
         }
 
         public override void Visit(ForNode node)
-        {  
+        {
+            symbolTable.OpenScope();
             node.initializer.Accept(this);
             node.condition.Accept(this);
             node.iterator.Accept(this);
             node.body.Accept(this);
+            symbolTable.CloseScope();
         }
 
         public override void Visit(HeadNode node)
@@ -128,12 +144,14 @@ namespace P4_Project.Visitors
         }
 
         public override void Visit(IfNode node)
-        {  
+        {
+            symbolTable.OpenScope();
             if (node.condition != null)
                 node.condition.Accept(this);
             node.body.Accept(this);
             if (node.elseNode != null)
-                node.elseNode.Accept(this);   
+                node.elseNode.Accept(this);
+            symbolTable.CloseScope();
         }
 
         public override void Visit(LoneCallNode node)
@@ -147,14 +165,18 @@ namespace P4_Project.Visitors
         }
 
         public override void Visit(WhileNode node)
-        {   
+        {
+            symbolTable.OpenScope();
             node.condition.Accept(this);
-            node.body.Accept(this);   
+            node.body.Accept(this);
+            symbolTable.CloseScope();
         }
 
         public override void Visit(MAGIA node)
-        { 
-            node.block.Accept(this); 
+        {
+            symbolTable.OpenScope();
+            node.block.Accept(this);
+            symbolTable.CloseScope();
         }
 
         public override void Visit(BreakNode node)
