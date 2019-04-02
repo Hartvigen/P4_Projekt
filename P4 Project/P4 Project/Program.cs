@@ -47,7 +47,7 @@ namespace P4_Project
                     case "-t":
                     case "--test":
                         Console.WriteLine("Printing test png called: testgraph.png ");
-                        Console.WriteLine(TestPrint() ? "succeeded!" : "failed!");
+                        Console.WriteLine(TestPrint() ? "print succeeded!" : "print failed!");
                         break;
                     default:
                         Console.WriteLine("Parsing input file: " + args[0]);
