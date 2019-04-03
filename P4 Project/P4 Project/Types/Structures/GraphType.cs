@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace P4_Project.Types.Structures
 {
-    class Graph : BaseType
+    class GraphType : BaseType
     {
         public override string ToString()
         {
-            return "graph";
+            throw new NotSupportedException("Typen 'graph' kan ikke bruges");
         }
     }
 }

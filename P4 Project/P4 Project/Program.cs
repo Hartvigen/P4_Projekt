@@ -14,13 +14,6 @@ namespace P4_Project
     {
         static void Main(string[] args)
         {
-            BaseType t1 = new SetType(new NumberType()), t2 = new SetType(new BooleanType());
-
-            Console.WriteLine(t1 == t2);
-            Console.ReadKey();
-
-
-
             string defaultFile = "MAGIAFile.txt";
 
             Console.WriteLine("Parsing input file and assigning variables: ");
