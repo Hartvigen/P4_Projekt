@@ -86,10 +86,18 @@
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
+    <Compile Include="Types\Structures\EdgeType.cs" />
+    <Compile Include="Types\Structures\Graph.cs" />
     <Compile Include="Visitors\TypeVisitor.cs" />
     <Compile Include="Visitors\XmlTreeBuilder.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
     <Compile Include="Visitors\Visitor.cs" />
+    <Compile Include="Types\BaseType.cs" />
+    <Compile Include="Types\Primitives\NumberType.cs" />
+    <Compile Include="Types\Primitives\BooleanType.cs" />
+    <Compile Include="Types\Structures\VertexType.cs" />
+    <Compile Include="Types\Functions\FunctionType.cs" />
+    <Compile Include="Types\Collections\SetType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

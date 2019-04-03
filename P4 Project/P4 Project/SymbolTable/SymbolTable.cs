@@ -4,63 +4,58 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.Compiler.SyntaxAnalysis;
+using static P4_Project.TypeS;
 
-namespace P4_Project.SymbolTable
+namespace P4_Project.SymTab
 {
-    class SymbolTable
+    public class SymbolTable
     {
-        const int undef = 0, number = 1, boolean = 2, text = 3, vertex = 4, edge = 5, set = 10, list = 20, queue = 30, stack = 40;
+        Parser parser;
+        public static Obj undefObj = new Obj("undef", undef, var);
 
-        const int var = 0, proc = 1, scope = 2;
+        // Kinds
+        public const int var = 0, func = 1;
 
-        public int curLevel;
-        public Obj undefObj;
-        public Obj topScope;
+        SymbolTable parent;
+        List<SymbolTable> innerScopes = new List<SymbolTable>();
+        Dictionary<string, Obj> symbolDecls = new Dictionary<string, Obj>();
 
-        Compiler.SyntaxAnalysis.Parser parser;
-        
-
+        //Constructor for visitor (no parser argument)
+        public SymbolTable(SymbolTable _parent, Parser _parser)
+        {
+            parent = _parent;
+            parser = _parser;
+        }
 
         //open a new scope and make it the current (topScope)
-        void OpenScope()
+        public SymbolTable OpenScope()
         {
-            Obj scop = new Obj("", scope, null, topScope, 0);
-            topScope = scop;
-            curLevel++;
+            SymbolTable newTable = new SymbolTable(this, parser);
+            innerScopes.Add(newTable);
+            return newTable;
         }
 
         //close the current scope
-        void CloseScope()
+        public SymbolTable CloseScope()
         {
-            topScope = topScope.Next;
-            curLevel--;
+            return parent;
+        }
+
+        public Obj NewObj(Obj obj)
+        {
+            return NewObj(obj.Name, obj.Kind, obj.Type);
         }
 
         //creates a new Object in the current scope
-        public Obj NewObj(string name, int kind, int type)
+        public Obj NewObj(string name, int type, int kind)
         {
-            Obj p, last, obj = new Obj();
-            obj.Name = name; obj.Kind = kind; obj.Type = type;
-            obj.Level = curLevel;
+            Obj obj = new Obj(name, type, kind);
 
-            p = topScope.Locals;
-            last = null;
-
-            while (p != null)
-            {
-                if (p.Name == name)
-                    parser.SemErr("name declared twice");
-                last = p;
-                p = p.Next;
-            }
-
-            if (last == null)
-                topScope.Locals = obj;
+            if (symbolDecls.ContainsKey(obj.Name))
+                parser.SemErr($"{name} declared twice");
             else
-                last.Next = obj;
-
-            if (kind == var)
-                obj.Adr = topScope.NextAdr++;
+                symbolDecls.Add(obj.Name, obj);
 
             return obj;
         }
@@ -68,32 +63,16 @@ namespace P4_Project.SymbolTable
         //search for a name in all open scopes and return its object node
         public Obj Find(string name)
         {
-            Obj obj, scope;
-            scope = topScope;
-            while(scope != null)
-            {
-                obj = scope.Locals;
-                while(obj != null)
-                {
-                    if(obj.Name == name)
-                    {
-                        return obj;
-                    }
-                    obj = obj.Next;
-                }
-                scope = scope.Next;
-            }
-            parser.SemErr(name + " is undeclared");
-            return undefObj;
-        }
+            if (symbolDecls.TryGetValue(name, out Obj value))
+                return value;
 
-        //Constructor for the symbol table
-        public SymbolTable(Compiler.SyntaxAnalysis.Parser parser)
-        {
-            this.parser = parser;
-            topScope = null;
-            curLevel = -1;
-            undefObj = new Obj("undef", var, null, 0, undef, 0);
+            else if (parent != null)
+                return parent.Find(name);
+
+            else
+                parser.SemErr($"{name} has not been declared not declared");
+
+            return null;
         }
 
     }
