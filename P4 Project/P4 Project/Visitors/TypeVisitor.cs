@@ -17,7 +17,7 @@ namespace P4_Project.Visitors
     class TypeVisitor : Visitor
     {
         SymbolTable symbolTable = new SymbolTable(null, null);
-        Obj obj = new Obj(null, 0, 0);
+        Obj obj = new Obj(null, null, 0);
 
 
         public override void Visit(CallNode node)

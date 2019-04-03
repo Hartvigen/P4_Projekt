@@ -26,13 +26,19 @@ Coco/R itself) does not fall under the GNU General Public License.
 ----------------------------------------------------------------------*/
 -->begin
 using System;
+using P4_Project.Types;
+using P4_Project.Types.Primitives;
+using P4_Project.Types.Collections;
+using P4_Project.Types.Structures;
+using P4_Project.Types.Functions;
 using P4_Project.AST;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
-using P4_Project.SymbolTable;
+using P4_Project.SymTab;
+using static P4_Project.SymTab.SymbolTable;
 
 -->namespace
 

@@ -6,8 +6,11 @@ namespace P4_Project.Types.Functions
 {
     public class FunctionType : BaseType
     {
+        public BaseType ReturnType { get; set; }
+
         public Dictionary<string, BaseType> Parameters { get; private set; }
         public List<BaseType> TypeList { get => Parameters.Values.ToList(); }
+
 
         public FunctionType(Dictionary<string, BaseType> parameters)
         {
@@ -16,7 +19,7 @@ namespace P4_Project.Types.Functions
 
         public override string ToString()
         {
-            return $"function({string.Join(", ", Parameters.Select(pair => $"{pair.Key} {{{pair.Value.ToString()}}}"))})";
+            return $"function({string.Join(", ", Parameters.Select(pair => $"{pair.Key} {pair.Value.ToString()}"))})";
         }
 
         public override bool Equals(object obj)

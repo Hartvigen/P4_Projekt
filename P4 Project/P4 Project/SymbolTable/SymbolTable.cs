@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using P4_Project.Compiler.SyntaxAnalysis;
+using P4_Project.Types;
 using static P4_Project.TypeS;
 
 namespace P4_Project.SymTab
@@ -12,14 +13,14 @@ namespace P4_Project.SymTab
     public class SymbolTable
     {
         Parser parser;
-        public static Obj undefObj = new Obj("undef", undef, var);
 
-        // Kinds
-        public const int var = 0, func = 1;
+        public const int var = 0, func = 1; // Kinds
+        public static Obj undefObj = new Obj("undef", null, var);
 
         SymbolTable parent;
         List<SymbolTable> innerScopes = new List<SymbolTable>();
         Dictionary<string, Obj> symbolDecls = new Dictionary<string, Obj>();
+
 
         //Constructor for visitor (no parser argument)
         public SymbolTable(SymbolTable _parent, Parser _parser)
@@ -27,6 +28,7 @@ namespace P4_Project.SymTab
             parent = _parent;
             parser = _parser;
         }
+
 
         //open a new scope and make it the current (topScope)
         public SymbolTable OpenScope()
@@ -42,13 +44,9 @@ namespace P4_Project.SymTab
             return parent;
         }
 
-        public Obj NewObj(Obj obj)
-        {
-            return NewObj(obj.Name, obj.Kind, obj.Type);
-        }
 
         //creates a new Object in the current scope
-        public Obj NewObj(string name, int type, int kind)
+        public Obj NewObj(string name, BaseType type, int kind)
         {
             Obj obj = new Obj(name, type, kind);
 
@@ -73,6 +71,5 @@ namespace P4_Project.SymTab
 
             return null;
         }
-
     }
 }
