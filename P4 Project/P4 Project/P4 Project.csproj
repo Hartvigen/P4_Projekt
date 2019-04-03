@@ -43,9 +43,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="GraphVizWrapper">
-      <HintPath>..\packages\GraphViz.NET.1.0.0\lib\net40\GraphVizWrapper.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AST\Expressions\BinExprNode.cs" />
@@ -72,7 +69,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolTable\Obj.cs" />
     <Compile Include="SymbolTable\SymbolTable.cs" />
-    <Compile Include="TypeS.cs" />
+    <Compile Include="Types.cs" />
     <Compile Include="AST\Stmts\AssignNode.cs" />
     <Compile Include="AST\Stmts\Block.cs" />
     <Compile Include="AST\Stmts\Decls\DeclNode.cs" />
@@ -89,6 +86,8 @@
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
+    <Compile Include="Types\Structures\EdgeType.cs" />
+    <Compile Include="Types\Structures\Graph.cs" />
     <Compile Include="Visitors\TypeVisitor.cs" />
     <Compile Include="Visitors\XmlTreeBuilder.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
@@ -99,11 +98,6 @@
     <Compile Include="Types\Structures\VertexType.cs" />
     <Compile Include="Types\Functions\FunctionType.cs" />
     <Compile Include="Types\Collections\SetType.cs" />
-    <Compile Include="Types\Primitives\TextType.cs" />
-    <Compile Include="Types\Collections\QueueType.cs" />
-    <Compile Include="Types\Collections\StackType.cs" />
-    <Compile Include="Types\Collections\CollecType.cs" />
-    <Compile Include="Types\Collections\ListType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -112,16 +106,10 @@
     <None Include="Graphviz\bin\config6" />
     <None Include="Graphviz\bin\Graphviz.ini" />
     <None Include="Graphviz\bin\Settings.ini" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Compiler\CodeGeneration\" />
     <Folder Include="Compiler\SemanticAnalysis\" />
-    <Folder Include="Types\" />
-    <Folder Include="Types\Primitives\" />
-    <Folder Include="Types\Collections\" />
-    <Folder Include="Types\Structures\" />
-    <Folder Include="Types\Functions\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Graphviz\bin\acyclic.exe" />

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace P4_Project.Types.Structures
 {
-    class EdgeType
+    class EdgeType : BaseType
     {
+        public override string ToString()
+        {
+            return "edge";
+        }
     }
 }

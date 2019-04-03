@@ -19,7 +19,7 @@ namespace P4_Project.SymTab
 
         SymbolTable parent;
         List<SymbolTable> innerScopes = new List<SymbolTable>();
-        HashSet<Obj> symbolDecls = new HashSet<Obj>();
+        Dictionary<string, Obj> symbolDecls = new Dictionary<string, Obj>();
 
         //Constructor for visitor (no parser argument)
         public SymbolTable(SymbolTable _parent, Parser _parser)
@@ -52,10 +52,10 @@ namespace P4_Project.SymTab
         {
             Obj obj = new Obj(name, type, kind);
 
-            if (symbolDecls.Contains(obj))
+            if (symbolDecls.ContainsKey(obj.Name))
                 parser.SemErr($"{name} declared twice");
             else
-                symbolDecls.Add(obj);
+                symbolDecls.Add(obj.Name, obj);
 
             return obj;
         }
@@ -63,7 +63,16 @@ namespace P4_Project.SymTab
         //search for a name in all open scopes and return its object node
         public Obj Find(string name)
         {
-            return undefObj;
+            if (symbolDecls.TryGetValue(name, out Obj value))
+                return value;
+
+            else if (parent != null)
+                return parent.Find(name);
+
+            else
+                parser.SemErr($"{name} has not been declared not declared");
+
+            return null;
         }
 
     }
