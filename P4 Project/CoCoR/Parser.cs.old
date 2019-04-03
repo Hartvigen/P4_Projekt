@@ -151,7 +151,7 @@ public SymbolTable tab;
 		while (!(la.kind == 0 || la.kind == 14)) {SynErr(57); Get();}
 		Expect(14);
 		Expect(1);
-		funcName = t.val; obj = tab.NewObj(t.val, t.kind, typ);
+		funcName = t.val; obj = tab.NewObj(t.val, t.kind, null);
 		Expect(10);
 		if (la.val != ")") {
 			FuncParams(ref paramBlock);
@@ -439,7 +439,7 @@ public SymbolTable tab;
 		v = null; Obj obj; 
 		Expect(10);
 		Expect(1);
-		v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, t.kind, typ); 
+		v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, t.kind, null); 
 		VEParams(v);
 		Expect(11);
 	}
@@ -474,7 +474,7 @@ public SymbolTable tab;
 		edge = null; Obj obj; 
 		Expect(10);
 		Identifier(out VarNode right);
-		edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, t.kind, typ); 
+		edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, t.kind, null); 
 		VEParams(edge);
 		Expect(11);
 	}

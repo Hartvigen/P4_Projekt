@@ -1,4 +1,5 @@
 ﻿using P4_Project.AST.Expressions;
+using P4_Project.Types;
 using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,12 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class VarDeclNode : DeclNode
     {
-        public int type;
+        public BaseType type;
         public ExprNode expr; // If the variable should have a default value, this value is stored in "expr".
 
         public VarDeclNode() { }
 
-        public VarDeclNode(int _type, string _symbolName, ExprNode _expr)
+        public VarDeclNode(BaseType _type, string _symbolName, ExprNode _expr)
             : base(_symbolName)
         {
             type = _type;
@@ -32,7 +33,7 @@ namespace P4_Project.AST.Stmts.Decls
 
         public String getVarType()
         {
-            return TypeS.getCodeFromInt(type);
+            return type.ToString();
         }
     }
 }
