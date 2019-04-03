@@ -13,7 +13,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
     public class ParserTests
     {
         static string validIdentifier = "test123";
-        static string validStringType = "text";
+        static string validTextType = "text";
         static string invalidIdentifier = "123test";
 
         static string invalidType = "notAType";
@@ -393,9 +393,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         {
             bool success;
 
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge(" + validStringType + " " + validIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
+            success = TryParse("[edge(" + validTextType + " " + validIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
             Assert.IsFalse(success);
         }
 
@@ -404,9 +404,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ParseTestFailure11()
         {
             bool success;
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "  " + validStringType + " " + validIdentifier + ")]");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "  " + validTextType + " " + validIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge(" + validStringType + " " + validIdentifier + "  " + validStringType + " " + validIdentifier + ")]");
+            success = TryParse("[edge(" + validTextType + " " + validIdentifier + "  " + validTextType + " " + validIdentifier + ")]");
             Assert.IsFalse(success);
         }
 
@@ -415,9 +415,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ParseTestFailure12()
         {
             bool success;
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + ".  " + validStringType + " " + validIdentifier + ")]");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + ".  " + validTextType + " " + validIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge(" + validStringType + " " + validIdentifier + ".  " + validStringType + " " + validIdentifier + ")]");
+            success = TryParse("[edge(" + validTextType + " " + validIdentifier + ".  " + validTextType + " " + validIdentifier + ")]");
             Assert.IsFalse(success);
         }
 
@@ -426,9 +426,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ParseTestFailure13()
         {
             bool success;
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + ")");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + ")");
             Assert.IsFalse(success);
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + ")");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + ")");
             Assert.IsFalse(success);
         }
 
@@ -437,9 +437,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ParseTestFailure14()
         {
             bool success;
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "]");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "]");
             Assert.IsFalse(success);
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "]");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "]");
             Assert.IsFalse(success);
         }
 
@@ -448,9 +448,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ParseTestFailure15()
         {
             bool success;
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "");
             Assert.IsFalse(success);
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "");
             Assert.IsFalse(success);
         }
 
@@ -459,13 +459,13 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ParseTestFailure16()
         {
             bool success;
-            success = TryParse("[vertex " + validStringType + " " + validIdentifier + ")]");
+            success = TryParse("[vertex " + validTextType + " " + validIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge " + validStringType + " " + validIdentifier + ")]");
+            success = TryParse("[edge " + validTextType + " " + validIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[vertex" + validStringType + " " + validIdentifier + ")]");
+            success = TryParse("[vertex" + validTextType + " " + validIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge" + validStringType + " " + validIdentifier + ")]");
+            success = TryParse("[edge" + validTextType + " " + validIdentifier + ")]");
             Assert.IsFalse(success);
         }
 
@@ -474,9 +474,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ParseTestFailure17()
         {
             bool success;
-            success = TryParse("[vertex(" + validStringType + " " + validIdentifier + "");
+            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "");
             Assert.IsFalse(success);
-            success = TryParse("[edge(" + validStringType + " " + validIdentifier + "");
+            success = TryParse("[edge(" + validTextType + " " + validIdentifier + "");
             Assert.IsFalse(success);
         }
 

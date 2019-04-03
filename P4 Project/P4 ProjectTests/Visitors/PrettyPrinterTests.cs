@@ -59,7 +59,7 @@ namespace P4_Project.Visitors.Tests
             visitor = null;
         }
 
-        public static String Prettify(String program)
+        public static string Prettify(string program)
         {
             Parser parser = new Parser(new Scanner(StreamFromString(program)));
             parser.Parse();
@@ -72,8 +72,8 @@ namespace P4_Project.Visitors.Tests
         [TestMethod()]
         public void PrettyPrinterTestSuccess01()
         {
-            String program = Prettify(File.ReadAllText(pathToPrettyCode));
-            String startprogram = File.ReadAllText(pathToPrettyCode);
+            string program = Prettify(File.ReadAllText(pathToPrettyCode));
+            string startprogram = File.ReadAllText(pathToPrettyCode);
 
             Assert.IsTrue(program == startprogram);
         }
@@ -82,7 +82,7 @@ namespace P4_Project.Visitors.Tests
         [TestMethod()]
         public void PrettyPrinterTestSuccess02()
         {
-            String program = File.ReadAllText(pathToPrettyCode);
+            string program = File.ReadAllText(pathToPrettyCode);
 
             for (int i = 10; i > 0; i--)
                 program = Prettify(program);
@@ -94,7 +94,7 @@ namespace P4_Project.Visitors.Tests
         [TestMethod()]
         public void PrettyPrinterTestFailure01()
         {
-            String program = File.ReadAllText(pathToUglyCode);
+            string program = File.ReadAllText(pathToUglyCode);
             Assert.IsFalse(program == File.ReadAllText(pathToPrettyCode));
         }
 
