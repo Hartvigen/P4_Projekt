@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,68 +8,15 @@ using System.Threading.Tasks;
 
 namespace HandWrittenScannerParser
 {
-    class Token
-    {
-        private int kind;
-        private string value;
-
-        public Token(Kinds kind, string value)
-        {
-            this.kind = (int)kind;
-            this.value = value;
-        }
-    }
-
-    enum Kinds : int
-    {
-        Number,
-        IDENT,
-        LBrack,
-        RBrack,
-        Assign,
-        RParen,
-        LParen,
-        Func
-    }
-
-    class Inputter
-    {
-        public int line = 1;
-        public int col = 0;
-        private IEnumerator<char> input;
-
-        public Inputter(string path)
-        {
-            input = File.ReadAllText(path, Encoding.UTF8).GetEnumerator();
-        }
-
-        public void MoveNext()
-        {
-            input.MoveNext();
-            col++;
-            if (input.Current.ToString().Contains('\n'))
-            {
-                line++;
-                input.MoveNext();
-                col = 1;
-            }
-        }
-
-        public char Current()
-        {
-            return input.Current;
-        }
-
-
-    }
 
     class Scanner
     {
-        private Inputter input;
-        private Queue<Token> Tokens = new Queue<Token>();
-        Regex numberRegex = new Regex("[0-9.]");
-        Regex IDENTRegex = new Regex("[A-Za-z_]");
-        Regex WSREgex = new Regex("\\s, \r");
+        public Inputter input;
+        public  Queue<Token> Tokens = new Queue<Token>();
+        static Regex digitRegex = new Regex("[0-9]");
+        static Regex numberRegex = new Regex(digitRegex.ToString() + "|\\.");
+        static Regex IdentFuncRegex = new Regex("[A-Za-z_]");
+        static Regex WSREgex = new Regex("\\s | \\r");
 
         public Scanner(string path)
         {
@@ -83,61 +29,70 @@ namespace HandWrittenScannerParser
             return Tokens.Peek();
         }
 
+        public Token DeQueueNext()
+        {
+            return Tokens.Dequeue();
+        }
+
         public void NextToken()
         {
-            input.MoveNext();
             Token tkn = null;
+            string curstring = input.Current().ToString();
 
-            while(WSREgex.IsMatch(input.Current().ToString()))
+            while((string.IsNullOrWhiteSpace(curstring) || curstring[0] == '\r') && input.hasNext)
             {
                 input.MoveNext();
+                if(input.hasNext)
+                    curstring = input.Current().ToString();
             }
 
-            if (numberRegex.IsMatch(input.Current().ToString()))
+            if (digitRegex.IsMatch(curstring))
             {
                 tkn = NumberToken();
             }
-            else if (IDENTRegex.IsMatch(input.Current().ToString()))
+            else if (IdentFuncRegex.IsMatch(curstring))
             {
                 tkn = IdentOrFuncToken();
             }
             else
             {
-                switch (input.Current())
-                {
-                    case '[':
-                        tkn = new Token(Kinds.LBrack, "[");
-                        break;
-                    case ']':
-                        tkn = new Token(Kinds.RBrack, "[");
-                        break;
-                    case '=':
-                        tkn = new Token(Kinds.Assign, "[");
-                        break;
-                    case '(':
-                        tkn = new Token(Kinds.LParen, "[");
-                        break;
-                    case ')':
-                        tkn = new Token(Kinds.RParen, "[");
-                        break;
-
-                    default:
-                        throw new Exception("Error: Cannot recognize symbol.");
-                }
+                if(input.hasNext)
+                    switch (curstring[0])
+                    {
+                        case '[':
+                            tkn = new Token(Kinds.LBrack, "[");
+                            break;
+                        case ']':
+                            tkn = new Token(Kinds.RBrack, "]");
+                            break;
+                        case '=':
+                            tkn = new Token(Kinds.Assign, "=");
+                            break;
+                        case '(':
+                            tkn = new Token(Kinds.LParen, "(");
+                            break;
+                        case ')':
+                            tkn = new Token(Kinds.RParen, ")");
+                            break;                       
+                        default:
+                            throw new Exception("Error: Cannot recognize symbol.");
+                    }
+                input.MoveNext();
             }
-
             Tokens.Enqueue(tkn);
-
-
         }
 
         public Token NumberToken()
         {
             StringBuilder sb = new StringBuilder();
+            string numstring = input.Current().ToString();
+            
 
-            while (numberRegex.IsMatch(input.Current().ToString()))
+            while (numberRegex.IsMatch(numstring))
             {
-                sb.Append(input.Current());
+                sb.Append(numstring);
+                input.MoveNext();
+                numstring = input.Current().ToString();
             }
             if(sb.ToString().Count(f => f == '.') > 1)
                 throw new Exception($"Error: Number ending at line {input.line}, column {input.col} contains multiple dots\n");
@@ -146,30 +101,19 @@ namespace HandWrittenScannerParser
 
         public Token IdentOrFuncToken()
         {
-            Token tkn;
-            bool continuous = true;
-            string value = "";
+            StringBuilder sb = new StringBuilder();
+            string stringstring = input.Current().ToString();
 
-            while (continuous)
+            while(IdentFuncRegex.IsMatch(stringstring) || digitRegex.IsMatch(stringstring))
             {
-                if (value.Contains("func "))//TODO check for space
-                {
-                    return tkn = new Token(Kinds.Func, "func");
-                }
-
-                if (IDENTRegex.IsMatch(input.Current().ToString()))
-                {
-                    value = value + input.Current();
-                }
-                else
-                {
-                    continuous = false;
-                }
-
+                sb.Append(input.Current());
                 input.MoveNext();
+                stringstring = input.Current().ToString();
             }
-
-            return tkn = new Token(Kinds.IDENT, value);
+            if (string.IsNullOrWhiteSpace(stringstring) && sb.ToString().Equals("func"))
+                return new Token(Kinds.Func, sb.ToString());
+            else
+                return new Token(Kinds.IDENT, sb.ToString());
         }
-    }
+    }    
 }

@@ -12,21 +12,17 @@ namespace HandWrittenScannerParser
     {
         static void Main(string[] args)
         {
-            string text1 = "Hello";
-            string nottest = "1Hello";
-            Regex rgx = new Regex(@"^[A-Za-z][A-Za-z0-9]*$");
-            if(rgx.IsMatch(text1))
-                Console.WriteLine("Did it");
-            if (!rgx.IsMatch(nottest))
-                Console.WriteLine("Didn't do it");
-            String path = "MagiaText.txt";
-            if (File.Exists(path))
-            {
-                string program = File.ReadAllText(path, Encoding.UTF8);
-                
-            
-            }
-
+            /*Scanner scanner = new Scanner("MagiaText.txt");
+            while (scanner.input.hasNext) {
+                scanner.NextToken();
+                if (scanner.input.hasNext || scanner.Tokens.Count != 0)
+                {
+                    Token current = scanner.DeQueueNext();
+                    Console.WriteLine($"Kind is : {current.Getkind().ToString()}, Value is : {current.GetValue()}");
+                }
+            }*/
+            Parser parser = new Parser("MagiaText.txt");
+            parser.parse();
             Console.ReadKey();
         }
     }
