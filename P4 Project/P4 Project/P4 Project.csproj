@@ -86,8 +86,6 @@
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
-    <Compile Include="Types\Structures\EdgeType.cs" />
-    <Compile Include="Types\Structures\Graph.cs" />
     <Compile Include="Visitors\TypeVisitor.cs" />
     <Compile Include="Visitors\XmlTreeBuilder.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
@@ -108,8 +106,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="ClassDiagram2.cd" />
-    <None Include="ClassDiagram3.cd" />
     <None Include="Graphviz\bin\config6" />
     <None Include="Graphviz\bin\Graphviz.ini" />
     <None Include="Graphviz\bin\Settings.ini" />

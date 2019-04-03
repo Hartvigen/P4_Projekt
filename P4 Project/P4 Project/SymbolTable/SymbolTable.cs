@@ -66,11 +66,10 @@ namespace P4_Project.SymTab
             if (symbolDecls.TryGetValue(name, out Obj value))
                 return value;
 
-            else if (parent != null)
+            if (parent != null)
                 return parent.Find(name);
 
-            else
-                parser.SemErr($"{name} has not been declared not declared");
+            parser.SemErr($"{name} has not been declared not declared");
 
             return null;
         }

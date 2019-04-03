@@ -10,7 +10,7 @@ namespace P4_Project.Types.Structures
     {
         public override string ToString()
         {
-            throw new NotImplementedException("Typen 'graph' kan ikke bruges");
+            throw new NotSupportedException("Typen 'graph' kan ikke bruges");
         }
     }
 }
