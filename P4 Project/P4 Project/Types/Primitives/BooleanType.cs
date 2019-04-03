@@ -1,10 +1,11 @@
 ﻿using System;
 namespace P4_Project.Types.Primitives
 {
-    public class BooleanType
+    public class BooleanType : BaseType
     {
-        public BooleanType()
+        public override string ToString()
         {
+            return "boolean";
         }
     }
 }

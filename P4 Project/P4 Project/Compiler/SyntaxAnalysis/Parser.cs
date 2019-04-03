@@ -181,7 +181,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             while (!(la.kind == 0 || la.kind == 14)) { SynErr(57); Get(); }
             Expect(14);
             Expect(1);
-            funcName = t.val; obj = tab.NewObj(t.val, t.kind, null);
+            funcName = t.val; obj = tab.NewObj(t.val, t.kind, 0);
             Expect(10);
             if (la.val != ")")
             {
@@ -546,7 +546,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             v = null; Obj obj;
             Expect(10);
             Expect(1);
-            v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, t.kind, null);
+            v = new VertexDeclNode(TypeS.vertex, t.val); obj = tab.NewObj(t.val, t.kind, 0);
             VEParams(v);
             Expect(11);
         }
@@ -588,7 +588,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             edge = null; Obj obj;
             Expect(10);
             Identifier(out VarNode right);
-            edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, t.kind, null);
+            edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, t.kind, 0);
             VEParams(edge);
             Expect(11);
         }
@@ -819,27 +819,27 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             if (la.kind == 50)
             {
                 Get();
-                type = Types.number;
+                type = TypeS.number;
             }
             else if (la.kind == 51)
             {
                 Get();
-                type = Types.boolean;
+                type = TypeS.boolean;
             }
             else if (la.kind == 52)
             {
                 Get();
-                type = Types.text;
+                type = TypeS.text;
             }
             else if (la.kind == 8)
             {
                 Get();
-                type = Types.vertex;
+                type = TypeS.vertex;
             }
             else if (la.kind == 9)
             {
                 Get();
-                type = Types.edge;
+                type = TypeS.edge;
             }
             else SynErr(71);
         }
@@ -853,7 +853,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 ExpectWeak(36, 1);
                 SingleType(out subType);
                 ExpectWeak(37, 18);
-                type = Types.list + subType;
+                type = TypeS.list + subType;
             }
             else if (la.kind == 47)
             {
@@ -861,7 +861,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 ExpectWeak(36, 1);
                 SingleType(out subType);
                 ExpectWeak(37, 18);
-                type = Types.set + subType;
+                type = TypeS.set + subType;
             }
             else if (la.kind == 48)
             {
@@ -869,7 +869,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 ExpectWeak(36, 1);
                 SingleType(out subType);
                 ExpectWeak(37, 18);
-                type = Types.queue + subType;
+                type = TypeS.queue + subType;
             }
             else if (la.kind == 49)
             {
@@ -877,7 +877,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 ExpectWeak(36, 1);
                 SingleType(out subType);
                 ExpectWeak(37, 18);
-                type = Types.stack + subType;
+                type = TypeS.stack + subType;
             }
             else SynErr(72);
         }

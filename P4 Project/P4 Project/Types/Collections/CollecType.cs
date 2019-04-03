@@ -1,10 +1,13 @@
 ﻿using System;
 namespace P4_Project.Types.Collections
 {
-    public class CollecType
+    public abstract class CollecType : BaseType
     {
-        public CollecType()
+        public BaseType SubType { get; private set; }
+
+        protected CollecType(BaseType subType)
         {
+            SubType = subType;
         }
     }
 }

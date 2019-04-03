@@ -9,15 +9,15 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using static P4_Project.Types;
+using P4_Project.SymTab;
+using static P4_Project.TypeS;
 
 namespace P4_Project.Visitors
 {
     class TypeVisitor : Visitor
     {
-
-        SymbolTable.SymbolTable symbolTable = new SymbolTable.SymbolTable();
-        SymbolTable.Obj obj = new SymbolTable.Obj();
+        SymbolTable symbolTable = new SymbolTable(null, null);
+        Obj obj = new Obj(null, 0, 0);
 
 
         public override void Visit(CallNode node)
@@ -96,7 +96,7 @@ namespace P4_Project.Visitors
             obj.Type = node.type;
             obj.Kind = var;
             symbolTable.NewObj(obj);
-            obj = new SymbolTable.Obj();
+            obj = new Obj(null, 0, 0);
 
             if (node.expr != null)
                 node.expr.Accept(this);

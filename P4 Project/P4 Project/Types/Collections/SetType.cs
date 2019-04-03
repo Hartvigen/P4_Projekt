@@ -1,10 +1,15 @@
 ﻿using System;
 namespace P4_Project.Types.Collections
 {
-    public class SetType
+    public class SetType : CollecType
     {
-        public SetType()
+        public SetType(BaseType subType)
+        : base(subType)
+        { }
+
+        public override string ToString()
         {
+            return $"set<{SubType.ToString()}>";
         }
     }
 }

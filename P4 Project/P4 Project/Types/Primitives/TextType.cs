@@ -1,10 +1,11 @@
 ﻿using System;
 namespace P4_Project.Types.Primitives
 {
-    public class TextType
+    public class TextType : BaseType
     {
-        public TextType()
+        public override string ToString()
         {
+            return "text";
         }
     }
 }

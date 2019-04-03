@@ -32,7 +32,7 @@ namespace P4_Project.AST.Stmts.Decls
 
         public String getVarType()
         {
-            return Types.getCodeFromInt(type);
+            return TypeS.getCodeFromInt(type);
         }
     }
 }

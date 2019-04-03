@@ -4,6 +4,9 @@ using P4_Project.Visitors;
 using System;
 using System.IO;
 using P4_Project.Graphviz;
+using P4_Project.Types.Collections;
+using P4_Project.Types.Primitives;
+using P4_Project.Types;
 
 namespace P4_Project
 {
@@ -11,7 +14,14 @@ namespace P4_Project
     {
         static void Main(string[] args)
         {
-            String defaultFile = "MAGIAFile.txt";
+            BaseType t1 = new SetType(new NumberType()), t2 = new SetType(new BooleanType());
+
+            Console.WriteLine(t1 == t2);
+            Console.ReadKey();
+
+
+
+            string defaultFile = "MAGIAFile.txt";
 
             Console.WriteLine("Parsing input file and assigning variables: ");
             Console.WriteLine(TryParseAndSymbolCheck(defaultFile) ? "Compile Succeeded!" : "Compile failed!");

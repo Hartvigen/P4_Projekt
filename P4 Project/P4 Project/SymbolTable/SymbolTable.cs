@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using P4_Project.Compiler.SyntaxAnalysis;
-using static P4_Project.Types;
+using static P4_Project.TypeS;
 
 namespace P4_Project.SymTab
 {
@@ -19,7 +19,7 @@ namespace P4_Project.SymTab
 
         SymbolTable parent;
         List<SymbolTable> innerScopes = new List<SymbolTable>();
-        List<Obj> symbolDecls = new List<Obj>();
+        HashSet<Obj> symbolDecls = new HashSet<Obj>();
 
         //Constructor for visitor (no parser argument)
         public SymbolTable(SymbolTable _parent, Parser _parser)
@@ -50,28 +50,12 @@ namespace P4_Project.SymTab
         //creates a new Object in the current scope
         public Obj NewObj(string name, int type, int kind)
         {
-            Obj p, last, obj = new Obj();
-            obj.Name = name; obj.Kind = kind; obj.Type = type;
-            obj.Level = curLevel;
+            Obj obj = new Obj(name, type, kind);
 
-            p = topScope.Locals;
-            last = null;
-
-            while (p != null)
-            {
-                if (p.Name == name)
-                    parser.SemErr("name declared twice");
-                last = p;
-                p = p.Next;
-            }
-
-            if (last == null)
-                topScope.Locals = obj;
+            if (symbolDecls.Contains(obj))
+                parser.SemErr($"{name} declared twice");
             else
-                last.Next = obj;
-
-            if (kind == var)
-                obj.Adr = topScope.NextAdr++;
+                symbolDecls.Add(obj);
 
             return obj;
         }
@@ -79,22 +63,6 @@ namespace P4_Project.SymTab
         //search for a name in all open scopes and return its object node
         public Obj Find(string name)
         {
-            Obj obj, scope;
-            scope = topScope;
-            while(scope != null)
-            {
-                obj = scope.Locals;
-                while(obj != null)
-                {
-                    if(obj.Name == name)
-                    {
-                        return obj;
-                    }
-                    obj = obj.Next;
-                }
-                scope = scope.Next;
-            }
-            parser.SemErr(name + " is undeclared");
             return undefObj;
         }
 
