@@ -4,53 +4,42 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.Compiler.SyntaxAnalysis;
 using static P4_Project.Types;
 
-namespace P4_Project.SymbolTable
+namespace P4_Project.SymTab
 {
-    class SymbolTable
+    public class SymbolTable
     {
-        public const int var = 0, func = 1, scope = 2;
+        Parser parser;
+        public static Obj undefObj = new Obj("undef", undef, var);
 
-        public int curLevel;
-        public Obj undefObj;
-        public Obj topScope;
-       //public SymbolTable vertexTable = new SymbolTable();
-       //public SymbolTable edgeTable = new SymbolTable();
+        // Kinds
+        public const int var = 0, func = 1;
 
-
-        Compiler.SyntaxAnalysis.Parser parser;
+        SymbolTable parent;
+        List<SymbolTable> innerScopes = new List<SymbolTable>();
+        List<Obj> symbolDecls = new List<Obj>();
 
         //Constructor for visitor (no parser argument)
-        public SymbolTable()
+        public SymbolTable(SymbolTable _parent, Parser _parser)
         {
-            topScope = null;
-            curLevel = -1;
-            undefObj = new Obj("undef", var, null, 0, undef, 0);
-        }
-
-        //Constructor for ATG
-        public SymbolTable(Compiler.SyntaxAnalysis.Parser parser)
-        {
-            this.parser = parser;
-            topScope = null;
-            curLevel = -1;
-            undefObj = new Obj("undef", var, null, 0, undef, 0);
+            parent = _parent;
+            parser = _parser;
         }
 
         //open a new scope and make it the current (topScope)
-        public void OpenScope()
+        public SymbolTable OpenScope()
         {
-            Obj scop = new Obj("", scope, null, topScope, 0);
-            topScope = scop;
-            curLevel++;
+            SymbolTable newTable = new SymbolTable(this, parser);
+            innerScopes.Add(newTable);
+            return newTable;
         }
 
         //close the current scope
-        public void CloseScope()
+        public SymbolTable CloseScope()
         {
-            topScope = topScope.Next;
-            curLevel--;
+            return parent;
         }
 
         public Obj NewObj(Obj obj)
@@ -59,7 +48,7 @@ namespace P4_Project.SymbolTable
         }
 
         //creates a new Object in the current scope
-        public Obj NewObj(string name, int kind, int type)
+        public Obj NewObj(string name, int type, int kind)
         {
             Obj p, last, obj = new Obj();
             obj.Name = name; obj.Kind = kind; obj.Type = type;

@@ -90,6 +90,7 @@
     <Compile Include="Visitors\XmlTreeBuilder.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
     <Compile Include="Visitors\Visitor.cs" />
+    <Compile Include="Types\BaseType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -102,6 +103,11 @@
   <ItemGroup>
     <Folder Include="Compiler\CodeGeneration\" />
     <Folder Include="Compiler\SemanticAnalysis\" />
+    <Folder Include="Types\" />
+    <Folder Include="Types\Primitives\" />
+    <Folder Include="Types\Collections\" />
+    <Folder Include="Types\Structures\" />
+    <Folder Include="Types\Functions\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Graphviz\bin\acyclic.exe" />

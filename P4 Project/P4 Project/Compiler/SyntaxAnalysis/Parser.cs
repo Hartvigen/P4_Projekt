@@ -6,7 +6,7 @@ using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
-using P4_Project.SymbolTable;
+using P4_Project.SymTab;
 
 namespace P4_Project.Compiler.SyntaxAnalysis
 {

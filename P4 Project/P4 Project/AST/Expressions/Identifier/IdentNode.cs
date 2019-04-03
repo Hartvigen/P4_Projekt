@@ -1,4 +1,4 @@
-﻿using P4_Project.SymbolTable;
+﻿using P4_Project.SymTab;
 using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
