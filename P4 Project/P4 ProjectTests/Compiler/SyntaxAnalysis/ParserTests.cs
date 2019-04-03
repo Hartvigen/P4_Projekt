@@ -25,7 +25,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
         static List<string> singleTypes = new List<string>()
         {
-            "number", "text", "bool", "vertex", "edge"
+            "number", "text", "boolean", "vertex", "edge"
         };
 
         static List<string> collectionTypes = new List<string>()
@@ -90,7 +90,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
                 {
                     case "number": return "123";
                     case "text": return "\"text\"";
-                    case "bool": return "true";
+                    case "boolean": return "true";
                     case "vertex": return "none";
                     case "edge": return "none";
                     default: throw new Exception(type + " is not added to the switch but is in the list.");
@@ -115,7 +115,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
                 {
                     case "number": return "!";
                     case "text": return "!";
-                    case "bool": return "!";
+                    case "boolean": return "!";
                     case "vertex": return "!";
                     case "edge": return "!";
                     default: throw new Exception(type + " is not added to the switch but is in the list of single types.");
@@ -160,8 +160,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             for (i = singleTypes.Count - 1; i >= 0 && success; i--)
                 success = TryParse("[vertex(" + singleTypes[i] + " " + validIdentifier + ")]");
 
-            for (i = singleTypes.Count - 1; i >= 0 && success; i--)
-                success = TryParse("[edge(" + singleTypes[i] + " " + validIdentifier + ")]");
+            if (success)
+                for (i = singleTypes.Count - 1; i >= 0 && success; i--)
+                    success = TryParse("[edge(" + singleTypes[i] + " " + validIdentifier + ")]");
 
             if (!success)
                 Console.WriteLine("Failed with type: " + singleTypes[i]);
@@ -222,10 +223,10 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         [TestMethod()]
         public void ParseTestSuccess6()
         {
-            string func = "[vertex(bool what = true)] func FuncDecl(number x){vertex(v1, what = false)}";
+            string func = "[vertex(boolean what = true)] func FuncDecl(number x){vertex(v1, what = false)}";
             Assert.IsTrue(TryParse(func));
 
-            string func2 = "[vertex(bool tst = true)] [edge(number weight = 0)] func FuncDecl(number x, bool boulian){vertex{(v1, tst = false), (v2, tst = true)} v1 -> (v2, weight = 10)}";
+            string func2 = "[vertex(boolean tst = true)] [edge(number weight = 0)] func FuncDecl(number x, boolean boulian){vertex{(v1, tst = false), (v2, tst = true)} v1 -> (v2, weight = 10)}";
             Assert.IsTrue(TryParse(func2));
         }
 
@@ -487,12 +488,20 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             Assert.IsFalse(TryParse(func));
         }
 
-        // a forgotten FuncDecl before func should give error
+        // a forgotten FuncDecl before function should give error
         [TestMethod()]
         public void ParseTestFailure19()
         {
             string func = "func(number x){x = 5}";
             Assert.IsFalse(TryParse(func));
+        }
+
+        // a forgotten FuncDecl before func should give error
+        [TestMethod()]
+        public void ParseTestFailure20()
+        {
+            string str = "[vertex(edge " + validIdentifier + ")]";
+            Assert.IsTrue(TryParse(str));
         }
     }
 }

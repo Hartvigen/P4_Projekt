@@ -9,7 +9,7 @@ using P4_Project.AST.Stmts.Decls;
 
 namespace P4_Project.Visitors
 {
-    class PrettyPrinter : Visitor
+    public class PrettyPrinter : Visitor
     {
         //The string that contains the prettyprinted code.
         public StringBuilder str = new StringBuilder();
@@ -204,6 +204,7 @@ namespace P4_Project.Visitors
         {
             foreach (Node n in node.statements)
             {
+                if(n != null)
                 n.Accept(this);
             }
         }
@@ -255,7 +256,7 @@ namespace P4_Project.Visitors
         {
             if (str.Length != 0)
                 RemoveIndentAndNewline();
-            str.Append("[" + node.getName() + "(");
+            str.Append("[" + node.getName().ToLower() + "(");
             foreach (Node n in node.attrDeclBlock.statements)
             {
                 n.Accept(this);

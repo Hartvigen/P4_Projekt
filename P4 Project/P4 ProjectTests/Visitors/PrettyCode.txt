@@ -1,0 +1,101 @@
+﻿[vertex(number distance = 1, vertex parent = none, boolean bVal = false)]
+[edge(number weight = 1, text t)]
+
+vertex(v156)
+tester()
+number x = whileifs()
+set<vertex> vset = graph.vertices()
+graph.vertices().clear()
+VEDecls()
+exprs()
+manyparams(v156, 10, false, "hello")
+
+func GetVal(number a)
+{
+    return 3 + 4 + a
+}
+
+func whileifs()
+{
+    number total = 2
+    number sum
+    boolean b = false
+    while(!b)
+    {
+        if (total == 1)
+        {
+            total = total + 1
+            if (total == 7)
+            {
+                total = total + GetVal(total)
+            } elseif (total == 10)
+            {
+                total = GetVal(total)
+            } else
+            {
+                total = 0
+            } 
+            b = true
+        } 
+        total = total - 1
+    }
+    while(total > 0)
+    {
+        sum = sum + total
+    }
+    number i
+    for(i = sum, i > 0, i = i - 1)
+    {
+        total = total + sum / i
+    }
+    return total
+}
+
+func tester()
+{
+    number p = 1.5
+    list<number> nlist = {1, 2, 3, 4, 5}
+    foreach(number n in nlist)
+    {
+        p = p + n
+    }
+}
+
+func VEDecls()
+{
+    vertex(v1)
+    vertex(v2, distance = 4, parent = v1, bval = true)
+    vertex(v3, bval = true)
+    vertex(v4)
+    vertex(v5, parent = v3)
+    vertex(v6, distance = 4, parent = v1, bval = true)
+    v1--v2
+    v2--(v3, t = "Hello my lady")
+    edge e = graph.Edge(v2, v3)
+    vertex var = v2
+    graph.removeEdge(v1, v2)
+    graph.removeEdge(v2, v3)
+    v2->v3
+    v3->v4
+    v3->(v5, weight = 42, t = "The Answer")
+    v1<-v6
+    v2<-v3
+    v2<-(v5, t = "the world")
+    graph.ClearEdges()
+    graph.ClearVertices()
+    vertex(v1)
+    vertex(v2, distance = 4, parent = v1, bval = true)
+    v1->v2
+    graph.ClearAll()
+}
+
+func expr()
+{
+    vertex(v2, distance = 4, parent = v1, bval = true)
+    boolean b = 5 != 6 && 5 - 8 + 9 * (v2.distance) > -8 + 11 % 3 || 5 == 8
+}
+
+func manyparams(vertex v1, number n, boolean mightbetrue, text greeting)
+{
+    return false
+}

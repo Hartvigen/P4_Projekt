@@ -1,6 +1,7 @@
 ﻿using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,8 +27,8 @@ namespace P4_Project.AST.Expressions.Values
             vi.Visit(this);
         }
 
-        public String getString() {
-            return "" + value;
+        public string getString() {
+            return value.ToString(CultureInfo.InvariantCulture);
         }
     }
 }
