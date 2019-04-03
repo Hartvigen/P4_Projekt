@@ -18,11 +18,11 @@ namespace P4_Project.Visitors.Tests
 
         static Parser parserWithUglyCode;
         static Scanner scannerUgly;
-        static String pathToUglyCode;
+        static string pathToUglyCode;
 
         static Parser parserWithPrettyCode;
         static Scanner scannerPretty;
-        static String pathToPrettyCode;
+        static string pathToPrettyCode;
 
         //Generates a header attribute declaration for vertex and edge where all types are being used.
         [ClassInitialize()]

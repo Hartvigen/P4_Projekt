@@ -6,54 +6,37 @@ using GraphVizWrapper.Queries;
 
 namespace P4_Project.Graphviz
 {
-    public class DotToPng
+    public abstract class DotToPng
     {
-        private static GetStartProcessQuery getStartProcessQuery = new GetStartProcessQuery();
-        private static GetProcessStartInfoQuery getProcessStartInfoQuery = new GetProcessStartInfoQuery();
-        private static RegisterLayoutPluginCommand registerLayoutPluginCommand = new RegisterLayoutPluginCommand(getProcessStartInfoQuery, getStartProcessQuery);
-        private static GraphGeneration wrapper = new GraphGeneration(getStartProcessQuery, getProcessStartInfoQuery, registerLayoutPluginCommand);
-        private bool isDone = false;
-
-        public DotToPng()
-        {
-            createPNGFile();
-        }
-
-        public DotToPng(string DOT)
-        {
-            createPNGFileFromDOT(DOT);
-        }
-
-        public DotToPng(string DOT, string fileName)
-        {
-            createNamedPNGFileFromDOT(DOT, fileName);
-        }
-
-        public void createPNGFile()
+        public static bool createPNGFile()
         {
             String dotExample = "digraph{a -> b; b -> c; c -> a;}";
-            byte[] output = wrapper.GenerateGraph(dotExample, Enums.GraphReturnType.Png);
+            byte[] output = setup().GenerateGraph(dotExample, Enums.GraphReturnType.Png);
             File.WriteAllBytes("testgraph.png", output);
-            isDone = true;
+            return true;
         }
 
-        public void createPNGFileFromDOT(string DOT)
+        public static bool createPNGFile(string DOT)
         {
-            byte[] output = wrapper.GenerateGraph(DOT, Enums.GraphReturnType.Png);
+            byte[] output = setup().GenerateGraph(DOT, Enums.GraphReturnType.Png);
             File.WriteAllBytes("graph.png", output);
-            isDone = true;
+            return true;
         }
 
-        public void createNamedPNGFileFromDOT(string DOT, string fileName)
+        public static bool createPNGFile(string DOT, string fileName)
         {
-            byte[] output = wrapper.GenerateGraph(DOT, Enums.GraphReturnType.Png);
+            byte[] output = setup().GenerateGraph(DOT, Enums.GraphReturnType.Png);
             File.WriteAllBytes(fileName, output);
-            isDone = true;
+            return true;
         }
 
-        public bool getIsDone()
+        private static GraphGeneration setup()
         {
-            return isDone;
+            return new GraphGeneration(
+                new GetStartProcessQuery(),
+                new GetProcessStartInfoQuery(),
+                new RegisterLayoutPluginCommand(new GetProcessStartInfoQuery(), new GetStartProcessQuery())
+                );
         }
     }
 }

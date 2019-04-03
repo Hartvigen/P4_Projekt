@@ -50,7 +50,7 @@ namespace P4_Project
                     case "-t":
                     case "--test":
                         Console.WriteLine("Printing test png called: testgraph.png ");
-                        Console.WriteLine(TestPrint() ? "print succeeded!" : "print failed!");
+                        Console.WriteLine(DotToPng.createPNGFile() ? "print succeeded!" : "print failed!");
                         break;
                     default:
                         Console.WriteLine("Parsing input file: " + args[0]);
@@ -118,14 +118,6 @@ namespace P4_Project
             File.WriteAllText("xmltree.xml", visitor.ast.ToString());
 
             return parser.errors.count == 0;
-        }
-
-        public static bool TestPrint()
-        {
-            DotToPng dotToPng = new DotToPng();
-            if (dotToPng.getIsDone())
-                return true;
-            else return false;
         }
     }
 }

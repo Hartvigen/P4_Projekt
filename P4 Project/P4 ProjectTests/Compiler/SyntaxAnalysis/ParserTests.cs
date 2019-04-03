@@ -503,5 +503,45 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             string str = "[vertex(edge " + validIdentifier + ")]";
             Assert.IsTrue(TryParse(str));
         }
+
+        //Invalid single type is error
+        [TestMethod()]
+        public void ParseTestFailure21()
+        {
+            string str = "[vertex(" + invalidType + " " + validIdentifier + ")]";
+            Assert.IsFalse(TryParse(str));
+        }
+
+        //Invalid single type and invalid identfier is error
+        [TestMethod()]
+        public void ParseTestFailure22()
+        {
+            string str = "[vertex(" + invalidType + " " + invalidIdentifier + ")]";
+            Assert.IsFalse(TryParse(str));
+        }
+
+        //Invalid collection with valid single type and valid identifier is error
+        [TestMethod()]
+        public void ParseTestFailure23()
+        {
+            string str = "[vertex(" + invalidCollection + "<" + singleTypes[0] + ">" + " " + validIdentifier + ")]";
+            Assert.IsFalse(TryParse(str));
+        }
+
+        //Invalid collection with invalid single type and valid identifier is error
+        [TestMethod()]
+        public void ParseTestFailure24()
+        {
+            string str = "[vertex(" + invalidCollection + "<" + invalidType + ">" + " " + validIdentifier + ")]";
+            Assert.IsFalse(TryParse(str));
+        }
+
+        //Invalid collection with invalid single type and invalid identifier is error
+        [TestMethod()]
+        public void ParseTestFailure25()
+        {
+            string str = "[vertex(" + invalidCollection + "<" + invalidType + ">" + " " + invalidIdentifier + ")]";
+            Assert.IsFalse(TryParse(str));
+        }
     }
 }
