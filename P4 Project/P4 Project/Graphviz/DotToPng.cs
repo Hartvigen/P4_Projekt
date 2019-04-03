@@ -10,7 +10,7 @@ namespace P4_Project.Graphviz
     {
         public static bool createPNGFile()
         {
-            String dotExample = "digraph{a -> b; b -> c; c -> a;}";
+            String dotExample = "digraph{one -> two; two -> three; three -> four; four -> one;}";
             byte[] output = setup().GenerateGraph(dotExample, Enums.GraphReturnType.Png);
             File.WriteAllBytes("testgraph.png", output);
             return true;

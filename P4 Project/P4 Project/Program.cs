@@ -16,8 +16,11 @@ namespace P4_Project
         {
             string defaultFile = "MAGIAFile.txt";
 
-            Console.WriteLine("Parsing input file and assigning variables: ");
-            Console.WriteLine(TryParseAndSymbolCheck(defaultFile) ? "Compile Succeeded!" : "Compile failed!");
+            //Uncomment these lines if you wanna play with the program
+            //But Dont commit them uncommented as they might destroy everything else.
+            
+            //Console.WriteLine("Do something custom: ");
+            //Console.WriteLine(TryParseAndSymbolCheck(defaultFile) ? "Compile Succeeded!" : "Compile failed!");
 
             if (args.Length > 0)
             {
