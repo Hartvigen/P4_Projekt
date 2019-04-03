@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace P4_Project
 {
-    public class Types
+    public static class TypeS
     {
         // Types
         public const int
@@ -29,12 +29,12 @@ namespace P4_Project
 
         public static string getCodeFromInt(int i)
         {
-            String s = i.ToString();
+            string s = i.ToString();
 
             if (i < 10)
                 return getStringFromInt(i);
 
-            String collectiontype;
+            string collectiontype;
             collectiontype = getStringFromInt((i / 10) * 10);
             collectiontype += "<" + getStringFromInt(i % 10) + ">";
             return collectiontype;
