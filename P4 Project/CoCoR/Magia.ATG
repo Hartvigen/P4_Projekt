@@ -96,12 +96,12 @@ AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprN
 
 /*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters, so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =                           (. Obj obj; funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
-    SYNC "func" IDENT                                           (. funcName = t.val; obj = tab.NewObj(t.val, t.kind, null);.)
+FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
+    SYNC "func" IDENT                                           (. funcName = t.val; .)
     '('														
         [
             IF(la.val != ")") FuncParams<ref paramBlock>
-        ] 
+        ]                                                       (. //tab.NewObj(t.val, t.kind, func); .)
     ')' 
     SYNC '{' 
         Stmts<ref stmtBlock>                                    
@@ -109,12 +109,12 @@ FuncDecl<out FuncDeclNode funcNode> =                           (. Obj obj; func
     .
 
 /*------------------------------------------------------------------------*/
-FuncParams<ref Block paramBlock> =          (. int typ = 0; Obj obj; .)
-    Type<out typ>							(. obj = tab.NewObj(t.val, t.kind, typ); .)
-    IDENT                                   (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
+FuncParams<ref Block paramBlock> =          (. BaseType type = null; .)
+    Type<out type>
+    IDENT                                   (. paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); .)
     {
-        SYNC ',' Type<out typ>
-        IDENT                               (. paramBlock.Add(new VarDeclNode(typ, t.val, null)); .)
+        SYNC ',' Type<out type>
+        IDENT                               (. paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); .)
     }.										
 
 
@@ -198,12 +198,12 @@ Member<ExprNode source, out MemberNode mem> =       (. mem = null; .)
 
 /*------------------------------------------------------------------------*/
 FullDecl<ref Block block> =						(. Obj obj; .)
-    Type<out int typ>							(. obj = tab.NewObj(t.val, t.kind, typ); .)
+    Type<out BaseType type>
     (
         IDENT                                   (. string name = t.val; ExprNode expr = null; .)
         [
             Assign<out expr>
-        ]                                       (. block.Add(new VarDeclNode(typ, name, expr)); .)
+        ]                                       (. block.Add(new VarDeclNode(type, name, expr)); obj = tab.NewObj(name, type, var); .)
     | 
         '{' 
             VtxDecls<ref block>
@@ -228,7 +228,7 @@ VtxDecls<ref Block b>
 
 /*------------------------------------------------------------------------*/
 VtxDecl<out VertexDeclNode v>                   (. v = null; Obj obj; .)
-    = '(' IDENT                                 (. v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, t.kind, null); .)
+    = '(' IDENT                                 (. v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, new VertexType(), var); .)
     VEParams<v>               
     ')'.
 
@@ -256,7 +256,7 @@ EdgeDecls<IdentNode left, int op, ref Block b>
 
 /*------------------------------------------------------------------------*/
 EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge> (. edge = null; Obj obj; .)
-    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, t.kind, null); .)
+    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, new EdgeType(), var); .)
     VEParams<edge>                           
     ')'.
 
@@ -381,26 +381,26 @@ Const<out ExprNode e> =     (. e = null; .)
     ).
 
 /*------------------------------------------------------------------------*/
-Type<out int type> =        (. type = 0; .)
+Type<out BaseType type> =        (. type = null; .)
     ( SingleType<out type>
     | CollecType<out type>
     ).
 
 /*------------------------------------------------------------------------*/
 /* Types is, like Operators, a file in the solution containing enumerate values for all types. */
-CollecType<out int type> =                                     (. type = 0; int subType = 0; .)
-    ( "list" WEAK '<' SingleType<out subType> WEAK '>'         (. type = Types.list + subType; .)
-    | "set" WEAK '<' SingleType<out subType> WEAK '>'          (. type = Types.set + subType; .)
-    | "queue" WEAK '<' SingleType<out subType> WEAK '>'        (. type = Types.queue + subType; .)
-    | "stack" WEAK '<' SingleType<out subType> WEAK '>'        (. type = Types.stack + subType; .)
+CollecType<out BaseType type> =                                (. type = null; BaseType subType = null; .)
+    ( "list" WEAK '<' SingleType<out subType> WEAK '>'         (. type = new ListType(subType);  .)
+    | "set" WEAK '<' SingleType<out subType> WEAK '>'          (. type = new SetType(subType);   .)
+    | "queue" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new QueueType(subType); .)
+    | "stack" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new StackType(subType); .)
     ).
 /*------------------------------------------------------------------------*/
-SingleType<out int type> = (. type = 0; .)
-    ( "number"             (. type = Types.number; .)
-    | "boolean"            (. type = Types.boolean; .)
-    | "text"               (. type = Types.text; .)
-    | "vertex"             (. type = Types.vertex; .)
-    | "edge"               (. type = Types.edge; .)
+SingleType<out BaseType type> = (. type = null; .)
+    ( "number"                  (. type = new NumberType();  .)
+    | "boolean"                 (. type = new BooleanType(); .)
+    | "text"                    (. type = new TextType();    .)
+    | "vertex"                  (. type = new VertexType();  .)
+    | "edge"                    (. type = new EdgeType();    .)
     ).
 
 /*------------------------------------------------------------------------*/

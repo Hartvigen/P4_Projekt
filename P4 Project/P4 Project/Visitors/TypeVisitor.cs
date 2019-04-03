@@ -17,7 +17,6 @@ namespace P4_Project.Visitors
     class TypeVisitor : Visitor
     {
         SymbolTable symbolTable = new SymbolTable(null, null);
-        Obj obj = new Obj(null, 0, 0);
 
 
         public override void Visit(CallNode node)
@@ -92,11 +91,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(VarDeclNode node)
         {
-            obj.Name = node.symbolName;
-            obj.Type = node.type;
-            obj.Kind = var;
-            symbolTable.NewObj(obj);
-            obj = new Obj(null, 0, 0);
+            symbolTable.NewObj(node.symbolName, node.type, var);
 
             if (node.expr != null)
                 node.expr.Accept(this);
