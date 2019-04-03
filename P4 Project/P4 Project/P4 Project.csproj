@@ -98,6 +98,13 @@
     <Compile Include="Types\Structures\VertexType.cs" />
     <Compile Include="Types\Functions\FunctionType.cs" />
     <Compile Include="Types\Collections\SetType.cs" />
+    <Compile Include="Types\Primitives\TextType.cs" />
+    <Compile Include="Types\Collections\QueueType.cs" />
+    <Compile Include="Types\Collections\StackType.cs" />
+    <Compile Include="Types\Collections\CollecType.cs" />
+    <Compile Include="Types\Collections\ListType.cs" />
+    <Compile Include="Types\Structures\EdgeType.cs" />
+    <Compile Include="Types\Structures\GraphType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
