@@ -120,21 +120,17 @@ namespace P4_Project.Visitors
 
         public override void Visit(ForeachNode node)
         {
-            symbolTable.OpenScope();
             node.iterationVar.Accept(this);
             node.iterator.Accept(this);
             node.body.Accept(this);
-            symbolTable.CloseScope();
         }
 
         public override void Visit(ForNode node)
         {
-            symbolTable.OpenScope();
             node.initializer.Accept(this);
             node.condition.Accept(this);
             node.iterator.Accept(this);
             node.body.Accept(this);
-            symbolTable.CloseScope();
         }
 
         public override void Visit(HeadNode node)
@@ -144,13 +140,11 @@ namespace P4_Project.Visitors
 
         public override void Visit(IfNode node)
         {
-            symbolTable.OpenScope();
             if (node.condition != null)
                 node.condition.Accept(this);
             node.body.Accept(this);
             if (node.elseNode != null)
                 node.elseNode.Accept(this);
-            symbolTable.CloseScope();
         }
 
         public override void Visit(LoneCallNode node)
@@ -165,17 +159,13 @@ namespace P4_Project.Visitors
 
         public override void Visit(WhileNode node)
         {
-            symbolTable.OpenScope();
             node.condition.Accept(this);
             node.body.Accept(this);
-            symbolTable.CloseScope();
         }
 
         public override void Visit(MAGIA node)
         {
-            symbolTable.OpenScope();
             node.block.Accept(this);
-            symbolTable.CloseScope();
         }
 
         public override void Visit(BreakNode node)
