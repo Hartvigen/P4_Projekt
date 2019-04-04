@@ -15,7 +15,7 @@ namespace P4_Project.SymTab
         Parser parser;
 
         public const int var = 0, func = 1; // Kinds
-        public static Obj undefObj = new Obj("undef", null, var);
+        public static Obj undefObj = new Obj("undef", null, var, null);
 
         SymbolTable parent;
         List<SymbolTable> innerScopes = new List<SymbolTable>();

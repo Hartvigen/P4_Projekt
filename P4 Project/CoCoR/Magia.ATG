@@ -14,8 +14,7 @@ which will be explained when met first in context.  */
 /* the starting symbol of the grammar.*/
 COMPILER MAGIA   
 
-    
-public SymbolTable tab;
+
 /*public CodeGenerator gen;*/
     
   
