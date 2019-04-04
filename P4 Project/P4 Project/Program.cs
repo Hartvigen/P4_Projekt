@@ -16,8 +16,11 @@ namespace P4_Project
         {
             string defaultFile = "MAGIAFile.txt";
 
-            Console.WriteLine("Parsing input file and assigning variables: ");
-            Console.WriteLine(TryParseAndSymbolCheck(defaultFile) ? "Compile Succeeded!" : "Compile failed!");
+            //Uncomment these lines if you wanna play with the program
+            //But Dont commit them uncommented as they might destroy everything else.
+            
+            //Console.WriteLine("Do something custom: ");
+            //Console.WriteLine(TryParseAndSymbolCheck(defaultFile) ? "Compile Succeeded!" : "Compile failed!");
 
             if (args.Length > 0)
             {
@@ -50,7 +53,7 @@ namespace P4_Project
                     case "-t":
                     case "--test":
                         Console.WriteLine("Printing test png called: testgraph.png ");
-                        Console.WriteLine(TestPrint() ? "print succeeded!" : "print failed!");
+                        Console.WriteLine(DotToPng.createPNGFile() ? "print succeeded!" : "print failed!");
                         break;
                     default:
                         Console.WriteLine("Parsing input file: " + args[0]);
@@ -118,14 +121,6 @@ namespace P4_Project
             File.WriteAllText("xmltree.xml", visitor.ast.ToString());
 
             return parser.errors.count == 0;
-        }
-
-        public static bool TestPrint()
-        {
-            DotToPng dotToPng = new DotToPng();
-            if (dotToPng.getIsDone())
-                return true;
-            else return false;
         }
     }
 }
