@@ -97,7 +97,7 @@ AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprN
 /*------------------------------------------------------------------------*/
 FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; Obj funcObj; BaseType returnType = null; List<BaseType> parameterTypes = new List<BaseType()>; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
     SYNC "func"                                             (. tab = tab.OpenScope(); .)
-    [Type<out returnType>] IDENT                            (. funcName = t.val; .)
+    (Type<out returnType> | none) IDENT                     (. funcName = t.val; .)
     '('
         [
             IF(la.val != ")") FuncParams<ref paramBlock, ref parameterTypes>
