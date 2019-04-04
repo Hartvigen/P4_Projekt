@@ -37,18 +37,14 @@ public class Parser {
 	int errDist = minErrDist;
 
 	public MAGIA mainNode;
+	public SymbolTable tab;
 
-public SymbolTable tab;
-/*public CodeGenerator gen;*/
-    
-  
-/*--------------------------------------------------------------------------*/
-/* The following section contains the token specification of MAGIA.*/
 
 
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
+		tab = new SymbolTable(null, this);
 	}
 
 	void SynErr (int n) {
@@ -104,7 +100,7 @@ public SymbolTable tab;
 
 	
 	void MAGIA() {
-		mainNode = null; Block mainBlock = new Block(); 
+		tab = tab.OpenScope(); mainNode = null; Block mainBlock = new Block(); 
 		while (la.kind == 4) {
 			while (!(la.kind == 0 || la.kind == 4)) {SynErr(54); Get();}
 			Head(out HeadNode headNode);
@@ -115,7 +111,7 @@ public SymbolTable tab;
 			FuncDecl(out FuncDeclNode funcNode);
 			mainBlock.Add(funcNode); 
 		}
-		mainNode = new MAGIA(mainBlock); 
+		mainNode = new MAGIA(mainBlock); tab = tab.CloseScope(); 
 	}
 
 	void Head(out HeadNode headNode) {
@@ -150,23 +146,28 @@ public SymbolTable tab;
 	}
 
 	void FuncDecl(out FuncDeclNode funcNode) {
-		funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); 
+		funcNode = null; Obj funcObj; BaseType returnType; List<BaseType> parameterTypes = new List<BaseType()>; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); 
 		while (!(la.kind == 0 || la.kind == 11)) {SynErr(57); Get();}
 		Expect(11);
+		tab = tab.OpenScope(); 
+		Type(out returnType);
 		Expect(1);
 		funcName = t.val; 
 		Expect(7);
 		if (la.val != ")") {
-			FuncParams(ref paramBlock);
+			FuncParams(ref paramBlock, ref parameterTypes);
 		}
-		tab.NewObj(t.val, t.kind, func); 
 		Expect(8);
 		while (!(la.kind == 0 || la.kind == 12)) {SynErr(58); Get();}
 		Expect(12);
 		Stmts(ref stmtBlock);
 		while (!(la.kind == 0 || la.kind == 13)) {SynErr(59); Get();}
 		Expect(13);
-		funcNode = new FuncDeclNode(funcName, paramBlock, stmtBlock); 
+		SymbolTable funcScope = tab;
+		tab = tab.CloseScope(); 
+		funcObj = tab.NewObj(funcName, new FunctionType(returnType, parameterTypes), func, funcScope); 
+		funcNode = new FuncDeclNode(funcName, funcObj, paramBlock, stmtBlock); 
+		
 	}
 
 	void AttrDecls(ref HeadNode headNode) {
@@ -181,7 +182,7 @@ public SymbolTable tab;
 
 	void AttrDecl(out VarDeclNode attrDecl) {
 		attrDecl = null; string name = ""; ExprNode val = null; 
-		Type(out int typ);
+		Type(out BaseType typ);
 		Expect(1);
 		name = t.val; 
 		if (la.kind == 25) {
@@ -212,15 +213,17 @@ public SymbolTable tab;
 		} else SynErr(61);
 	}
 
-	void FuncParams(ref Block paramBlock) {
+	void FuncParams(ref Block paramBlock, ref List'<'BaseType'>' parameterTypes) {
 		BaseType type = null; 
 		Type(out type);
+		parameterTypes.Add(type); 
 		Expect(1);
 		paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); 
 		while (la.kind == 10) {
 			while (!(la.kind == 0 || la.kind == 10)) {SynErr(62); Get();}
 			Get();
 			Type(out type);
+			parameterTypes.Add(type); 
 			Expect(1);
 			paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); 
 		}
@@ -290,15 +293,17 @@ public SymbolTable tab;
 		Expect(14);
 		Expect(7);
 		Expr(out ExprNode e);
+		tab = tab.OpenScope(); 
 		Expect(8);
 		Expect(12);
 		Stmts(ref b);
 		w = new WhileNode(e, b); 
 		Expect(13);
+		tab = tab.CloseScope(); 
 	}
 
 	void StmtFor(out StmtNode f) {
-		f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); 
+		f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); tab = tab.OpenScope(); 
 		Expect(15);
 		Expect(7);
 		Stmt(out StmtNode s1);
@@ -314,13 +319,14 @@ public SymbolTable tab;
 		Stmts(ref b);
 		f = new ForNode(init, e, iter, b); 
 		Expect(13);
+		tab = tab.CloseScope(); 
 	}
 
 	void StmtForeach(out StmtNode f) {
-		f = null; Block b = new Block(); VarDeclNode v = null; 
+		f = null; Block b = new Block(); VarDeclNode v = null; tab = tab.OpenScope(); 
 		Expect(16);
 		Expect(7);
-		Type(out int typ);
+		Type(out BaseType typ);
 		Expect(1);
 		v = new VarDeclNode(typ, t.val, null); 
 		Expect(17);
@@ -330,6 +336,7 @@ public SymbolTable tab;
 		Stmts(ref b);
 		f = new ForeachNode(v, e1, b); 
 		Expect(13);
+		tab = tab.CloseScope(); 
 	}
 
 	void StmtIf(out StmtNode i) {
@@ -337,7 +344,7 @@ public SymbolTable tab;
 		Expect(18);
 		Expect(7);
 		Expr(out ExprNode ie1);
-		e = ie1; 
+		e = ie1; tab = tab.OpenScope(); 
 		Expect(8);
 		Expect(12);
 		Stmts(ref b);
@@ -362,6 +369,7 @@ public SymbolTable tab;
 			k = new IfNode(null, b); j.SetElse(k); 
 			Expect(13);
 		}
+		tab = tab.CloseScope(); 
 	}
 
 	void Expr(out ExprNode e) {
@@ -441,7 +449,7 @@ public SymbolTable tab;
 		v = null; Obj obj; 
 		Expect(7);
 		Expect(1);
-		v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, new VertexType(), var); 
+		v = new VertexDeclNode(new VertexType(), t.val); obj = tab.NewObj(t.val, new VertexType(), var); 
 		VEParams(v);
 		Expect(8);
 	}
@@ -473,10 +481,10 @@ public SymbolTable tab;
 	}
 
 	void EdgeDecl(IdentNode left, int op, out EdgeDeclNode edge) {
-		edge = null; Obj obj; 
+		edge = null; 
 		Expect(7);
 		Identifier(out VarNode right);
-		edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, new EdgeType(), var); 
+		edge = new EdgeDeclNode(left, right, op); 
 		VEParams(edge);
 		Expect(8);
 	}

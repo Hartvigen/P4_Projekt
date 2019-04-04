@@ -39,6 +39,7 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.SymTab;
 using static P4_Project.SymTab.SymbolTable;
+using System.Collections.Generic;
 
 -->namespace
 
@@ -56,12 +57,14 @@ public class Parser {
 	int errDist = minErrDist;
 
 	public MAGIA mainNode;
+	public SymbolTable tab;
 
 -->declarations
 
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
+		tab = new SymbolTable(null, this);
 	}
 
 	void SynErr (int n) {

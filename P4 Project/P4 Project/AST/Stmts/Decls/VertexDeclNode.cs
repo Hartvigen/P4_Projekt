@@ -1,4 +1,5 @@
 ﻿using P4_Project.AST.Expressions;
+using P4_Project.Types;
 using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
@@ -13,11 +14,12 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class VertexDeclNode : VEDeclNode
     {
-        int type;
+        BaseType type;
 
         public VertexDeclNode() { }
 
-        public VertexDeclNode(int _type, string _symbolName) 
+
+        public VertexDeclNode(BaseType _type, string _symbolName) 
             : base(_symbolName)
         {
             type = _type;

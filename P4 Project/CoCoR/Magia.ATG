@@ -14,8 +14,7 @@ which will be explained when met first in context.  */
 /* the starting symbol of the grammar.*/
 COMPILER MAGIA   
 
-    
-public SymbolTable tab;
+
 /*public CodeGenerator gen;*/
     
   
@@ -46,7 +45,7 @@ IGNORE cr + lf + tab                            /* These characters are ignored 
 PRODUCTIONS
 /* The starting rule of MAGIA contains quite a few COCO/R-specific features. The code written */
 /* in (. .) is C# code that is injected into the generated parser code. */
-MAGIA =                                     (. mainNode = null; Block mainBlock = new Block(); .)
+MAGIA =                                     (. tab = tab.OpenScope(); mainNode = null; Block mainBlock = new Block(); .)
 /* The keyword 'SYNC' specifies that the parser will skip tokens untill it discovers a token that */
 /* should follow the SYNC statement. If the next token is already valid, the SYNC is skipped. */
 
@@ -60,7 +59,7 @@ MAGIA =                                     (. mainNode = null; Block mainBlock 
 /* also happen to the variable outside the Stmts production */
     Stmts<ref mainBlock>
     { FuncDecl<out FuncDeclNode funcNode>   (. mainBlock.Add(funcNode); .)
-    }                                       (. mainNode = new MAGIA(mainBlock); .)
+    }                                       (. mainNode = new MAGIA(mainBlock); tab = tab.CloseScope(); .)
 /* All productions end with a dot. */
     .
     
@@ -96,24 +95,29 @@ AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprN
 
 /*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters, so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
-    SYNC "func" IDENT                                           (. funcName = t.val; .)
-    '('														
+FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; Obj funcObj; BaseType returnType = null; List<BaseType> parameterTypes = new List<BaseType()>; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
+    SYNC "func"                                             (. tab = tab.OpenScope(); .)
+    (Type<out returnType> | none) IDENT                     (. funcName = t.val; .)
+    '('
         [
-            IF(la.val != ")") FuncParams<ref paramBlock>
-        ]                                                       (. tab.NewObj(t.val, t.kind, func); .)
+            IF(la.val != ")") FuncParams<ref paramBlock, ref parameterTypes>
+        ]
     ')' 
-    SYNC '{' 
-        Stmts<ref stmtBlock>                                    
-    SYNC '}'                                                    (. funcNode = new FuncDeclNode(funcName, paramBlock, stmtBlock); .)
+    SYNC '{'
+        Stmts<ref stmtBlock>
+    SYNC '}'                                                (. SymbolTable funcScope = tab;
+                                                               tab = tab.CloseScope(); 
+                                                               funcObj = tab.NewObj(funcName, new FunctionType(returnType, parameterTypes), func, funcScope); 
+                                                               funcNode = new FuncDeclNode(funcName, funcObj, paramBlock, stmtBlock); 
+                                                            .)
     .
 
 /*------------------------------------------------------------------------*/
-FuncParams<ref Block paramBlock> =          (. BaseType type = null; .)
-    Type<out type>
+FuncParams<ref Block paramBlock, ref List<.BaseType.> parameterTypes> = (. BaseType type = null; .)       
+    Type<out type>                          (. parameterTypes.Add(type); .)
     IDENT                                   (. paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); .)
     {
-        SYNC ',' Type<out type>
+        SYNC ',' Type<out type>             (. parameterTypes.Add(type); .)
         IDENT                               (. paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); .)
     }.										
 
@@ -135,35 +139,39 @@ StrucStmt<out StmtNode s>                   (. s = null; .)
 
 /*------------------------------------------------------------------------*/
 StmtWhile<out StmtNode w>                   (. w = null; Block b = new Block(); .)
-    = "while" '(' Expr<out ExprNode e>    
+    = "while" '(' Expr<out ExprNode e>      (. tab = tab.OpenScope(); .)
         ')' '{' Stmts<ref b>                (. w = new WhileNode(e, b); .)
-        '}'.
+        '}'									(. tab = tab.CloseScope(); .)
+		.
 
 /*------------------------------------------------------------------------*/
-StmtFor<out StmtNode f>                     (. f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); .)
+StmtFor<out StmtNode f>                     (. f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); tab = tab.OpenScope(); .)
     = "for" '(' Stmt<out StmtNode s1>       (. init = s1; .)
         ',' Expr<out ExprNode e1>           (. e = e1;  .)
         ',' Stmt<out StmtNode s2>           (. iter = s2; .)
         ')' '{' Stmts<ref b>                (. f = new ForNode(init, e, iter, b); .)
-        '}'.
+        '}'									(. tab = tab.CloseScope(); .)
+		.
 
 /*------------------------------------------------------------------------*/
-StmtForeach<out StmtNode f>                 (. f = null; Block b = new Block(); VarDeclNode v = null; .)
+StmtForeach<out StmtNode f>                 (. f = null; Block b = new Block(); VarDeclNode v = null; tab = tab.OpenScope(); .)
     = "foreach" '(' Type<out BaseType typ>
         IDENT                               (. v = new VarDeclNode(typ, t.val, null); .)
-        "in" Expr<out ExprNode e1>
+        "in" Expr<out ExprNode e1>			
         ')' '{' Stmts<ref b>                (. f = new ForeachNode(v, e1, b); .)
-        '}'.
+        '}'									(. tab = tab.CloseScope(); .)
+		.
 
 /*------------------------------------------------------------------------*/
 StmtIf<out StmtNode i>                                  (. i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; IfNode k = null; .)
-    = "if" '(' Expr<out ExprNode ie1>                   (. e = ie1; .)
+    = "if" '(' Expr<out ExprNode ie1>                   (. e = ie1; tab = tab.OpenScope(); .)
         ')' '{' Stmts<ref b>                            (. i = new IfNode(e, b); j = (IfNode)i; .)
         '}' {"elseif" '(' Expr<out ExprNode ie2>        (. e = ie2; b = new Block(); .)
         ')' '{' Stmts<ref b>                            (. k = new IfNode(e, b); j.SetElse(k); j = k; .)
         '}'} ["else"                                    (. b = new Block(); .)
         '{' Stmts<ref b>                                (. k = new IfNode(null, b); j.SetElse(k); .)
-        '}'].
+        '}']											(. tab = tab.CloseScope(); .)
+		.
 
 /*------------------------------------------------------------------------*/
 Stmt<out StmtNode stmtNode> =                       (. stmtNode = null; .)
@@ -255,8 +263,8 @@ EdgeDecls<IdentNode left, int op, ref Block b>
     }.
 
 /*------------------------------------------------------------------------*/
-EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge> (. edge = null; Obj obj; .)
-    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, new EdgeType(), var); .)
+EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge> (. edge = null; .)
+    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); .)
     VEParams<edge>                           
     ')'.
 
