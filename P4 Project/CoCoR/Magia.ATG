@@ -95,9 +95,9 @@ AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprN
 
 /*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters, so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; Obj funcObj; BaseType returnType; List<BaseType> parameterTypes = new List<BaseType>(); string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
+FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; Obj funcObj; BaseType returnType = null; List<BaseType> parameterTypes = new List<BaseType()>; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
     SYNC "func"                                             (. tab = tab.OpenScope(); .)
-    Type<out returnType> IDENT                              (. funcName = t.val; .)
+    [Type<out returnType>] IDENT                            (. funcName = t.val; .)
     '('
         [
             IF(la.val != ")") FuncParams<ref paramBlock, ref parameterTypes>
