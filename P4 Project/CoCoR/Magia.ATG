@@ -95,7 +95,7 @@ AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprN
 
 /*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters, so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; Obj funcObj; BaseType returnType; List<BaseType> parameterTypes = new List<BaseType()>; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
+FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; Obj funcObj; BaseType returnType; List<BaseType> parameterTypes = new List<BaseType>(); string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
     SYNC "func"                                             (. tab = tab.OpenScope(); .)
     Type<out returnType> IDENT                              (. funcName = t.val; .)
     '('
@@ -113,7 +113,7 @@ FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; 
     .
 
 /*------------------------------------------------------------------------*/
-FuncParams<ref Block paramBlock, ref List<BaseType> parameterTypes> =          (. BaseType type = null; .)
+FuncParams<ref Block paramBlock, ref List<.BaseType.> parameterTypes> = (. BaseType type = null; .)       
     Type<out type>                          (. parameterTypes.Add(type); .)
     IDENT                                   (. paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); .)
     {
@@ -141,7 +141,8 @@ StrucStmt<out StmtNode s>                   (. s = null; .)
 StmtWhile<out StmtNode w>                   (. w = null; Block b = new Block(); .)
     = "while" '(' Expr<out ExprNode e>      (. tab = tab.OpenScope(); .)
         ')' '{' Stmts<ref b>                (. w = new WhileNode(e, b); .)
-        '}'.								(. tab = tab.CloseScope(); .)
+        '}'									(. tab = tab.CloseScope(); .)
+		.
 
 /*------------------------------------------------------------------------*/
 StmtFor<out StmtNode f>                     (. f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); tab = tab.OpenScope(); .)
@@ -149,7 +150,8 @@ StmtFor<out StmtNode f>                     (. f = null; StmtNode init = null; E
         ',' Expr<out ExprNode e1>           (. e = e1;  .)
         ',' Stmt<out StmtNode s2>           (. iter = s2; .)
         ')' '{' Stmts<ref b>                (. f = new ForNode(init, e, iter, b); .)
-        '}'.								(. tab = tab.CloseScope(); .)
+        '}'									(. tab = tab.CloseScope(); .)
+		.
 
 /*------------------------------------------------------------------------*/
 StmtForeach<out StmtNode f>                 (. f = null; Block b = new Block(); VarDeclNode v = null; tab = tab.OpenScope(); .)
@@ -157,7 +159,8 @@ StmtForeach<out StmtNode f>                 (. f = null; Block b = new Block(); 
         IDENT                               (. v = new VarDeclNode(typ, t.val, null); .)
         "in" Expr<out ExprNode e1>			
         ')' '{' Stmts<ref b>                (. f = new ForeachNode(v, e1, b); .)
-        '}'.								(. tab = tab.CloseScope(); .)
+        '}'									(. tab = tab.CloseScope(); .)
+		.
 
 /*------------------------------------------------------------------------*/
 StmtIf<out StmtNode i>                                  (. i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; IfNode k = null; .)
@@ -167,7 +170,8 @@ StmtIf<out StmtNode i>                                  (. i = null; ExprNode e 
         ')' '{' Stmts<ref b>                            (. k = new IfNode(e, b); j.SetElse(k); j = k; .)
         '}'} ["else"                                    (. b = new Block(); .)
         '{' Stmts<ref b>                                (. k = new IfNode(null, b); j.SetElse(k); .)
-        '}'].											(. tab = tab.CloseScope(); .)
+        '}']											(. tab = tab.CloseScope(); .)
+		.
 
 /*------------------------------------------------------------------------*/
 Stmt<out StmtNode stmtNode> =                       (. stmtNode = null; .)

@@ -39,6 +39,7 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.SymTab;
 using static P4_Project.SymTab.SymbolTable;
+using System.Collections.Generic;
 
 -->namespace
 
