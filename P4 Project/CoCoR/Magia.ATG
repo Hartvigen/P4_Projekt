@@ -14,8 +14,7 @@ which will be explained when met first in context.  */
 /* the starting symbol of the grammar.*/
 COMPILER MAGIA   
 
-    
-public SymbolTable tab;
+
 /*public CodeGenerator gen;*/
     
   
@@ -96,24 +95,29 @@ AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprN
 
 /*The IF command makes the parser read a token ahead to see whether the function declaration has any parameters or if it is simply an empty pair of parenthisis. If a right parenthisis is read, there is no parameters, so FuncParams can safely be skipped, but if any non-right parenthisis is read, then FuncParam will be called and any eventual errors will be handled there*/
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = null; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
-    SYNC "func" IDENT                                           (. funcName = t.val; tab = tab.OpenScope(); .)
-    '('														
+FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; Obj funcObj; BaseType returnType; List<BaseType> parameterTypes = new List<BaseType()>; string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); .)
+    SYNC "func"                                             (. tab = tab.OpenScope(); .)
+    Type<out returnType> IDENT                              (. funcName = t.val; .)
+    '('
         [
-            IF(la.val != ")") FuncParams<ref paramBlock>
-        ]                                                       (. tab.NewObj(t.val, t.kind, func); .)
+            IF(la.val != ")") FuncParams<ref paramBlock, ref parameterTypes>
+        ]
     ')' 
-    SYNC '{' 
-        Stmts<ref stmtBlock>                                    
-    SYNC '}'                                                    (. funcNode = new FuncDeclNode(funcName, paramBlock, stmtBlock); tab = tab.CloseScope(); .)
+    SYNC '{'
+        Stmts<ref stmtBlock>
+    SYNC '}'                                                (. SymbolTable funcScope = tab;
+                                                               tab = tab.CloseScope(); 
+                                                               funcObj = tab.NewObj(funcName, new FunctionType(returnType, parameterTypes), func, funcScope); 
+                                                               funcNode = new FuncDeclNode(funcName, funcObj, paramBlock, stmtBlock); 
+                                                            .)
     .
 
 /*------------------------------------------------------------------------*/
-FuncParams<ref Block paramBlock> =          (. BaseType type = null; .)
-    Type<out type>
+FuncParams<ref Block paramBlock, ref List<BaseType> parameterTypes> =          (. BaseType type = null; .)
+    Type<out type>                          (. parameterTypes.Add(type); .)
     IDENT                                   (. paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); .)
     {
-        SYNC ',' Type<out type>
+        SYNC ',' Type<out type>             (. parameterTypes.Add(type); .)
         IDENT                               (. paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var); .)
     }.										
 
@@ -255,8 +259,8 @@ EdgeDecls<IdentNode left, int op, ref Block b>
     }.
 
 /*------------------------------------------------------------------------*/
-EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge> (. edge = null; Obj obj; .)
-    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); obj = tab.NewObj(t.val, new EdgeType(), var); .)
+EdgeDecl<IdentNode left, int op, out EdgeDeclNode edge> (. edge = null; .)
+    = '(' Identifier<out VarNode right>                 (. edge = new EdgeDeclNode(left, right, op); .)
     VEParams<edge>                           
     ')'.
 

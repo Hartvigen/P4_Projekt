@@ -15,7 +15,7 @@ namespace P4_Project.SymTab
         Parser parser;
 
         public const int var = 0, func = 1; // Kinds
-        public static Obj undefObj = new Obj("undef", null, var);
+        public static Obj undefObj = new Obj("undef", null, var, null);
 
         SymbolTable parent;
         List<SymbolTable> innerScopes = new List<SymbolTable>();
@@ -46,9 +46,9 @@ namespace P4_Project.SymTab
 
 
         //creates a new Object in the current scope
-        public Obj NewObj(string name, BaseType type, int kind)
+        public Obj NewObj(string name, BaseType type, int kind, SymbolTable scope = null)
         {
-            Obj obj = new Obj(name, type, kind);
+            Obj obj = new Obj(name, type, kind, scope);
 
             if (symbolDecls.ContainsKey(obj.Name))
                 parser.SemErr($"{name} declared twice");
