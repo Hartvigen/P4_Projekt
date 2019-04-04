@@ -102,7 +102,7 @@ namespace P4_Project
 
             MAGIA AST = parser.mainNode;
 
-            TypeVisitor visitor = new TypeVisitor();
+            TypeVisitor visitor = new TypeVisitor(parser.tab);
             AST.Accept(visitor);
 
             return parser.errors.count == 0;

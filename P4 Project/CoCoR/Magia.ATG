@@ -85,7 +85,7 @@ AttrDecls<ref HeadNode headNode> =          (. VarDeclNode attrDecl; .)
 
 /*------------------------------------------------------------------------*/
 AttrDecl<out VarDeclNode attrDecl> = (. attrDecl = null; string name = ""; ExprNode val = null; .)
-    Type<out int typ>
+    Type<out BaseType typ>
     /* The expression t.val contains the scanned string value of the most recently parsed token.*/
     IDENT                            (. name = t.val; .)
     [
@@ -101,7 +101,7 @@ FuncDecl<out FuncDeclNode funcNode> =                           (. funcNode = nu
     '('														
         [
             IF(la.val != ")") FuncParams<ref paramBlock>
-        ]                                                       (. //tab.NewObj(t.val, t.kind, func); .)
+        ]                                                       (. tab.NewObj(t.val, t.kind, func); .)
     ')' 
     SYNC '{' 
         Stmts<ref stmtBlock>                                    
@@ -149,7 +149,7 @@ StmtFor<out StmtNode f>                     (. f = null; StmtNode init = null; E
 
 /*------------------------------------------------------------------------*/
 StmtForeach<out StmtNode f>                 (. f = null; Block b = new Block(); VarDeclNode v = null; .)
-    = "foreach" '(' Type<out int typ>
+    = "foreach" '(' Type<out BaseType typ>
         IDENT                               (. v = new VarDeclNode(typ, t.val, null); .)
         "in" Expr<out ExprNode e1>
         ')' '{' Stmts<ref b>                (. f = new ForeachNode(v, e1, b); .)
@@ -228,7 +228,7 @@ VtxDecls<ref Block b>
 
 /*------------------------------------------------------------------------*/
 VtxDecl<out VertexDeclNode v>                   (. v = null; Obj obj; .)
-    = '(' IDENT                                 (. v = new VertexDeclNode(Types.vertex, t.val); obj = tab.NewObj(t.val, new VertexType(), var); .)
+    = '(' IDENT                                 (. v = new VertexDeclNode(new VertexType(), t.val); obj = tab.NewObj(t.val, new VertexType(), var); .)
     VEParams<v>               
     ')'.
 
