@@ -177,11 +177,19 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void FuncDecl(out FuncDeclNode funcNode)
         {
-            funcNode = null; Obj funcObj; BaseType returnType; List<BaseType> parameterTypes = new List<BaseType>(); string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block();
+            funcNode = null; Obj funcObj; BaseType returnType = null; BaseTypeList parameterTypes = new BaseTypeList(); string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block();
             while (!(la.kind == 0 || la.kind == 11)) { SynErr(57); Get(); }
             Expect(11);
             tab = tab.OpenScope();
-            Type(out returnType);
+            if (StartOf(5))
+            {
+                Type(out returnType);
+            }
+            else if (la.kind == 12)
+            {
+                Get();
+            }
+            else SynErr(58);
             Expect(1);
             funcName = t.val;
             Expect(7);
@@ -190,11 +198,11 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 FuncParams(ref paramBlock, ref parameterTypes);
             }
             Expect(8);
-            while (!(la.kind == 0 || la.kind == 12)) { SynErr(58); Get(); }
-            Expect(12);
-            Stmts(ref stmtBlock);
             while (!(la.kind == 0 || la.kind == 13)) { SynErr(59); Get(); }
             Expect(13);
+            Stmts(ref stmtBlock);
+            while (!(la.kind == 0 || la.kind == 14)) { SynErr(60); Get(); }
+            Expect(14);
             SymbolTable funcScope = tab;
             tab = tab.CloseScope();
             funcObj = tab.NewObj(funcName, new FunctionType(returnType, parameterTypes), func, funcScope);
@@ -220,7 +228,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Type(out BaseType typ);
             Expect(1);
             name = t.val;
-            if (la.kind == 25)
+            if (la.kind == 26)
             {
                 Assign(out val);
             }
@@ -238,28 +246,28 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             {
                 CollecType(out type);
             }
-            else SynErr(60);
+            else SynErr(61);
         }
 
         void Assign(out ExprNode expr)
         {
             expr = null;
-            Expect(25);
+            Expect(26);
             if (StartOf(10))
             {
                 Expr(out expr);
             }
-            else if (la.kind == 12)
+            else if (la.kind == 13)
             {
                 Get();
                 Args(out CollecConst collec);
                 expr = collec;
-                Expect(13);
+                Expect(14);
             }
-            else SynErr(61);
+            else SynErr(62);
         }
 
-        void FuncParams(ref Block paramBlock, ref List<BaseType> parameterTypes)
+        void FuncParams(ref Block paramBlock, ref BaseTypeList parameterTypes)
         {
             BaseType type = null;
             Type(out type);
@@ -268,7 +276,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             paramBlock.Add(new VarDeclNode(type, t.val, null)); tab.NewObj(t.val, type, var);
             while (la.kind == 10)
             {
-                while (!(la.kind == 0 || la.kind == 10)) { SynErr(62); Get(); }
+                while (!(la.kind == 0 || la.kind == 10)) { SynErr(63); Get(); }
                 Get();
                 Type(out type);
                 parameterTypes.Add(type);
@@ -285,24 +293,24 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             {
                 Get();
                 string name = t.val; ExprNode expr = null;
-                if (la.kind == 25)
+                if (la.kind == 26)
                 {
                     Assign(out expr);
                 }
                 block.Add(new VarDeclNode(type, name, expr)); obj = tab.NewObj(name, type, var);
             }
-            else if (la.kind == 12)
+            else if (la.kind == 13)
             {
                 Get();
                 VtxDecls(ref block);
-                Expect(13);
+                Expect(14);
             }
             else if (la.kind == 7)
             {
                 VtxDecl(out VertexDeclNode VertexDecl);
                 block.Add(VertexDecl);
             }
-            else SynErr(63);
+            else SynErr(64);
         }
 
         void Stmt(out StmtNode stmtNode)
@@ -312,7 +320,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             {
                 CallOrID(out IdentNode i);
                 stmtNode = new LoneCallNode(i);
-                while (la.kind == 24)
+                while (la.kind == 25)
                 {
                     Member(i, out MemberNode member);
                     i = member; stmtNode = new LoneCallNode(i);
@@ -323,66 +331,66 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                     stmtNode = stmt;
                 }
             }
-            else if (la.kind == 21)
+            else if (la.kind == 22)
             {
                 Get();
                 Expr(out ExprNode expr);
                 stmtNode = new ReturnNode(expr);
             }
-            else if (la.kind == 22)
+            else if (la.kind == 23)
             {
                 Get();
                 stmtNode = new BreakNode();
             }
-            else if (la.kind == 23)
+            else if (la.kind == 24)
             {
                 Get();
                 stmtNode = new ContinueNode();
             }
-            else SynErr(64);
+            else SynErr(65);
         }
 
         void StrucStmt(out StmtNode s)
         {
             s = null;
-            if (la.kind == 14)
+            if (la.kind == 15)
             {
                 StmtWhile(out s);
             }
-            else if (la.kind == 15)
+            else if (la.kind == 16)
             {
                 StmtFor(out s);
             }
-            else if (la.kind == 16)
+            else if (la.kind == 17)
             {
                 StmtForeach(out s);
             }
-            else if (la.kind == 18)
+            else if (la.kind == 19)
             {
                 StmtIf(out s);
             }
-            else SynErr(65);
+            else SynErr(66);
         }
 
         void StmtWhile(out StmtNode w)
         {
             w = null; Block b = new Block();
-            Expect(14);
+            Expect(15);
             Expect(7);
             Expr(out ExprNode e);
             tab = tab.OpenScope();
             Expect(8);
-            Expect(12);
+            Expect(13);
             Stmts(ref b);
             w = new WhileNode(e, b);
-            Expect(13);
+            Expect(14);
             tab = tab.CloseScope();
         }
 
         void StmtFor(out StmtNode f)
         {
             f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); tab = tab.OpenScope();
-            Expect(15);
+            Expect(16);
             Expect(7);
             Stmt(out StmtNode s1);
             init = s1;
@@ -393,63 +401,63 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Stmt(out StmtNode s2);
             iter = s2;
             Expect(8);
-            Expect(12);
+            Expect(13);
             Stmts(ref b);
             f = new ForNode(init, e, iter, b);
-            Expect(13);
+            Expect(14);
             tab = tab.CloseScope();
         }
 
         void StmtForeach(out StmtNode f)
         {
             f = null; Block b = new Block(); VarDeclNode v = null; tab = tab.OpenScope();
-            Expect(16);
+            Expect(17);
             Expect(7);
             Type(out BaseType typ);
             Expect(1);
             v = new VarDeclNode(typ, t.val, null);
-            Expect(17);
+            Expect(18);
             Expr(out ExprNode e1);
             Expect(8);
-            Expect(12);
+            Expect(13);
             Stmts(ref b);
             f = new ForeachNode(v, e1, b);
-            Expect(13);
+            Expect(14);
             tab = tab.CloseScope();
         }
 
         void StmtIf(out StmtNode i)
         {
             i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; IfNode k = null;
-            Expect(18);
+            Expect(19);
             Expect(7);
             Expr(out ExprNode ie1);
             e = ie1; tab = tab.OpenScope();
             Expect(8);
-            Expect(12);
+            Expect(13);
             Stmts(ref b);
             i = new IfNode(e, b); j = (IfNode)i;
-            Expect(13);
-            while (la.kind == 19)
+            Expect(14);
+            while (la.kind == 20)
             {
                 Get();
                 Expect(7);
                 Expr(out ExprNode ie2);
                 e = ie2; b = new Block();
                 Expect(8);
-                Expect(12);
+                Expect(13);
                 Stmts(ref b);
                 k = new IfNode(e, b); j.SetElse(k); j = k;
-                Expect(13);
+                Expect(14);
             }
-            if (la.kind == 20)
+            if (la.kind == 21)
             {
                 Get();
                 b = new Block();
-                Expect(12);
+                Expect(13);
                 Stmts(ref b);
                 k = new IfNode(null, b); j.SetElse(k);
-                Expect(13);
+                Expect(14);
             }
             tab = tab.CloseScope();
         }
@@ -477,7 +485,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         void Member(ExprNode source, out MemberNode mem)
         {
             mem = null;
-            ExpectWeak(24, 1);
+            ExpectWeak(25, 1);
             CallOrID(out IdentNode i);
             mem = new MemberNode(source, i);
         }
@@ -485,39 +493,39 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         void IdentCont(IdentNode i, out StmtNode s)
         {
             s = null; Block b = new Block();
-            if (la.kind == 25)
+            if (la.kind == 26)
             {
                 Assign(out ExprNode expr);
                 s = new AssignNode(i, expr);
             }
-            else if (la.kind == 26 || la.kind == 27 || la.kind == 28)
+            else if (la.kind == 27 || la.kind == 28 || la.kind == 29)
             {
                 EdgeOpr(out int op);
                 EdgeOneOrMore(i, op, ref b);
                 s = b;
             }
-            else SynErr(66);
+            else SynErr(67);
         }
 
         void EdgeOpr(out int op)
         {
             op = 0;
-            if (la.kind == 26)
+            if (la.kind == 27)
             {
                 Get();
                 op = Operators.LEFTARR;
             }
-            else if (la.kind == 27)
+            else if (la.kind == 28)
             {
                 Get();
                 op = Operators.NONARR;
             }
-            else if (la.kind == 28)
+            else if (la.kind == 29)
             {
                 Get();
                 op = Operators.RIGHTARR;
             }
-            else SynErr(67);
+            else SynErr(68);
         }
 
         void EdgeOneOrMore(IdentNode left, int op, ref Block b)
@@ -532,13 +540,13 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 EdgeDecl(left, op, out EdgeDeclNode edge);
                 b.Add(edge);
             }
-            else if (la.kind == 12)
+            else if (la.kind == 13)
             {
                 Get();
                 EdgeDecls(left, op, ref b);
-                Expect(13);
+                Expect(14);
             }
-            else SynErr(68);
+            else SynErr(69);
         }
 
         void VtxDecls(ref Block b)
@@ -620,7 +628,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             e = null; int op = 0;
             ExprAnd(out ExprNode e1);
             e = e1;
-            while (la.kind == 29)
+            while (la.kind == 30)
             {
                 Get();
                 op = Operators.OR;
@@ -634,7 +642,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             e = null; int op = 0;
             ExprEQ(out ExprNode e1);
             e = e1;
-            while (la.kind == 30)
+            while (la.kind == 31)
             {
                 Get();
                 op = Operators.AND;
@@ -648,9 +656,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             e = null; int op = 0;
             ExprRel(out ExprNode e1);
             e = e1;
-            if (la.kind == 31 || la.kind == 32)
+            if (la.kind == 32 || la.kind == 33)
             {
-                if (la.kind == 31)
+                if (la.kind == 32)
                 {
                     Get();
                     op = Operators.EQ;
@@ -672,17 +680,17 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             e = e1;
             if (StartOf(16))
             {
-                if (la.kind == 33)
+                if (la.kind == 34)
                 {
                     Get();
                     op = Operators.LESS;
                 }
-                else if (la.kind == 34)
+                else if (la.kind == 35)
                 {
                     Get();
                     op = Operators.GREATER;
                 }
-                else if (la.kind == 35)
+                else if (la.kind == 36)
                 {
                     Get();
                     op = Operators.LESSEQ;
@@ -700,16 +708,16 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         void ExprPlus(out ExprNode e)
         {
             e = null; bool b = false; int op = 0;
-            if (la.kind == 37)
+            if (la.kind == 38)
             {
                 Get();
                 b = true;
             }
             ExprMult(out ExprNode e1);
             if (b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1;
-            while (la.kind == 37 || la.kind == 38)
+            while (la.kind == 38 || la.kind == 39)
             {
-                if (la.kind == 38)
+                if (la.kind == 39)
                 {
                     Get();
                     op = Operators.PLUS;
@@ -729,14 +737,14 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             e = null; int op = 0;
             ExprNot(out ExprNode e1);
             e = e1;
-            while (la.kind == 39 || la.kind == 40 || la.kind == 41)
+            while (la.kind == 40 || la.kind == 41 || la.kind == 42)
             {
-                if (la.kind == 39)
+                if (la.kind == 40)
                 {
                     Get();
                     op = Operators.MULT;
                 }
-                else if (la.kind == 40)
+                else if (la.kind == 41)
                 {
                     Get();
                     op = Operators.DIV;
@@ -754,7 +762,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         void ExprNot(out ExprNode e)
         {
             e = null; bool b = false;
-            if (la.kind == 42)
+            if (la.kind == 43)
             {
                 Get();
                 b = true;
@@ -783,13 +791,13 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                     CallOrID(out IdentNode ident);
                     e = ident;
                 }
-                while (la.kind == 24)
+                while (la.kind == 25)
                 {
                     Member(e, out MemberNode member);
                     e = member;
                 }
             }
-            else SynErr(69);
+            else SynErr(70);
         }
 
         void Const(out ExprNode e)
@@ -805,11 +813,6 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 Get();
                 e = new TextConst(t.val);
             }
-            else if (la.kind == 43)
-            {
-                Get();
-                e = new BoolConst(Convert.ToBoolean(t.val));
-            }
             else if (la.kind == 44)
             {
                 Get();
@@ -818,9 +821,14 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             else if (la.kind == 45)
             {
                 Get();
+                e = new BoolConst(Convert.ToBoolean(t.val));
+            }
+            else if (la.kind == 12)
+            {
+                Get();
                 e = new NoneConst();
             }
-            else SynErr(70);
+            else SynErr(71);
         }
 
         void SingleType(out BaseType type)
@@ -851,7 +859,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 Get();
                 type = new EdgeType();
             }
-            else SynErr(71);
+            else SynErr(72);
         }
 
         void CollecType(out BaseType type)
@@ -860,36 +868,36 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             if (la.kind == 46)
             {
                 Get();
-                ExpectWeak(33, 1);
+                ExpectWeak(34, 1);
                 SingleType(out subType);
-                ExpectWeak(34, 18);
+                ExpectWeak(35, 18);
                 type = new ListType(subType);
             }
             else if (la.kind == 47)
             {
                 Get();
-                ExpectWeak(33, 1);
+                ExpectWeak(34, 1);
                 SingleType(out subType);
-                ExpectWeak(34, 18);
+                ExpectWeak(35, 18);
                 type = new SetType(subType);
             }
             else if (la.kind == 48)
             {
                 Get();
-                ExpectWeak(33, 1);
+                ExpectWeak(34, 1);
                 SingleType(out subType);
-                ExpectWeak(34, 18);
+                ExpectWeak(35, 18);
                 type = new QueueType(subType);
             }
             else if (la.kind == 49)
             {
                 Get();
-                ExpectWeak(33, 1);
+                ExpectWeak(34, 1);
                 SingleType(out subType);
-                ExpectWeak(34, 18);
+                ExpectWeak(35, 18);
                 type = new StackType(subType);
             }
-            else SynErr(72);
+            else SynErr(73);
         }
 
 
@@ -905,25 +913,25 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         }
 
         static readonly bool[,] set = {
-        {_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-        {_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-        {_T,_T,_x,_x, _T,_T,_T,_x, _x,_T,_T,_T, _T,_T,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-        {_T,_T,_x,_x, _x,_T,_T,_x, _x,_x,_x,_T, _x,_T,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-        {_x,_T,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+        {_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_T,_T, _x,_T,_T,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+        {_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_T,_T, _x,_T,_T,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+        {_T,_T,_x,_x, _T,_T,_T,_x, _x,_T,_T,_T, _x,_T,_T,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+        {_T,_T,_x,_x, _x,_T,_T,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+        {_x,_T,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
         {_x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-        {_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+        {_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
         {_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
         {_x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x},
         {_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x,_x},
-        {_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-        {_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+        {_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+        {_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
         {_x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-        {_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-        {_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+        {_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+        {_x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
         {_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-        {_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-        {_x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-        {_T,_T,_x,_x, _T,_T,_T,_T, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_T,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x}
+        {_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+        {_x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+        {_T,_T,_x,_x, _T,_T,_T,_T, _x,_x,_T,_T, _x,_T,_T,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x}
 
     };
     } // end Parser
@@ -952,40 +960,40 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case 9: s = "\"]\" expected"; break;
                 case 10: s = "\",\" expected"; break;
                 case 11: s = "\"func\" expected"; break;
-                case 12: s = "\"{\" expected"; break;
-                case 13: s = "\"}\" expected"; break;
-                case 14: s = "\"while\" expected"; break;
-                case 15: s = "\"for\" expected"; break;
-                case 16: s = "\"foreach\" expected"; break;
-                case 17: s = "\"in\" expected"; break;
-                case 18: s = "\"if\" expected"; break;
-                case 19: s = "\"elseif\" expected"; break;
-                case 20: s = "\"else\" expected"; break;
-                case 21: s = "\"return\" expected"; break;
-                case 22: s = "\"break\" expected"; break;
-                case 23: s = "\"continue\" expected"; break;
-                case 24: s = "\".\" expected"; break;
-                case 25: s = "\"=\" expected"; break;
-                case 26: s = "\"<-\" expected"; break;
-                case 27: s = "\"--\" expected"; break;
-                case 28: s = "\"->\" expected"; break;
-                case 29: s = "\"||\" expected"; break;
-                case 30: s = "\"&&\" expected"; break;
-                case 31: s = "\"==\" expected"; break;
-                case 32: s = "\"!=\" expected"; break;
-                case 33: s = "\"<\" expected"; break;
-                case 34: s = "\">\" expected"; break;
-                case 35: s = "\"<=\" expected"; break;
-                case 36: s = "\">=\" expected"; break;
-                case 37: s = "\"-\" expected"; break;
-                case 38: s = "\"+\" expected"; break;
-                case 39: s = "\"*\" expected"; break;
-                case 40: s = "\"/\" expected"; break;
-                case 41: s = "\"%\" expected"; break;
-                case 42: s = "\"!\" expected"; break;
-                case 43: s = "\"true\" expected"; break;
-                case 44: s = "\"false\" expected"; break;
-                case 45: s = "\"none\" expected"; break;
+                case 12: s = "\"none\" expected"; break;
+                case 13: s = "\"{\" expected"; break;
+                case 14: s = "\"}\" expected"; break;
+                case 15: s = "\"while\" expected"; break;
+                case 16: s = "\"for\" expected"; break;
+                case 17: s = "\"foreach\" expected"; break;
+                case 18: s = "\"in\" expected"; break;
+                case 19: s = "\"if\" expected"; break;
+                case 20: s = "\"elseif\" expected"; break;
+                case 21: s = "\"else\" expected"; break;
+                case 22: s = "\"return\" expected"; break;
+                case 23: s = "\"break\" expected"; break;
+                case 24: s = "\"continue\" expected"; break;
+                case 25: s = "\".\" expected"; break;
+                case 26: s = "\"=\" expected"; break;
+                case 27: s = "\"<-\" expected"; break;
+                case 28: s = "\"--\" expected"; break;
+                case 29: s = "\"->\" expected"; break;
+                case 30: s = "\"||\" expected"; break;
+                case 31: s = "\"&&\" expected"; break;
+                case 32: s = "\"==\" expected"; break;
+                case 33: s = "\"!=\" expected"; break;
+                case 34: s = "\"<\" expected"; break;
+                case 35: s = "\">\" expected"; break;
+                case 36: s = "\"<=\" expected"; break;
+                case 37: s = "\">=\" expected"; break;
+                case 38: s = "\"-\" expected"; break;
+                case 39: s = "\"+\" expected"; break;
+                case 40: s = "\"*\" expected"; break;
+                case 41: s = "\"/\" expected"; break;
+                case 42: s = "\"%\" expected"; break;
+                case 43: s = "\"!\" expected"; break;
+                case 44: s = "\"true\" expected"; break;
+                case 45: s = "\"false\" expected"; break;
                 case 46: s = "\"list\" expected"; break;
                 case 47: s = "\"set\" expected"; break;
                 case 48: s = "\"queue\" expected"; break;
@@ -998,21 +1006,22 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case 55: s = "invalid Head"; break;
                 case 56: s = "this symbol not expected in Stmts"; break;
                 case 57: s = "this symbol not expected in FuncDecl"; break;
-                case 58: s = "this symbol not expected in FuncDecl"; break;
+                case 58: s = "invalid FuncDecl"; break;
                 case 59: s = "this symbol not expected in FuncDecl"; break;
-                case 60: s = "invalid Type"; break;
-                case 61: s = "invalid Assign"; break;
-                case 62: s = "this symbol not expected in FuncParams"; break;
-                case 63: s = "invalid FullDecl"; break;
-                case 64: s = "invalid Stmt"; break;
-                case 65: s = "invalid StrucStmt"; break;
-                case 66: s = "invalid IdentCont"; break;
-                case 67: s = "invalid EdgeOpr"; break;
-                case 68: s = "invalid EdgeOneOrMore"; break;
-                case 69: s = "invalid Factor"; break;
-                case 70: s = "invalid Const"; break;
-                case 71: s = "invalid SingleType"; break;
-                case 72: s = "invalid CollecType"; break;
+                case 60: s = "this symbol not expected in FuncDecl"; break;
+                case 61: s = "invalid Type"; break;
+                case 62: s = "invalid Assign"; break;
+                case 63: s = "this symbol not expected in FuncParams"; break;
+                case 64: s = "invalid FullDecl"; break;
+                case 65: s = "invalid Stmt"; break;
+                case 66: s = "invalid StrucStmt"; break;
+                case 67: s = "invalid IdentCont"; break;
+                case 68: s = "invalid EdgeOpr"; break;
+                case 69: s = "invalid EdgeOneOrMore"; break;
+                case 70: s = "invalid Factor"; break;
+                case 71: s = "invalid Const"; break;
+                case 72: s = "invalid SingleType"; break;
+                case 73: s = "invalid CollecType"; break;
 
                 default: s = "error " + n; break;
             }
@@ -1048,4 +1057,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
     {
         public FatalError(string m) : base(m) { }
     }
+
+    class BaseTypeList : List<BaseType>
+    { }
 }
