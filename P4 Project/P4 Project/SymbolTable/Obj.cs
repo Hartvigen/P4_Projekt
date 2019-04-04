@@ -15,7 +15,7 @@ namespace P4_Project.SymTab
         public int Kind { get; set; }           // var, func
         public SymbolTable Scope { get; set; }  // the scope of the function
 
-        public Obj(string name, BaseType type, int kind, SymbolTable scope = null)
+        public Obj(string name, BaseType type, int kind, SymbolTable scope)
         {
             Name = name;
             Type = type;

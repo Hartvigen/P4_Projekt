@@ -46,9 +46,9 @@ namespace P4_Project.SymTab
 
 
         //creates a new Object in the current scope
-        public Obj NewObj(string name, BaseType type, int kind)
+        public Obj NewObj(string name, BaseType type, int kind, SymbolTable scope = null)
         {
-            Obj obj = new Obj(name, type, kind);
+            Obj obj = new Obj(name, type, kind, scope);
 
             if (symbolDecls.ContainsKey(obj.Name))
                 parser.SemErr($"{name} declared twice");
