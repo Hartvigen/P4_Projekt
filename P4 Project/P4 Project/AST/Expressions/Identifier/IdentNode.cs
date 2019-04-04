@@ -16,14 +16,16 @@ namespace P4_Project.AST.Expressions.Identifier
         /// <summary>
         /// The identifier is the string value of the identifier, and the reference is a reference directly to the symbol table.
         /// </summary>
-        public string identifier;
+        public string Identifier { get; private set; }
 
-        public IdentNode() { }
 
-        public IdentNode(string _identifier)
+        protected IdentNode() { }
+
+        protected IdentNode(string identifier)
         {
-            identifier = _identifier;
+            Identifier = identifier;
         }
+
 
         public override void Accept(Visitor vi)
         {

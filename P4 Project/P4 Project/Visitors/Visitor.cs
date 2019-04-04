@@ -27,14 +27,14 @@ namespace P4_Project.Visitors
         public abstract void Visit(UnaExprNode node);
 
         //Decls
-        public abstract void Visit(EdgeDeclNode node);
+        public abstract void Visit(EdgeCreateNode node);
         public abstract void Visit(FuncDeclNode node);
         public abstract void Visit(VarDeclNode node);
         public abstract void Visit(VertexDeclNode node);
 
         //Stmts
         public abstract void Visit(AssignNode node);
-        public abstract void Visit(Block node);
+        public abstract void Visit(BlockNode node);
         public abstract void Visit(ForeachNode node);
         public abstract void Visit(ForNode node);
         public abstract void Visit(HeadNode node);

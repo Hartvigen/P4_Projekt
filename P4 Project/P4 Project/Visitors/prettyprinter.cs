@@ -27,43 +27,43 @@ namespace P4_Project.Visitors
         //spaces, indentation, brackets, spaces and so on...
         public override void Visit(CallNode node)
         {
-            str.Append(node.identifier + "(");
-            node.parameters.Accept(this);
+            str.Append(node.Identifier + "(");
+            node.Parameters.Accept(this);
             str.Append(")");
         }
 
         public override void Visit(IdentNode node)
         {
-            str.Append(node.identifier);
+            str.Append(node.Identifier);
             IndentAndNewline();
         }
 
         public override void Visit(MemberNode node)
         {
-            if (node.inParentheses)
+            if (node.InParentheses)
                 str.Append("(");
-            node.source.Accept(this);
+            node.Source.Accept(this);
             str.Append(".");
-            node.memberIdent.Accept(this);
-            if (node.inParentheses)
+            node.MemberIdent.Accept(this);
+            if (node.InParentheses)
                 str.Append(")");
         }
 
         public override void Visit(VarNode node)
         {
-            str.Append(node.identifier);
+            str.Append(node.Identifier);
         }
 
         public override void Visit(BoolConst node)
         {
-            str.Append(node.getString());
+            str.Append(node.GetString());
         }
 
         public override void Visit(CollecConst node)
         {
-            if (node.exprs.Count == 0)
+            if (node.Expressions.Count == 0)
                 return;
-            foreach (Node n in node.exprs)
+            foreach (Node n in node.Expressions)
             {
                 n.Accept(this);
                 str.Append(", ");
@@ -78,53 +78,53 @@ namespace P4_Project.Visitors
 
         public override void Visit(NumConst node)
         {
-            str.Append(node.getString());
+            str.Append(node.GetString());
         }
 
         public override void Visit(TextConst node)
         {
-            str.Append(node.value);
+            str.Append(node.Value);
         }
 
         public override void Visit(BinExprNode node)
         {
-            if (node.inParentheses)
+            if (node.InParentheses)
                 str.Append("(");
-            node.left.Accept(this);
-            str.Append(" " + node.getCodeofOperator() + " ");
-            node.right.Accept(this);
-            if (node.inParentheses)
+            node.Left.Accept(this);
+            str.Append(" " + node.GetCodeofOperator() + " ");
+            node.Right.Accept(this);
+            if (node.InParentheses)
                 str.Append(")");
         }
 
         public override void Visit(UnaExprNode node)
         {
-            if (node.inParentheses)
+            if (node.InParentheses)
                 str.Append("(");
-            str.Append(node.getCodeofOperator());
-            node.expr.Accept(this);
-            if (node.inParentheses)
+            str.Append(node.GetCodeofOperator());
+            node.Expr.Accept(this);
+            if (node.InParentheses)
                 str.Append("(");
         }
 
-        public override void Visit(EdgeDeclNode node)
+        public override void Visit(EdgeCreateNode node)
         {
-            node.start.Accept(this);
-            str.Append(node.getCodeofOperator());
-            if (node.attributes.statements.Count != 0)
+            node.Start.Accept(this);
+            str.Append(node.GetCodeofOperator());
+            if (node.Attributes.statements.Count != 0)
                 str.Append("(");
-            node.end.Accept(this);
-            if (node.attributes.statements.Count != 0)
+            node.End.Accept(this);
+            if (node.Attributes.statements.Count != 0)
                 str.Append(", ");
-            foreach (Node n in node.attributes.statements)
+            foreach (Node n in node.Attributes.statements)
             {
                 n.Accept(this);
                 RemoveIndentAndNewline();
                 str.Append(", ");
             }
-            if(node.attributes.statements.Count > 0)
+            if(node.Attributes.statements.Count > 0)
             RemoveLastCommaAndSpace();
-            if (node.attributes.statements.Count != 0)
+            if (node.Attributes.statements.Count != 0)
                 str.Append(")");
             IndentAndNewline();
         }
@@ -133,21 +133,21 @@ namespace P4_Project.Visitors
         {
             IndentAndNewline();
             str.Append("func " + node.symbolName + "(");
-            if (node.parameters.statements.Count > 0)
-                foreach (Node n in node.parameters.statements)
+            if (node.Parameters.statements.Count > 0)
+                foreach (Node n in node.Parameters.statements)
                 {
                     n.Accept(this);
                     RemoveIndentAndNewline();
                     str.Append(", ");
                 }
-            if (node.parameters.statements.Count > 0)
+            if (node.Parameters.statements.Count > 0)
                 RemoveIndentAndNewline();
             str.Append(")");
             str.AppendLine();
             str.Append("{");
             indentLevel++;
             IndentAndNewline();
-            foreach (Node n in node.body.statements)
+            foreach (Node n in node.Body.statements)
             {
                 n.Accept(this);
             }
@@ -160,14 +160,14 @@ namespace P4_Project.Visitors
 
         public override void Visit(VarDeclNode node)
         {
-            str.Append(node.getVarType() + " " + node.symbolName);
-            if (node.expr != null)
+            str.Append(node.GetVarType() + " " + node.symbolName);
+            if (node.DefaultValue != null)
             {
                 str.Append(" = ");
-                if (node.expr.GetType() == typeof(CollecConst))
+                if (node.DefaultValue.GetType() == typeof(CollecConst))
                     str.Append("{");
-                node.expr.Accept(this);
-                if (node.expr.GetType() == typeof(CollecConst))
+                node.DefaultValue.Accept(this);
+                if (node.DefaultValue.GetType() == typeof(CollecConst))
                     str.Append("}");
             }
             IndentAndNewline();
@@ -177,15 +177,15 @@ namespace P4_Project.Visitors
         {
             str.Append("vertex(");
             str.Append(node.symbolName);
-            if (node.attributes.statements.Count > 0)
+            if (node.Attributes.statements.Count > 0)
                 str.Append(", ");
-            foreach (Node n in node.attributes.statements)
+            foreach (Node n in node.Attributes.statements)
             {
                 n.Accept(this);
                 RemoveIndentAndNewline();
                 str.Append(", ");
             }
-            if (node.attributes.statements.Count > 0)
+            if (node.Attributes.statements.Count > 0)
                 RemoveLastCommaAndSpace();
             str.Append(")");
             IndentAndNewline();
@@ -194,13 +194,13 @@ namespace P4_Project.Visitors
         public override void Visit(AssignNode node)
         {
             str.Append("");
-            node.target.Accept(this);
+            node.Target.Accept(this);
             str.Append(" = ");
-            node.value.Accept(this);
+            node.Value.Accept(this);
             IndentAndNewline();
         }
 
-        public override void Visit(Block node)
+        public override void Visit(BlockNode node)
         {
             foreach (Node n in node.statements)
             {
@@ -212,16 +212,16 @@ namespace P4_Project.Visitors
         public override void Visit(ForeachNode node)
         {
             str.Append("foreach(");
-            node.iterationVar.Accept(this);
+            node.IterationVar.Accept(this);
             RemoveIndentAndNewline();
             str.Append(" in ");
-            node.iterator.Accept(this);
+            node.Iterator.Accept(this);
             str.Append(")");
             IndentAndNewline();
             str.Append("{");
             indentLevel++;
             IndentAndNewline();
-            node.body.Accept(this);
+            node.Body.Accept(this);
             RemoveIndentAndNewline();
             indentLevel--;
             IndentAndNewline();
@@ -232,19 +232,19 @@ namespace P4_Project.Visitors
         public override void Visit(ForNode node)
         {
             str.Append("for(");
-            node.initializer.Accept(this);
+            node.Initializer.Accept(this);
             RemoveIndentAndNewline();
             str.Append(", ");
-            node.condition.Accept(this);
+            node.Condition.Accept(this);
             str.Append(", ");
-            node.iterator.Accept(this);
+            node.Iterator.Accept(this);
             RemoveIndentAndNewline();
             str.Append(")");
             IndentAndNewline();
             str.Append("{");
             indentLevel++;
             IndentAndNewline();
-            node.body.Accept(this);
+            node.Body.Accept(this);
             RemoveIndentAndNewline();
             indentLevel--;
             IndentAndNewline();
@@ -271,52 +271,52 @@ namespace P4_Project.Visitors
 
         public override void Visit(IfNode node)
         {
-            if (node.condition != null)
+            if (node.Condition != null)
             {
                 str.Append("if (");
-                node.condition.Accept(this);
+                node.Condition.Accept(this);
                 str.Append(")");
             }
             IndentAndNewline();
             str.Append("{");
             indentLevel++;
             IndentAndNewline();
-            node.body.Accept(this);
+            node.Body.Accept(this);
             RemoveIndentAndNewline();
             indentLevel--;
             IndentAndNewline();
             str.Append("} ");
-            if (node.elseNode != null)
+            if (node.ElseNode != null)
             {
                 str.Append("else");
-                node.elseNode.Accept(this);
+                node.ElseNode.Accept(this);
             }
             else IndentAndNewline();
         }
 
         public override void Visit(LoneCallNode node)
         {
-            node.call.Accept(this);
+            node.Call.Accept(this);
             IndentAndNewline();
         }
 
         public override void Visit(ReturnNode node)
         {
             str.Append("return ");
-            node.ret.Accept(this);
+            node.Ret.Accept(this);
             IndentAndNewline();
         }
 
         public override void Visit(WhileNode node)
         {
             str.Append("while(");
-            node.condition.Accept(this);
+            node.Condition.Accept(this);
             str.Append(")");
             IndentAndNewline();
             str.Append("{");
             indentLevel++;
             IndentAndNewline();
-            foreach (Node n in node.body.statements)
+            foreach (Node n in node.Body.statements)
             {
                 n.Accept(this);
             }

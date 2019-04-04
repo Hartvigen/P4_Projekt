@@ -24,7 +24,7 @@ namespace P4_Project.Visitors
         public override void Visit(CallNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.parameters.Accept(this);
+            node.Parameters.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
@@ -37,8 +37,8 @@ namespace P4_Project.Visitors
         public override void Visit(MemberNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.source.Accept(this);
-            node.memberIdent.Accept(this);
+            node.Source.Accept(this);
+            node.MemberIdent.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
@@ -81,59 +81,59 @@ namespace P4_Project.Visitors
         public override void Visit(BinExprNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.left.Accept(this);
-            node.right.Accept(this);
+            node.Left.Accept(this);
+            node.Right.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(UnaExprNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.expr.Accept(this);
+            node.Expr.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
-        public override void Visit(EdgeDeclNode node)
+        public override void Visit(EdgeCreateNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.start.Accept(this);
-            node.end.Accept(this);
-            node.attributes.Accept(this);
+            node.Start.Accept(this);
+            node.End.Accept(this);
+            node.Attributes.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(FuncDeclNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.parameters.Accept(this);
-            node.body.Accept(this);
+            node.Parameters.Accept(this);
+            node.Body.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(VarDeclNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            if(node.expr != null)
-            node.expr.Accept(this);
+            if(node.DefaultValue != null)
+            node.DefaultValue.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(VertexDeclNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.attributes.Accept(this);
+            node.Attributes.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(AssignNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.target.Accept(this);
-            node.value.Accept(this);
+            node.Target.Accept(this);
+            node.Value.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
-        public override void Visit(Block node)
+        public override void Visit(BlockNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             foreach (Node n in node.statements)
@@ -144,19 +144,19 @@ namespace P4_Project.Visitors
         public override void Visit(ForeachNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.iterationVar.Accept(this);
-            node.iterator.Accept(this);
-            node.body.Accept(this);
+            node.IterationVar.Accept(this);
+            node.Iterator.Accept(this);
+            node.Body.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(ForNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.initializer.Accept(this);
-            node.condition.Accept(this);
-            node.iterator.Accept(this);
-            node.body.Accept(this);
+            node.Initializer.Accept(this);
+            node.Condition.Accept(this);
+            node.Iterator.Accept(this);
+            node.Body.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
@@ -170,33 +170,33 @@ namespace P4_Project.Visitors
         public override void Visit(IfNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            if(node.condition != null)
-            node.condition.Accept(this);
-            node.body.Accept(this);
-            if(node.elseNode != null)
-            node.elseNode.Accept(this);
+            if(node.Condition != null)
+            node.Condition.Accept(this);
+            node.Body.Accept(this);
+            if(node.ElseNode != null)
+            node.ElseNode.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(LoneCallNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.call.Accept(this);
+            node.Call.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(ReturnNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.ret.Accept(this);
+            node.Ret.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(WhileNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.condition.Accept(this);
-            node.body.Accept(this);
+            node.Condition.Accept(this);
+            node.Body.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 

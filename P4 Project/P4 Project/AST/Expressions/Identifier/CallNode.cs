@@ -13,17 +13,19 @@ namespace P4_Project.AST.Expressions.Identifier
     /// </summary>
     public class CallNode : IdentNode
     {
-        public CollecConst parameters;
+        public CollecConst Parameters { get; private set; }
+
 
         public CallNode()
-            : base("")
+            : base(null)
         { }
 
-        public CallNode(string _identifier, CollecConst _parameters) 
-            : base(_identifier)
+        public CallNode(string identifier, CollecConst parameters) 
+            : base(identifier)
         {
-            parameters = _parameters;
+            Parameters = parameters;
         }
+
 
         public override void Accept(Visitor vi)
         {

@@ -11,33 +11,42 @@ namespace P4_Project.AST.Stmts.Decls
     /// <summary>
     /// The "EdgeDeclNode" represents the declaration of an edge between two vertices
     /// </summary>
-    public class EdgeDeclNode : VEDeclNode
+    public class EdgeCreateNode : StmtNode
     {
-        public IdentNode start, end;
+        public BlockNode Attributes { get; private set; } = new BlockNode();
 
-        private int Operator;
+        public IdentNode Start { get; private set; }
+        public IdentNode End { get; private set; }
 
-        public EdgeDeclNode(IdentNode _start, IdentNode _end, int _operator)
-            :base(_start.identifier+_end.identifier)
+        public int Operator { get; private set; }
+
+
+        public EdgeCreateNode(IdentNode start, IdentNode end, int @operator)
         {
-            start = _start;
-            end = _end;
-            Operator = _operator;
+            Start = start;
+            End = end;
+            Operator = @operator;
         }
+
 
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
         }
 
-        public String getNameOfOperator()
+        public string GetNameOfOperator()
         {
             return Operators.getNameFromInt(Operator);
         }
 
-        public String getCodeofOperator()
+        public string GetCodeofOperator()
         {
             return Operators.getCodeFromInt(Operator);
+        }
+
+        public void AddAttr(AssignNode assign)
+        {
+            Attributes.Add(assign);
         }
     }
 }

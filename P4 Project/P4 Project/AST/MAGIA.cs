@@ -17,11 +17,11 @@ namespace P4_Project.AST
         /// This Block contains the entire list of statements that serve as the first layer of branches.
         /// That is, the headers, the statements of the program's body, and the function declarations.
         /// </summary>
-        public Block block;
+        public BlockNode block;
 
         public MAGIA() { }
 
-        public MAGIA(Block _block)
+        public MAGIA(BlockNode _block)
         {
             block = _block;
         }

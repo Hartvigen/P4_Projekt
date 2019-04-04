@@ -13,14 +13,16 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class ReturnNode : StmtNode
     {
-        public ExprNode ret;
+        public ExprNode Ret { get; private set; }
+
 
         public ReturnNode() { }
 
-        public ReturnNode(ExprNode _ret)
+        public ReturnNode(ExprNode ret)
         {
-            ret = _ret;
+            Ret = ret;
         }
+
 
         public override void Accept(Visitor vi)
         {

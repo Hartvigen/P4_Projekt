@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.SymTab;
 
 namespace P4_Project.AST.Stmts.Decls
 {
@@ -14,26 +15,26 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class VarDeclNode : DeclNode
     {
-        public BaseType type;
-        public ExprNode expr; // If the variable should have a default value, this value is stored in "expr".
+        public ExprNode DefaultValue { get; private set; }
+
 
         public VarDeclNode() { }
 
-        public VarDeclNode(BaseType _type, string _symbolName, ExprNode _expr)
-            : base(_symbolName)
+        public VarDeclNode(Obj symbolObject, ExprNode defaultValue)
+            : base(symbolObject)
         {
-            type = _type;
-            expr = _expr;
+            DefaultValue = defaultValue;
         }
+
 
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
         }
 
-        public String getVarType()
+        public string GetVarType()
         {
-            return type.ToString();
+            return SymbolObject.Type.ToString();
         }
     }
 }

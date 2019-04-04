@@ -14,16 +14,18 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class AssignNode : StmtNode
     {
-        public IdentNode target;
-        public ExprNode value;
+        public IdentNode Target { get; private set; }
+        public ExprNode Value { get; private set; }
+
 
         public AssignNode() { }
 
-        public AssignNode(IdentNode _target, ExprNode _value)
+        public AssignNode(IdentNode target, ExprNode value)
         {
-            target = _target;
-            value = _value; 
+            Target = target;
+            Value = value; 
         }
+
 
         public override void Accept(Visitor vi)
         {

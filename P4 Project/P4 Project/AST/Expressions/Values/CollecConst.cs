@@ -13,13 +13,15 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class CollecConst : ExprNode
     {
-        public List<ExprNode> exprs = new List<ExprNode>();
+        public List<ExprNode> Expressions { get; private set; } = new List<ExprNode>();
+
 
         public CollecConst(){ }
 
+
         public void Add(ExprNode expr)
         {
-            exprs.Add(expr);
+            Expressions.Add(expr);
         }
 
         public override void Accept(Visitor vi)

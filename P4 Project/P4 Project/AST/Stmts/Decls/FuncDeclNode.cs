@@ -13,18 +13,19 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class FuncDeclNode : DeclNode
     {
-        public Obj FuncObj { get; private set; }
-        public Block parameters;
-        public Block body;
+        public BlockNode Parameters { get; private set; }
+        public BlockNode Body { get; private set; }
+
 
         public FuncDeclNode() { }
 
-        public FuncDeclNode(string _symbolName, Obj _funcObj, Block _parameters, Block _body) : base(_symbolName)
+        public FuncDeclNode(Obj symbolObject, BlockNode parameters, BlockNode body) 
+            : base(symbolObject)
         {
-            FuncObj = _funcObj;
-            parameters = _parameters;
-            body = _body;
+            Parameters = parameters;
+            Body = body;
         }
+
 
         public override void Accept(Visitor vi)
         {

@@ -23,6 +23,5 @@ namespace P4_Project.SymTab
 
             Scope = scope;
         }
-
     }
 }

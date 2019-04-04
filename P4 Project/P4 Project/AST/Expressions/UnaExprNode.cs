@@ -12,30 +12,32 @@ namespace P4_Project.AST.Expressions
     /// </summary>
     public class UnaExprNode : ExprNode
     {
-        public ExprNode expr;
-        int operatorType;
+        public ExprNode Expr { get; private set; }
+        public int OperatorType { get; private set; }
+
 
         public UnaExprNode() { }
 
-        public UnaExprNode(int _operatorType, ExprNode _expr)
+        public UnaExprNode(int operatorType, ExprNode expr)
         {
-            operatorType = _operatorType;
-            expr = _expr;
+            OperatorType = operatorType;
+            Expr = expr;
         }
+
 
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
         }
 
-        public String getNameOfOperator()
+        public string GetNameOfOperator()
         {
-            return Operators.getNameFromInt(operatorType);
+            return Operators.getNameFromInt(OperatorType);
         }
 
-        public String getCodeofOperator()
+        public string GetCodeofOperator()
         {
-            return Operators.getCodeFromInt(operatorType);
+            return Operators.getCodeFromInt(OperatorType);
         }
     }
 }

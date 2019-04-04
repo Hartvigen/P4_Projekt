@@ -16,17 +16,19 @@ namespace P4_Project.AST.Expressions.Identifier
         /// <summary>
         /// memIdent is the name of the field or method that is being accessed, while source is the location of said field or method.
         /// </summary>
-        public ExprNode source;
-        public IdentNode memberIdent;
+        public ExprNode Source { get; private set; }
+        public IdentNode MemberIdent { get; private set; }
+
 
         public MemberNode() { }
 
-        public MemberNode(ExprNode _source, IdentNode _memberIdent) 
-            : base(_memberIdent.identifier)
+        public MemberNode(ExprNode source, IdentNode memberIdent) 
+            : base(memberIdent.Identifier)
         {
-            source = _source;
-            memberIdent = _memberIdent;
+            Source = source;
+            MemberIdent = memberIdent;
         }
+
 
         public override void Accept(Visitor vi)
         {

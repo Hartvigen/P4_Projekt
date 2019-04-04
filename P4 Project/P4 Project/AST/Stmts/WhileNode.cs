@@ -13,14 +13,16 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class WhileNode : StmtNode
     {
-        public ExprNode condition;
-        public Block body;
+        public ExprNode Condition { get; private set; }
+        public BlockNode Body { get; private set; }
 
-        public WhileNode(ExprNode _condition, Block _block)
+
+        public WhileNode(ExprNode condition, BlockNode block)
         {
-            condition = _condition;
-            body = _block;
+            Condition = condition;
+            Body = block;
         }
+
 
         public override void Accept(Visitor vi)
         {

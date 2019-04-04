@@ -116,7 +116,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void MAGIA()
         {
-            tab = tab.OpenScope(); mainNode = null; Block mainBlock = new Block();
+            tab = tab.OpenScope(); mainNode = null; BlockNode mainBlock = new BlockNode();
             while (la.kind == 4)
             {
                 while (!(la.kind == 0 || la.kind == 4)) { SynErr(54); Get(); }
@@ -153,7 +153,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Expect(9);
         }
 
-        void Stmts(ref Block block)
+        void Stmts(ref BlockNode block)
         {
             while (!(StartOf(3))) { SynErr(56); Get(); }
             while (StartOf(4))
@@ -177,7 +177,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void FuncDecl(out FuncDeclNode funcNode)
         {
-            funcNode = null; Obj funcObj; BaseType returnType; List<BaseType> parameterTypes = new List<BaseType>(); string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block();
+            funcNode = null; Obj funcObj; BaseType returnType; List<BaseType> parameterTypes = new List<BaseType>(); string funcName = ""; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode();
             while (!(la.kind == 0 || la.kind == 11)) { SynErr(57); Get(); }
             Expect(11);
             tab = tab.OpenScope();
@@ -259,7 +259,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             else SynErr(61);
         }
 
-        void FuncParams(ref Block paramBlock, ref List<BaseType> parameterTypes)
+        void FuncParams(ref BlockNode paramBlock, ref List<BaseType> parameterTypes)
         {
             BaseType type = null;
             Type(out type);
@@ -277,7 +277,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
         }
 
-        void FullDecl(ref Block block)
+        void FullDecl(ref BlockNode block)
         {
             Obj obj;
             Type(out BaseType type);
@@ -366,7 +366,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void StmtWhile(out StmtNode w)
         {
-            w = null; Block b = new Block();
+            w = null; BlockNode b = new BlockNode();
             Expect(14);
             Expect(7);
             Expr(out ExprNode e);
@@ -381,7 +381,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void StmtFor(out StmtNode f)
         {
-            f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); tab = tab.OpenScope();
+            f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; BlockNode b = new BlockNode(); tab = tab.OpenScope();
             Expect(15);
             Expect(7);
             Stmt(out StmtNode s1);
@@ -402,7 +402,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void StmtForeach(out StmtNode f)
         {
-            f = null; Block b = new Block(); VarDeclNode v = null; tab = tab.OpenScope();
+            f = null; BlockNode b = new BlockNode(); VarDeclNode v = null; tab = tab.OpenScope();
             Expect(16);
             Expect(7);
             Type(out BaseType typ);
@@ -420,7 +420,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void StmtIf(out StmtNode i)
         {
-            i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; IfNode k = null;
+            i = null; ExprNode e = null; BlockNode b = new BlockNode(); IfNode j = null; IfNode k = null;
             Expect(18);
             Expect(7);
             Expr(out ExprNode ie1);
@@ -435,7 +435,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 Get();
                 Expect(7);
                 Expr(out ExprNode ie2);
-                e = ie2; b = new Block();
+                e = ie2; b = new BlockNode();
                 Expect(8);
                 Expect(12);
                 Stmts(ref b);
@@ -445,7 +445,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             if (la.kind == 20)
             {
                 Get();
-                b = new Block();
+                b = new BlockNode();
                 Expect(12);
                 Stmts(ref b);
                 k = new IfNode(null, b); j.SetElse(k);
@@ -469,7 +469,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             {
                 Get();
                 Args(out CollecConst collec);
-                i = new CallNode(i.identifier, collec);
+                i = new CallNode(i.Identifier, collec);
                 Expect(8);
             }
         }
@@ -484,7 +484,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         void IdentCont(IdentNode i, out StmtNode s)
         {
-            s = null; Block b = new Block();
+            s = null; BlockNode b = new BlockNode();
             if (la.kind == 25)
             {
                 Assign(out ExprNode expr);
@@ -520,16 +520,16 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             else SynErr(67);
         }
 
-        void EdgeOneOrMore(IdentNode left, int op, ref Block b)
+        void EdgeOneOrMore(IdentNode left, int op, ref BlockNode b)
         {
             if (la.kind == 1)
             {
                 Identifier(out VarNode varNode);
-                b.Add(new EdgeDeclNode(left, varNode, op));
+                b.Add(new EdgeCreateNode(left, varNode, op));
             }
             else if (la.kind == 7)
             {
-                EdgeDecl(left, op, out EdgeDeclNode edge);
+                EdgeDecl(left, op, out EdgeCreateNode edge);
                 b.Add(edge);
             }
             else if (la.kind == 12)
@@ -541,7 +541,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             else SynErr(68);
         }
 
-        void VtxDecls(ref Block b)
+        void VtxDecls(ref BlockNode b)
         {
             VtxDecl(out VertexDeclNode v1);
             b.Add(v1);
@@ -577,7 +577,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
         }
 
-        void VEParams(VEDeclNode ve)
+        void VEParams(Node ve)
         {
             while (WeakSeparator(10, 15, 7))
             {
@@ -594,23 +594,23 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             varNode = new VarNode(t.val);
         }
 
-        void EdgeDecl(IdentNode left, int op, out EdgeDeclNode edge)
+        void EdgeDecl(IdentNode left, int op, out EdgeCreateNode edge)
         {
             edge = null;
             Expect(7);
             Identifier(out VarNode right);
-            edge = new EdgeDeclNode(left, right, op);
+            edge = new EdgeCreateNode(left, right, op);
             VEParams(edge);
             Expect(8);
         }
 
-        void EdgeDecls(IdentNode left, int op, ref Block b)
+        void EdgeDecls(IdentNode left, int op, ref BlockNode b)
         {
-            EdgeDecl(left, op, out EdgeDeclNode e1);
+            EdgeDecl(left, op, out EdgeCreateNode e1);
             b.Add(e1);
             while (WeakSeparator(10, 12, 13))
             {
-                EdgeDecl(left, op, out EdgeDeclNode e2);
+                EdgeDecl(left, op, out EdgeCreateNode e2);
                 b.Add(e2);
             }
         }
