@@ -57,7 +57,7 @@ namespace P4_Project.Graphviz.Tests
 
         //The defualts will create an example file PNG file.
         [TestMethod()]
-        public void ParseTestSuccess01()
+        public void DotToPngTestSuccess01()
         {
             string direc = Directory.GetCurrentDirectory();
             DotToPng.createPNGFile();
@@ -66,7 +66,7 @@ namespace P4_Project.Graphviz.Tests
 
         //The custom DOT code will create an PNG file.
         [TestMethod()]
-        public void ParseTestSuccess02()
+        public void DotToPngTestSuccess02()
         {
             DotToPng.createPNGFile(customDotCode);
             Assert.IsTrue(File.Exists(DotToPng.defaultFilePath));
@@ -74,7 +74,7 @@ namespace P4_Project.Graphviz.Tests
 
         //The custom DOT code at a custom filepath will create an PNG file at the custom path.
         [TestMethod()]
-        public void ParseTestSuccess03()
+        public void DotToPngTestSuccess03()
         {
             DotToPng.createPNGFile(customDotCode, customFilePath);
             Assert.IsTrue(File.Exists(customFilePath));
@@ -82,21 +82,21 @@ namespace P4_Project.Graphviz.Tests
 
         //The custom Code and defualt code is not the same.
         [TestMethod()]
-        public void ParseTestSuccess04()
+        public void DotToPngTestSuccess04()
         {
             Assert.IsTrue(customDotCode != DotToPng.defaultDotCode);
         }
 
         //The custom path and defualt path is not the same.
         [TestMethod()]
-        public void ParseTestSuccess05()
+        public void DotToPngTestSuccess05()
         {
             Assert.IsTrue(customFilePath != DotToPng.defaultFilePath);
         }
 
         //The same picture will be genereate given the same code.
         [TestMethod()]
-        public void ParseTestSuccess06()
+        public void DotToPngTestSuccess06()
         {
             //The defualt picture
             DotToPng.createPNGFile();
@@ -109,7 +109,7 @@ namespace P4_Project.Graphviz.Tests
 
         //The pictures are different if different Dot code is given.
         [TestMethod()]
-        public void ParseTestSuccess07()
+        public void DotToPngTestSuccess07()
         {
             //The defualt picture
             DotToPng.createPNGFile();
@@ -122,7 +122,7 @@ namespace P4_Project.Graphviz.Tests
 
         //The pictures are the same if same Dot code is given even if it is custom code.
         [TestMethod()]
-        public void ParseTestSuccess08()
+        public void DotToPngTestSuccess08()
         {
             //The defualt picture
             DotToPng.createPNGFile(customDotCode, DotToPng.defaultFilePath);
