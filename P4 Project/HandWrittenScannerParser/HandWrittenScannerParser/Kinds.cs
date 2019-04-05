@@ -1,14 +1,14 @@
 ﻿namespace HandWrittenScannerParser
 {
-    enum Kinds
+    public enum Kinds
     {
         Number,
         IDENT,
         LBrack,
         RBrack,
         Assign,
-        RParen,
         LParen,
+        RParen,
         Func
     }
 }

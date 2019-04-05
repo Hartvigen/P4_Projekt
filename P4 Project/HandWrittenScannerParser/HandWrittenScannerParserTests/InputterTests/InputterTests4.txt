@@ -1,0 +1,10 @@
+[102.12]
+[1000.223]
+[5945236484]
+
+Ident = prog
+
+func proc() fp1 = fp2
+func meth() ident = proc
+func BigDig() Ident = fp1
+func fp2() prog = proc
