@@ -101,11 +101,7 @@ public class Parser {
 
 	
 	void MAGIA() {
-<<<<<<< HEAD
 		mainNode = null; BlockNode mainBlock = new BlockNode(); 
-=======
-		tab = tab.OpenScope(); mainNode = null; Block mainBlock = new Block(); 
->>>>>>> jonas
 		while (la.kind == 4) {
 			while (!(la.kind == 0 || la.kind == 4)) {SynErr(54); Get();}
 			Head(out HeadNode head);
@@ -121,7 +117,7 @@ public class Parser {
 			FuncDecl(out FuncDeclNode funcDecl);
 			mainBlock.Add(funcDecl);         
 		}
-		mainNode = new MAGIA(mainBlock); tab = tab.CloseScope(); 
+		mainNode = new MAGIA(mainBlock); 
 	}
 
 	void Head(out HeadNode head) {
@@ -167,6 +163,17 @@ public class Parser {
 		} else if (la.kind == 12) {
 			Get();
 		} else SynErr(59);
+=======
+		funcNode = null; Obj funcObj; BaseType returnType = null; BaseTypeList parameterTypes = new List<BaseType>(); string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); 
+		while (!(la.kind == 0 || la.kind == 11)) {SynErr(57); Get();}
+		Expect(11);
+		tab = tab.OpenScope(); 
+		if (StartOf(5)) {
+			Type(out returnType);
+		} else if (la.kind == 12) {
+			Get();
+		} else SynErr(58);
+>>>>>>> jonas
 		Expect(1);
 		funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); 
 		ExpectWeak(7, 8);
@@ -179,6 +186,7 @@ public class Parser {
 				paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); 
 			}
 		}
+<<<<<<< HEAD
 		protocol = new FunctionType(returnType, parameterTypes); 
 		ExpectWeak(9, 9);
 		ExpectWeak(13, 10);
@@ -188,21 +196,6 @@ public class Parser {
 			Stmt(out stmt);
 			stmtBlock.Add(stmt); 
 =======
-		funcNode = null; Obj funcObj; BaseType returnType = null; BaseTypeList parameterTypes = new List<BaseType>(); string funcName = ""; Block paramBlock = new Block(); Block stmtBlock = new Block(); 
-		while (!(la.kind == 0 || la.kind == 11)) {SynErr(57); Get();}
-		Expect(11);
-		tab = tab.OpenScope(); 
-		if (StartOf(5)) {
-			Type(out returnType);
-		} else if (la.kind == 12) {
-			Get();
-		} else SynErr(58);
-		Expect(1);
-		funcName = t.val; 
-		Expect(7);
-		if (la.val != ")") {
-			FuncParams(ref paramBlock, ref parameterTypes);
-		}
 		Expect(8);
 		while (!(la.kind == 0 || la.kind == 13)) {SynErr(59); Get();}
 		Expect(13);
@@ -232,20 +225,15 @@ public class Parser {
 		
 	}
 
-<<<<<<< HEAD
 	void VarDecl(out VarDeclNode varDecl) {
 		varDecl = null; BaseType type = null; string name = null; ExprNode value = null; 
 		Type(out type);
 		Expect(1);
 		name = t.val; 
+<<<<<<< HEAD
 		if (la.kind == 29) {
 			Assign(out value);
 =======
-	void AttrDecl(out VarDeclNode attrDecl) {
-		attrDecl = null; string name = ""; ExprNode val = null; 
-		Type(out BaseType typ);
-		Expect(1);
-		name = t.val; 
 		if (la.kind == 26) {
 			Assign(out val);
 >>>>>>> jonas
@@ -403,12 +391,52 @@ public class Parser {
 			Stmt(out stmt);
 			stmtBlock.Add(stmt); 
 		}
+=======
+		} else if (la.kind == 22) {
+			Get();
+			Expr(out ExprNode expr);
+			stmtNode = new ReturnNode(expr); 
+		} else if (la.kind == 23) {
+			Get();
+			stmtNode = new BreakNode(); 
+		} else if (la.kind == 24) {
+			Get();
+			stmtNode = new ContinueNode(); 
+		} else SynErr(65);
+	}
+
+	void StrucStmt(out StmtNode s) {
+		s = null; 
+		if (la.kind == 15) {
+			StmtWhile(out s);
+		} else if (la.kind == 16) {
+			StmtFor(out s);
+		} else if (la.kind == 17) {
+			StmtForeach(out s);
+		} else if (la.kind == 19) {
+			StmtIf(out s);
+		} else SynErr(66);
+	}
+
+	void StmtWhile(out StmtNode w) {
+		w = null; Block b = new Block(); 
+		Expect(15);
+		Expect(7);
+		Expr(out ExprNode e);
+		tab = tab.OpenScope(); 
+		Expect(8);
+		Expect(13);
+		Stmts(ref b);
+		w = new WhileNode(e, b); 
+		Expect(14);
+>>>>>>> jonas
 		tab = tab.CloseScope(); 
 		Expect(14);
 		w = new WhileNode(condition, stmtBlock); 
 	}
 
 	void StmtFor(out StmtNode f) {
+<<<<<<< HEAD
 		f = null; BlockNode stmtBlock = new BlockNode(); StmtNode stmt = null; 
 		Expect(16);
 		StmtNode init = null; ExprNode cond = null; StmtNode iter = null; 
@@ -431,19 +459,43 @@ public class Parser {
 			Stmt(out stmt);
 			stmtBlock.Add(stmt); 
 		}
+=======
+		f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); tab = tab.OpenScope(); 
+		Expect(16);
+		Expect(7);
+		Stmt(out StmtNode s1);
+		init = s1; 
+		Expect(10);
+		Expr(out ExprNode e1);
+		e = e1;  
+		Expect(10);
+		Stmt(out StmtNode s2);
+		iter = s2; 
+		Expect(8);
+		Expect(13);
+		Stmts(ref b);
+		f = new ForNode(init, e, iter, b); 
+		Expect(14);
+>>>>>>> jonas
 		tab = tab.CloseScope(); 
 		Expect(14);
 		f = new ForNode(init, cond, iter, stmtBlock); 
 	}
 
 	void StmtForeach(out StmtNode f) {
+<<<<<<< HEAD
 		f = null; StmtNode stmt = null; 
 		Expect(17);
 		VarDeclNode itrVar = null; BlockNode stmtBlock = new BlockNode(); 
+=======
+		f = null; Block b = new Block(); VarDeclNode v = null; tab = tab.OpenScope(); 
+		Expect(17);
+>>>>>>> jonas
 		Expect(7);
 		tab = tab.OpenScope(); 
 		Type(out BaseType type);
 		Expect(1);
+<<<<<<< HEAD
 		itrVar = new VarDeclNode(tab.NewObj(t.val, type, var), null); 
 		Expect(18);
 		Expr(out ExprNode collection);
@@ -454,12 +506,23 @@ public class Parser {
 			Stmt(out stmt);
 			stmtBlock.Add(stmt); 
 		}
+=======
+		v = new VarDeclNode(typ, t.val, null); 
+		Expect(18);
+		Expr(out ExprNode e1);
+		Expect(8);
+		Expect(13);
+		Stmts(ref b);
+		f = new ForeachNode(v, e1, b); 
+		Expect(14);
+>>>>>>> jonas
 		tab = tab.CloseScope(); 
 		Expect(14);
 		f = new ForeachNode(itrVar, collection, stmtBlock); 
 	}
 
 	void StmtIf(out StmtNode i) {
+<<<<<<< HEAD
 		i = null; ExprNode condition = null; BlockNode stmtBlock; 
 		Expect(19);
 		Expect(7);
@@ -505,84 +568,6 @@ public class Parser {
 			Expect(14);
 			latestNode.SetElse(new IfNode(null, stmtBlock)); 
 =======
-		} else if (la.kind == 22) {
-			Get();
-			Expr(out ExprNode expr);
-			stmtNode = new ReturnNode(expr); 
-		} else if (la.kind == 23) {
-			Get();
-			stmtNode = new BreakNode(); 
-		} else if (la.kind == 24) {
-			Get();
-			stmtNode = new ContinueNode(); 
-		} else SynErr(65);
-	}
-
-	void StrucStmt(out StmtNode s) {
-		s = null; 
-		if (la.kind == 15) {
-			StmtWhile(out s);
-		} else if (la.kind == 16) {
-			StmtFor(out s);
-		} else if (la.kind == 17) {
-			StmtForeach(out s);
-		} else if (la.kind == 19) {
-			StmtIf(out s);
-		} else SynErr(66);
-	}
-
-	void StmtWhile(out StmtNode w) {
-		w = null; Block b = new Block(); 
-		Expect(15);
-		Expect(7);
-		Expr(out ExprNode e);
-		tab = tab.OpenScope(); 
-		Expect(8);
-		Expect(13);
-		Stmts(ref b);
-		w = new WhileNode(e, b); 
-		Expect(14);
-		tab = tab.CloseScope(); 
-	}
-
-	void StmtFor(out StmtNode f) {
-		f = null; StmtNode init = null; ExprNode e = null; StmtNode iter = null; Block b = new Block(); tab = tab.OpenScope(); 
-		Expect(16);
-		Expect(7);
-		Stmt(out StmtNode s1);
-		init = s1; 
-		Expect(10);
-		Expr(out ExprNode e1);
-		e = e1;  
-		Expect(10);
-		Stmt(out StmtNode s2);
-		iter = s2; 
-		Expect(8);
-		Expect(13);
-		Stmts(ref b);
-		f = new ForNode(init, e, iter, b); 
-		Expect(14);
-		tab = tab.CloseScope(); 
-	}
-
-	void StmtForeach(out StmtNode f) {
-		f = null; Block b = new Block(); VarDeclNode v = null; tab = tab.OpenScope(); 
-		Expect(17);
-		Expect(7);
-		Type(out BaseType typ);
-		Expect(1);
-		v = new VarDeclNode(typ, t.val, null); 
-		Expect(18);
-		Expr(out ExprNode e1);
-		Expect(8);
-		Expect(13);
-		Stmts(ref b);
-		f = new ForeachNode(v, e1, b); 
-		Expect(14);
-		tab = tab.CloseScope(); 
-	}
-
-	void StmtIf(out StmtNode i) {
 		i = null; ExprNode e = null; Block b = new Block(); IfNode j = null; IfNode k = null; 
 		Expect(19);
 		Expect(7);
@@ -613,7 +598,6 @@ public class Parser {
 			Expect(14);
 >>>>>>> jonas
 		}
-		tab = tab.CloseScope(); 
 	}
 
 	void Expr(out ExprNode e) {
@@ -756,7 +740,6 @@ public class Parser {
 		vertexDecl = null; VarNode varNode = null; ExprNode expr = null; 
 		Expect(7);
 		Expect(1);
-<<<<<<< HEAD
 		vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new VertexType(), var)); 
 		while (WeakSeparator(8,18,5) ) {
 			Identifier(out varNode);
@@ -764,11 +747,6 @@ public class Parser {
 			vertexDecl.AddAttr(new AssignNode(varNode, expr)); 
 		}
 		Expect(9);
-=======
-		v = new VertexDeclNode(new VertexType(), t.val); obj = tab.NewObj(t.val, new VertexType(), var); 
-		VEParams(v);
-		Expect(8);
->>>>>>> jonas
 	}
 
 	void Args(out CollecConst collec) {
@@ -783,41 +761,6 @@ public class Parser {
 		}
 	}
 
-<<<<<<< HEAD
-=======
-	void VEParams(VEDeclNode ve) {
-		while (WeakSeparator(10,15,7) ) {
-			Identifier(out VarNode varNode);
-			Assign(out ExprNode expr);
-			ve.AddAttr(new AssignNode(varNode, expr)); 
-		}
-	}
-
-	void Identifier(out VarNode varNode) {
-		varNode = null; 
-		Expect(1);
-		varNode = new VarNode(t.val); 
-	}
-
-	void EdgeDecl(IdentNode left, int op, out EdgeDeclNode edge) {
-		edge = null; 
-		Expect(7);
-		Identifier(out VarNode right);
-		edge = new EdgeDeclNode(left, right, op); 
-		VEParams(edge);
-		Expect(8);
-	}
-
-	void EdgeDecls(IdentNode left, int op, ref Block b) {
-		EdgeDecl(left, op, out EdgeDeclNode e1);
-		b.Add(e1); 
-		while (WeakSeparator(10,12,13) ) {
-			EdgeDecl(left, op, out EdgeDeclNode e2);
-			b.Add(e2); 
-		}
-	}
-
->>>>>>> jonas
 	void ExprOR(out ExprNode e) {
 		e = null; int op = 0; 
 		ExprAnd(out ExprNode e1);
@@ -1281,6 +1224,6 @@ public class FatalError: Exception {
 	public FatalError(string m): base(m) {}
 }
 
-class BaseTypeList : List<BaseType>()
+class BaseTypeList : List<BaseType>
 { }
 }
