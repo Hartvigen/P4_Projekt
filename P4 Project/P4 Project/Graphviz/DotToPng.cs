@@ -8,22 +8,10 @@ namespace P4_Project.Graphviz
 {
     public abstract class DotToPng
     {
-        public static bool createPNGFile()
-        {
-            String dotExample = "digraph{one -> two; two -> three; three -> four; four -> one;}";
-            byte[] output = setup().GenerateGraph(dotExample, Enums.GraphReturnType.Png);
-            File.WriteAllBytes("testgraph.png", output);
-            return true;
-        }
+        public const string defaultFilePath = "defualt.png";
+        public const string defaultDotCode = "digraph{one -> two; two -> three; three -> four; four -> one;}";
 
-        public static bool createPNGFile(string DOT)
-        {
-            byte[] output = setup().GenerateGraph(DOT, Enums.GraphReturnType.Png);
-            File.WriteAllBytes("graph.png", output);
-            return true;
-        }
-
-        public static bool createPNGFile(string DOT, string fileName)
+        public static bool createPNGFile(string DOT = defaultDotCode, string fileName = defaultFilePath)
         {
             byte[] output = setup().GenerateGraph(DOT, Enums.GraphReturnType.Png);
             File.WriteAllBytes(fileName, output);
@@ -35,7 +23,9 @@ namespace P4_Project.Graphviz
             return new GraphGeneration(
                 new GetStartProcessQuery(),
                 new GetProcessStartInfoQuery(),
-                new RegisterLayoutPluginCommand(new GetProcessStartInfoQuery(), new GetStartProcessQuery())
+                new RegisterLayoutPluginCommand(
+                    new GetProcessStartInfoQuery(), 
+                    new GetStartProcessQuery())
                 );
         }
     }

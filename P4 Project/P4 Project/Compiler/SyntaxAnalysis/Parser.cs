@@ -1085,4 +1085,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
     {
         public FatalError(string m) : base(m) { }
     }
+
+    class BaseTypeList : List<BaseType>
+    { }
 }

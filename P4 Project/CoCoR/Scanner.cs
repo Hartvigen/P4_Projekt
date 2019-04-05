@@ -372,9 +372,15 @@ public class Scanner {
 			case "if": t.kind = 19; break;
 			case "elseif": t.kind = 20; break;
 			case "else": t.kind = 21; break;
+<<<<<<< HEAD
 			case "return": t.kind = 26; break;
 			case "break": t.kind = 27; break;
 			case "continue": t.kind = 28; break;
+=======
+			case "return": t.kind = 22; break;
+			case "break": t.kind = 23; break;
+			case "continue": t.kind = 24; break;
+>>>>>>> jonas
 			case "true": t.kind = 44; break;
 			case "false": t.kind = 45; break;
 			case "list": t.kind = 46; break;
@@ -460,6 +466,7 @@ public class Scanner {
 			case 15:
 				{t.kind = 14; break;}
 			case 16:
+<<<<<<< HEAD
 				{t.kind = 22; break;}
 			case 17:
 				{t.kind = 23; break;}
@@ -467,6 +474,15 @@ public class Scanner {
 				{t.kind = 24; break;}
 			case 19:
 				{t.kind = 25; break;}
+=======
+				{t.kind = 25; break;}
+			case 17:
+				{t.kind = 27; break;}
+			case 18:
+				{t.kind = 28; break;}
+			case 19:
+				{t.kind = 29; break;}
+>>>>>>> jonas
 			case 20:
 				if (ch == '|') {AddCh(); goto case 21;}
 				else {goto case 0;}
@@ -494,19 +510,33 @@ public class Scanner {
 			case 31:
 				{t.kind = 42; break;}
 			case 32:
+<<<<<<< HEAD
+=======
+				recEnd = pos; recKind = 26;
+				if (ch == '=') {AddCh(); goto case 24;}
+				else {t.kind = 26; break;}
+			case 33:
+>>>>>>> jonas
 				recEnd = pos; recKind = 34;
 				if (ch == '-') {AddCh(); goto case 17;}
 				else if (ch == '=') {AddCh(); goto case 26;}
 				else {t.kind = 34; break;}
+<<<<<<< HEAD
 			case 33:
+=======
+			case 34:
+>>>>>>> jonas
 				recEnd = pos; recKind = 38;
 				if (ch == '-') {AddCh(); goto case 18;}
 				else if (ch == '>') {AddCh(); goto case 19;}
 				else {t.kind = 38; break;}
+<<<<<<< HEAD
 			case 34:
 				recEnd = pos; recKind = 29;
 				if (ch == '=') {AddCh(); goto case 24;}
 				else {t.kind = 29; break;}
+=======
+>>>>>>> jonas
 			case 35:
 				recEnd = pos; recKind = 43;
 				if (ch == '=') {AddCh(); goto case 25;}
