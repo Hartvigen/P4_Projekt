@@ -11,8 +11,6 @@ namespace P4_Project.Visitors
     {
         //Identifier
         public abstract void Visit(CallNode node);
-        public abstract void Visit(IdentNode node);
-        public abstract void Visit(MemberNode node);
         public abstract void Visit(VarNode node);
 
         //Values

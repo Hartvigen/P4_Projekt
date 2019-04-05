@@ -43,7 +43,7 @@ IGNORE cr + lf + tab                            /* These characters are ignored 
 /*------------------------------------------------------------------------*/
 /* The rest of the file contains the grammar for MAGIA.  */
 PRODUCTIONS
-MAGIA =                                         (. mainNode = null; Block mainBlock = new Block(); .)
+MAGIA =                                         (. mainNode = null; BlockNode mainBlock = new BlockNode(); .)
     { SYNC Head<out HeadNode head>              (. mainBlock.Add(head);             .)
     }
     { SYNC Stmt<out StmtNode stmt>              (. mainBlock.Add(stmt);             .)
@@ -69,29 +69,30 @@ Head<out HeadNode head> =                       (. head = null; VarDeclNode attr
 
 
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =           (. funcNode = null; string funcName = ""; BaseType returnType = null; FunctionType protocol = null; .)
-    "func" (Type<out returnType> | none) IDENT  (. funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); .)
-    WEAK '('                                    (. tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); .)
+FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string funcName = ""; BaseType returnType = null; FunctionType protocol = null; .)
+    "func" (Type<out returnType> | "none") IDENT    (. funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); .)
+    WEAK '('                                        (. tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); .)
         [ IF(la.val != ")" && la.val != "{") 
-          VarDecl<out paramDecl>                (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
-          { WEAK ',' VarDecl<out paramDecl>     (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
+          VarDecl<out paramDecl>                    (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
+          { WEAK ',' VarDecl<out paramDecl>         (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
           }
-        ]                                       (. protocol = new FunctionType(returnType, parameterTypes); .)
+        ]                                           (. protocol = new FunctionType(returnType, parameterTypes); .)
     WEAK ')'
-    WEAK '{'                                    (. StmtNode stmt = null; .)
-        { SYNC Stmt<out stmt>                   (. stmtBlock.Add(stmt); .)
+    WEAK '{'                                        (. StmtNode stmt = null; .)
+        { SYNC Stmt<out stmt>                       (. stmtBlock.Add(stmt); .)
         }
-    WEAK '}'                                    (. SymbolTable funcScope = tab; tab = tab.CloseScope(); 
-                                                   funcObj = tab.NewObj(funcName, protocol, func, funcScope); 
-                                                   funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
-                                                .)
+    WEAK '}'                                        (. SymbolTable funcScope = tab; tab = tab.CloseScope(); 
+                                                       Obj funcObj = tab.NewObj(funcName, protocol, func, funcScope); 
+                                                       funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
+                                                    .)
 .
 
 
 /*------------------------------------------------------------------------*/
-Stmt<out StmtNode stmt> =
+Stmt<out StmtNode stmt> =   (. stmt = null; .)
     ( StructStmt<out stmt>
     | SimpleStmt<out stmt>
+    | KeywordStmt<out stmt>
     | FullDecl<out stmt>
     )
 .
@@ -119,28 +120,30 @@ StmtWhile<out StmtNode w> =     (. w = null; BlockNode stmtBlock = new BlockNode
 .
 
 /*------------------------------------------------------------------------*/
-StmtFor<out StmtNode f> =           (. f = null; BlockNode stmtBlock = new BlockNode(); StmtNode stmt = null; .)
-    "for"                           (. StmtNode init = null; ExprNode cond = null; StmtNode iter = null; .)
+StmtFor<out StmtNode f> =               (. f = null; BlockNode stmtBlock = new BlockNode(); StmtNode stmt = null; .)
+    "for"                               (. StmtNode init = null; ExprNode cond = null; StmtNode iter = null; .)
     '(' 
-        Stmt<out init> WEAK ','
+        ( SimpleStmt<out init>
+        | VarDecl<out VarDeclNode vert> (. init = vert; .)
+        ) WEAK ','
         Expr<out cond> WEAK ','
         Stmt<out iter>
     ')' 
-    '{'                             (. tab = tab.OpenScope(); .)
-        { SYNC Stmt<out stmt>       (. stmtBlock.Add(stmt); .)
-        }                           (. tab = tab.CloseScope(); .)
-    '}'                             (. f = new ForNode(init, cond, iter, stmtBlock); .)
+    '{'                                 (. tab = tab.OpenScope(); .)
+        { SYNC Stmt<out stmt>           (. stmtBlock.Add(stmt); .)
+        }                               (. tab = tab.CloseScope(); .)
+    '}'                                 (. f = new ForNode(init, cond, iter, stmtBlock); .)
 .
 
 /*------------------------------------------------------------------------*/
 StmtForeach<out StmtNode f> =           (. f = null; StmtNode stmt = null; .)
     "foreach"                           (. VarDeclNode itrVar = null; BlockNode stmtBlock = new BlockNode(); .)
-    '(' 
-        Type<out BaseType type> IDENT   (. itrVar = new VarDeclNode(type, t.val, null); .)
+    '('                                 (. tab = tab.OpenScope(); .)
+        Type<out BaseType type> IDENT   (. itrVar = new VarDeclNode(tab.NewObj(t.val, type, var), null); .)
         "in" 
         Expr<out ExprNode collection> 
     ')' 
-    '{'                                 (. tab = tab.OpenScope(); .)
+    '{'
         { SYNC Stmt<out stmt>           (. stmtBlock.Add(stmt); .)
         }                               (. tab = tab.CloseScope(); .)
     '}'                                 (. f = new ForeachNode(itrVar, collection, stmtBlock); .)
@@ -163,7 +166,7 @@ StmtIf<out StmtNode i> =            (. i = null; ExprNode condition = null; Bloc
         '}'                         (. latestNode.SetElse(new IfNode(condition, stmtBlock)); latestNode = latestNode.ElseNode; .)
     } 
     [
-        "else" '{'                  (. tab = tab.OpenScope(); stmtBlock = new Block(); .)
+        "else" '{'                  (. tab = tab.OpenScope(); stmtBlock = new BlockNode(); .)
             { SYNC Stmt<out stmt>   (. stmtBlock.Add(stmt); .)
             }                       (. tab = tab.CloseScope(); .)
         '}'                         (. latestNode.SetElse(new IfNode(null, stmtBlock)); .)
@@ -172,41 +175,32 @@ StmtIf<out StmtNode i> =            (. i = null; ExprNode condition = null; Bloc
 
 
 /*------------------------------------------------------------------------*/
-SimpleStmt<out StmtNode stmt> =             (. stmt = null; .)
-    ( 
-        CallOrID<out IdentNode i>
-        { Member<i, out MemberNode member>  (. i = member; .)
-        }                                   (. stmt = new LoneCallNode(i); .)
-        [ Assign<out ExprNode expr>         (. stmt = new AssignNode(i, expr); .)
-        | EdgeOneOrMore<i, out stmt>
-        ]            
-    | 
-        "return" Expr<out ExprNode expr>            (. stmt = new ReturnNode(expr); .)
-    |
-        "break"                                     (. stmt = new BreakNode(); .)
-    |
-        "continue"                                  (. stmt = new ContinueNode(); .)
-    )
+SimpleStmt<out StmtNode stmt> =         (. stmt = null; .)
+    CallOrID<out IdentNode i>
+    { Member<i, out IdentNode target>   (. i = target; .)
+    }                                   (. stmt = new LoneCallNode(i); .)
+    [ Assign<out ExprNode expr>         (. stmt = new AssignNode(i, expr); .)
+    | EdgeOneOrMore<i, out stmt>
+    ]
 .
 
 /*------------------------------------------------------------------------*/
-Member<ExprNode source, out MemberNode mem> =       (. mem = null; .)
-    WEAK '.' CallOrID<out IdentNode i>              (. mem = new MemberNode(source, i); .)
+Member<ExprNode source, out IdentNode i> =  (. i = null; .)
+    WEAK '.' CallOrID<out i>                (. i.Source = source; .)
 .
 
 /*------------------------------------------------------------------------*/
 EdgeOneOrMore<IdentNode start, out StmtNode stmt> = (. stmt = null; EdgeCreateNode edge; .)
-    EdgeOpr<out int op>
+    EdgeOpr<out int op>                             (. stmt = edge = new EdgeCreateNode(start, op); .)
     ( 
-        Identifier<out VarNode end>                 (. stmt = new EdgeCreatrNode(start, end, op); .)
+        Identifier<out VarNode end>                 (. edge.AddRightSide(end, new List<AssignNode>()); .)
     | 
-        EdgeCreate<left, op, out edge>              (. stmt = edge; .)
+        EdgeCreate<edge>
     | 
-    '{'                                             (. MultiDecl multiDecl = new MultiDecl(); .)
-        EdgeCreate<left, op, out edge>              (. multiDecl.Add(edge); .)
-        { WEAK ',' EdgeCreate<left, op, out edge>   (. multiDecl.AddDecl(vertexDecl); .)
-        }                                           (. stmt = multiDecl; .)
-    '}'
+      '{'
+        EdgeCreate<edge> 
+        { WEAK ',' EdgeCreate<edge> }
+      '}'
     )
 .
 
@@ -219,13 +213,22 @@ EdgeOpr<out int op> =   (. op = 0;                  .)
 .
 
 /*------------------------------------------------------------------------*/
-EdgeCreate<IdentNode left, int op, out EdgeCreateNode edge> = (. edge = null; VarNode varNode = null; ExprNode expr = null; .)
+EdgeCreate<EdgeCreateNode edge> =           (. VarNode varNode = null; ExprNode expr = null; List<AssignNode> attributes = new List<AssignNode>(); .)
     '(' 
-        Identifier<out VarNode right>                       (. edge = new EdgeCreateNode(left, right, op); .)
+        Identifier<out VarNode right>
         { WEAK ',' Identifier<out varNode>
-          Assign<out expr>                                  (. edge.AddAttr(new AssignNode(varNode, expr)); .)
-        }
+          Assign<out expr>                  (. attributes.Add(new AssignNode(varNode, expr)); .)
+        }                                   (. edge.AddRightSide(right, attributes); .)
     ')'
+.
+
+
+/*------------------------------------------------------------------------*/
+KeywordStmt<out StmtNode stmt> =            (. stmt = null; .)
+    ( "return" Expr<out ExprNode expr>      (. stmt = new ReturnNode(expr); .)
+    | "break"                               (. stmt = new BreakNode(); .)
+    | "continue"                            (. stmt = new ContinueNode(); .)
+    )
 .
 
 
@@ -339,19 +342,18 @@ ExprNot<out ExprNode e>             (. e = null; bool b = false;.)
     .
 
 /*------------------------------------------------------------------------*/
-Factor<out ExprNode e>                      (. e = null; .)
+Factor<out ExprNode e>                  (. e = null; .)
     =
     Const<out e>
     | 
     (
-        '(' 
-            Expr<out e> 
-        ')' 
-        | 
-        CallOrID<out IdentNode ident>       (. e = ident; .)
+      '(' 
+        Expr<out e> 
+      ')' 
+      | 
+      CallOrID<out IdentNode ident>     (. e = ident; .)
     ) 
-    {
-        Member<e, out MemberNode member>    (. e = member; .)
+    { Member<e, out IdentNode target>   (. e = target; .)
     }
     .        
 
@@ -361,7 +363,7 @@ CallOrID<out IdentNode i> =                 (. i = null; .)
     Identifier<out VarNode varNode>         (. i = varNode; .)
     [
         '(' 
-            Args<out CollecConst collec>    (. i = new CallNode(i.identifier, collec); .)
+            Args<out CollecConst collec>    (. i = new CallNode(i.Identifier, collec); .)
         ')'
     ].
 

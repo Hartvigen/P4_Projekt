@@ -10,7 +10,9 @@ namespace P4_Project.AST.Stmts.Decls
 
 
         public MultiDecl()
-        { }
+        {
+            Decls = new List<DeclNode>();
+        }
 
 
         public override void Accept(Visitor vi)

@@ -232,15 +232,15 @@ public class Scanner {
 		start[34] = 5; 
 		start[91] = 9; 
 		start[40] = 10; 
-		start[41] = 11; 
-		start[93] = 12; 
-		start[44] = 13; 
+		start[44] = 11; 
+		start[41] = 12; 
+		start[93] = 13; 
 		start[123] = 14; 
 		start[125] = 15; 
 		start[46] = 16; 
-		start[61] = 32; 
-		start[60] = 33; 
-		start[45] = 34; 
+		start[60] = 32; 
+		start[45] = 33; 
+		start[61] = 34; 
 		start[124] = 20; 
 		start[38] = 22; 
 		start[33] = 35; 
@@ -364,19 +364,19 @@ public class Scanner {
 			case "vertex": t.kind = 5; break;
 			case "edge": t.kind = 6; break;
 			case "func": t.kind = 11; break;
-			case "while": t.kind = 14; break;
-			case "for": t.kind = 15; break;
-			case "foreach": t.kind = 16; break;
-			case "in": t.kind = 17; break;
-			case "if": t.kind = 18; break;
-			case "elseif": t.kind = 19; break;
-			case "else": t.kind = 20; break;
-			case "return": t.kind = 21; break;
-			case "break": t.kind = 22; break;
-			case "continue": t.kind = 23; break;
-			case "true": t.kind = 43; break;
-			case "false": t.kind = 44; break;
-			case "none": t.kind = 45; break;
+			case "none": t.kind = 12; break;
+			case "while": t.kind = 15; break;
+			case "for": t.kind = 16; break;
+			case "foreach": t.kind = 17; break;
+			case "in": t.kind = 18; break;
+			case "if": t.kind = 19; break;
+			case "elseif": t.kind = 20; break;
+			case "else": t.kind = 21; break;
+			case "return": t.kind = 26; break;
+			case "break": t.kind = 27; break;
+			case "continue": t.kind = 28; break;
+			case "true": t.kind = 44; break;
+			case "false": t.kind = 45; break;
 			case "list": t.kind = 46; break;
 			case "set": t.kind = 47; break;
 			case "queue": t.kind = 48; break;
@@ -456,65 +456,65 @@ public class Scanner {
 			case 13:
 				{t.kind = 10; break;}
 			case 14:
-				{t.kind = 12; break;}
-			case 15:
 				{t.kind = 13; break;}
+			case 15:
+				{t.kind = 14; break;}
 			case 16:
-				{t.kind = 24; break;}
+				{t.kind = 22; break;}
 			case 17:
-				{t.kind = 26; break;}
+				{t.kind = 23; break;}
 			case 18:
-				{t.kind = 27; break;}
+				{t.kind = 24; break;}
 			case 19:
-				{t.kind = 28; break;}
+				{t.kind = 25; break;}
 			case 20:
 				if (ch == '|') {AddCh(); goto case 21;}
 				else {goto case 0;}
 			case 21:
-				{t.kind = 29; break;}
+				{t.kind = 30; break;}
 			case 22:
 				if (ch == '&') {AddCh(); goto case 23;}
 				else {goto case 0;}
 			case 23:
-				{t.kind = 30; break;}
-			case 24:
 				{t.kind = 31; break;}
-			case 25:
+			case 24:
 				{t.kind = 32; break;}
+			case 25:
+				{t.kind = 33; break;}
 			case 26:
-				{t.kind = 35; break;}
-			case 27:
 				{t.kind = 36; break;}
+			case 27:
+				{t.kind = 37; break;}
 			case 28:
-				{t.kind = 38; break;}
-			case 29:
 				{t.kind = 39; break;}
-			case 30:
+			case 29:
 				{t.kind = 40; break;}
-			case 31:
+			case 30:
 				{t.kind = 41; break;}
+			case 31:
+				{t.kind = 42; break;}
 			case 32:
-				recEnd = pos; recKind = 25;
-				if (ch == '=') {AddCh(); goto case 24;}
-				else {t.kind = 25; break;}
-			case 33:
-				recEnd = pos; recKind = 33;
+				recEnd = pos; recKind = 34;
 				if (ch == '-') {AddCh(); goto case 17;}
 				else if (ch == '=') {AddCh(); goto case 26;}
-				else {t.kind = 33; break;}
-			case 34:
-				recEnd = pos; recKind = 37;
+				else {t.kind = 34; break;}
+			case 33:
+				recEnd = pos; recKind = 38;
 				if (ch == '-') {AddCh(); goto case 18;}
 				else if (ch == '>') {AddCh(); goto case 19;}
-				else {t.kind = 37; break;}
+				else {t.kind = 38; break;}
+			case 34:
+				recEnd = pos; recKind = 29;
+				if (ch == '=') {AddCh(); goto case 24;}
+				else {t.kind = 29; break;}
 			case 35:
-				recEnd = pos; recKind = 42;
+				recEnd = pos; recKind = 43;
 				if (ch == '=') {AddCh(); goto case 25;}
-				else {t.kind = 42; break;}
+				else {t.kind = 43; break;}
 			case 36:
-				recEnd = pos; recKind = 34;
+				recEnd = pos; recKind = 35;
 				if (ch == '=') {AddCh(); goto case 27;}
-				else {t.kind = 34; break;}
+				else {t.kind = 35; break;}
 
 		}
 		t.val = new String(tval, 0, tlen);

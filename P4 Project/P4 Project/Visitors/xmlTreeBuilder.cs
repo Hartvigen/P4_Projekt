@@ -28,20 +28,6 @@ namespace P4_Project.Visitors
             ast.AppendLine($"</{node.GetType().Name}>");
         }
 
-        public override void Visit(IdentNode node)
-        {
-            ast.AppendLine($"<{node.GetType().Name}>");
-            ast.AppendLine($"</{node.GetType().Name}>");
-        }
-
-        public override void Visit(MemberNode node)
-        {
-            ast.AppendLine($"<{node.GetType().Name}>");
-            node.Source.Accept(this);
-            node.MemberIdent.Accept(this);
-            ast.AppendLine($"</{node.GetType().Name}>");
-        }
-
         public override void Visit(VarNode node)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
@@ -95,11 +81,11 @@ namespace P4_Project.Visitors
 
         public override void Visit(EdgeCreateNode node)
         {
-            ast.AppendLine($"<{node.GetType().Name}>");
-            node.Start.Accept(this);
-            node.End.Accept(this);
-            node.Attributes.Accept(this);
-            ast.AppendLine($"</{node.GetType().Name}>");
+            //ast.AppendLine($"<{node.GetType().Name}>");
+            //node.Start.Accept(this);
+            //node.End.Accept(this);
+            //node.Attributes.Accept(this);
+            //ast.AppendLine($"</{node.GetType().Name}>");
         }
 
         public override void Visit(FuncDeclNode node)

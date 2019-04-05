@@ -13,18 +13,15 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class EdgeCreateNode : StmtNode
     {
-        public BlockNode Attributes { get; private set; } = new BlockNode();
-
         public IdentNode Start { get; private set; }
-        public IdentNode End { get; private set; }
-
         public int Operator { get; private set; }
 
+        public List<Tuple<IdentNode, List<AssignNode>>> RightSides { get; private set; } = new List<Tuple<IdentNode, List<AssignNode>>>();
+        
 
-        public EdgeCreateNode(IdentNode start, IdentNode end, int @operator)
+        public EdgeCreateNode(IdentNode start, int @operator)
         {
             Start = start;
-            End = end;
             Operator = @operator;
         }
 
@@ -32,6 +29,13 @@ namespace P4_Project.AST.Stmts.Decls
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
+        }
+
+        public void AddRightSide(IdentNode rightVertex, List<AssignNode> attributes)
+        {
+            RightSides.Add(
+                new Tuple<IdentNode, List<AssignNode>>(rightVertex, attributes)
+            );
         }
 
         public string GetNameOfOperator()
@@ -42,11 +46,6 @@ namespace P4_Project.AST.Stmts.Decls
         public string GetCodeofOperator()
         {
             return Operators.getCodeFromInt(Operator);
-        }
-
-        public void AddAttr(AssignNode assign)
-        {
-            Attributes.Add(assign);
         }
     }
 }

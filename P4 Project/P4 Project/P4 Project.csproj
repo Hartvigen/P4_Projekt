@@ -48,7 +48,6 @@
     <Compile Include="AST\Expressions\BinExprNode.cs" />
     <Compile Include="AST\Expressions\Identifier\CallNode.cs" />
     <Compile Include="AST\Expressions\Identifier\VarNode.cs" />
-    <Compile Include="AST\Expressions\Identifier\MemberNode.cs" />
     <Compile Include="AST\Expressions\Values\BoolConst.cs" />
     <Compile Include="AST\Expressions\Values\CollecConst.cs" />
     <Compile Include="AST\Expressions\Values\NoneConst.cs" />

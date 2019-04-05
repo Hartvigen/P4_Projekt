@@ -29,17 +29,6 @@ namespace P4_Project.Visitors
             node.Parameters.Accept(this);
         }
 
-        public override void Visit(IdentNode node)
-        {
-            
-        }
-
-        public override void Visit(MemberNode node)
-        {    
-            node.Source.Accept(this);
-            node.MemberIdent.Accept(this);   
-        }
-
         public override void Visit(VarNode node)
         {
 
@@ -83,9 +72,9 @@ namespace P4_Project.Visitors
 
         public override void Visit(EdgeCreateNode node)
         {
-            node.Start.Accept(this);
-            node.End.Accept(this);
-            node.Attributes.Accept(this);  
+            //node.Start.Accept(this);
+            //node.End.Accept(this);
+            //node.Attributes.Accept(this);  
         }
 
         public override void Visit(FuncDeclNode node)

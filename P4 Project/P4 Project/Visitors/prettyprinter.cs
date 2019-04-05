@@ -32,23 +32,6 @@ namespace P4_Project.Visitors
             str.Append(")");
         }
 
-        public override void Visit(IdentNode node)
-        {
-            str.Append(node.Identifier);
-            IndentAndNewline();
-        }
-
-        public override void Visit(MemberNode node)
-        {
-            if (node.InParentheses)
-                str.Append("(");
-            node.Source.Accept(this);
-            str.Append(".");
-            node.MemberIdent.Accept(this);
-            if (node.InParentheses)
-                str.Append(")");
-        }
-
         public override void Visit(VarNode node)
         {
             str.Append(node.Identifier);
@@ -109,30 +92,30 @@ namespace P4_Project.Visitors
 
         public override void Visit(EdgeCreateNode node)
         {
-            node.Start.Accept(this);
-            str.Append(node.GetCodeofOperator());
-            if (node.Attributes.statements.Count != 0)
-                str.Append("(");
-            node.End.Accept(this);
-            if (node.Attributes.statements.Count != 0)
-                str.Append(", ");
-            foreach (Node n in node.Attributes.statements)
-            {
-                n.Accept(this);
-                RemoveIndentAndNewline();
-                str.Append(", ");
-            }
-            if(node.Attributes.statements.Count > 0)
-            RemoveLastCommaAndSpace();
-            if (node.Attributes.statements.Count != 0)
-                str.Append(")");
-            IndentAndNewline();
+            //node.Start.Accept(this);
+            //str.Append(node.GetCodeofOperator());
+            //if (node.Attributes.statements.Count != 0)
+            //    str.Append("(");
+            //node.End.Accept(this);
+            //if (node.Attributes.statements.Count != 0)
+            //    str.Append(", ");
+            //foreach (Node n in node.Attributes.statements)
+            //{
+            //    n.Accept(this);
+            //    RemoveIndentAndNewline();
+            //    str.Append(", ");
+            //}
+            //if(node.Attributes.statements.Count > 0)
+            //RemoveLastCommaAndSpace();
+            //if (node.Attributes.statements.Count != 0)
+            //    str.Append(")");
+            //IndentAndNewline();
         }
 
         public override void Visit(FuncDeclNode node)
         {
             IndentAndNewline();
-            str.Append("func " + node.symbolName + "(");
+            str.Append("func " + node.SymbolObject.Name + "(");
             if (node.Parameters.statements.Count > 0)
                 foreach (Node n in node.Parameters.statements)
                 {
@@ -160,7 +143,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(VarDeclNode node)
         {
-            str.Append(node.GetVarType() + " " + node.symbolName);
+            str.Append(node.GetVarType() + " " + node.SymbolObject.Name);
             if (node.DefaultValue != null)
             {
                 str.Append(" = ");
@@ -176,7 +159,7 @@ namespace P4_Project.Visitors
         public override void Visit(VertexDeclNode node)
         {
             str.Append("vertex(");
-            str.Append(node.symbolName);
+            str.Append(node.SymbolObject.Name);
             if (node.Attributes.statements.Count > 0)
                 str.Append(", ");
             foreach (Node n in node.Attributes.statements)
