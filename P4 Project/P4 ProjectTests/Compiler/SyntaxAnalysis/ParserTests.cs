@@ -42,16 +42,16 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
             for (int i = collectionTypes.Count - 1; i >= 0; i--)
             {
-                headerWithAllTypesVertex += singleTypes[i] + " " + validIdentifier + ", ";
+                headerWithAllTypesVertex += singleTypes[i] + " " + validIdentifier + i + "vertex" + ", ";
                 for (int j = singleTypes.Count - 1; j >= 0; j--)
-                    headerWithAllTypesVertex += (collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + ", ");
+                    headerWithAllTypesVertex += (collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + i + j + "vertex" + ", ");
             }
 
             for (int i = collectionTypes.Count - 1; i >= 0; i--)
             {
-                headerWithAllTypesEdge += singleTypes[i] + " " + validIdentifier + ", ";
+                headerWithAllTypesEdge += singleTypes[i] + " " + validIdentifier + i + "edge" + ", ";
                 for (int j = singleTypes.Count - 1; j >= 0; j--)
-                    headerWithAllTypesEdge += (collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + ", ");
+                    headerWithAllTypesEdge += (collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + i + j + "edge" + ", ");
             }
 
             headerWithAllTypesEdge = headerWithAllTypesEdge.Remove(headerWithAllTypesEdge.LastIndexOf(","));
