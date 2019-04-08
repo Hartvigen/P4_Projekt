@@ -13,15 +13,15 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class EdgeCreateNode : StmtNode
     {
-        public IdentNode Start { get; private set; }
+        public IdentNode LeftSide { get; private set; }
         public int Operator { get; private set; }
 
-        public List<Tuple<IdentNode, List<AssignNode>>> RightSides { get; private set; } = new List<Tuple<IdentNode, List<AssignNode>>>();
+        public List<Tuple<IdentNode, List<AssignNode>>> RightSide { get; private set; } = new List<Tuple<IdentNode, List<AssignNode>>>();
         
 
         public EdgeCreateNode(IdentNode start, int @operator)
         {
-            Start = start;
+            LeftSide = start;
             Operator = @operator;
         }
 
@@ -33,7 +33,7 @@ namespace P4_Project.AST.Stmts.Decls
 
         public void AddRightSide(IdentNode rightVertex, List<AssignNode> attributes)
         {
-            RightSides.Add(
+            RightSide.Add(
                 new Tuple<IdentNode, List<AssignNode>>(rightVertex, attributes)
             );
         }
