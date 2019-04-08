@@ -1,0 +1,5 @@
+ident1 = function1
+
+func function1() ident2 = function2
+func function2() ident3 = function3
+func function3() ident4 = MAGIA

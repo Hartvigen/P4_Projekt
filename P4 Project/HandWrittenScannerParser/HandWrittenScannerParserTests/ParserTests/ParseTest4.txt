@@ -1,0 +1,3 @@
+[24.48]
+ident1 = function
+func function() ident2 = Magia

@@ -1,6 +1,6 @@
 ﻿namespace HandWrittenScannerParser
 {
-    class Token
+    public class Token
     {
         private int kind;
         private string value;
