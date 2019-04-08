@@ -166,5 +166,10 @@ namespace P4_Project.Visitors
         {    
             
         }
+
+        public override void Visit(MultiDecl node)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

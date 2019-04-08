@@ -17,7 +17,7 @@ namespace P4_Project.AST.Stmts.Decls
 
         public override void Accept(Visitor vi)
         {
-            //vi.Visit(this);
+            vi.Visit(this);
         }
 
         public void AddDecl(DeclNode decl)

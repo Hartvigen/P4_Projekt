@@ -9,10 +9,10 @@ graph.vertices()
 graph.vertices().clear()			VEDecls()
 exprs()			manyparams(v156, 10, false, "hello")
 
-func GetVal(number a){
+func number GetVal(number a){
     return 3
 + 4 + a
-} func whileifs() {
+} func none whileifs() {
 				number total = 2
 		  number sum
 		boolean b =			false
@@ -34,7 +34,7 @@ func GetVal(number a){
 								total 
 								+ 
 								GetVal(total)
-				        } elseif (total == 1	0)
+				        } elseif (total == 10)
 
 			
 					    {
@@ -55,12 +55,12 @@ func GetVal(number a){
     
 	{
 
-        total = tota	l + sum		/						i
+        total = total + sum		/						i
     }				
 										 return total
 														}
 
-func tester()
+func none tester()
 {
     number p = 1.5							   list<number>	
 							   nlist = {1, 2, 3, 4, 5}
@@ -70,7 +70,7 @@ func tester()
     }
 }
 
-func VEDecls()
+func none VEDecls()
 {
     vertex(v1)
     vertex(v2, distance					= 4, parent = v1, bval = true)
@@ -96,10 +96,10 @@ func VEDecls()
 	(v5, t = "the world")
 				graph.ClearEdges()
     graph.ClearVertices()
-    vertex(v1)
-    vertex(v2, distance = 4, parent = v1, bval = true)
-    v1->v2  graph.ClearAll()  }  func expr() {
-    vertex(v2,    
+    vertex(v1_2)
+    vertex(v2_2, distance = 4, parent = v1, bval = true)
+    v1->v2  graph.ClearAll()  }  func none expr() {
+    vertex(v2_3,    
 	distance = 4,    
 	parent = v1, bval = true)
     boolean b = 5
@@ -112,12 +112,12 @@ func VEDecls()
 	11 * (54 - 6) < -4
 }
 
-func		manyparams(vertex     
+func boolean		manyparams(vertex     
 v1    , 
 number		n,
 
 boolean			mightbetrue, text greeting)
 {		return false
 }
-func hello(text greet)
+func boolean hello(text greet)
 {    return true}
