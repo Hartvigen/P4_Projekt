@@ -42,9 +42,9 @@ namespace P4_Project.AST.Stmts
         public string getName()
         {
             if (type == 1)
-                return "Vertex";
+                return "vertex";
             if (type == 2)
-                return "Edge";
+                return "edge";
 
             throw new Exception("type: " + type + " Is not supported");
         }

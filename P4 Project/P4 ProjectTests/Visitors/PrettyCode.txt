@@ -1,6 +1,7 @@
 ﻿[vertex(number distance = 1, vertex parent = none, boolean bVal = false)]
 [edge(number weight = 1, text t)]
 
+hello("hello")
 vertex(v156)
 tester()
 number x = whileifs()
@@ -10,12 +11,12 @@ VEDecls()
 exprs()
 manyparams(v156, 10, false, "hello")
 
-func GetVal(number a)
+func number GetVal(number a)
 {
     return 3 + 4 + a
 }
 
-func whileifs()
+func none whileifs()
 {
     number total = 2
     number sum
@@ -25,6 +26,14 @@ func whileifs()
         if (total == 1)
         {
             total = total + 1
+            if (total == 1000)
+            {
+                 break 
+            } else
+            {
+                con
+                tinue
+            } 
             if (total == 7)
             {
                 total = total + GetVal(total)
@@ -37,13 +46,16 @@ func whileifs()
             } 
             b = true
         } 
-        total = total - 1
+        tota
+        l = total - 1
     }
     while(total > 0)
     {
         sum = sum + total
     }
-    number i
+    numb
+    er
+    i
     for(i = sum, i > 0, i = i - 1)
     {
         total = total + sum / i
@@ -51,7 +63,7 @@ func whileifs()
     return total
 }
 
-func tester()
+func none tester()
 {
     number p = 1.5
     list<number> nlist = {1, 2, 3, 4, 5}
@@ -61,7 +73,7 @@ func tester()
     }
 }
 
-func VEDecls()
+func none VEDecls()
 {
     vertex(v1)
     vertex(v2, distance = 4, parent = v1, bval = true)
@@ -69,33 +81,38 @@ func VEDecls()
     vertex(v4)
     vertex(v5, parent = v3)
     vertex(v6, distance = 4, parent = v1, bval = true)
-    v1--v2
-    v2--(v3, t = "Hello my lady")
+    v1 -- v2
+    v2 -- (v3, t = "Hello my lady")
     edge e = graph.Edge(v2, v3)
     vertex var = v2
     graph.removeEdge(v1, v2)
     graph.removeEdge(v2, v3)
-    v2->v3
-    v3->v4
-    v3->(v5, weight = 42, t = "The Answer")
-    v1<-v6
-    v2<-v3
-    v2<-(v5, t = "the world")
+    v2 -> v3
+    v3 -> v4
+    v3 -> (v5, weight = 42, t = "The Answer")
+    v1 <- v6
+    v2 <- v3
+    v2 <- (v5, t = "the world")
     graph.ClearEdges()
     graph.ClearVertices()
-    vertex(v1)
-    vertex(v2, distance = 4, parent = v1, bval = true)
-    v1->v2
+    vertex(v1_2)
+    vertex(v2_2, distance = 4, parent = v1, bval = true)
+    v1 -> v2
     graph.ClearAll()
 }
 
-func expr()
+func none expr()
 {
-    vertex(v2, distance = 4, parent = v1, bval = true)
-    boolean b = 5 != 6 && 5 - 8 + 9 * (v2.distance) > -8 + 11 % 3 || 5 == 8
+    vertex(v2_3, distance = 4, parent = v1, bval = true)
+    boolean b = 5 != 6 && 5 - 8 + 9 * v2.distance > -8 + 11 % 3 || 5 == 8 || 11 * 54 - 6 < -4
 }
 
-func manyparams(vertex v1, number n, boolean mightbetrue, text greeting)
+func boolean manyparams(vertex v1, number n, boolean mightbetrue, text greeting)
 {
     return false
+}
+
+func boolean hello(text greet)
+{
+    return true
 }

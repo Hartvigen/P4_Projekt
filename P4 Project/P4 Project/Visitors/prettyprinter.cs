@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -6,6 +7,7 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
+using P4_Project.Types.Functions;
 
 namespace P4_Project.Visitors
 {
@@ -27,6 +29,11 @@ namespace P4_Project.Visitors
         //spaces, indentation, brackets, spaces and so on...
         public override void Visit(CallNode node)
         {
+            if (node.Source != null)
+            {
+                node.Source.Accept(this);
+                str.Append(".");
+            }
             str.Append(node.Identifier + "(");
             node.Parameters.Accept(this);
             str.Append(")");
@@ -34,6 +41,12 @@ namespace P4_Project.Visitors
 
         public override void Visit(VarNode node)
         {
+            if (node.Source != null)
+            {
+                node.Source.Accept(this);
+                str.Append(".");
+            }
+
             str.Append(node.Identifier);
         }
 
@@ -92,30 +105,29 @@ namespace P4_Project.Visitors
 
         public override void Visit(EdgeCreateNode node)
         {
-            //node.Start.Accept(this);
-            //str.Append(node.GetCodeofOperator());
-            //if (node.Attributes.statements.Count != 0)
-            //    str.Append("(");
-            //node.End.Accept(this);
-            //if (node.Attributes.statements.Count != 0)
-            //    str.Append(", ");
-            //foreach (Node n in node.Attributes.statements)
-            //{
-            //    n.Accept(this);
-            //    RemoveIndentAndNewline();
-            //    str.Append(", ");
-            //}
-            //if(node.Attributes.statements.Count > 0)
-            //RemoveLastCommaAndSpace();
-            //if (node.Attributes.statements.Count != 0)
-            //    str.Append(")");
-            //IndentAndNewline();
+            foreach (Tuple<IdentNode, List<AssignNode>> list in node.RightSide)
+            {
+                node.LeftSide.Accept(this);
+                str.Append(" " + node.GetCodeofOperator() + " ");
+                if(list.Item2.Count != 0)
+                str.Append("(");
+                list.Item1.Accept(this);
+                foreach (AssignNode n in list.Item2)
+                {
+                    str.Append(", ");
+                    n.Accept(this);
+                    RemoveIndentAndNewline();
+                }
+                if (list.Item2.Count != 0)
+                    str.Append(")");
+                IndentAndNewline();
+            }            
         }
 
         public override void Visit(FuncDeclNode node)
         {
             IndentAndNewline();
-            str.Append("func " + node.SymbolObject.Name + "(");
+            str.Append("func " + (((FunctionType)node.SymbolObject.Type).ReturnType?.ToString() ?? "none") + " " + node.SymbolObject.Name + "(");
             if (node.Parameters.statements.Count > 0)
                 foreach (Node n in node.Parameters.statements)
                 {
@@ -239,7 +251,7 @@ namespace P4_Project.Visitors
         {
             if (str.Length != 0)
                 RemoveIndentAndNewline();
-            str.Append("[" + node.getName().ToLower() + "(");
+            str.Append("[" + node.getName() + "(");
             foreach (Node n in node.attrDeclBlock.statements)
             {
                 n.Accept(this);
@@ -348,6 +360,11 @@ namespace P4_Project.Visitors
         public void RemoveLastCommaAndSpace()
         {
             str.Remove(str.Length - 2, 2); //Remove the last comma and space.
+        }
+
+        public override void Visit(MultiDecl node)
+        {
+            node.Decls.ForEach(n => n.Accept(this));
         }
     }
 }

@@ -29,6 +29,7 @@ namespace P4_Project.Visitors
         public abstract void Visit(FuncDeclNode node);
         public abstract void Visit(VarDeclNode node);
         public abstract void Visit(VertexDeclNode node);
+        public abstract void Visit(MultiDecl node);
 
         //Stmts
         public abstract void Visit(AssignNode node);
