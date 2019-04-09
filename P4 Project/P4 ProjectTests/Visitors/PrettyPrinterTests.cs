@@ -122,5 +122,23 @@ namespace P4_Project.Visitors.Tests
         {
             Assert.IsTrue(File.ReadAllText(pathToPrettyCode) == Prettify(File.ReadAllText(pathToUglyCode)));
         }
+
+        //This tests the performence of the prettyprinter, it should complete in under 2 second if not there is probably 
+        //something expensive going on depending on the speed of you computer it might be actually be okay.
+        [TestMethod()]
+        public void PrettyPrinterTestFailure05()
+        {
+
+            string program = File.ReadAllText(pathToUglyCode);
+
+            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+
+            for (int i = 2000; i > 0; i--)
+                Prettify(program);
+
+            Int32 elapsed = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds  - unixTimestamp;
+
+            Assert.IsTrue(elapsed < 3);
+        }
     }
 }
