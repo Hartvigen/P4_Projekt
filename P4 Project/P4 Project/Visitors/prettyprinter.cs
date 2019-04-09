@@ -41,6 +41,8 @@ namespace P4_Project.Visitors
 
         public override void Visit(VarNode node)
         {
+            if (node.InParentheses)
+                str.Append("(");
             if (node.Source != null)
             {
                 node.Source.Accept(this);
@@ -48,6 +50,9 @@ namespace P4_Project.Visitors
             }
 
             str.Append(node.Identifier);
+
+            if (node.InParentheses)
+                str.Append(")");
         }
 
         public override void Visit(BoolConst node)
@@ -62,7 +67,7 @@ namespace P4_Project.Visitors
             foreach (Node n in node.Expressions)
             {
                 n.Accept(this);
-                str.Append(", ");
+                CommaAndSpace();
             }
             RemoveLastCommaAndSpace();
         }
@@ -114,7 +119,7 @@ namespace P4_Project.Visitors
                 list.Item1.Accept(this);
                 foreach (AssignNode n in list.Item2)
                 {
-                    str.Append(", ");
+                    CommaAndSpace();
                     n.Accept(this);
                     RemoveIndentAndNewline();
                 }
@@ -128,15 +133,17 @@ namespace P4_Project.Visitors
         {
             IndentAndNewline();
             str.Append("func " + (((FunctionType)node.SymbolObject.Type).ReturnType?.ToString() ?? "none") + " " + node.SymbolObject.Name + "(");
-            if (node.Parameters.statements.Count > 0)
+            if (node.Parameters.statements.Count != 0)
+            {
                 foreach (Node n in node.Parameters.statements)
                 {
                     n.Accept(this);
                     RemoveIndentAndNewline();
-                    str.Append(", ");
+                    CommaAndSpace();
                 }
-            if (node.Parameters.statements.Count > 0)
-                RemoveIndentAndNewline();
+                RemoveLastCommaAndSpace();
+            }
+
             str.Append(")");
             IndentAndNewline();
             str.Append("{");
@@ -172,23 +179,24 @@ namespace P4_Project.Visitors
         {
             str.Append("vertex(");
             str.Append(node.SymbolObject.Name);
-            if (node.Attributes.statements.Count > 0)
-                str.Append(", ");
-            foreach (Node n in node.Attributes.statements)
+            if (node.Attributes.statements.Count != 0)
             {
-                n.Accept(this);
-                RemoveIndentAndNewline();
-                str.Append(", ");
-            }
-            if (node.Attributes.statements.Count > 0)
+                CommaAndSpace();
+                foreach (Node n in node.Attributes.statements)
+                {
+                    n.Accept(this);
+                    RemoveIndentAndNewline();
+                    CommaAndSpace();
+                }
                 RemoveLastCommaAndSpace();
+            }
+                
             str.Append(")");
             IndentAndNewline();
         }
 
         public override void Visit(AssignNode node)
         {
-            str.Append("");
             node.Target.Accept(this);
             str.Append(" = ");
             node.Value.Accept(this);
@@ -229,9 +237,9 @@ namespace P4_Project.Visitors
             str.Append("for(");
             node.Initializer.Accept(this);
             RemoveIndentAndNewline();
-            str.Append(", ");
+            CommaAndSpace();
             node.Condition.Accept(this);
-            str.Append(", ");
+            CommaAndSpace();
             node.Iterator.Accept(this);
             RemoveIndentAndNewline();
             str.Append(")");
@@ -256,7 +264,7 @@ namespace P4_Project.Visitors
             {
                 n.Accept(this);
                 RemoveIndentAndNewline();
-                str.Append(", ");
+                CommaAndSpace();
             }
             RemoveLastCommaAndSpace();
             str.Append(")]");
@@ -271,6 +279,7 @@ namespace P4_Project.Visitors
                 str.Append("if (");
                 node.Condition.Accept(this);
                 str.Append(")");
+                IndentAndNewline();
             }
             IndentAndNewline();
             str.Append("{");
@@ -347,19 +356,23 @@ namespace P4_Project.Visitors
                 str.Append(" ");
         }
 
+        //Will make a comma and space.
+        public void CommaAndSpace()
+        {
+            str.Append(", ");
+        }
+
         //First removes all the indents of the current level and then adds a newline
         //Is acutally just a function that revereses whatever IndentAndNewline function does.
         public void RemoveIndentAndNewline() {
-            for (int i = indentLevel * indentSizeInSpaces; i > 0; i--)
-                str.Remove(str.Length - 1, 1);
-            str.Remove(str.Length - Environment.NewLine.Length, Environment.NewLine.Length); //Remove the newline.
+            str.Length -= indentLevel * indentSizeInSpaces + Environment.NewLine.Length; //Moves the pointer back the appropriate amount.
         }
 
         //Function with the purpose of removing Comma and space,
-        //It actually just removes the last two added chars in the code.
+        //It actually just moves the pointer two places back.
         public void RemoveLastCommaAndSpace()
         {
-            str.Remove(str.Length - 2, 2); //Remove the last comma and space.
+            str.Length -= 2; //Moves the pointer 2 back so the chars are "removed/forgotten"
         }
 
         public override void Visit(MultiDecl node)
