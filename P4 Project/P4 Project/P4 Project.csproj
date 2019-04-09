@@ -188,7 +188,6 @@
     <Content Include="Graphviz\bin\mingle.exe" />
     <Content Include="Graphviz\bin\mm2gv.exe" />
     <Content Include="Graphviz\bin\neato.exe" />
-    <Content Include="Graphviz\bin\New Text Document.txt" />
     <Content Include="Graphviz\bin\nop.exe" />
     <Content Include="Graphviz\bin\osage.exe" />
     <Content Include="Graphviz\bin\patchwork.exe" />
