@@ -123,7 +123,7 @@ namespace P4_Project.Visitors.Tests
             Assert.IsTrue(File.ReadAllText(pathToPrettyCode) == Prettify(File.ReadAllText(pathToUglyCode)));
         }
 
-        //This tests the performence of the prettyprinter, it should complete in under 2 second if not there is probably 
+        //This tests the performence of the prettyprinter, it should complete in the 2000 prettyfyings in under 2 second if not there is probably 
         //something expensive going on depending on the speed of you computer it might be actually be okay.
         [TestMethod()]
         public void PrettyPrinterTestFailure05()
