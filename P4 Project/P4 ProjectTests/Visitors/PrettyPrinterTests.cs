@@ -24,11 +24,10 @@ namespace P4_Project.Visitors.Tests
         static Scanner scannerPretty;
         static string pathToPrettyCode;
 
-        //Generates a header attribute declaration for vertex and edge where all types are being used.
         [ClassInitialize()]
         public static void ClassInit(TestContext context)
         {
-            pathToUglyCode =   "../../../../P4 Project/P4 ProjectTests/Visitors/UglyCode.txt";
+            pathToUglyCode = "../../../../P4 Project/P4 ProjectTests/Visitors/UglyCode.txt";
             pathToPrettyCode = "../../../../P4 Project/P4 ProjectTests/Visitors/PrettyCode.txt";
         }
 
@@ -86,7 +85,7 @@ namespace P4_Project.Visitors.Tests
 
             for (int i = 10; i > 0; i--)
                 program = Prettify(program);
-            
+
             Assert.IsTrue(program == File.ReadAllText(pathToPrettyCode));
         }
 
@@ -115,6 +114,13 @@ namespace P4_Project.Visitors.Tests
         public void PrettyPrinterTestFailure03()
         {
             Assert.IsFalse(File.ReadAllText(pathToUglyCode) == File.ReadAllText(pathToPrettyCode));
+        }
+
+        //The Ugly Code gets pretty after exactly one prettify
+        [TestMethod()]
+        public void PrettyPrinterTestFailure04()
+        {
+            Assert.IsTrue(File.ReadAllText(pathToPrettyCode) == Prettify(File.ReadAllText(pathToUglyCode)));
         }
     }
 }
