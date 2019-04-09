@@ -12,31 +12,34 @@ namespace P4_Project.AST.Expressions
     /// </summary>
     public class BinExprNode : ExprNode
     {
-        public ExprNode left, right;
-        int operatorType;
+        public ExprNode Left { get; private set; }
+        public ExprNode Right { get; private set; }
+        public int OperatorType { get; private set; }
+
 
         public BinExprNode() { }
 
-        public BinExprNode(ExprNode _left, int _operatorType, ExprNode _right)
+        public BinExprNode(ExprNode left, int operatorType, ExprNode right)
         {
-            left = _left;
-            right = _right;
-            operatorType = _operatorType;
+            Left = left;
+            Right = right;
+            OperatorType = operatorType;
         }
+
 
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
         }
 
-        public String getNameOfOperator()
+        public string GetNameOfOperator()
         {
-            return Operators.getNameFromInt(operatorType);
+            return Operators.getNameFromInt(OperatorType);
         }
 
-        public String getCodeofOperator()
+        public string GetCodeofOperator()
         {
-            return Operators.getCodeFromInt(operatorType);
+            return Operators.getCodeFromInt(OperatorType);
         }
     }
 }

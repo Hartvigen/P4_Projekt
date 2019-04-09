@@ -48,7 +48,6 @@
     <Compile Include="AST\Expressions\BinExprNode.cs" />
     <Compile Include="AST\Expressions\Identifier\CallNode.cs" />
     <Compile Include="AST\Expressions\Identifier\VarNode.cs" />
-    <Compile Include="AST\Expressions\Identifier\MemberNode.cs" />
     <Compile Include="AST\Expressions\Values\BoolConst.cs" />
     <Compile Include="AST\Expressions\Values\CollecConst.cs" />
     <Compile Include="AST\Expressions\Values\NoneConst.cs" />
@@ -71,21 +70,14 @@
     <Compile Include="SymbolTable\SymbolTable.cs" />
     <Compile Include="Types.cs" />
     <Compile Include="AST\Stmts\AssignNode.cs" />
-    <Compile Include="AST\Stmts\Block.cs" />
     <Compile Include="AST\Stmts\Decls\DeclNode.cs" />
-    <Compile Include="AST\Stmts\Decls\EdgeDeclNode.cs" />
     <Compile Include="AST\Stmts\Decls\FuncDeclNode.cs" />
     <Compile Include="AST\Stmts\Decls\VarDeclNode.cs" />
-    <Compile Include="AST\Stmts\Decls\VEDeclNode.cs" />
     <Compile Include="AST\Stmts\Decls\VertexDeclNode.cs" />
-    <Compile Include="AST\Stmts\ForeachNode.cs" />
-    <Compile Include="AST\Stmts\ForNode.cs" />
     <Compile Include="AST\Stmts\HeadNode.cs" />
-    <Compile Include="AST\Stmts\IfNode.cs" />
     <Compile Include="AST\Stmts\LoneCallNode.cs" />
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
-    <Compile Include="AST\Stmts\WhileNode.cs" />
     <Compile Include="Visitors\TypeVisitor.cs" />
     <Compile Include="Visitors\XmlTreeBuilder.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
@@ -103,6 +95,13 @@
     <Compile Include="Types\Collections\ListType.cs" />
     <Compile Include="Types\Structures\EdgeType.cs" />
     <Compile Include="Types\Structures\GraphType.cs" />
+    <Compile Include="AST\Stmts\EdgeCreateNode.cs" />
+    <Compile Include="AST\Stmts\BlockNode.cs" />
+    <Compile Include="AST\Stmts\ForeachNode.cs" />
+    <Compile Include="AST\Stmts\ForNode.cs" />
+    <Compile Include="AST\Stmts\IfNode.cs" />
+    <Compile Include="AST\Stmts\WhileNode.cs" />
+    <Compile Include="AST\Stmts\Decls\MultiDecl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -16,23 +16,17 @@ namespace P4_Project.Visitors
 {
     class TypeVisitor : Visitor
     {
-        SymbolTable symbolTable = new SymbolTable(null, null);
+        SymbolTable symbolTable;
+
+        public TypeVisitor(SymbolTable table)
+        {
+            symbolTable = table;
+        }
 
 
         public override void Visit(CallNode node)
         { 
-            node.parameters.Accept(this);
-        }
-
-        public override void Visit(IdentNode node)
-        {
-            
-        }
-
-        public override void Visit(MemberNode node)
-        {    
-            node.source.Accept(this);
-            node.memberIdent.Accept(this);   
+            node.Parameters.Accept(this);
         }
 
         public override void Visit(VarNode node)
@@ -67,48 +61,47 @@ namespace P4_Project.Visitors
 
         public override void Visit(BinExprNode node)
         {
-            node.left.Accept(this);
-            node.right.Accept(this);      
+            node.Left.Accept(this);
+            node.Right.Accept(this);      
         }
 
         public override void Visit(UnaExprNode node)
         {
-            node.expr.Accept(this);  
+            node.Expr.Accept(this);  
         }
 
-        public override void Visit(EdgeDeclNode node)
+        public override void Visit(EdgeCreateNode node)
         {
-            node.start.Accept(this);
-            node.end.Accept(this);
-            node.attributes.Accept(this);  
+            //node.Start.Accept(this);
+            //node.End.Accept(this);
+            //node.Attributes.Accept(this);  
         }
 
         public override void Visit(FuncDeclNode node)
         {
-            node.parameters.Accept(this);
-            node.body.Accept(this);
+            node.Parameters.Accept(this);
+            node.Body.Accept(this);
         }
 
         public override void Visit(VarDeclNode node)
         {
-            symbolTable.NewObj(node.symbolName, node.type, var);
 
-            if (node.expr != null)
-                node.expr.Accept(this);
+            if (node.DefaultValue != null)
+                node.DefaultValue.Accept(this);
         }
 
         public override void Visit(VertexDeclNode node)
         {  
-            node.attributes.Accept(this);
+            node.Attributes.Accept(this);
         }
 
         public override void Visit(AssignNode node)
         {
-            node.target.Accept(this);
-            node.value.Accept(this);          
+            node.Target.Accept(this);
+            node.Value.Accept(this);          
         }
 
-        public override void Visit(Block node)
+        public override void Visit(BlockNode node)
         { 
             foreach (Node n in node.statements)
                 n.Accept(this);    
@@ -116,21 +109,17 @@ namespace P4_Project.Visitors
 
         public override void Visit(ForeachNode node)
         {
-            symbolTable.OpenScope();
-            node.iterationVar.Accept(this);
-            node.iterator.Accept(this);
-            node.body.Accept(this);
-            symbolTable.CloseScope();
+            node.IterationVar.Accept(this);
+            node.Iterator.Accept(this);
+            node.Body.Accept(this);
         }
 
         public override void Visit(ForNode node)
         {
-            symbolTable.OpenScope();
-            node.initializer.Accept(this);
-            node.condition.Accept(this);
-            node.iterator.Accept(this);
-            node.body.Accept(this);
-            symbolTable.CloseScope();
+            node.Initializer.Accept(this);
+            node.Condition.Accept(this);
+            node.Iterator.Accept(this);
+            node.Body.Accept(this);
         }
 
         public override void Visit(HeadNode node)
@@ -140,38 +129,32 @@ namespace P4_Project.Visitors
 
         public override void Visit(IfNode node)
         {
-            symbolTable.OpenScope();
-            if (node.condition != null)
-                node.condition.Accept(this);
-            node.body.Accept(this);
-            if (node.elseNode != null)
-                node.elseNode.Accept(this);
-            symbolTable.CloseScope();
+            if (node.Condition != null)
+                node.Condition.Accept(this);
+            node.Body.Accept(this);
+            if (node.ElseNode != null)
+                node.ElseNode.Accept(this);
         }
 
         public override void Visit(LoneCallNode node)
         {  
-            node.call.Accept(this);   
+            node.Call.Accept(this);   
         }
 
         public override void Visit(ReturnNode node)
         { 
-            node.ret.Accept(this);    
+            node.Ret.Accept(this);    
         }
 
         public override void Visit(WhileNode node)
         {
-            symbolTable.OpenScope();
-            node.condition.Accept(this);
-            node.body.Accept(this);
-            symbolTable.CloseScope();
+            node.Condition.Accept(this);
+            node.Body.Accept(this);
         }
 
         public override void Visit(MAGIA node)
         {
-            symbolTable.OpenScope();
             node.block.Accept(this);
-            symbolTable.CloseScope();
         }
 
         public override void Visit(BreakNode node)

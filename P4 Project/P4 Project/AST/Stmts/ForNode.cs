@@ -13,18 +13,18 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class ForNode : StmtNode
     {
-        public StmtNode initializer;
-        public ExprNode condition;
-        public StmtNode iterator;
+        public StmtNode Initializer { get; private set; }
+        public ExprNode Condition { get; private set; }
+        public StmtNode Iterator { get; private set; }
 
-        public Block body;
+        public BlockNode Body { get; private set; }
 
-        public ForNode(StmtNode init, ExprNode con, StmtNode iter, Block _body)
+        public ForNode(StmtNode initializer, ExprNode condition, StmtNode iterator, BlockNode body)
         {
-            initializer = init;
-            condition = con;
-            iterator = iter;
-            body = _body;
+            Initializer = initializer;
+            Condition = condition;
+            Iterator = iterator;
+            Body = body;
         }
 
         public override void Accept(Visitor vi)

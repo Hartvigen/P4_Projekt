@@ -13,22 +13,24 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class NumConst : ExprNode
     {
-        double value;
+        public double Value { get; private set; }
+
 
         public NumConst() { }
 
-        public NumConst(double _value)
+        public NumConst(double value)
         {
-            value = _value;
+            Value = value;
         }
+
 
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
         }
 
-        public string getString() {
-            return value.ToString(CultureInfo.InvariantCulture);
+        public string GetString() {
+            return Value.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

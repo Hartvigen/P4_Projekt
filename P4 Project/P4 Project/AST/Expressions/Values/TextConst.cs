@@ -12,14 +12,16 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class TextConst : ExprNode
     {
-        public string value;
+        public string Value { get; private set; }
+
 
         public TextConst() { }
 
-        public TextConst(string _value)
+        public TextConst(string value)
         {
-            value = _value;
+            Value = value;
         }
+
 
         public override void Accept(Visitor vi)
         {

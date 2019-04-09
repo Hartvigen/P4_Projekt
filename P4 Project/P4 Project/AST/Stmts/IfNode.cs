@@ -13,21 +13,23 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class IfNode : StmtNode
     {
-        public ExprNode condition;
-        public Block body;
-        public IfNode elseNode = null;
+        public ExprNode Condition { get; private set; }
+        public BlockNode Body { get; private set; }
+        public IfNode ElseNode { get; private set; }
+
 
         public IfNode() { }
 
-        public IfNode(ExprNode e, Block b)
+        public IfNode(ExprNode condition, BlockNode body)
         {
-            condition = e;
-            body = b;
+            Condition = condition;
+            Body = body;
         }
 
-        public void SetElse(IfNode i)
+
+        public void SetElse(IfNode elseNode)
         {
-            elseNode = i;
+            ElseNode = elseNode;
         }
 
         public override void Accept(Visitor vi)

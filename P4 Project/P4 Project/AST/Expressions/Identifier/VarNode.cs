@@ -18,6 +18,7 @@ namespace P4_Project.AST.Expressions.Identifier
             : base(_identifier)
         { }
 
+
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);

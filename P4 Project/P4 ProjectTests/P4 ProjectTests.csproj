@@ -61,10 +61,17 @@
   <ItemGroup>
     <Compile Include="Compiler\SyntaxAnalysis\ParserTests.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\ScannerTests.cs" />
+    <Compile Include="Graphviz\DotToPngTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Visitors\PrettyPrinterTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\P4 Project\App.config">
+      <Link>App.config</Link>
+    </None>
+    <None Include="Graphviz\bin\config6" />
+    <None Include="Graphviz\bin\Graphviz.ini" />
+    <None Include="Graphviz\bin\Settings.ini" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -74,6 +81,96 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Graphviz\bin\acyclic.exe" />
+    <Content Include="Graphviz\bin\ann.dll" />
+    <Content Include="Graphviz\bin\bcomps.exe" />
+    <Content Include="Graphviz\bin\ccomps.exe" />
+    <Content Include="Graphviz\bin\cdt.dll" />
+    <Content Include="Graphviz\bin\cgraph.dll" />
+    <Content Include="Graphviz\bin\circo.exe" />
+    <Content Include="Graphviz\bin\dijkstra.exe" />
+    <Content Include="Graphviz\bin\dot.exe" />
+    <Content Include="Graphviz\bin\dotty.exe" />
+    <Content Include="Graphviz\bin\exparse.h" />
+    <Content Include="Graphviz\bin\fc-cache.exe" />
+    <Content Include="Graphviz\bin\fc-cat.exe" />
+    <Content Include="Graphviz\bin\fc-list.exe" />
+    <Content Include="Graphviz\bin\fc-match.exe" />
+    <Content Include="Graphviz\bin\fdp.exe" />
+    <Content Include="Graphviz\bin\fontconfig.dll" />
+    <Content Include="Graphviz\bin\fontconfig_fix.dll" />
+    <Content Include="Graphviz\bin\freetype6.dll" />
+    <Content Include="Graphviz\bin\gc.exe" />
+    <Content Include="Graphviz\bin\getopt.h" />
+    <Content Include="Graphviz\bin\glut32.dll" />
+    <Content Include="Graphviz\bin\gml2gv.exe" />
+    <Content Include="Graphviz\bin\graphml2gv.exe" />
+    <Content Include="Graphviz\bin\gv2gml.exe" />
+    <Content Include="Graphviz\bin\gvc.dll" />
+    <Content Include="Graphviz\bin\gvcolor.exe" />
+    <Content Include="Graphviz\bin\gvedit.exe" />
+    <Content Include="Graphviz\bin\GVedit.html" />
+    <Content Include="Graphviz\bin\gvgen.exe" />
+    <Content Include="Graphviz\bin\gvmap.exe" />
+    <Content Include="Graphviz\bin\gvpack.exe" />
+    <Content Include="Graphviz\bin\gvplugin_core.dll" />
+    <Content Include="Graphviz\bin\gvplugin_dot_layout.dll" />
+    <Content Include="Graphviz\bin\gvplugin_gd.dll" />
+    <Content Include="Graphviz\bin\gvplugin_gdiplus.dll" />
+    <Content Include="Graphviz\bin\gvplugin_neato_layout.dll" />
+    <Content Include="Graphviz\bin\gvplugin_pango.dll" />
+    <Content Include="Graphviz\bin\gvpr.exe" />
+    <Content Include="Graphviz\bin\gxl2gv.exe" />
+    <Content Include="Graphviz\bin\iconv.dll" />
+    <Content Include="Graphviz\bin\intl.dll" />
+    <Content Include="Graphviz\bin\jpeg62.dll" />
+    <Content Include="Graphviz\bin\lefty.exe" />
+    <Content Include="Graphviz\bin\libatk-1.0-0.dll" />
+    <Content Include="Graphviz\bin\libcairo-2.dll" />
+    <Content Include="Graphviz\bin\libexpat-1.dll" />
+    <Content Include="Graphviz\bin\libexpat.dll" />
+    <Content Include="Graphviz\bin\libfontconfig-1.dll" />
+    <Content Include="Graphviz\bin\libfreetype-6.dll" />
+    <Content Include="Graphviz\bin\libgdk-win32-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libgdkglext-win32-1.0-0.dll" />
+    <Content Include="Graphviz\bin\libgdk_pixbuf-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libgio-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libglade-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libglib-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libgmodule-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libgobject-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libgthread-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libgtk-win32-2.0-0.dll" />
+    <Content Include="Graphviz\bin\libgtkglext-win32-1.0-0.dll" />
+    <Content Include="Graphviz\bin\libltdl-3.dll" />
+    <Content Include="Graphviz\bin\libpango-1.0-0.dll" />
+    <Content Include="Graphviz\bin\libpangocairo-1.0-0.dll" />
+    <Content Include="Graphviz\bin\libpangoft2-1.0-0.dll" />
+    <Content Include="Graphviz\bin\libpangowin32-1.0-0.dll" />
+    <Content Include="Graphviz\bin\libpng12.dll" />
+    <Content Include="Graphviz\bin\libpng14-14.dll" />
+    <Content Include="Graphviz\bin\libxml2.dll" />
+    <Content Include="Graphviz\bin\lneato.exe" />
+    <Content Include="Graphviz\bin\ltdl.dll" />
+    <Content Include="Graphviz\bin\mingle.exe" />
+    <Content Include="Graphviz\bin\mm2gv.exe" />
+    <Content Include="Graphviz\bin\neato.exe" />
+    <Content Include="Graphviz\bin\nop.exe" />
+    <Content Include="Graphviz\bin\osage.exe" />
+    <Content Include="Graphviz\bin\patchwork.exe" />
+    <Content Include="Graphviz\bin\Pathplan.dll" />
+    <Content Include="Graphviz\bin\props.txt" />
+    <Content Include="Graphviz\bin\prune.exe" />
+    <Content Include="Graphviz\bin\QtCore4.dll" />
+    <Content Include="Graphviz\bin\QtGui4.dll" />
+    <Content Include="Graphviz\bin\sccmap.exe" />
+    <Content Include="Graphviz\bin\sfdp.exe" />
+    <Content Include="Graphviz\bin\smyrna.exe" />
+    <Content Include="Graphviz\bin\tred.exe" />
+    <Content Include="Graphviz\bin\twopi.exe" />
+    <Content Include="Graphviz\bin\unflatten.exe" />
+    <Content Include="Graphviz\bin\vmalloc.dll" />
+    <Content Include="Graphviz\bin\zlib1.dll" />
     <Content Include="Visitors\PrettyCode.txt" />
     <Content Include="Visitors\UglyCode.txt" />
   </ItemGroup>

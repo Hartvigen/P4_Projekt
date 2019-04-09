@@ -12,22 +12,24 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class BoolConst : ExprNode
     {
-        public bool val;
+        public bool Value { get; private set; }
+
 
         public BoolConst() { }
 
-        public BoolConst(bool _val)
+        public BoolConst(bool value)
         {
-            val = _val;
+            Value = value;
         }
+
 
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
         }
 
-        public String getString() {
-            return val ? "true" : "false";
+        public string GetString() {
+            return Value ? "true" : "false";
         }
     }
 }

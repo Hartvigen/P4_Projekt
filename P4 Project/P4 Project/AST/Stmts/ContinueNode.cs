@@ -9,8 +9,8 @@ namespace P4_Project.AST.Stmts
 {
     public class ContinueNode : StmtNode
     {
-        public ContinueNode()
-        {
+        public ContinueNode() { 
+        
         }
 
         public override void Accept(Visitor vi)

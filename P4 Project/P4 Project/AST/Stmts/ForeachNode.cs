@@ -14,19 +14,21 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class ForeachNode : StmtNode
     {
-        public VarDeclNode iterationVar;
-        public ExprNode iterator;
+        public VarDeclNode IterationVar { get; private set; }
+        public ExprNode Iterator { get; private set; }
 
-        public Block body;
+        public BlockNode Body { get; private set; }
+
 
         public ForeachNode() { }
 
-        public ForeachNode(VarDeclNode v, ExprNode e, Block b)
+        public ForeachNode(VarDeclNode iterationVar, ExprNode iterator, BlockNode body)
         {
-            iterationVar = v;
-            iterator = e;
-            body = b;
+            IterationVar = iterationVar;
+            Iterator = iterator;
+            Body = body;
         }
+
 
         public override void Accept(Visitor vi)
         {

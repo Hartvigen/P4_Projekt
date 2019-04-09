@@ -1,31 +1,39 @@
 ﻿using P4_Project.AST.Expressions;
+using P4_Project.Types;
 using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.SymTab;
 
 namespace P4_Project.AST.Stmts.Decls
 {
     /// <summary>
     /// The "VertexDeclNode" represents the declaration of a vertex.
     /// </summary>
-    public class VertexDeclNode : VEDeclNode
+    public class VertexDeclNode : DeclNode
     {
-        int type;
+        public BlockNode Attributes { get; private set; } = new BlockNode();
 
-        public VertexDeclNode() { }
 
-        public VertexDeclNode(int _type, string _symbolName) 
-            : base(_symbolName)
-        {
-            type = _type;
-        }
+        public VertexDeclNode() 
+        { }
+
+        public VertexDeclNode(Obj symbolObject) 
+            : base(symbolObject)
+        { }
+
 
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
+        }
+
+        public void AddAttr(AssignNode assign)
+        {
+            Attributes.Add(assign);
         }
     }
 }

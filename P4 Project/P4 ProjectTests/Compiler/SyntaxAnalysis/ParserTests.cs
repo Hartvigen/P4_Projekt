@@ -223,10 +223,10 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         [TestMethod()]
         public void ParseTestSuccess6()
         {
-            string func = "[vertex(boolean what = true)] func FuncDecl(number x){vertex(v1, what = false)}";
+            string func = "[vertex(boolean what = true)] func none FuncDecl(number x){vertex(v1, what = false)}";
             Assert.IsTrue(TryParse(func));
 
-            string func2 = "[vertex(boolean tst = true)] [edge(number weight = 0)] func FuncDecl(number x, boolean boulian){vertex{(v1, tst = false), (v2, tst = true)} v1 -> (v2, weight = 10)}";
+            string func2 = "[vertex(boolean tst = true)] [edge(number weight = 0)] func none FuncDecl(number x, boolean boulian){vertex{(v1, tst = false), (v2, tst = true)} v1 -> (v2, weight = 10)}";
             Assert.IsTrue(TryParse(func2));
         }
 
@@ -234,7 +234,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         [TestMethod()]
         public void ParseTestSuccess7()
         {
-            string func = "func FuncDecl(number x){x = 5 return x}";
+            string func = "func number FuncDecl(number x){x = 5 return x}";
             Assert.IsTrue(TryParse(func));
         }
 
@@ -246,10 +246,10 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
                 "x = 4 * 5 + 3 - 3";
             Assert.IsTrue(TryParse(func));
 
-            string func2 = "func FuncDecl(number x){x = 4 * 5 + 3 - 3}";
+            string func2 = "func none FuncDecl(number x){x = 4 * 5 + 3 - 3}";
             Assert.IsTrue(TryParse(func2));
 
-            string func3 = "func FuncDecl(number x, number y){if(-x > y){x = y}}";
+            string func3 = "func none FuncDecl(number x, number y){if(-x > y){x = y}}";
             Assert.IsTrue(TryParse(func3));
 
         }

@@ -12,6 +12,6 @@ namespace P4_Project.AST.Expressions
     /// </summary>
     public abstract class ExprNode : Node
     {
-        public bool inParentheses = false;
+        public bool InParentheses { get; set; } = false;
     }
 }

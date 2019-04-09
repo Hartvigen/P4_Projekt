@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.SymTab;
 
 namespace P4_Project.AST.Stmts.Decls
 {
@@ -11,13 +12,14 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public abstract class DeclNode : StmtNode
     {
-        public string symbolName;
+        public Obj SymbolObject { get; private set; }
+
 
         public DeclNode() { }
 
-        public DeclNode(string _symbolName)
+        public DeclNode(Obj symbolObject)
         {
-            symbolName = _symbolName;
+            SymbolObject = symbolObject;
         }
     }
 }

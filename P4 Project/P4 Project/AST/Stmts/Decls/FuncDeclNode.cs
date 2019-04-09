@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.SymTab;
 
 namespace P4_Project.AST.Stmts.Decls
 {
@@ -12,16 +13,19 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class FuncDeclNode : DeclNode
     {
-        public Block parameters;
-        public Block body;
+        public BlockNode Parameters { get; private set; }
+        public BlockNode Body { get; private set; }
+
 
         public FuncDeclNode() { }
 
-        public FuncDeclNode(string _symbolName, Block _parameters, Block _body) : base(_symbolName)
+        public FuncDeclNode(Obj symbolObject, BlockNode parameters, BlockNode body) 
+            : base(symbolObject)
         {
-            parameters = _parameters;
-            body = _body;
+            Parameters = parameters;
+            Body = body;
         }
+
 
         public override void Accept(Visitor vi)
         {

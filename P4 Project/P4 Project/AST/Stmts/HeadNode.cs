@@ -18,7 +18,8 @@ namespace P4_Project.AST.Stmts
         public const int VERTEX = 1, EDGE = 2;
 
         public int type;
-        public Block attrDeclBlock = new Block();
+        public BlockNode attrDeclBlock = new BlockNode();
+
 
         public HeadNode() { }
 
@@ -26,6 +27,7 @@ namespace P4_Project.AST.Stmts
         {
             type = _type;
         }
+
 
         public void AddAttr(VarDeclNode attrDecl)
         {
@@ -37,11 +39,11 @@ namespace P4_Project.AST.Stmts
             vi.Visit(this);
         }
 
-        public String getName()
+        public string getName()
         {
             if (type == 1)
                 return "Vertex";
-            else if (type == 2)
+            if (type == 2)
                 return "Edge";
 
             throw new Exception("type: " + type + " Is not supported");
