@@ -1,4 +1,5 @@
-﻿using P4_Project.AST;
+﻿using System;
+using P4_Project.AST;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
@@ -10,40 +11,45 @@ namespace P4_Project.Visitors
     public abstract class Visitor
     {
         //Identifier
-        public abstract void Visit(CallNode node);
-        public abstract void Visit(VarNode node);
+        public abstract object Visit(CallNode node, object o);
+        public abstract object Visit(VarNode node, object o);
+
+        internal void Visit(MultiDecl multiDecl, object p)
+        {
+            throw new NotImplementedException();
+        }
 
         //Values
-        public abstract void Visit(BoolConst node);
-        public abstract void Visit(CollecConst node);
-        public abstract void Visit(NoneConst node);
-        public abstract void Visit(NumConst node);
-        public abstract void Visit(TextConst node);
+        public abstract object Visit(BoolConst node, object o);
+        public abstract object Visit(CollecConst node, object o);
+        public abstract object Visit(NoneConst node, object o);
+        public abstract object Visit(NumConst node, object o);
+        public abstract object Visit(TextConst node, object o);
 
         //Expressions
-        public abstract void Visit(BinExprNode node);
-        public abstract void Visit(UnaExprNode node);
+        public abstract object Visit(BinExprNode node, object o);
+        public abstract object Visit(UnaExprNode node, object o);
 
         //Decls
-        public abstract void Visit(EdgeCreateNode node);
-        public abstract void Visit(FuncDeclNode node);
-        public abstract void Visit(VarDeclNode node);
-        public abstract void Visit(VertexDeclNode node);
+        public abstract object Visit(EdgeCreateNode node, object o);
+        public abstract object Visit(FuncDeclNode node, object o);
+        public abstract object Visit(VarDeclNode node, object o);
+        public abstract object Visit(VertexDeclNode node, object o);
 
         //Stmts
-        public abstract void Visit(AssignNode node);
-        public abstract void Visit(BlockNode node);
-        public abstract void Visit(ForeachNode node);
-        public abstract void Visit(ForNode node);
-        public abstract void Visit(HeadNode node);
-        public abstract void Visit(IfNode node);
-        public abstract void Visit(LoneCallNode node);
-        public abstract void Visit(ReturnNode node);
-        public abstract void Visit(WhileNode node);
-        public abstract void Visit(BreakNode node);
-        public abstract void Visit(ContinueNode node);
+        public abstract object Visit(AssignNode node, object o);
+        public abstract object Visit(BlockNode node, object o);
+        public abstract object Visit(ForeachNode node, object o);
+        public abstract object Visit(ForNode node, object o);
+        public abstract object Visit(HeadNode node, object o);
+        public abstract object Visit(IfNode node, object o);
+        public abstract object Visit(LoneCallNode node, object o);
+        public abstract object Visit(ReturnNode node, object o);
+        public abstract object Visit(WhileNode node, object o);
+        public abstract object Visit(BreakNode node, object o);
+        public abstract object Visit(ContinueNode node, object o);
 
         //AST
-        public abstract void Visit(MAGIA node);
+        public abstract object Visit(MAGIA node, object o);
     }
 }

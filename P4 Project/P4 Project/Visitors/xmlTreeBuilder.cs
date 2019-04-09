@@ -21,188 +21,213 @@ namespace P4_Project.Visitors
         //2. Accept the node
         //3. End XML tag of whatever node type is.
         //That will generate a XML tree that shows the entire node structure of the program.
-        public override void Visit(CallNode node)
+        public override object Visit(CallNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Parameters.Accept(this);
+            node.Parameters.Accept(this,null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(VarNode node)
-        {
-            ast.AppendLine($"<{node.GetType().Name}>");
-            ast.AppendLine($"</{node.GetType().Name}>");
-        }
-
-        public override void Visit(BoolConst node)
+        public override object Visit(VarNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(CollecConst node)
+        public override object Visit(BoolConst node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(NoneConst node)
+        public override object Visit(CollecConst node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(NumConst node)
+        public override object Visit(NoneConst node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(TextConst node)
+        public override object Visit(NumConst node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(BinExprNode node)
+        public override object Visit(TextConst node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Left.Accept(this);
-            node.Right.Accept(this);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(UnaExprNode node)
+        public override object Visit(BinExprNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Expr.Accept(this);
+            node.Left.Accept(this, null);
+            node.Right.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(EdgeCreateNode node)
+        public override object Visit(UnaExprNode node, object o)
+        {
+            ast.AppendLine($"<{node.GetType().Name}>");
+            node.Expr.Accept(this, null);
+            ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
+        }
+
+        public override object Visit(EdgeCreateNode node, object o)
         {
             //ast.AppendLine($"<{node.GetType().Name}>");
             //node.Start.Accept(this);
             //node.End.Accept(this);
             //node.Attributes.Accept(this);
             //ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(FuncDeclNode node)
+        public override object Visit(FuncDeclNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Parameters.Accept(this);
-            node.Body.Accept(this);
+            node.Parameters.Accept(this, null);
+            node.Body.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(VarDeclNode node)
+        public override object Visit(VarDeclNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             if(node.DefaultValue != null)
-            node.DefaultValue.Accept(this);
+            node.DefaultValue.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(VertexDeclNode node)
+        public override object Visit(VertexDeclNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Attributes.Accept(this);
+            node.Attributes.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(AssignNode node)
+        public override object Visit(AssignNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Target.Accept(this);
-            node.Value.Accept(this);
+            node.Target.Accept(this, null);
+            node.Value.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(BlockNode node)
+        public override object Visit(BlockNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             foreach (Node n in node.statements)
-                n.Accept(this);
+                n.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(ForeachNode node)
+        public override object Visit(ForeachNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.IterationVar.Accept(this);
-            node.Iterator.Accept(this);
-            node.Body.Accept(this);
+            node.IterationVar.Accept(this, null);
+            node.Iterator.Accept(this, null);
+            node.Body.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(ForNode node)
+        public override object Visit(ForNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Initializer.Accept(this);
-            node.Condition.Accept(this);
-            node.Iterator.Accept(this);
-            node.Body.Accept(this);
+            node.Initializer.Accept(this, null);
+            node.Condition.Accept(this, null);
+            node.Iterator.Accept(this, null);
+            node.Body.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(HeadNode node)
+        public override object Visit(HeadNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.attrDeclBlock.Accept(this);
+            node.attrDeclBlock.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(IfNode node)
+        public override object Visit(IfNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             if(node.Condition != null)
-            node.Condition.Accept(this);
-            node.Body.Accept(this);
+            node.Condition.Accept(this, null);
+            node.Body.Accept(this, null);
             if(node.ElseNode != null)
-            node.ElseNode.Accept(this);
+            node.ElseNode.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(LoneCallNode node)
+        public override object Visit(LoneCallNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Call.Accept(this);
+            node.Call.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(ReturnNode node)
+        public override object Visit(ReturnNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Ret.Accept(this);
+            node.Ret.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(WhileNode node)
+        public override object Visit(WhileNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.Condition.Accept(this);
-            node.Body.Accept(this);
+            node.Condition.Accept(this, null);
+            node.Body.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(MAGIA node)
+        public override object Visit(MAGIA node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
-            node.block.Accept(this);
+            node.block.Accept(this, null);
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(BreakNode node)
+        public override object Visit(BreakNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
 
-        public override void Visit(ContinueNode node)
+        public override object Visit(ContinueNode node, object o)
         {
             ast.AppendLine($"<{node.GetType().Name}>");
             ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
     }
 }

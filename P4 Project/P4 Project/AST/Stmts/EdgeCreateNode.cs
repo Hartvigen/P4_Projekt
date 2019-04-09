@@ -26,9 +26,10 @@ namespace P4_Project.AST.Stmts.Decls
         }
 
 
-        public override void Accept(Visitor vi)
+        public override object Accept(Visitor vi, object o)
         {
-            vi.Visit(this);
+            vi.Visit(this, null);
+            return null;
         }
 
         public void AddRightSide(IdentNode rightVertex, List<AssignNode> attributes)
