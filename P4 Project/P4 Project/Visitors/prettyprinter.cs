@@ -138,7 +138,7 @@ namespace P4_Project.Visitors
             if (node.Parameters.statements.Count > 0)
                 RemoveIndentAndNewline();
             str.Append(")");
-            str.AppendLine();
+            IndentAndNewline();
             str.Append("{");
             indentLevel++;
             IndentAndNewline();
@@ -342,7 +342,7 @@ namespace P4_Project.Visitors
         //Will make a newline and ident to the current indent level.
         public void IndentAndNewline()
         {
-            str.AppendLine();
+            str.Append(Environment.NewLine);
             for (int i = indentLevel*indentSizeInSpaces; i > 0; i--)
                 str.Append(" ");
         }
@@ -352,7 +352,7 @@ namespace P4_Project.Visitors
         public void RemoveIndentAndNewline() {
             for (int i = indentLevel * indentSizeInSpaces; i > 0; i--)
                 str.Remove(str.Length - 1, 1);
-            str.Remove(str.Length - 2, 2); //Remove the newline.
+            str.Remove(str.Length - Environment.NewLine.Length, Environment.NewLine.Length); //Remove the newline.
         }
 
         //Function with the purpose of removing Comma and space,
