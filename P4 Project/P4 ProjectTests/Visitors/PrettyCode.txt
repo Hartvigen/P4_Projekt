@@ -24,11 +24,9 @@ func none whileifs()
     while(!b)
     {
         if (total == 1)
-        
         {
             total = total + 1
             if (total == 1000)
-            
             {
                  break 
             } else
@@ -36,11 +34,9 @@ func none whileifs()
                  continue 
             } 
             if (total == 7)
-            
             {
                 total = total + GetVal(total)
             } elseif (total == 10)
-            
             {
                 total = GetVal(total)
             } else

@@ -279,7 +279,6 @@ namespace P4_Project.Visitors
                 str.Append("if (");
                 node.Condition.Accept(this);
                 str.Append(")");
-                IndentAndNewline();
             }
             IndentAndNewline();
             str.Append("{");
