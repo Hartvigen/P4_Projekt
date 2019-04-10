@@ -62,7 +62,8 @@ namespace P4_Project.Visitors
         public override void Visit(BinExprNode node)
         {
             node.Left.Accept(this);
-            node.Right.Accept(this);      
+            node.Right.Accept(this);
+            //Console.WriteLine(string.Format("{0} {1} ", node.Left.GetType(), node.Right.GetType()));
         }
 
         public override void Visit(UnaExprNode node)
@@ -87,7 +88,11 @@ namespace P4_Project.Visitors
         {
 
             if (node.DefaultValue != null)
+            {
                 node.DefaultValue.Accept(this);
+                Console.WriteLine(string.Format("{0} = {1} ", node.GetVarType(), node.DefaultValue));
+            }
+                
         }
 
         public override void Visit(VertexDeclNode node)
@@ -98,7 +103,7 @@ namespace P4_Project.Visitors
         public override void Visit(AssignNode node)
         {
             node.Target.Accept(this);
-            node.Value.Accept(this);          
+            node.Value.Accept(this);
         }
 
         public override void Visit(BlockNode node)
@@ -116,6 +121,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(ForNode node)
         {
+            //Tjek om alle delene af forløkken er korrekt
             node.Initializer.Accept(this);
             node.Condition.Accept(this);
             node.Iterator.Accept(this);
@@ -129,6 +135,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(IfNode node)
         {
+            // Om den ikker er null er giver en bool, ligesom while
             if (node.Condition != null)
                 node.Condition.Accept(this);
             node.Body.Accept(this);
@@ -148,6 +155,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(WhileNode node)
         {
+            // Her skal der tjekkes om hver side af conditionen er samme type
             node.Condition.Accept(this);
             node.Body.Accept(this);
         }
@@ -169,7 +177,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(MultiDecl node)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }
