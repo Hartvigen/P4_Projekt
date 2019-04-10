@@ -1,0 +1,136 @@
+COMPILER MAGIA 
+ 
+CHARACTERS
+ letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+ digit = "0123456789".
+ cr = '\r'.
+ lf = '\n'.
+ tab = '\t'.
+ CharInLine = ANY - cr - lf. 
+ AnyButDoubleQuote = CharInLine - '\"'. 
+
+TOKENS
+ IDENT = letter {letter | digit | '_'}.
+ NUMBER = digit {digit} ['.' digit {digit}].
+ TEXT = '"' {AnyButDoubleQuote | "\\\""} '"'. 
+ 
+COMMENTS FROM "/*" TO "*/" NESTED
+COMMENTS FROM "//" TO lf
+
+IGNORE cr + lf + tab 
+
+
+
+
+PRODUCTIONS
+
+
+MAGIA = { SYNC Head } { SYNC Stmt } { SYNC FuncDecl } .
+
+
+
+Head = '[' ( "vertex" | "edge" ) WEAK '(' VarDecl { WEAK ',' VarDecl } WEAK ')' ']' .
+
+
+FuncDecl = "func" (Type | "none") IDENT WEAK '(' [ IF(la.val != ")" && la.val != "{") VarDecl { WEAK ',' VarDecl } ] WEAK ')' WEAK '{' { SYNC Stmt } WEAK '}' .
+
+Stmt = ( StructStmt | SimpleStmt | KeywordStmt | FullDecl ).
+
+
+
+StructStmt = ( StmtWhile | StmtFor | StmtForeach | StmtIf ).
+
+
+StmtWhile = "while" '(' Expr ')' '{' { SYNC Stmt } '}' .
+
+
+StmtFor = "for" '(' ( SimpleStmt | VarDecl ) WEAK ',' Expr WEAK ',' Stmt')' '{' { SYNC Stmt } '}' .
+
+
+StmtForeach = "foreach" '(' Type IDENT "in" Expr ')' '{' { SYNC Stmt } '}' .
+
+
+StmtIf = "if" '(' Expr ')' '{' { SYNC Stmt } '}' { "elseif" '(' Expr ')' '{' { SYNC Stmt } '}' } [ "else" '{' { SYNC Stmt } '}' ].
+
+
+
+SimpleStmt = CallOrID { Member } [ Assign | EdgeOneOrMore].
+
+
+Member = WEAK '.' CallOrID.
+
+
+EdgeOneOrMore = EdgeOpr ( Identifier | EdgeCreate | '{' EdgeCreate { WEAK ',' EdgeCreate } '}' ).
+
+
+EdgeOpr = ( "<-" | "--" | "->" ).
+
+
+EdgeCreate = '(' Identifier { WEAK ',' Identifier Assign } ')'.
+
+
+KeywordStmt = ( "return" Expr | "break" | "continue" ).
+
+
+FullDecl = Type ( IDENT [ Assign ] | '{' VtxDecl { WEAK ',' VtxDecl } '}' | VtxDecl ).
+
+
+VtxDecl = '(' IDENT { WEAK ',' Identifier Assign } ')'.
+
+
+VarDecl = Type IDENT [ Assign ] .
+
+
+Assign = '=' ( Expr | '{' Args '}' ).
+
+
+Expr = ExprOR. 
+
+ExprOR = ExprAnd { "||" ExprAnd }.
+
+
+ExprAnd = ExprEQ { "&&" ExprEQ }.
+
+
+ExprEQ = ExprRel [("==" | "!=" ) ExprRel ].
+
+
+ExprRel = ExprPlus [('<' | '>' | "<=" | ">=" ) ExprPlus ].
+
+
+ExprPlus = ['-' ] ExprMult {('+' | '-' ) ExprMult }.
+
+
+ExprMult = ExprNot {('*' | '/' | '%' ) ExprNot }.
+
+
+ExprNot = ['!' ] Factor.
+
+
+Factor = Const| ('(' Expr ')' | CallOrID ) { Member }. 
+
+
+
+CallOrID = Identifier ['(' Args ')'].
+
+
+Args = [Expr { WEAK ',' Expr } ].
+
+
+
+Identifier = ( IDENT ).
+
+
+Const = ( NUMBER | TEXT | "true"| "false" | "none" ).
+
+
+Type = ( SingleType | CollecType).
+
+
+
+CollecType = ( "list" WEAK '' | "set" WEAK '' | "queue" WEAK '' | "stack" WEAK '' ).
+
+SingleType = ( "number" | "boolean" | "text" | "vertex" | "edge" ).
+
+
+END MAGIA.
