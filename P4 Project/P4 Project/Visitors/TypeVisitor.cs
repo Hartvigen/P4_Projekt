@@ -16,7 +16,7 @@ namespace P4_Project.Visitors
 {
     class TypeVisitor : Visitor
     {
-        SymbolTable symbolTable;
+        public SymbolTable symbolTable;
 
         public TypeVisitor(SymbolTable table)
         {
@@ -93,10 +93,14 @@ namespace P4_Project.Visitors
 
         public override object Visit(VarDeclNode node, object o)
         {
+            
+
 
             if (node.DefaultValue != null)
+            {
                 node.DefaultValue.Accept(this, null);
-
+                //Console.WriteLine(string.Format("{0} = {1} ", node.GetVarType(), node.DefaultValue));
+            }
             return null;
         }
 
@@ -110,6 +114,13 @@ namespace P4_Project.Visitors
         {
             node.Target.Accept(this, null);
             node.Value.Accept(this, null);
+
+           // if (!node.Value.GetType().Equals(null))
+               // Console.WriteLine("Value is no a variable");
+
+            Console.WriteLine("TARGET = "+node.Target.ToString() + " Value = " + node.Value.ToString());
+
+
             return null;
         }
 
@@ -169,9 +180,12 @@ namespace P4_Project.Visitors
 
         public override object Visit(WhileNode node, object o)
         {
-           
-            if (!node.Condition.Accept(this, null).Equals(TypeS.boolean))
-                Console.WriteLine("visitWhileLOOP");
+            //Console.WriteLine("entering whileloop" + node.Condition.Accept(this, null).GetType());
+           // if (!node.Condition.Accept(this, null).Equals("2"))
+           //       Console.WriteLine("visitWhileLOOP");
+
+
+            node.Condition.Accept(this, null);
             node.Body.Accept(this, null);
 
             return node;

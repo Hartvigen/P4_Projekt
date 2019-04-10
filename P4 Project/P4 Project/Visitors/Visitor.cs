@@ -16,7 +16,7 @@ namespace P4_Project.Visitors
 
         internal void Visit(MultiDecl multiDecl, object p)
         {
-            throw new NotImplementedException();
+            
         }
 
         //Values
