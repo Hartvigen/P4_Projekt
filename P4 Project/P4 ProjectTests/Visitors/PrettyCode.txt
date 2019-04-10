@@ -100,7 +100,7 @@ func none VEDecls()
 func none expr()
 {
     vertex(v2_3, distance = 4, parent = v1, bval = true)
-    boolean b = 5 != 6 && 5 - 8 + 9 * v2.distance > -8 + 11 % 3 || 5 == 8 || 11 * 54 - 6 < -4
+    boolean b = 5 != 6 && 5 - 8 + 9 * (v2.distance) > -8 + 11 % 3 || 5 == 8 || 11 * (54 - 6) < -4
 }
 
 func boolean manyparams(vertex v1, number n, boolean mightbetrue, text greeting)

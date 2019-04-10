@@ -638,6 +638,7 @@ public class Parser {
 			if (la.kind == 7) {
 				Get();
 				Expr(out e);
+				e.InParentheses = true; 
 				Expect(9);
 			} else {
 				CallOrID(out IdentNode ident);

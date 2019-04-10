@@ -16,13 +16,11 @@ namespace P4_Project.AST.Stmts
         public ExprNode Condition { get; private set; }
         public BlockNode Body { get; private set; }
 
-
         public WhileNode(ExprNode condition, BlockNode block)
         {
             Condition = condition;
             Body = block;
         }
-
 
         public override void Accept(Visitor vi)
         {
