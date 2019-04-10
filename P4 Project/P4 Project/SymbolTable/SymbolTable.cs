@@ -71,5 +71,9 @@ namespace P4_Project.SymTab
 
             return null;
         }
+        public List<SymbolTable> GetScopes()
+        {
+            return innerScopes;
+        }
     }
 }

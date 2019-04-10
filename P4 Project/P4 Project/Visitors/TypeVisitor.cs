@@ -86,13 +86,12 @@ namespace P4_Project.Visitors
 
         public override void Visit(VarDeclNode node)
         {
-
             if (node.DefaultValue != null)
             {
+
                 node.DefaultValue.Accept(this);
-                Console.WriteLine(string.Format("{0} = {1} ", node.GetVarType(), node.DefaultValue));
+                //Console.WriteLine(string.Format("{0} = {1} \n {2} {3} ", node.GetVarType(), node.DefaultValue, symbolTable.GetScopes().Capacity, symbolTable.Find("total")));
             }
-                
         }
 
         public override void Visit(VertexDeclNode node)
@@ -102,6 +101,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(AssignNode node)
         {
+            Console.WriteLine(node.Value.GetType());
             node.Target.Accept(this);
             node.Value.Accept(this);
         }
