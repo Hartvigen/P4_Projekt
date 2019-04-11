@@ -71,9 +71,15 @@ namespace P4_Project.SymTab
 
             return null;
         }
+        // return all the innerscopes
         public List<SymbolTable> GetScopes()
         {
             return innerScopes;
+        }
+
+        public Dictionary<string, Obj> GetDic()
+        {
+            return symbolDecls;
         }
     }
 }

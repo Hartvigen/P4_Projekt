@@ -90,8 +90,11 @@ namespace P4_Project.Visitors
             {
 
                 node.DefaultValue.Accept(this);
-                //Console.WriteLine(string.Format("{0} = {1} \n {2} {3} ", node.GetVarType(), node.DefaultValue, symbolTable.GetScopes().Capacity, symbolTable.Find("total")));
+                /*Console.WriteLine(string.Format("{0} = {1} + {2} + {3} + {4} + {5} ",
+                     node.GetVarType(), node.DefaultValue, symbolTable.GetScopes().Capacity,
+                      symbolTable.Find("x"), symbolTable.Find("vset"), symbolTable.Find("sum")));*/
             }
+            
         }
 
         public override void Visit(VertexDeclNode node)
@@ -101,7 +104,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(AssignNode node)
         {
-            Console.WriteLine(node.Value.GetType());
+            //Console.WriteLine(node.Value.GetType());
             node.Target.Accept(this);
             node.Value.Accept(this);
         }
@@ -117,6 +120,7 @@ namespace P4_Project.Visitors
             node.IterationVar.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
+            Print();
         }
 
         public override void Visit(ForNode node)
@@ -178,6 +182,18 @@ namespace P4_Project.Visitors
         public override void Visit(MultiDecl node)
         {
             //throw new NotImplementedException();
+        }
+
+        public void Print()
+        {
+            symbolTable.OpenScope();
+            string output = "";
+            foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
+            {
+                output += string.Format("{0}, {1} + {2}", kvp.Key, kvp.Value.Name, kvp.Value.Type);
+                output += "\n";
+            }
+            Console.WriteLine(output);
         }
     }
 }
