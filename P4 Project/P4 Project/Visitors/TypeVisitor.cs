@@ -97,10 +97,12 @@ namespace P4_Project.Visitors
             if (node.DefaultValue != null)
             {
 
-                //node.DefaultValue.Accept(this, null);
-                //symbolTable.NewObj(node.SymbolObject.Name, SetType(node), 0);
+                node.DefaultValue.Accept(this);
+                /*Console.WriteLine(string.Format("{0} = {1} + {2} + {3} + {4} + {5} ",
+                     node.GetVarType(), node.DefaultValue, symbolTable.GetScopes().Capacity,
+                      symbolTable.Find("x"), symbolTable.Find("vset"), symbolTable.Find("sum")));*/
             }
-            return null;
+            
         }
 
         public override object Visit(VertexDeclNode node, object o)
@@ -111,21 +113,9 @@ namespace P4_Project.Visitors
 
         public override object Visit(AssignNode node, object o)
         {
-            Type tType = (Type) node.Target.Accept(this, null);
-            Type vType = (Type) node.Value.Accept(this, null);
-
-           if (!node.Value.GetType().Equals(null))
-                Console.WriteLine("Value is not a variable");
-
-            if (!tType.Equals(vType))
-                Console.WriteLine("Imcompatible types in Assign");
-            else
-                Console.WriteLine("Success");
-
-            // Console.WriteLine("TARGET = "+node.Target.ToString() + " Value = " + node.Value.ToString());
-
-
-            return null;
+            //Console.WriteLine(node.Value.GetType());
+            node.Target.Accept(this);
+            node.Value.Accept(this);
         }
 
         public override object Visit(BlockNode node, object o)
@@ -201,8 +191,8 @@ namespace P4_Project.Visitors
         
         public override object Visit(MAGIA node, object o)
         {
-            node.block.Accept(this, null);
-            return null;
+            node.block.Accept(this);
+            Print();
         }
 
         public override object Visit(BreakNode node, object o)
@@ -218,6 +208,21 @@ namespace P4_Project.Visitors
         public override object Visit(MultiDecl multiDecl, object p)
         {
             return null;
+        }
+
+        public void Print()
+        {
+            string output = "";
+            foreach (SymbolTable table in symbolTable.GetScopes())
+            {
+                foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
+                {
+                    output += string.Format("{0}, {1} + {2}", kvp.Key, kvp.Value.Name, kvp.Value.Type);
+                    output += "\n";
+                }
+                output += "\n\n\n";
+            }
+            Console.WriteLine(output);
         }
     }
 }
