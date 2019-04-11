@@ -10,6 +10,7 @@ using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.SymTab;
+using P4_Project.Types.Collections;
 using static P4_Project.TypeS;
 
 namespace P4_Project.Visitors
@@ -93,14 +94,10 @@ namespace P4_Project.Visitors
 
         public override object Visit(VarDeclNode node, object o)
         {
-            
 
+            //node.DefaultValue.Accept(this, null);
+            //symbolTable.NewObj(node.SymbolObject.Name, SetType(node), 0);
 
-            if (node.DefaultValue != null)
-            {
-                node.DefaultValue.Accept(this, null);
-                //Console.WriteLine(string.Format("{0} = {1} ", node.GetVarType(), node.DefaultValue));
-            }
             return null;
         }
 
@@ -112,13 +109,18 @@ namespace P4_Project.Visitors
 
         public override object Visit(AssignNode node, object o)
         {
-            node.Target.Accept(this, null);
-            node.Value.Accept(this, null);
+            Type tType = (Type) node.Target.Accept(this, null);
+            Type vType = (Type) node.Value.Accept(this, null);
 
-           // if (!node.Value.GetType().Equals(null))
-               // Console.WriteLine("Value is no a variable");
+           if (!node.Value.GetType().Equals(null))
+                Console.WriteLine("Value is not a variable");
 
-            Console.WriteLine("TARGET = "+node.Target.ToString() + " Value = " + node.Value.ToString());
+            if (!tType.Equals(vType))
+                Console.WriteLine("Imcompatible types in Assign");
+            else
+                Console.WriteLine("Success");
+
+            // Console.WriteLine("TARGET = "+node.Target.ToString() + " Value = " + node.Value.ToString());
 
 
             return null;
@@ -157,11 +159,15 @@ namespace P4_Project.Visitors
 
         public override object Visit(IfNode node, object o)
         {
-            if (node.Condition != null)
-                node.Condition.Accept(this, null);
+            
+            Type eType = (Type)node.Condition.Accept(this, null);
+
+           // if (!eType.Equals(TypeS.boolean))
+           //     Console.WriteLine("Expression in if is not a boolean");
+
+
             node.Body.Accept(this, null);
-            if (node.ElseNode != null)
-                node.ElseNode.Accept(this,null);
+            node.ElseNode.Accept(this, null);
 
             return null;
         }
@@ -203,6 +209,11 @@ namespace P4_Project.Visitors
         }
 
         public override object Visit(ContinueNode node, object o)
+        {
+            return null;
+        }
+
+        public override object Visit(MultiDecl multiDecl, object p)
         {
             return null;
         }

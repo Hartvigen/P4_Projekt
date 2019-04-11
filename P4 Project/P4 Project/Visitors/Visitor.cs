@@ -14,10 +14,7 @@ namespace P4_Project.Visitors
         public abstract object Visit(CallNode node, object o);
         public abstract object Visit(VarNode node, object o);
 
-        internal void Visit(MultiDecl multiDecl, object p)
-        {
-            
-        }
+        public abstract object Visit(MultiDecl multiDecl, object p);
 
         //Values
         public abstract object Visit(BoolConst node, object o);

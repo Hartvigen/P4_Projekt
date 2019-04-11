@@ -229,5 +229,10 @@ namespace P4_Project.Visitors
             ast.AppendLine($"</{node.GetType().Name}>");
             return null;
         }
+
+        public override object Visit(MultiDecl multiDecl, object p)
+        {
+            return null;
+        }
     }
 }

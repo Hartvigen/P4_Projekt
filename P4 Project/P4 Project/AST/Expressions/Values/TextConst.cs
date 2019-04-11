@@ -25,8 +25,7 @@ namespace P4_Project.AST.Expressions.Values
 
         public override object Accept(Visitor vi, object o)
         {
-            vi.Visit(this, null);
-            return null;
+            return vi.Visit(this, o);
         }
     }
 }

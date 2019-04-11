@@ -30,8 +30,7 @@ namespace P4_Project.AST.Stmts
         public override object Accept(Visitor vi, object o)
         {
 
-            vi.Visit(this, o);
-            return null;
+            return vi.Visit(this, o);
         }
     }
 }

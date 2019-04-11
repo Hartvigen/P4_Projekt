@@ -375,5 +375,10 @@ namespace P4_Project.Visitors
         {
             str.Remove(str.Length - 2, 2); //Remove the last comma and space.
         }
+
+        public override object Visit(MultiDecl multiDecl, object p)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
