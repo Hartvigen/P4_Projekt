@@ -97,12 +97,12 @@ namespace P4_Project.Visitors
             if (node.DefaultValue != null)
             {
 
-                node.DefaultValue.Accept(this);
+                node.DefaultValue.Accept(this, null);
                 /*Console.WriteLine(string.Format("{0} = {1} + {2} + {3} + {4} + {5} ",
                      node.GetVarType(), node.DefaultValue, symbolTable.GetScopes().Capacity,
                       symbolTable.Find("x"), symbolTable.Find("vset"), symbolTable.Find("sum")));*/
             }
-            
+            return null;
         }
 
         public override object Visit(VertexDeclNode node, object o)
@@ -114,8 +114,9 @@ namespace P4_Project.Visitors
         public override object Visit(AssignNode node, object o)
         {
             //Console.WriteLine(node.Value.GetType());
-            node.Target.Accept(this);
-            node.Value.Accept(this);
+            node.Target.Accept(this, null);
+            node.Value.Accept(this, null);
+            return null;
         }
 
         public override object Visit(BlockNode node, object o)
@@ -191,8 +192,9 @@ namespace P4_Project.Visitors
         
         public override object Visit(MAGIA node, object o)
         {
-            node.block.Accept(this);
+            node.block.Accept(this, null);
             Print();
+            return null;
         }
 
         public override object Visit(BreakNode node, object o)
