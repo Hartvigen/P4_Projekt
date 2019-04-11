@@ -77,6 +77,7 @@ namespace P4_Project.SymTab
             return innerScopes;
         }
 
+        // return the dictionary
         public Dictionary<string, Obj> GetDic()
         {
             return symbolDecls;

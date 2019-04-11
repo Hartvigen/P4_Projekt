@@ -120,7 +120,6 @@ namespace P4_Project.Visitors
             node.IterationVar.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
-            Print();
         }
 
         public override void Visit(ForNode node)
@@ -167,6 +166,7 @@ namespace P4_Project.Visitors
         public override void Visit(MAGIA node)
         {
             node.block.Accept(this);
+            Print();
         }
 
         public override void Visit(BreakNode node)
@@ -186,12 +186,15 @@ namespace P4_Project.Visitors
 
         public void Print()
         {
-            symbolTable.OpenScope();
             string output = "";
-            foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
+            foreach (SymbolTable table in symbolTable.GetScopes())
             {
-                output += string.Format("{0}, {1} + {2}", kvp.Key, kvp.Value.Name, kvp.Value.Type);
-                output += "\n";
+                foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
+                {
+                    output += string.Format("{0}, {1} + {2}", kvp.Key, kvp.Value.Name, kvp.Value.Type);
+                    output += "\n";
+                }
+                output += "\n\n\n";
             }
             Console.WriteLine(output);
         }
