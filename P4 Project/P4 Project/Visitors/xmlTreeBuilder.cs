@@ -12,7 +12,7 @@ using P4_Project.AST.Stmts.Decls;
 
 namespace P4_Project.Visitors
 {
-    class XmlTreeBuilder : Visitor
+    public class XmlTreeBuilder : Visitor
     {
         public StringBuilder ast = new StringBuilder();
 

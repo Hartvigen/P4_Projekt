@@ -1,21 +1,14 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using P4_Project.AST;
 using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.Visitors;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.Visitors.Tests
 {
     [TestClass()]
     public class PrettyPrinterTests
     {
-        static PrettyPrinter visitor;
-
         static Parser parserWithUglyCode;
         static Scanner scannerUgly;
         static string pathToUglyCode;
@@ -27,8 +20,8 @@ namespace P4_Project.Visitors.Tests
         [ClassInitialize()]
         public static void ClassInit(TestContext context)
         {
-            pathToUglyCode = "../../../../P4 Project/P4 ProjectTests/Visitors/UglyCode.txt";
-            pathToPrettyCode = "../../../../P4 Project/P4 ProjectTests/Visitors/PrettyCode.txt";
+            pathToUglyCode = "../../../../P4 Project/P4 ProjectTests/Visitors/TestCode/UglyCode.txt";
+            pathToPrettyCode = "../../../../P4 Project/P4 ProjectTests/Visitors/TestCode/PrettyCode.txt";
         }
 
         [TestInitialize]
@@ -39,8 +32,6 @@ namespace P4_Project.Visitors.Tests
 
             parserWithUglyCode = new Parser(scannerUgly);
             parserWithPrettyCode = new Parser(scannerPretty);
-
-            visitor = new PrettyPrinter();
         }
 
         static private MemoryStream StreamFromString(string str)
@@ -55,7 +46,6 @@ namespace P4_Project.Visitors.Tests
             parserWithPrettyCode = null;
             scannerPretty = null;
             scannerUgly = null;
-            visitor = null;
         }
 
         public static string Prettify(string program)
@@ -69,7 +59,7 @@ namespace P4_Project.Visitors.Tests
 
         //Makeing Pretty written code pretty actually makes no changes 
         [TestMethod()]
-        public void PrettyPrinterTestSuccess01()
+        public void PrettyPrinterTest01()
         {
             string program = Prettify(File.ReadAllText(pathToPrettyCode));
             string startprogram = File.ReadAllText(pathToPrettyCode);
@@ -79,7 +69,7 @@ namespace P4_Project.Visitors.Tests
 
         //Prettyfying code 10 times changes nothing to the actual code. 
         [TestMethod()]
-        public void PrettyPrinterTestSuccess02()
+        public void PrettyPrinterTest02()
         {
             string program = File.ReadAllText(pathToPrettyCode);
 
@@ -91,7 +81,7 @@ namespace P4_Project.Visitors.Tests
 
         //Prettyfying ugly code makes the code actually different.
         [TestMethod()]
-        public void PrettyPrinterTestFailure01()
+        public void PrettyPrinterTest03()
         {
             string program = File.ReadAllText(pathToUglyCode);
             Assert.IsFalse(program == File.ReadAllText(pathToPrettyCode));
@@ -99,7 +89,7 @@ namespace P4_Project.Visitors.Tests
 
         //Prettyfying ugly code makes the code actually different but subsequent prettyfyings does nothing..
         [TestMethod()]
-        public void PrettyPrinterTestFailure02()
+        public void PrettyPrinterTest04()
         {
             string program = File.ReadAllText(pathToUglyCode);
             Assert.IsFalse(Prettify(program) == program);
@@ -111,34 +101,50 @@ namespace P4_Project.Visitors.Tests
 
         //The UglyCode and prettyCode arent actually the exact same code.
         [TestMethod()]
-        public void PrettyPrinterTestFailure03()
+        public void PrettyPrinterTest05()
         {
             Assert.IsFalse(File.ReadAllText(pathToUglyCode) == File.ReadAllText(pathToPrettyCode));
         }
 
         //The Ugly Code gets pretty after exactly one prettify
         [TestMethod()]
-        public void PrettyPrinterTestFailure04()
+        public void PrettyPrinterTest06()
         {
             Assert.IsTrue(File.ReadAllText(pathToPrettyCode) == Prettify(File.ReadAllText(pathToUglyCode)));
         }
 
-        //This tests the performence of the prettyprinter, it should complete in the 2000 prettyfyings in under 2 second if not there is probably 
+        //The Ugly code parses without error
+        [TestMethod()]
+        public void PrettyPrinterTest07()
+        {
+            parserWithUglyCode.Parse();
+            Assert.IsTrue(parserWithUglyCode.errors.count == 0);
+        }
+
+        //The pretty code parses without error
+        [TestMethod()]
+        public void PrettyPrinterTest08()
+        {
+            parserWithPrettyCode.Parse();
+            Assert.IsTrue(parserWithPrettyCode.errors.count == 0);
+        }
+
+        //This tests the performence of the prettyprinter, it should complete the 1000 prettyfyings in under 1 second if not there is probably 
         //something expensive going on depending on the speed of you computer it might be actually be okay.
         [TestMethod()]
-        public void PrettyPrinterTestFailure05()
+        public void PrettyPrinterTest09()
         {
 
             string program = File.ReadAllText(pathToUglyCode);
 
             Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 
-            for (int i = 2000; i > 0; i--)
+            for (int i = 1000; i > 0; i--)
                 Prettify(program);
 
-            Int32 elapsed = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds  - unixTimestamp;
+            Int32 elapsed = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds - unixTimestamp;
 
-            Assert.IsTrue(elapsed < 3);
+            Assert.IsTrue(elapsed < 2);
         }
     }
 }

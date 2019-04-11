@@ -119,23 +119,42 @@ namespace P4_Project.Visitors
 
         public override object Visit(EdgeCreateNode node, object o)
         {
-            foreach (Tuple<IdentNode, List<AssignNode>> list in node.RightSide)
+            node.LeftSide.Accept(this, null);
+            str.Append(" " + node.GetCodeofOperator() + " ");
+            if (node.RightSide.Count == 1)
             {
-                node.LeftSide.Accept(this, null);
-                str.Append(" " + node.GetCodeofOperator() + " ");
-                if (list.Item2.Count != 0)
+                if (node.RightSide[0].Item2.Count != 0)
                     str.Append("(");
-                list.Item1.Accept(this, null);
-                foreach (AssignNode n in list.Item2)
-                {
-                    CommaAndSpace();
-                    n.Accept(this, null);
-                    RemoveIndentAndNewline();
-                }
-                if (list.Item2.Count != 0)
+
+                node.RightSide[0].Item1.Accept(this, null);
+                CommaAndSpace();
+
+                node.RightSide[0].Item2.ForEach(l => { l.Accept(this, null); RemoveIndentAndNewline(); CommaAndSpace(); });
+
+                RemoveLastCommaAndSpace();
+
+                if (node.RightSide[0].Item2.Count != 0)
                     str.Append(")");
-                IndentAndNewline();
             }
+            else
+            {
+                str.Append("{");
+                node.RightSide.ForEach(t =>
+                {
+                    str.Append("(");
+                    t.Item1.Accept(this, null);
+                    CommaAndSpace();
+
+                    t.Item2.ForEach(l => { l.Accept(this, null); RemoveIndentAndNewline(); CommaAndSpace(); });
+
+                    RemoveLastCommaAndSpace();
+                    str.Append(")");
+                    CommaAndSpace();
+                });
+                RemoveLastCommaAndSpace();
+                str.Append("}");
+            }
+            IndentAndNewline();
             return null;
         }
 
@@ -191,18 +210,13 @@ namespace P4_Project.Visitors
         {
             str.Append("vertex(");
             str.Append(node.SymbolObject.Name);
-            if (node.Attributes.statements.Count != 0)
-            {
+            CommaAndSpace();
+            node.Attributes.statements.ForEach(v => {
+                v.Accept(this, null);
+                RemoveIndentAndNewline();
                 CommaAndSpace();
-                foreach (Node n in node.Attributes.statements)
-                {
-                    n.Accept(this, null);
-                    RemoveIndentAndNewline();
-                    CommaAndSpace();
-                }
-                RemoveLastCommaAndSpace();
-            }
-
+            });
+            RemoveLastCommaAndSpace();
             str.Append(")");
             IndentAndNewline();
             return null;
@@ -374,7 +388,42 @@ namespace P4_Project.Visitors
 
         public override object Visit(MultiDecl node, object o)
         {
-            node.Decls.ForEach(n => n.Accept(this, null));
+            if (node.Decls[0].GetType().Name == "VertexDeclNode")
+            {
+                if (node.Decls.Count > 1)
+                {
+                    str.Append("vertex{");
+                    node.Decls.ForEach(d =>
+                    {
+                        str.Append("(");
+                        str.Append(d.SymbolObject.Name);
+                        CommaAndSpace();
+                        ((VertexDeclNode)d).Attributes.statements.ForEach(v => {
+                            v.Accept(this, null);
+                            RemoveIndentAndNewline();
+                            CommaAndSpace();
+                        });
+                        RemoveLastCommaAndSpace();
+                        str.Append(")");
+                        CommaAndSpace();
+                    });
+                    RemoveLastCommaAndSpace();
+                    str.Append("}");
+                }
+                else
+                {
+                    str.Append("vertex(");
+                    node.Decls[0].Accept(this, null);
+                    str.Append(")");
+                }
+            }
+            else
+            {
+                Console.WriteLine(node.Decls.GetType().Name);
+                node.Decls.ForEach(n => { n.Accept(this, null); IndentAndNewline(); });
+                RemoveIndentAndNewline();
+            }
+            IndentAndNewline();
             return null;
         }
 

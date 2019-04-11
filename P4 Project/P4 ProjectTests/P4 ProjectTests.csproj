@@ -63,6 +63,7 @@
     <Compile Include="Compiler\SyntaxAnalysis\ScannerTests.cs" />
     <Compile Include="Graphviz\DotToPngTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Visitors\XmlTreeBuilderTests.cs" />
     <Compile Include="Visitors\PrettyPrinterTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -171,8 +172,9 @@
     <Content Include="Graphviz\bin\unflatten.exe" />
     <Content Include="Graphviz\bin\vmalloc.dll" />
     <Content Include="Graphviz\bin\zlib1.dll" />
-    <Content Include="Visitors\PrettyCode.txt" />
-    <Content Include="Visitors\UglyCode.txt" />
+    <Content Include="Visitors\TestCode\PrettyCode.txt" />
+    <Content Include="Visitors\TestCode\UglyCode.txt" />
+    <Content Include="Visitors\TestCode\xmltree.xml" />
   </ItemGroup>
   <ItemGroup />
   <Choose>
