@@ -63,7 +63,7 @@ namespace P4_Project.Visitors.Tests
             Parser parser = new Parser(new Scanner(StreamFromString(program)));
             parser.Parse();
             PrettyPrinter prettyPrinter = new PrettyPrinter();
-            parser.mainNode.Accept(prettyPrinter);
+            parser.mainNode.Accept(prettyPrinter, null);
             return prettyPrinter.str.ToString();
         }
 

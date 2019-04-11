@@ -10,13 +10,14 @@ using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.SymTab;
+using P4_Project.Types.Collections;
 using static P4_Project.TypeS;
 
 namespace P4_Project.Visitors
 {
     class TypeVisitor : Visitor
     {
-        SymbolTable symbolTable;
+        public SymbolTable symbolTable;
 
         public TypeVisitor(SymbolTable table)
         {
@@ -24,160 +25,199 @@ namespace P4_Project.Visitors
         }
 
 
-        public override void Visit(CallNode node)
+        public override object Visit(CallNode node, object o)
         { 
-            node.Parameters.Accept(this);
+            node.Parameters.Accept(this,null);
+            return null;
         }
 
-        public override void Visit(VarNode node)
+        public override object Visit(VarNode node,object o)
+        {
+            return null;
+        }
+
+        public override object Visit(BoolConst node, object o)
+        {
+            return null;
+        }
+
+        public override object Visit(CollecConst node, object o)
+        {
+            return null;
+        }
+
+        public override object Visit(NoneConst node, object o)
+        {
+            return null;
+        }
+
+        public override object Visit(NumConst node, object o)
         {
 
+            return null;
         }
 
-        public override void Visit(BoolConst node)
+        public override object Visit(TextConst node, object o)
         {
-
+            return null;
         }
 
-        public override void Visit(CollecConst node)
-        {  
-            
-        }
-
-        public override void Visit(NoneConst node)
-        {
-
-        }
-
-        public override void Visit(NumConst node)
+        public override object Visit(BinExprNode node, object o)
         {
  
+            node.Left.Accept(this, null);
+            node.Right.Accept(this, null);
+            return null;
+
         }
 
-        public override void Visit(TextConst node)
+        public override object Visit(UnaExprNode node, object o)
         {
-                
+            node.Expr.Accept(this, null);
+            return null;
         }
 
-        public override void Visit(BinExprNode node)
-        {
-            node.Left.Accept(this);
-            node.Right.Accept(this);
-            //Console.WriteLine(string.Format("{0} {1} ", node.Left.GetType(), node.Right.GetType()));
-        }
-
-        public override void Visit(UnaExprNode node)
-        {
-            node.Expr.Accept(this);  
-        }
-
-        public override void Visit(EdgeCreateNode node)
+        public override object Visit(EdgeCreateNode node, object o)
         {
             //node.Start.Accept(this);
             //node.End.Accept(this);
             //node.Attributes.Accept(this);  
+            return null;
         }
 
-        public override void Visit(FuncDeclNode node)
+        public override object Visit(FuncDeclNode node, object o)
         {
-            node.Parameters.Accept(this);
-            node.Body.Accept(this);
+            node.Parameters.Accept(this, null);
+            node.Body.Accept(this, null);
+            return null;
         }
 
-        public override void Visit(VarDeclNode node)
+        public override object Visit(VarDeclNode node, object o)
         {
             if (node.DefaultValue != null)
             {
 
-                node.DefaultValue.Accept(this);
-                //Console.WriteLine(string.Format("{0} = {1} \n {2} {3} ", node.GetVarType(), node.DefaultValue, symbolTable.GetScopes().Capacity, symbolTable.Find("total")));
+                //node.DefaultValue.Accept(this, null);
+                //symbolTable.NewObj(node.SymbolObject.Name, SetType(node), 0);
             }
+            return null;
         }
 
-        public override void Visit(VertexDeclNode node)
+        public override object Visit(VertexDeclNode node, object o)
         {  
-            node.Attributes.Accept(this);
+            node.Attributes.Accept(this, null);
+            return null;
         }
 
-        public override void Visit(AssignNode node)
+        public override object Visit(AssignNode node, object o)
         {
-            Console.WriteLine(node.Value.GetType());
-            node.Target.Accept(this);
-            node.Value.Accept(this);
+            Type tType = (Type) node.Target.Accept(this, null);
+            Type vType = (Type) node.Value.Accept(this, null);
+
+           if (!node.Value.GetType().Equals(null))
+                Console.WriteLine("Value is not a variable");
+
+            if (!tType.Equals(vType))
+                Console.WriteLine("Imcompatible types in Assign");
+            else
+                Console.WriteLine("Success");
+
+            // Console.WriteLine("TARGET = "+node.Target.ToString() + " Value = " + node.Value.ToString());
+
+
+            return null;
         }
 
-        public override void Visit(BlockNode node)
+        public override object Visit(BlockNode node, object o)
         { 
             foreach (Node n in node.statements)
-                n.Accept(this);    
+                n.Accept(this, null);
+
+            return null;
         }
 
-        public override void Visit(ForeachNode node)
+        public override object Visit(ForeachNode node, object o)
         {
-            node.IterationVar.Accept(this);
-            node.Iterator.Accept(this);
-            node.Body.Accept(this);
+            node.IterationVar.Accept(this,null);
+            node.Iterator.Accept(this, null);
+            node.Body.Accept(this, null);
+            return node;
         }
 
-        public override void Visit(ForNode node)
+        public override object Visit(ForNode node, object o)
         {
-            //Tjek om alle delene af forløkken er korrekt
-            node.Initializer.Accept(this);
-            node.Condition.Accept(this);
-            node.Iterator.Accept(this);
-            node.Body.Accept(this);
+            node.Initializer.Accept(this, null);
+            node.Condition.Accept(this, null);
+            node.Iterator.Accept(this, null);
+            node.Body.Accept(this, null);
+            return null;
         }
 
-        public override void Visit(HeadNode node)
+        public override object Visit(HeadNode node, object o)
         { 
-            node.attrDeclBlock.Accept(this); 
+            node.attrDeclBlock.Accept(this, null);
+            return null;
         }
 
-        public override void Visit(IfNode node)
+        public override object Visit(IfNode node, object o)
         {
-            // Om den ikker er null er giver en bool, ligesom while
-            if (node.Condition != null)
-                node.Condition.Accept(this);
-            node.Body.Accept(this);
-            if (node.ElseNode != null)
-                node.ElseNode.Accept(this);
+            
+            Type eType = (Type)node.Condition.Accept(this, null);
+
+           // if (!eType.Equals(TypeS.boolean))
+           //     Console.WriteLine("Expression in if is not a boolean");
+
+
+            node.Body.Accept(this, null);
+            node.ElseNode.Accept(this, null);
+
+            return null;
         }
 
-        public override void Visit(LoneCallNode node)
+        public override object Visit(LoneCallNode node, object o)
         {  
-            node.Call.Accept(this);   
+            node.Call.Accept(this, null);
+            return null;
         }
 
-        public override void Visit(ReturnNode node)
+        public override object Visit(ReturnNode node, object o)
         { 
-            node.Ret.Accept(this);    
+            node.Ret.Accept(this, null);
+            return null;
         }
 
-        public override void Visit(WhileNode node)
+        public override object Visit(WhileNode node, object o)
         {
-            // Her skal der tjekkes om hver side af conditionen er samme type
-            node.Condition.Accept(this);
-            node.Body.Accept(this);
-        }
+            //Console.WriteLine("entering whileloop" + node.Condition.Accept(this, null).GetType());
+           // if (!node.Condition.Accept(this, null).Equals("2"))
+           //       Console.WriteLine("visitWhileLOOP");
 
-        public override void Visit(MAGIA node)
+
+            node.Condition.Accept(this, null);
+            node.Body.Accept(this, null);
+
+            return node;
+        }
+        
+        public override object Visit(MAGIA node, object o)
         {
-            node.block.Accept(this);
+            node.block.Accept(this, null);
+            return null;
         }
 
-        public override void Visit(BreakNode node)
-        {    
-            
-        }
-
-        public override void Visit(ContinueNode node)
-        {    
-            
-        }
-
-        public override void Visit(MultiDecl node)
+        public override object Visit(BreakNode node, object o)
         {
-            //throw new NotImplementedException();
+            return null;
+        }
+
+        public override object Visit(ContinueNode node, object o)
+        {
+            return null;
+        }
+
+        public override object Visit(MultiDecl multiDecl, object p)
+        {
+            return null;
         }
     }
 }

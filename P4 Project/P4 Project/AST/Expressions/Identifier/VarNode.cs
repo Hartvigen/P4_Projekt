@@ -19,9 +19,9 @@ namespace P4_Project.AST.Expressions.Identifier
         { }
 
 
-        public override void Accept(Visitor vi)
+        public override object Accept(Visitor vi, object o)
         {
-            vi.Visit(this);
+            return vi.Visit(this, o);
         }
     }
 }

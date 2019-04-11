@@ -12,6 +12,6 @@ namespace P4_Project.AST
     /// </summary>
     public abstract class Node
     {
-        public abstract void Accept(Visitor vi);
+        public abstract object Accept(Visitor vi, object o);
     }
 }

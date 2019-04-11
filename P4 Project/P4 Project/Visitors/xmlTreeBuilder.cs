@@ -23,192 +23,192 @@ namespace P4_Project.Visitors
         //2. Accept the node
         //3. End XML tag of whatever node type is.
         //That will generate a XML tree that shows the entire node structure of the program.
-        public override void Visit(CallNode node)
+        public override object Visit(CallNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Parameters.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Parameters.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
-
-        public override void Visit(VarNode node)
+        public override object Visit(VarNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Source?.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Source?.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(BoolConst node)
+        public override object Visit(BoolConst node, object o)
         {
-            createXmlTag(node, XML.both);
+            return createXmlTag(node, XML.both);
         }
 
-        public override void Visit(CollecConst node)
+        public override object Visit(CollecConst node, object o)
         {
-            createXmlTag(node, XML.both);
+            return createXmlTag(node, XML.both);
         }
 
-        public override void Visit(NoneConst node)
+        public override object Visit(NoneConst node, object o)
         {
-            createXmlTag(node, XML.both);
+            return createXmlTag(node, XML.both);
         }
 
-        public override void Visit(NumConst node)
+        public override object Visit(NumConst node, object o)
         {
-            createXmlTag(node, XML.both);
+            return createXmlTag(node, XML.both);
         }
 
-        public override void Visit(TextConst node)
+        public override object Visit(TextConst node, object o)
         {
-            createXmlTag(node, XML.both);
+            return createXmlTag(node, XML.both);
         }
 
-        public override void Visit(BinExprNode node)
-        {
-            createXmlTag(node, XML.start);
-            node.Left.Accept(this);
-            node.Right.Accept(this);
-            createXmlTag(node, XML.end);
-        }
-
-        public override void Visit(UnaExprNode node)
+        public override object Visit(BinExprNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Expr.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Left.Accept(this, null);
+            node.Right.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(EdgeCreateNode node)
+        public override object Visit(UnaExprNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.LeftSide.Accept(this);
-            node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
-            createXmlTag(node, XML.end);
+            node.Expr.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(FuncDeclNode node)
+        public override object Visit(EdgeCreateNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Parameters.Accept(this);
-            node.Body.Accept(this);
-            createXmlTag(node, XML.end);
+            node.LeftSide.Accept(this, null);
+            node.RightSide.ForEach(t => { t.Item1.Accept(this, null); t.Item2.ForEach(l => l.Accept(this, null)); });
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(VarDeclNode node)
+        public override object Visit(FuncDeclNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.DefaultValue?.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Parameters.Accept(this, null);
+            node.Body.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(VertexDeclNode node)
+        public override object Visit(VarDeclNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Attributes.Accept(this);
-            createXmlTag(node, XML.end);
+            node.DefaultValue?.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(AssignNode node)
+        public override object Visit(VertexDeclNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Target.Accept(this);
-            node.Value.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Attributes.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(BlockNode node)
+        public override object Visit(AssignNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.statements.ForEach(n => n.Accept(this));
-            createXmlTag(node, XML.end);
+            node.Target.Accept(this, null);
+            node.Value.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(ForeachNode node)
+        public override object Visit(BlockNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.IterationVar.Accept(this);
-            node.Iterator.Accept(this);
-            node.Body.Accept(this);
-            createXmlTag(node, XML.end);
+            node.statements.ForEach(n => n.Accept(this, null));
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(ForNode node)
+        public override object Visit(ForeachNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Initializer.Accept(this);
-            node.Condition.Accept(this);
-            node.Iterator.Accept(this);
-            node.Body.Accept(this);
-            createXmlTag(node, XML.end);
+            node.IterationVar.Accept(this, null);
+            node.Iterator.Accept(this, null);
+            node.Body.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(HeadNode node)
+        public override object Visit(ForNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.attrDeclBlock.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Initializer.Accept(this, null);
+            node.Condition.Accept(this, null);
+            node.Iterator.Accept(this, null);
+            node.Body.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(IfNode node)
+        public override object Visit(HeadNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Condition?.Accept(this);
-            node.Body.Accept(this);
-            node.ElseNode?.Accept(this);
-            createXmlTag(node, XML.end);
+            node.attrDeclBlock.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(LoneCallNode node)
+        public override object Visit(IfNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Call.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Condition?.Accept(this, null);
+            node.Body.Accept(this, null);
+            node.ElseNode?.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(ReturnNode node)
+        public override object Visit(LoneCallNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Ret.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Call.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(WhileNode node)
+        public override object Visit(ReturnNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Condition.Accept(this);
-            node.Body.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Ret.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(MAGIA node)
+        public override object Visit(WhileNode node, object o)
         {
             createXmlTag(node, XML.start);
-            node.block.Accept(this);
-            createXmlTag(node, XML.end);
+            node.Condition.Accept(this, null);
+            node.Body.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        public override void Visit(BreakNode node)
-        {
-            createXmlTag(node, XML.both);
-        }
-
-        public override void Visit(ContinueNode node)
-        {
-            createXmlTag(node, XML.both);
-        }
-
-        public override void Visit(MultiDecl node)
+        public override object Visit(MAGIA node, object o)
         {
             createXmlTag(node, XML.start);
-            node.Decls.ForEach(n => n.Accept(this));
-            createXmlTag(node, XML.end);
+            node.block.Accept(this, null);
+            return createXmlTag(node, XML.end);
         }
 
-        private void createXmlTag(Node node, XML state)
+        public override object Visit(BreakNode node, object o)
+        {
+            return createXmlTag(node, XML.both);
+        }
+
+        public override object Visit(ContinueNode node, object o)
+        {
+            return createXmlTag(node, XML.both);
+        }
+
+        public override object Visit(MultiDecl node, object o)
+        {
+            createXmlTag(node, XML.start);
+            node.Decls.ForEach(n => n.Accept(this, null));
+            return createXmlTag(node, XML.end);
+        }
+
+        private object createXmlTag(Node node, XML state)
         {
             if (state == XML.start || state == XML.both)
                 ast.AppendLine($"<{node.GetType().Name}>");
-            if(state == XML.end || state == XML.both)
+            if (state == XML.end || state == XML.both)
                 ast.AppendLine($"</{node.GetType().Name}>");
+            return null;
         }
     }
 }

@@ -78,9 +78,8 @@
     <Compile Include="AST\Stmts\LoneCallNode.cs" />
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
-    <Compile Include="Visitors\TypeVisitor.cs" />
-    <Compile Include="Visitors\XmlTreeBuilder.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
+    <Compile Include="Visitors\TypeVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
     <Compile Include="Types\BaseType.cs" />
     <Compile Include="Types\Primitives\NumberType.cs" />
@@ -102,6 +101,7 @@
     <Compile Include="AST\Stmts\IfNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
     <Compile Include="AST\Stmts\Decls\MultiDecl.cs" />
+    <Compile Include="Visitors\XmlTreeBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

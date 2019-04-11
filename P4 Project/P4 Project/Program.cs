@@ -88,7 +88,7 @@ namespace P4_Project
             Parser parser = new Parser(new Scanner(filePath));
             parser.Parse();
             PrettyPrinter visitor = new PrettyPrinter();
-            parser.mainNode.Accept(visitor);
+            parser.mainNode.Accept(visitor, null);
 
             File.WriteAllText("prettyprint.txt", visitor.str.ToString());
 
@@ -103,7 +103,7 @@ namespace P4_Project
             MAGIA AST = parser.mainNode;
 
             TypeVisitor visitor = new TypeVisitor(parser.tab);
-            AST.Accept(visitor);
+            AST.Accept(visitor, null);
 
             return parser.errors.count == 0;
         }
@@ -116,7 +116,7 @@ namespace P4_Project
             MAGIA AST = parser.mainNode;
 
             XmlTreeBuilder visitor = new XmlTreeBuilder();
-            AST.Accept(visitor);
+            AST.Accept(visitor, null);
 
             File.WriteAllText("xmltree.xml", visitor.ast.ToString());
 

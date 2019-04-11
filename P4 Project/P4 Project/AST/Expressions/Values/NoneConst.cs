@@ -12,9 +12,9 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class NoneConst : ExprNode
     {
-        public override void Accept(Visitor vi)
+        public override object Accept(Visitor vi, object o)
         {
-            vi.Visit(this);
+            return vi.Visit(this, o);
         }
     }
 }
