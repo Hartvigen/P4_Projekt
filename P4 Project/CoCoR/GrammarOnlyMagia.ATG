@@ -1,5 +1,6 @@
 COMPILER MAGIA 
  
+ 
 CHARACTERS
  letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
  digit = "0123456789".
@@ -8,6 +9,7 @@ CHARACTERS
  tab = '\t'.
  CharInLine = ANY - cr - lf. 
  AnyButDoubleQuote = CharInLine - '\"'. 
+
 
 TOKENS
  IDENT = letter {letter | digit | '_'}.
@@ -96,7 +98,6 @@ Member = '.' CallOrID.
 Identifier = ( IDENT ).
 
 Const = ( NUMBER | TEXT | "true"| "false" | "none" ).
-
 
 Type = ( SingleType | CollecType).
 
