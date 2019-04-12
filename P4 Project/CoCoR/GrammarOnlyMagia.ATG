@@ -21,114 +21,86 @@ IGNORE cr + lf + tab
 
 
 
-
 PRODUCTIONS
 
-
-MAGIA = { SYNC Head } { SYNC Stmt } { SYNC FuncDecl } .
-
+MAGIA = { Head } { Stmt } { FuncDecl } .
 
 
-Head = '[' ( "vertex" | "edge" ) WEAK '(' VarDecl { WEAK ',' VarDecl } WEAK ')' ']' .
+Head = '[' ( "vertex" | "edge" ) '(' VarDecl { ',' VarDecl } ')' ']' .
 
+FuncDecl = "func" (Type | "none") IDENT '(' [ VarDecl { ',' VarDecl } ] ')' '{' { Stmt } '}' .
 
-FuncDecl = "func" (Type | "none") IDENT WEAK '(' [ IF(la.val != ")" && la.val != "{") VarDecl { WEAK ',' VarDecl } ] WEAK ')' WEAK '{' { SYNC Stmt } WEAK '}' .
-
-Stmt = ( StructStmt | SimpleStmt | KeywordStmt | FullDecl ).
-
+Stmt = ( StructStmt | KeywordStmt | SimpleStmt | FullDecl ).
 
 
 StructStmt = ( StmtWhile | StmtFor | StmtForeach | StmtIf ).
 
+StmtWhile = "while" '(' Expr ')' '{' { Stmt } '}' .
 
-StmtWhile = "while" '(' Expr ')' '{' { SYNC Stmt } '}' .
+StmtFor = "for" '(' ( SimpleStmt | VarDecl )  ',' Expr  ',' Stmt')' '{' { Stmt } '}' .
 
+StmtForeach = "foreach" '(' Type IDENT "in" Expr ')' '{' { Stmt } '}' .
 
-StmtFor = "for" '(' ( SimpleStmt | VarDecl ) WEAK ',' Expr WEAK ',' Stmt')' '{' { SYNC Stmt } '}' .
-
-
-StmtForeach = "foreach" '(' Type IDENT "in" Expr ')' '{' { SYNC Stmt } '}' .
-
-
-StmtIf = "if" '(' Expr ')' '{' { SYNC Stmt } '}' { "elseif" '(' Expr ')' '{' { SYNC Stmt } '}' } [ "else" '{' { SYNC Stmt } '}' ].
-
-
-
-SimpleStmt = CallOrID { Member } [ Assign | EdgeOneOrMore].
-
-
-Member = WEAK '.' CallOrID.
-
-
-EdgeOneOrMore = EdgeOpr ( Identifier | EdgeCreate | '{' EdgeCreate { WEAK ',' EdgeCreate } '}' ).
-
-
-EdgeOpr = ( "<-" | "--" | "->" ).
-
-
-EdgeCreate = '(' Identifier { WEAK ',' Identifier Assign } ')'.
+StmtIf = "if" '(' Expr ')' '{' { Stmt } '}' { "elseif" '(' Expr ')' '{' { Stmt } '}' } [ "else" '{' { Stmt } '}' ].
 
 
 KeywordStmt = ( "return" Expr | "break" | "continue" ).
 
 
-FullDecl = Type ( IDENT [ Assign ] | '{' VtxDecl { WEAK ',' VtxDecl } '}' | VtxDecl ).
+SimpleStmt = CallOrID { Member } [Assign | EdgeOneOrMore].
+
+EdgeOneOrMore = EdgeOpr ( Identifier | EdgeCreate | '{' EdgeCreate { ',' EdgeCreate } '}' ).
+
+EdgeOpr = ( "<-" | "--" | "->" ).
+
+EdgeCreate = '(' Identifier { ',' Identifier Assign } ')'.
 
 
-VtxDecl = '(' IDENT { WEAK ',' Identifier Assign } ')'.
+FullDecl = Type ( IDENT [ Assign ] | '{' VtxDecl { ',' VtxDecl } '}' | VtxDecl ).
+
+VtxDecl = '(' IDENT { ',' Identifier Assign } ')'.
 
 
-VarDecl = Type IDENT [ Assign ] .
-
+VarDecl = Type IDENT [ Assign ].
 
 Assign = '=' ( Expr | '{' Args '}' ).
+
 
 
 Expr = ExprOR. 
 
 ExprOR = ExprAnd { "||" ExprAnd }.
 
-
 ExprAnd = ExprEQ { "&&" ExprEQ }.
-
 
 ExprEQ = ExprRel [("==" | "!=" ) ExprRel ].
 
-
 ExprRel = ExprPlus [('<' | '>' | "<=" | ">=" ) ExprPlus ].
-
 
 ExprPlus = ['-' ] ExprMult {('+' | '-' ) ExprMult }.
 
-
 ExprMult = ExprNot {('*' | '/' | '%' ) ExprNot }.
 
+ExprNot = ['!'] Factor.
 
-ExprNot = ['!' ] Factor.
-
-
-Factor = Const| ('(' Expr ')' | CallOrID ) { Member }. 
-
+Factor = Const | CallOrID { Member }. 
 
 
 CallOrID = Identifier ['(' Args ')'].
 
+Args = [Expr { ',' Expr } ].
 
-Args = [Expr { WEAK ',' Expr } ].
-
+Member = '.' CallOrID.
 
 
 Identifier = ( IDENT ).
-
 
 Const = ( NUMBER | TEXT | "true"| "false" | "none" ).
 
 
 Type = ( SingleType | CollecType).
 
-
-
-CollecType = ( "list" WEAK '' | "set" WEAK '' | "queue" WEAK '' | "stack" WEAK '' ).
+CollecType = ( "list" | "set" | "queue" | "stack" ) '<' SingleType '>'.
 
 SingleType = ( "number" | "boolean" | "text" | "vertex" | "edge" ).
 
