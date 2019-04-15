@@ -50,9 +50,7 @@ namespace P4_Project.SymTab
         {
             Obj obj = new Obj(name, type, kind, scope);
 
-            if (symbolDecls.ContainsKey(obj.Name))
-                parser.SemErr($"{name} declared twice");
-            else
+            if (!symbolDecls.ContainsKey(obj.Name))
                 symbolDecls.Add(obj.Name, obj);
 
             return obj;
