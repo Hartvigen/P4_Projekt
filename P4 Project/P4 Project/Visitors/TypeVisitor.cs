@@ -28,40 +28,50 @@ namespace P4_Project.Visitors
 
 
         public override object Visit(CallNode node, object o)
-        { 
+        {
+          //  node.Accept(this, null);
+
             node.Parameters.Accept(this,null);
             return null;
         }
 
         public override object Visit(VarNode node,object o)
         {
+           // node.Accept(this, null);
             return null;
         }
 
         public override object Visit(BoolConst node, object o)
         {
-            return null;
+            //node.Accept(this, null);
+
+            return node.type = new BooleanType();
         }
 
         public override object Visit(CollecConst node, object o)
         {
+         //   node.Accept(this, null);
+
             return null;
         }
 
         public override object Visit(NoneConst node, object o)
         {
+         //   node.Accept(this, null);
+
             return null;
         }
 
         public override object Visit(NumConst node, object o)
         {
+         //   node.Accept(this, null);
 
-            return null;
+            return node.type = new NumberType();
         }
 
         public override object Visit(TextConst node, object o)
         {
-            return null;
+            return node.type = new TextType();
         }
 
         public override object Visit(BinExprNode node, object o)
@@ -69,17 +79,37 @@ namespace P4_Project.Visitors
  
             node.Left.Accept(this, null);
             node.Right.Accept(this, null);
-            //+ " " + node.Right.ToString() + " " + node.Left.ToString()
-           // Console.WriteLine("BinExprNode: " + node.Left.ToString());
-            //node.type = null;
+
+
+
+            Console.WriteLine("left: " + node.Left.Accept(this, null));
+            Console.WriteLine("right: " + node.Right.Accept(this, null));
+
+
+            if (node.Left.Accept(this, null) != null && node.Right.Accept(this, null) != null)
+            {
+
+               
+                if ((BaseType) node.Left.Accept(this, null) == (BaseType) node.Right.Accept(this, null))
+                {
+
+                    Console.WriteLine("BinExprNode is matching");
+                }
+                else
+                    Console.WriteLine("BinExprNode is not matching");
+            }
+            else
+                Console.WriteLine("BinExprNode is null");
+
             if (node.OperatorType == 9 || node.OperatorType == 10 || node.OperatorType == 11 || node.OperatorType == 12 || node.OperatorType == 13 || node.OperatorType == 14)
                 node.type = new NumberType();
             else
             {
                 node.type = new BooleanType();
             }
+
             // node.type = (BaseType)Convert.ChangeType(node.type, TypeCode.Boolean);
-            Console.WriteLine("BinExprNode: " + node.type);
+            // Console.WriteLine("BinExprNode: " + node.type);
 
             return node.type;
         }
@@ -109,11 +139,11 @@ namespace P4_Project.Visitors
 
         public override object Visit(FuncDeclNode node, object o)
         {
-            //Console.WriteLine("FuncDeclNode: "+node.SymbolObject.Name + " " + node.SymbolObject.Type);
+            Console.WriteLine("FuncDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
+
+            Console.WriteLine("Parameters: "+node.Parameters.statements.Count);
             node.Parameters.Accept(this, null);
             node.Body.Accept(this, null);
-
-
 
 
 
@@ -123,9 +153,9 @@ namespace P4_Project.Visitors
         public override object Visit(VarDeclNode node, object o)
         {
 
-            //node.DefaultValue.Accept(this, null);
+           // node.DefaultValue.Accept(this, null);
 
-            Console.WriteLine("VarDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
+           Console.WriteLine("VarDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
 
             //if (symbolTable.Find(node.SymbolObject.Name)== null)
             symbolTable.NewObj(node.SymbolObject.Name, node.Type, node.SymbolObject.Kind);
@@ -154,14 +184,11 @@ namespace P4_Project.Visitors
             BaseType targetType = symbolTable.Find(node.Target.Identifier).Type;
             BaseType valueTarget = (BaseType)node.Value.Accept(this, null);
 
-            if (node.Value.Accept(this, null) == null)
-                Console.WriteLine("Value is not a variable");
-            else
-            {
+            if (node.Value.Accept(this, null) != null){            
                 if (targetType != valueTarget)
                     Console.WriteLine("Imcompatible types in Assign");
                 else
-                    Console.WriteLine("Success");
+                    Console.WriteLine("AssignNode " +targetType + " == "+ valueTarget + " Success");
             }
             // Console.WriteLine("TARGET = "+node.Target.ToString() + " Value = " + node.Value.ToString());
 
@@ -237,8 +264,8 @@ namespace P4_Project.Visitors
             //       Console.WriteLine("visitWhileLOOP");
 
             Console.WriteLine("WhileNode " +node.Condition.ToString());
+            //Console.WriteLine("WhileNode " + node.Body.ToString());
 
-           // if()
 
             node.Condition.Accept(this, null);
             node.Body.Accept(this, null);
