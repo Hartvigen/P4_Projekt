@@ -16,7 +16,7 @@ namespace P4_Project.AST.Stmts.Decls
     public class VarDeclNode : DeclNode
     {
         public ExprNode DefaultValue { get; private set; }
-
+        public BaseType Type;
 
         public VarDeclNode() { }
 
@@ -24,6 +24,7 @@ namespace P4_Project.AST.Stmts.Decls
             : base(symbolObject)
         {
             DefaultValue = defaultValue;
+            Type = symbolObject.Type;
         }
 
 

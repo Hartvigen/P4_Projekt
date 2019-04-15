@@ -19,8 +19,8 @@ namespace P4_Project.Types.Functions
         public override string ToString()
         {
             int i = 0;
-            return "Func";
-            //return $"{ReturnType.ToString()} function({string.Join(", ", Parameters.Select(type => $"{type.ToString()} {{{i++}}}"))})";
+            return "func";
+           // return $"{ReturnType.ToString()} function({string.Join(", ", Parameters.Select(type => $"{type.ToString()} {{{i++}}}"))})";
         }
 
         public override bool Equals(object obj)

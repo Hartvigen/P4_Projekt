@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.Types;
 using P4_Project.Visitors;
 
 namespace P4_Project.AST.Expressions
@@ -13,5 +14,10 @@ namespace P4_Project.AST.Expressions
     public abstract class ExprNode : Node
     {
         public bool InParentheses { get; set; } = false;
+        public BaseType type;
+        public ExprNode()
+        {
+            type = null;
+        }
     }
 }

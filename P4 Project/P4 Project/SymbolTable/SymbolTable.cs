@@ -58,6 +58,8 @@ namespace P4_Project.SymTab
             return obj;
         }
 
+
+
         //search for a name in all open scopes and return its object node
         public Obj Find(string name)
         {
@@ -71,6 +73,7 @@ namespace P4_Project.SymTab
 
             return null;
         }
+
         // return all the innerscopes
         public List<SymbolTable> GetScopes()
         {
