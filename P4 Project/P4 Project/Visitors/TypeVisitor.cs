@@ -98,13 +98,15 @@ namespace P4_Project.Visitors
             if (node.DefaultValue != null)
             {
 
-            //  node.DefaultValue.Accept(this, null);
+                //  node.DefaultValue.Accept(this, null);
 
-            Console.WriteLine(node.SymbolObject.Name + " " + node.Type);
+                Console.WriteLine(node.SymbolObject.Name + " " + node.Type);
 
-            symbolTable.Find(node.SymbolObject.Name);
-               // symbolTable.NewObj(node.SymbolObject.Name, node.Type, node.SymbolObject.Kind);
+                symbolTable.Find(node.SymbolObject.Name);
+                // symbolTable.NewObj(node.SymbolObject.Name, node.Type, node.SymbolObject.Kind);
 
+                return null;
+            }
             return null;
         }
 
