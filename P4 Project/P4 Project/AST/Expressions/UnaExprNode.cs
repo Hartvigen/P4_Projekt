@@ -1,4 +1,5 @@
-﻿using P4_Project.Visitors;
+﻿using P4_Project.Types;
+using P4_Project.Visitors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace P4_Project.AST.Expressions
         public ExprNode Expr { get; private set; }
         public int OperatorType { get; private set; }
 
+        public BaseType type { get; set; }
 
         public UnaExprNode() { }
 

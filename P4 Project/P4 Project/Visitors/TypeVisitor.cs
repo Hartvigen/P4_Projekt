@@ -12,6 +12,7 @@ using P4_Project.AST.Stmts.Decls;
 using P4_Project.SymTab;
 using P4_Project.Types;
 using P4_Project.Types.Collections;
+using P4_Project.Types.Primitives;
 using static P4_Project.TypeS;
 
 namespace P4_Project.Visitors
@@ -68,45 +69,67 @@ namespace P4_Project.Visitors
  
             node.Left.Accept(this, null);
             node.Right.Accept(this, null);
-            return null;
+            //+ " " + node.Right.ToString() + " " + node.Left.ToString()
+           // Console.WriteLine("BinExprNode: " + node.Left.ToString());
+            //node.type = null;
+            if (node.OperatorType == 9 || node.OperatorType == 10 || node.OperatorType == 11 || node.OperatorType == 12 || node.OperatorType == 13 || node.OperatorType == 14)
+                node.type = new NumberType();
+            else
+            {
+                node.type = new BooleanType();
+            }
+            // node.type = (BaseType)Convert.ChangeType(node.type, TypeCode.Boolean);
+            Console.WriteLine("BinExprNode: " + node.type);
 
+            return node.type;
         }
 
         public override object Visit(UnaExprNode node, object o)
         {
             node.Expr.Accept(this, null);
-            return null;
+            if (node.OperatorType == 9 || node.OperatorType == 10 || node.OperatorType == 11 || node.OperatorType == 12 || node.OperatorType == 13 || node.OperatorType == 14)
+                node.type = new NumberType();
+            else
+            {
+                node.type = new BooleanType();
+            }
+
+            Console.WriteLine("UnaExprNode: " + node.type);
+
+            return node.type;
         }
 
         public override object Visit(EdgeCreateNode node, object o)
         {
-            //node.Start.Accept(this);
-            //node.End.Accept(this);
-            //node.Attributes.Accept(this);  
+            node.LeftSide.Accept(this,null);
+           // node.RightSide.Accept(this,null);
+            node.LeftSide.Accept(this,null);  
             return null;
         }
 
         public override object Visit(FuncDeclNode node, object o)
         {
+            //Console.WriteLine("FuncDeclNode: "+node.SymbolObject.Name + " " + node.SymbolObject.Type);
             node.Parameters.Accept(this, null);
             node.Body.Accept(this, null);
+
+
+
+
+
             return null;
         }
 
         public override object Visit(VarDeclNode node, object o)
         {
-            if (node.DefaultValue != null)
-            {
 
-                //  node.DefaultValue.Accept(this, null);
+            //node.DefaultValue.Accept(this, null);
 
-                Console.WriteLine(node.SymbolObject.Name + " " + node.Type);
+            Console.WriteLine("VarDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
 
-                symbolTable.Find(node.SymbolObject.Name);
-                // symbolTable.NewObj(node.SymbolObject.Name, node.Type, node.SymbolObject.Kind);
-
-                return null;
-            }
+            //if (symbolTable.Find(node.SymbolObject.Name)== null)
+            symbolTable.NewObj(node.SymbolObject.Name, node.Type, node.SymbolObject.Kind);
+            
             return null;
         }
 
@@ -118,21 +141,29 @@ namespace P4_Project.Visitors
 
         public override object Visit(AssignNode node, object o)
         {
-            BaseType tType = (BaseType) node.Target.Accept(this, null);
-            BaseType vType = (BaseType) node.Value.Accept(this, null);
+            node.Value.Accept(this, null);
+            node.Target.Accept(this, null);
+            //Print();
 
-           //if (!node.Value.GetType().Equals(null))
-           //     Console.WriteLine("Value is not a variable");
+            //BaseType tType = node.Value.type;
+            //BaseType vType = node.Value.type;
 
-           // if (!tType.Equals(vType))
-           //     Console.WriteLine("Imcompatible types in Assign");
-           // else
-           //     Console.WriteLine("Success");
+            //Console.WriteLine("-----------------AssignNode target: " + node.Target.Identifier);
 
+            //Console.WriteLine("AssignNode target: " + symbolTable.Find(node.Target.Identifier).Type);
+            BaseType targetType = symbolTable.Find(node.Target.Identifier).Type;
+            BaseType valueTarget = (BaseType)node.Value.Accept(this, null);
+
+            if (node.Value.Accept(this, null) == null)
+                Console.WriteLine("Value is not a variable");
+            else
+            {
+                if (targetType != valueTarget)
+                    Console.WriteLine("Imcompatible types in Assign");
+                else
+                    Console.WriteLine("Success");
+            }
             // Console.WriteLine("TARGET = "+node.Target.ToString() + " Value = " + node.Value.ToString());
-            
-
-           
 
             return null;
         }
@@ -164,21 +195,25 @@ namespace P4_Project.Visitors
 
         public override object Visit(HeadNode node, object o)
         { 
+            
             node.attrDeclBlock.Accept(this, null);
             return null;
         }
 
         public override object Visit(IfNode node, object o)
         {
+
+
+            //Console.WriteLine("IfNode body "+node.Body.Accept(this, null));
+            //Console.WriteLine("IfNode ElseNode "+node.ElseNode.Accept(this, null));
+
+            // Type eType = (Type)node.Condition.Accept(this, null);
+
+            //if (node.Body.Accept(this, null) != node.ElseNode.Accept(this, null))
+            //    Console.WriteLine("Expression in if is not a boolean");
+
+
             
-           // Type eType = (Type)node.Condition.Accept(this, null);
-
-           // if (!eType.Equals(TypeS.boolean))
-           //     Console.WriteLine("Expression in if is not a boolean");
-
-
-            //node.Body.Accept(this, null);
-            //node.ElseNode.Accept(this, null);
 
             return null;
         }
@@ -201,7 +236,7 @@ namespace P4_Project.Visitors
             // if (!node.Condition.Accept(this, null).Equals("2"))
             //       Console.WriteLine("visitWhileLOOP");
 
-            Console.WriteLine(node.Condition.ToString());
+            Console.WriteLine("WhileNode " +node.Condition.ToString());
 
            // if()
 
@@ -216,31 +251,31 @@ namespace P4_Project.Visitors
 
 
 
-            string output = "";
-            
+            //string output = "";
 
-                foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
-                {
-                    output += string.Format("{0} + {1}", kvp.Key, kvp.Value.Type);
-                    output += "\n";
-                }
-                output += "\n\n\n";
 
-            foreach (SymbolTable table in symbolTable.GetScopes())
-            {
+            //foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
+            //{
+            //    output += string.Format("{0} + {1}", kvp.Key, kvp.Value.Type);
+            //    output += "\n";
+            //}
+            //output += "\n\n\n";
 
-                foreach (KeyValuePair<string, Obj> kvp in table.GetDic())
-                {
-                    output += string.Format("{0} + {1}", kvp.Key, kvp.Value.Type);
-                    output += "\n";
-                }
-                output += "\n\n\n";
-            }
-            Console.WriteLine(output);
+            //foreach (SymbolTable table in symbolTable.GetScopes())
+            //{
+
+            //    foreach (KeyValuePair<string, Obj> kvp in table.GetDic())
+            //    {
+            //        output += string.Format("{0} + {1}", kvp.Key, kvp.Value.Type);
+            //        output += "\n";
+            //    }
+            //    output += "\n\n\n";
+            //}
+            //Console.WriteLine(output);
 
 
             node.block.Accept(this, null);
-            Print();
+           // Print();
             return null;
         }
 
@@ -262,11 +297,21 @@ namespace P4_Project.Visitors
         public void Print()
         {
             string output = "";
+
+
+            foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
+            {
+                output += string.Format("{0} + {1}", kvp.Key, kvp.Value.Type);
+                output += "\n";
+            }
+            output += "\n\n\n";
+
             foreach (SymbolTable table in symbolTable.GetScopes())
             {
-                foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
+
+                foreach (KeyValuePair<string, Obj> kvp in table.GetDic())
                 {
-                    output += string.Format("{0}, {1} + {2}", kvp.Key, kvp.Value.Name, kvp.Value.Type);
+                    output += string.Format("{0} + {1}", kvp.Key, kvp.Value.Type);
                     output += "\n";
                 }
                 output += "\n\n\n";
