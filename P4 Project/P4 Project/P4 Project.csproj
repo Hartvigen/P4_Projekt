@@ -50,7 +50,7 @@
     <Compile Include="AST\Expressions\Identifier\VarNode.cs" />
     <Compile Include="AST\Expressions\Values\BoolConst.cs" />
     <Compile Include="AST\Expressions\Values\CollecConst.cs" />
-    <Compile Include="AST\Expressions\Values\NoneConst.cs" />
+    <Compile Include="AST\Stmts\Decls\NoneConst.cs" />
     <Compile Include="AST\Expressions\Values\NumConst.cs" />
     <Compile Include="AST\Expressions\Identifier\IdentNode.cs" />
     <Compile Include="AST\Expressions\Values\TextConst.cs" />

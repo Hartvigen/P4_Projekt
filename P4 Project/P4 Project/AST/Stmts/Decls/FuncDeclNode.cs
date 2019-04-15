@@ -16,7 +16,6 @@ namespace P4_Project.AST.Stmts.Decls
         public BlockNode Parameters { get; private set; }
         public BlockNode Body { get; private set; }
 
-
         public FuncDeclNode() { }
 
         public FuncDeclNode(Obj symbolObject, BlockNode parameters, BlockNode body) 
