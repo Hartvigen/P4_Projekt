@@ -176,17 +176,10 @@ StmtIf<out StmtNode i> =            (. i = null; ExprNode condition = null; Bloc
 
 /*------------------------------------------------------------------------*/
 SimpleStmt<out StmtNode stmt> =         (. stmt = null; .)
-    CallOrID<out IdentNode i>
-    { Member<i, out IdentNode target>   (. i = target; .)
-    }                                   (. stmt = new LoneCallNode(i); .)
+    CallOrID<out IdentNode i>           (. stmt = new LoneCallNode(i); .)
     [ Assign<out ExprNode expr>         (. stmt = new AssignNode(i, expr); .)
     | EdgeOneOrMore<i, out stmt>
     ]
-.
-
-/*------------------------------------------------------------------------*/
-Member<ExprNode source, out IdentNode i> =  (. i = null; .)
-    WEAK '.' CallOrID<out i>                (. i.Source = source; .)
 .
 
 /*------------------------------------------------------------------------*/
@@ -342,18 +335,10 @@ ExprNot<out ExprNode e>             (. e = null; bool b = false;.)
     .
 
 /*------------------------------------------------------------------------*/
-Factor<out ExprNode e>                  (. e = null; .)
-    =
-    Const<out e>
-    | 
-    '(' 
-      Expr<out e>                       (. e.InParentheses = true; .)
-    ')' 
-    | 
-      CallOrID<out IdentNode ident>     (. e = ident; .)
-      { 
-        Member<e, out IdentNode target> (. e = target; .)
-      }
+Factor<out ExprNode e>      (. e = null; .)
+    = Const<out e>
+    | '(' Expr<out e> ')'   (. e.InParentheses = true; .)
+    | CallOrID<out e>
     .        
 
 
@@ -364,6 +349,10 @@ CallOrID<out IdentNode i> =                 (. i = null; .)
         '(' 
             Args<out CollecConst collec>    (. i = new CallNode(i.Identifier, collec); .)
         ')'
+    ]
+    [
+        WEAK '.'                            (. IdentNode source = i; .)
+        CallOrID<out i>                     (. i.AddBaseSource(source); .)
     ].
 
 /*------------------------------------------------------------------------*/
