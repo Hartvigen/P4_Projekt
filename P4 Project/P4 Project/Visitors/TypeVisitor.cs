@@ -29,48 +29,70 @@ namespace P4_Project.Visitors
 
         public override object Visit(CallNode node, object o)
         {
-          //  node.Accept(this, null);
+            //  node.Accept(this, null);
+            Console.WriteLine("CallNode " + node.Identifier);
+
+            if (node.Identifier == "GetVal") { 
+
+                node.type = symbolTable.Find(node.Identifier).Type;
+
+            }
 
             node.Parameters.Accept(this,null);
-            return null;
+            return node.type;
         }
 
         public override object Visit(VarNode node,object o)
         {
-           // node.Accept(this, null);
-            return null;
+            
+            Console.WriteLine("VARNODE: " + node.Identifier + " " + symbolTable.Find(node.Identifier).Type);
+
+
+            // symbolTable.NewObj(node.SymbolObject.Name, node.Type, node.SymbolObject.Kind);
+            node.type = symbolTable.Find(node.Identifier).Type;
+            return node.type;
         }
 
         public override object Visit(BoolConst node, object o)
         {
             //node.Accept(this, null);
-
+            Console.WriteLine("BoolConst-----------" + node.Value);
+            
             return node.type = new BooleanType();
         }
 
         public override object Visit(CollecConst node, object o)
         {
-         //   node.Accept(this, null);
-
-            return null;
+            foreach (ExprNode n in node.Expressions)
+            {
+                Console.WriteLine("CollecConst: " + n.type);
+                n.Accept(this, null);
+                node.type = n.type;
+            }
+            return node.type;
         }
 
         public override object Visit(NoneConst node, object o)
         {
-         //   node.Accept(this, null);
+            Console.WriteLine("NoneConst-----------" + node.type);
 
-            return null;
+            //   node.Accept(this, null);
+
+            return node.type;
         }
 
         public override object Visit(NumConst node, object o)
         {
-         //   node.Accept(this, null);
+            //   node.Accept(this, null);
+            //Console.WriteLine("NumConst-----------" + node.type);
 
             return node.type = new NumberType();
         }
 
         public override object Visit(TextConst node, object o)
         {
+            Console.WriteLine("TextConst-----------" + node.type);
+
             return node.type = new TextType();
         }
 
@@ -113,15 +135,17 @@ namespace P4_Project.Visitors
 
             return node.type;
         }
+        
 
         public override object Visit(UnaExprNode node, object o)
         {
             node.Expr.Accept(this, null);
-            if (node.OperatorType == 9 || node.OperatorType == 10 || node.OperatorType == 11 || node.OperatorType == 12 || node.OperatorType == 13 || node.OperatorType == 14)
-                node.type = new NumberType();
-            else
-            {
+
+            if (node.OperatorType == 15)
                 node.type = new BooleanType();
+            else if (node.OperatorType == 9)
+            {
+                node.type = new NumberType();
             }
 
             Console.WriteLine("UnaExprNode: " + node.type);
@@ -132,8 +156,11 @@ namespace P4_Project.Visitors
         public override object Visit(EdgeCreateNode node, object o)
         {
             node.LeftSide.Accept(this,null);
-           // node.RightSide.Accept(this,null);
-            node.LeftSide.Accept(this,null);  
+
+
+
+            //node.RightSide.Accept(this,null);
+           // node.LeftSide.Accept(this,null);  
             return null;
         }
 
@@ -153,7 +180,7 @@ namespace P4_Project.Visitors
         public override object Visit(VarDeclNode node, object o)
         {
 
-           // node.DefaultValue.Accept(this, null);
+            //node.DefaultValue.Accept(this, null);
 
            Console.WriteLine("VarDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
 
@@ -164,7 +191,17 @@ namespace P4_Project.Visitors
         }
 
         public override object Visit(VertexDeclNode node, object o)
-        {  
+        {
+            Console.WriteLine("VertexDeclNode: " +node.SymbolObject.Name + " " + node.SymbolObject.Type);
+
+
+            //Console.WriteLine("VarDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
+
+            //if (symbolTable.Find(node.SymbolObject.Name)== null)
+            symbolTable.NewObj(node.SymbolObject.Name, node.SymbolObject.Type, node.SymbolObject.Kind);
+
+      
+
             node.Attributes.Accept(this, null);
             return null;
         }
@@ -177,10 +214,7 @@ namespace P4_Project.Visitors
 
             //BaseType tType = node.Value.type;
             //BaseType vType = node.Value.type;
-
-            //Console.WriteLine("-----------------AssignNode target: " + node.Target.Identifier);
-
-            //Console.WriteLine("AssignNode target: " + symbolTable.Find(node.Target.Identifier).Type);
+            
             BaseType targetType = symbolTable.Find(node.Target.Identifier).Type;
             BaseType valueTarget = (BaseType)node.Value.Accept(this, null);
 
@@ -196,10 +230,11 @@ namespace P4_Project.Visitors
         }
 
         public override object Visit(BlockNode node, object o)
-        { 
-            foreach (Node n in node.statements)
+        {
+            foreach (Node n in node.statements) { 
+                Console.WriteLine("BlockNode: " + n);
                 n.Accept(this, null);
-
+            }
             return null;
         }
 
@@ -229,16 +264,35 @@ namespace P4_Project.Visitors
 
         public override object Visit(IfNode node, object o)
         {
+           
+
+            Console.WriteLine("IfNode Condition "+node.Condition.Accept(this, null));
+
+            node.Condition.Accept(this, null);
+            //node.ElseNode.Accept(this, null);
+            node.Body.Accept(this, null);
+
+            //Console.WriteLine("IfNode Condition " + node.ElseNode.Accept(this, null));
 
 
-            //Console.WriteLine("IfNode body "+node.Body.Accept(this, null));
             //Console.WriteLine("IfNode ElseNode "+node.ElseNode.Accept(this, null));
 
             // Type eType = (Type)node.Condition.Accept(this, null);
 
-            //if (node.Body.Accept(this, null) != node.ElseNode.Accept(this, null))
-            //    Console.WriteLine("Expression in if is not a boolean");
+            if ((BaseType)node.Condition.Accept(this, null) != new BooleanType())
+            {
+                Console.WriteLine("Expression in if is not a boolean");
+            }
 
+            if (node.Condition.Accept(this, null) == null)
+            {
+                Console.WriteLine("This is an else node");
+            }
+
+            //if (node.ElseNode.Accept(this, null) != null ){
+            //   if((BaseType)node.ElseNode.Accept(this, null) != new BooleanType())
+            //        Console.WriteLine("Expression in ElseIf is not a boolean");
+            //}
 
             
 
@@ -248,12 +302,17 @@ namespace P4_Project.Visitors
         public override object Visit(LoneCallNode node, object o)
         {  
             node.Call.Accept(this, null);
+            Console.WriteLine("LoneCallNode " + node.Call.Identifier);
+            //node.Call.type = symbolTable.Find(node.Call.Identifier).Type;
             return null;
         }
 
         public override object Visit(ReturnNode node, object o)
         { 
+
             node.Ret.Accept(this, null);
+            Console.WriteLine("ReturnNode " + node.Ret.type);
+
             return null;
         }
 
@@ -278,31 +337,9 @@ namespace P4_Project.Visitors
 
 
 
-            //string output = "";
-
-
-            //foreach (KeyValuePair<string, Obj> kvp in symbolTable.GetDic())
-            //{
-            //    output += string.Format("{0} + {1}", kvp.Key, kvp.Value.Type);
-            //    output += "\n";
-            //}
-            //output += "\n\n\n";
-
-            //foreach (SymbolTable table in symbolTable.GetScopes())
-            //{
-
-            //    foreach (KeyValuePair<string, Obj> kvp in table.GetDic())
-            //    {
-            //        output += string.Format("{0} + {1}", kvp.Key, kvp.Value.Type);
-            //        output += "\n";
-            //    }
-            //    output += "\n\n\n";
-            //}
-            //Console.WriteLine(output);
-
-
+            Print();
             node.block.Accept(this, null);
-           // Print();
+           
             return null;
         }
 
@@ -318,6 +355,11 @@ namespace P4_Project.Visitors
 
         public override object Visit(MultiDecl multiDecl, object p)
         {
+            foreach (Node n in multiDecl.Decls)
+            {
+                Console.WriteLine("MultiDecl: " + n);
+                n.Accept(this, null);
+            }
             return null;
         }
 
