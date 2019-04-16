@@ -346,15 +346,14 @@ Factor<out ExprNode e>                  (. e = null; .)
     =
     Const<out e>
     | 
-    (
-      '(' 
-        Expr<out e>                     (. e.InParentheses = true; .)
-      ')' 
-      | 
+    '(' 
+      Expr<out e>                       (. e.InParentheses = true; .)
+    ')' 
+    | 
       CallOrID<out IdentNode ident>     (. e = ident; .)
-    ) 
-    { Member<e, out IdentNode target>   (. e = target; .)
-    }
+      { 
+        Member<e, out IdentNode target> (. e = target; .)
+      }
     .        
 
 

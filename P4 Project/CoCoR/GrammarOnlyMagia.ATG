@@ -75,17 +75,17 @@ ExprOR = ExprAnd { "||" ExprAnd }.
 
 ExprAnd = ExprEQ { "&&" ExprEQ }.
 
-ExprEQ = ExprRel [("==" | "!=" ) ExprRel ].
+ExprEQ = ExprRel [ ("==" | "!=" ) ExprRel ].
 
-ExprRel = ExprPlus [('<' | '>' | "<=" | ">=" ) ExprPlus ].
+ExprRel = ExprPlus [ ('<' | '>' | "<=" | ">=" ) ExprPlus ].
 
-ExprPlus = ['-' ] ExprMult {('+' | '-' ) ExprMult }.
+ExprPlus = ['-'] ExprMult { ('+' | '-' ) ExprMult }.
 
-ExprMult = ExprNot {('*' | '/' | '%' ) ExprNot }.
+ExprMult = ExprNot { ('*' | '/' | '%' ) ExprNot }.
 
 ExprNot = ['!'] Factor.
 
-Factor = Const | CallOrID { Member }. 
+Factor = Const | '(' Expr ')' | CallOrID { Member }. 
 
 
 CallOrID = Identifier ['(' Args ')'].
