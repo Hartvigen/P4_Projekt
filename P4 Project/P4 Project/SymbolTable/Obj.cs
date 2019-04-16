@@ -25,7 +25,7 @@ namespace P4_Project.SymTab
 
         public Obj()
         {
-            Name = "undef";
+            Name = null;
             Type = null;
             Kind = 0;
             Scope = null;

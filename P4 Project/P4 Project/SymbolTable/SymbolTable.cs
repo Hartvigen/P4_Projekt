@@ -15,12 +15,10 @@ namespace P4_Project.SymTab
         Parser parser;
 
         public const int var = 0, func = 1; // Kinds
-        public static Obj undefObj = new Obj();
 
         SymbolTable parent;
         List<SymbolTable> innerScopes = new List<SymbolTable>();
         Dictionary<string, Obj> symbolDecls = new Dictionary<string, Obj>();
-
 
         //Constructor for visitor (no parser argument)
         public SymbolTable(SymbolTable _parent, Parser _parser)
