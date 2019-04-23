@@ -30,7 +30,7 @@ MAGIA = { Head } { Stmt } { FuncDecl } .
 
 Head = '[' ( "vertex" | "edge" ) '(' VarDecl { ',' VarDecl } ')' ']' .
 
-FuncDecl = "func" (Type | "none") IDENT '(' [ VarDecl { ',' VarDecl } ] ')' '{' { Stmt } '}' .
+FuncDecl = "func" (Type | "none") IDENT '(' [ ParamDecl { ',' ParamDecl } ] ')' '{' { Stmt } '}' .
 
 Stmt = ( StructStmt | KeywordStmt | SimpleStmt | FullDecl ).
 
@@ -63,6 +63,8 @@ FullDecl = Type ( IDENT [ Assign ] | '{' VtxDecl { ',' VtxDecl } '}' | VtxDecl )
 VtxDecl = '(' IDENT { ',' Identifier Assign } ')'.
 
 
+ParamDecl = Type IDENT.
+
 VarDecl = Type IDENT [ Assign ].
 
 Assign = '=' ( Expr | '{' Args '}' ).
@@ -88,7 +90,7 @@ ExprNot = ['!'] Factor.
 Factor = Const | '(' Expr ')' | CallOrID. 
 
 
-CallOrID = Identifier [ '(' Args ')' ] { '.' CallOrID }.
+CallOrID = Identifier [ '(' Args ')' ] [ '.' CallOrID ].
 
 Args = [Expr { ',' Expr } ].
 

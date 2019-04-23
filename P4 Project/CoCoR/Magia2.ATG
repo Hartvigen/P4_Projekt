@@ -73,8 +73,8 @@ FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string f
     "func" (Type<out returnType> | "none") IDENT    (. funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); .)
     WEAK '('                                        (. tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); .)
         [ IF(la.val != ")" && la.val != "{") 
-          VarDecl<out paramDecl>                    (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
-          { WEAK ',' VarDecl<out paramDecl>         (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
+          ParamDecl<out paramDecl>                    (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
+          { WEAK ',' ParamDecl<out paramDecl>         (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
           }
         ]                                           (. protocol = new FunctionType(returnType, parameterTypes); .)
     WEAK ')'
@@ -251,6 +251,12 @@ VtxDecl<out VertexDeclNode vertexDecl> =    (. vertexDecl = null; VarNode varNod
           Assign<out expr>                  (. vertexDecl.AddAttr(new AssignNode(varNode, expr)); .)
         }
     ')'
+.
+
+
+/*------------------------------------------------------------------------*/
+ParamDecl<out VarDeclNode varDecl> =  (. varDecl = null; BaseType type = null; .)
+    Type<out type> IDENT              (. varDecl = new VarDeclNode(tab.NewObj(t.val, type, var), null); .)
 .
 
 
