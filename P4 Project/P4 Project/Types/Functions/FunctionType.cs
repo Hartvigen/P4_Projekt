@@ -23,6 +23,11 @@ namespace P4_Project.Types.Functions
            // return $"{ReturnType.ToString()} function({string.Join(", ", Parameters.Select(type => $"{type.ToString()} {{{i++}}}"))})";
         }
 
+        public BaseType returnType()
+        {
+            return ReturnType;
+        }
+
         public override bool Equals(object obj)
         {
             return ReferenceEquals(this, obj);
