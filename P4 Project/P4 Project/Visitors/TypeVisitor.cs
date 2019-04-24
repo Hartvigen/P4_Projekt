@@ -16,6 +16,7 @@ using P4_Project.Types.Primitives;
 using static P4_Project.TypeS;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.Types.Functions;
+using P4_Project.Types.Structures;
 
 namespace P4_Project.Visitors
 {
@@ -45,6 +46,10 @@ namespace P4_Project.Visitors
                 
 
             }
+            if(node.Identifier == "vertices")
+            {
+                type = new SetType(new VertexType());
+            }
 
             node.Parameters.Accept(this,null);
             return type;
@@ -64,25 +69,38 @@ namespace P4_Project.Visitors
         public override object Visit(BoolConst node, object o)
         {
             //node.Accept(this, null);
-            Console.WriteLine("BoolConst: " + node.Value);
+            //Console.WriteLine("BoolConst: " + node.Value);
             
             return node.type = new BooleanType();
         }
 
         public override object Visit(CollecConst node, object o)
         {
+            int i = 0;
+            Console.WriteLine("CollecConst nodetype: " + node.ToString());
+
+            
+
             foreach (ExprNode n in node.Expressions)
             {
-               // Console.WriteLine("CollecConst: " + n.type);
                 n.Accept(this, null);
                 node.type = n.type;
+                Console.WriteLine("CollecConst: " + n.type);
+                i++;
             }
-            return node.type;
+            if (i > 0)
+            {
+                Console.WriteLine("----------------------");
+
+            }
+            else
+                return null;
+            return node.type;//node.type;<------------------------------------------------------et problem
         }
 
         public override object Visit(NoneConst node, object o)
         {
-            //Console.WriteLine("NoneConst: "  + node.type);
+            Console.WriteLine("NoneConst: "  + node.type);
 
             //   node.Accept(this, null);
 
@@ -106,7 +124,7 @@ namespace P4_Project.Visitors
         public override object Visit(TextConst node, object o)
         {
             //node.Accept(this, null);
-            Console.WriteLine("TextConst: " + node.Value + node.type);
+            //Console.WriteLine("TextConst: " + node.Value + node.type);
 
            //Console.WriteLine("TextConst: " + node.type);
             if (node != null)
@@ -197,21 +215,35 @@ namespace P4_Project.Visitors
         public override object Visit(VarDeclNode node, object o)
         {
             // Console.WriteLine("1VarDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
-            BaseType test = (BaseType)node.DefaultValue.Accept(this, null);
-            if (test.Equals(null))
+            //BaseType test = (BaseType)node.DefaultValue.Accept(this, null);
+            if (node.DefaultValue != null)
             {
+                if (node.DefaultValue.Accept(this, null) != null)
+                {
+
+                    Console.WriteLine("DefaultValue: " + node.DefaultValue.Accept(this, null) + " SymbolObject: " + node.SymbolObject.Type.ToString());
 
 
+                    if (node.SymbolObject.Type != new ListType((BaseType)node.DefaultValue.Accept(this, null))||
+                            node.SymbolObject.Type != new QueueType((BaseType)node.DefaultValue.Accept(this, null)) ||
+                            node.SymbolObject.Type != new SetType((BaseType)node.DefaultValue.Accept(this, null)) ||
+                            node.SymbolObject.Type != new StackType((BaseType)node.DefaultValue.Accept(this, null)))
+                    {
+                        parser.SemErr("Default value is not the same type as Collection type value.");
+                    }
+                    else if (node.DefaultValue.Accept(this, null).ToString() != node.SymbolObject.Type.ToString())
+                        parser.SemErr("Default value is not the same type as SymbolObject value.");
 
-               
-                Console.WriteLine(test + "+++++++++++++++++++++++++++++");
-                //Console.WriteLine("Node.DefaultValue.Accept(this, null) = " + node.DefaultValue.Accept(this, null));
-               //Console.WriteLine("4VarDeclNode: " + node.DefaultValue.type);
-                Console.WriteLine("DefaultValue: " + node.DefaultValue.Accept(this, null) + " SymbolObject: " + node.SymbolObject.Type.ToString());
+                }
+                else
+                {
+                    Console.WriteLine("DefaultValue: " + node.DefaultValue.Accept(this, null) + " SymbolObject: " + node.SymbolObject.Type.ToString());
+
+                    if (node.SymbolObject.Type.ToString() != "vertex" && node.SymbolObject.Type.ToString() != "edge")
+                        parser.SemErr("Default value is null. And not a vertex or edge.");
+                }
 
             }
-
-            //if (symbolTable.Find(node.SymbolObject.Name)== null)
             symbolTable.NewObj(node.SymbolObject.Name, node.Type, node.SymbolObject.Kind);
             
             return null;
@@ -230,7 +262,7 @@ namespace P4_Project.Visitors
       
 
             node.Attributes.Accept(this, null);
-            return null;
+            return null;// new VertexType();
         }
 
         public override object Visit(AssignNode node, object o)
@@ -252,8 +284,8 @@ namespace P4_Project.Visitors
             else
                 parser.SemErr("AssignNode is null");
 
-            Console.WriteLine(node.Target.Identifier);
-            Console.WriteLine("TARGET = "+ symbolTable.Find(node.Target.Identifier).Type + " Value = " + (BaseType)node.Value.Accept(this, null));
+           Console.WriteLine(node.Target.Identifier);
+            //Console.WriteLine("TARGET = "+ symbolTable.Find(node.Target.Identifier).Type + " Value = " + (BaseType)node.Value.Accept(this, null));
 
             return null;
         }
