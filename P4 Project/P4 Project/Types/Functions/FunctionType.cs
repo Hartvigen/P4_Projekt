@@ -18,7 +18,7 @@ namespace P4_Project.Types.Functions
 
         public override string ToString()
         {
-            int i = 0;
+            //int i = 0;
             return "func";
            // return $"{ReturnType.ToString()} function({string.Join(", ", Parameters.Select(type => $"{type.ToString()} {{{i++}}}"))})";
         }

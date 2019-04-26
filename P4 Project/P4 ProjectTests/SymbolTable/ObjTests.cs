@@ -106,12 +106,5 @@ namespace P4_Project.SymTab.Tests
         {
             Assert.IsNull(nullObj.Type);
         }
-
-        //Since the == operator is overidden for BaseType is will throw an excpetion when null checking.
-        [TestMethod()]
-        public void ObjTests09()
-        {
-            Assert.ThrowsException<NullReferenceException>(() => nullObj.Type == null);
-        }
     }
 }

@@ -57,7 +57,7 @@ namespace P4_Project.Visitors.Tests
             parser.Parse();
             XmlTreeBuilder xmlTreeBuilder = new XmlTreeBuilder();
             parser.mainNode.Accept(xmlTreeBuilder, null);
-            return xmlTreeBuilder.ast.ToString();
+            return xmlTreeBuilder.result.ToString();
         }
 
         //Xml Code and pretty MAGIA code is not the same

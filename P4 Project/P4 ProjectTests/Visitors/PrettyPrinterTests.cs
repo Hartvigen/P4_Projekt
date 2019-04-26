@@ -54,7 +54,7 @@ namespace P4_Project.Visitors.Tests
             parser.Parse();
             PrettyPrinter prettyPrinter = new PrettyPrinter();
             parser.mainNode.Accept(prettyPrinter, null);
-            return prettyPrinter.str.ToString();
+            return prettyPrinter.result.ToString();
         }
 
         //Makeing Pretty written code pretty actually makes no changes 

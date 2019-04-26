@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
@@ -10,6 +11,10 @@ namespace P4_Project.Visitors
 {
     public abstract class Visitor
     {
+        public string appropriateFileName = "defualt.txt";
+        public StringBuilder result = new StringBuilder();
+        public int errorCount = 0;
+
         //Identifier
         public abstract object Visit(CallNode node, object o);
         public abstract object Visit(VarNode node, object o);

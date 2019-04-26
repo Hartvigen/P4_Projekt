@@ -22,6 +22,10 @@ namespace P4_Project.Visitors
 {
     class TypeVisitor : Visitor
     {
+        public new string appropriateFileName = "typeCheckResult.txt";
+        public new StringBuilder result = new StringBuilder();
+        public new int errorCount = 0;
+
         public SymbolTable symbolTable;
         public Parser parser;
 
@@ -44,10 +48,17 @@ namespace P4_Project.Visitors
             //makes sure to not try and find methods in symbolobjects
             if (node.Identifier != "Edge" && node.Identifier != "vertices" && node.Identifier != "clear" && node.Identifier != "removeEdge" && node.Identifier != "ClearEdges" && node.Identifier != "ClearVertices" && node.Identifier != "ClearAll") {
 
-                returnType = (FunctionType)symbolTable.Find(node.Identifier).Type;
-                type = returnType.returnType();
-                
+                if (symbolTable.Find(node.Identifier) != null)
+                {
+                    returnType = (FunctionType)symbolTable.Find(node.Identifier).Type;
+                    type = returnType.returnType();
+                }
+                else
+                {
+                    type = null;
+                } 
 
+                
             }
             if(node.Identifier == "vertices")
             {
@@ -61,7 +72,9 @@ namespace P4_Project.Visitors
         //finds variable type, and returns the type.
         public override object Visit(VarNode node,object o)
         {
-            node.type = symbolTable.Find(node.Identifier).Type;
+            if (symbolTable.Find(node.Identifier) != null)
+                node.type = symbolTable.Find(node.Identifier).Type;
+            else return null;
             
             return node.type;
         }
@@ -264,8 +277,11 @@ namespace P4_Project.Visitors
         {
             node.Value.Accept(this, null);
             node.Target.Accept(this, null);
+            BaseType targetType = null;
 
-            BaseType targetType = symbolTable.Find(node.Target.Identifier).Type;
+            if (symbolTable.Find(node.Target.Identifier) != null)
+                targetType = symbolTable.Find(node.Target.Identifier).Type;
+
             BaseType valueTarget = (BaseType)node.Value.Accept(this, null);
 
             if (node.Value.Accept(this, null) != null){            
@@ -281,7 +297,8 @@ namespace P4_Project.Visitors
         //visits blocknode
         public override object Visit(BlockNode node, object o)
         {
-            foreach (Node n in node.statements) { 
+            foreach (Node n in node.statements)
+            {
                 n.Accept(this, null);
             }
             return null;
@@ -309,7 +326,6 @@ namespace P4_Project.Visitors
         //Visits HeadNode
         public override object Visit(HeadNode node, object o)
         { 
-            
             node.attrDeclBlock.Accept(this, null);
             return null;
         }

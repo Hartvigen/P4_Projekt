@@ -16,7 +16,7 @@ namespace P4_Project.AST.Expressions
         public ExprNode Left { get; private set; }
         public ExprNode Right { get; private set; }
         public int OperatorType { get; private set; }
-        public BaseType type { get;  set; }
+        public new BaseType type { get;  set; }
 
         public BinExprNode() { }
 

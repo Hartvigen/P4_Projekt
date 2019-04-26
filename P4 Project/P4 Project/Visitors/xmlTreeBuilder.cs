@@ -14,7 +14,9 @@ namespace P4_Project.Visitors
 {
     public class XmlTreeBuilder : Visitor
     {
-        public StringBuilder ast = new StringBuilder();
+        public new string appropriateFileName = "xmltree.xml";
+        public new StringBuilder result = new StringBuilder();
+        public new int errorCount = 0;
 
         private enum XML { start, end, both }
 
@@ -205,9 +207,9 @@ namespace P4_Project.Visitors
         private object createXmlTag(Node node, XML state)
         {
             if (state == XML.start || state == XML.both)
-                ast.AppendLine($"<{node.GetType().Name}>");
+                result.AppendLine($"<{node.GetType().Name}>");
             if (state == XML.end || state == XML.both)
-                ast.AppendLine($"</{node.GetType().Name}>");
+                result.AppendLine($"</{node.GetType().Name}>");
             return null;
         }
     }
