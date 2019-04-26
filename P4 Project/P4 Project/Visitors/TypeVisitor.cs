@@ -25,22 +25,25 @@ namespace P4_Project.Visitors
         public SymbolTable symbolTable;
         public Parser parser;
 
+        //can be used for function return type
+        public BaseType functionReturnType = null;
+
         public TypeVisitor(Parser parserObject)
         {
             symbolTable = parserObject.tab;
             parser = parserObject;
         }
 
-
+        //calls function and assign it a type
         public override object Visit(CallNode node, object o)
         {
-            //  node.Accept(this, null);
-            //Console.WriteLine("CallNode " + node.Identifier);
+
             BaseType type = null;
             FunctionType returnType;
 
+            //makes sure to not try and find methods in symbolobjects
             if (node.Identifier != "Edge" && node.Identifier != "vertices" && node.Identifier != "clear" && node.Identifier != "removeEdge" && node.Identifier != "ClearEdges" && node.Identifier != "ClearVertices" && node.Identifier != "ClearAll") {
-                //node.type = (BaseType)new NumberType();
+
                 returnType = (FunctionType)symbolTable.Find(node.Identifier).Type;
                 type = returnType.returnType();
                 
@@ -55,63 +58,41 @@ namespace P4_Project.Visitors
             return type;
         }
 
+        //finds variable type, and returns the type.
         public override object Visit(VarNode node,object o)
         {
             node.type = symbolTable.Find(node.Identifier).Type;
             
-           // Console.WriteLine("VARNODE: " + node.Identifier + " " + node.type);
-
-
-            // symbolTable.NewObj(node.SymbolObject.Name, node.Type, node.SymbolObject.Kind);
             return node.type;
         }
 
-        public override object Visit(BoolConst node, object o)
-        {
-            //node.Accept(this, null);
-            //Console.WriteLine("BoolConst: " + node.Value);
-            
-            return node.type = new BooleanType();
-        }
+        //returns a Bool type
+        public override object Visit(BoolConst node, object o) {return node.type = new BooleanType();}
 
+        //Checks if all elements in a collection is the same type, and returns the type
         public override object Visit(CollecConst node, object o)
         {
             int i = 0;
-            Console.WriteLine("CollecConst nodetype: " + node.ToString());
-
-            
-
             foreach (ExprNode n in node.Expressions)
             {
                 n.Accept(this, null);
-                node.type = n.type;
-                Console.WriteLine("CollecConst: " + n.type);
+                if (i == 0)
+                    node.type = n.type;
+                if (node.type != n.type)
+                    parser.SemErr("Not the same type in collection");
                 i++;
             }
-            if (i > 0)
-            {
-                Console.WriteLine("----------------------");
-
-            }
-            else
+            if (node.Expressions.Capacity == 0)
                 return null;
-            return node.type;//node.type;<------------------------------------------------------et problem
-        }
-
-        public override object Visit(NoneConst node, object o)
-        {
-            Console.WriteLine("NoneConst: "  + node.type);
-
-            //   node.Accept(this, null);
-
             return node.type;
         }
 
+        //returns null
+        public override object Visit(NoneConst node, object o) { return null;}
+
+        //returns a numberType
         public override object Visit(NumConst node, object o)
         {
-             // node.Accept(this, null);
-            //Console.WriteLine("NumConst: " +  node.Value + node.type);
-
             if (node != null)
                 return node.type = new NumberType();
             else
@@ -121,12 +102,9 @@ namespace P4_Project.Visitors
             }
         }
 
+        //returns a texttype
         public override object Visit(TextConst node, object o)
         {
-            //node.Accept(this, null);
-            //Console.WriteLine("TextConst: " + node.Value + node.type);
-
-           //Console.WriteLine("TextConst: " + node.type);
             if (node != null)
                 return node.type = new TextType();
             else
@@ -136,22 +114,18 @@ namespace P4_Project.Visitors
             }
         }
 
+        //Chekcs if the binExprNode should return a boolean or numbertype
         public override object Visit(BinExprNode node, object o)
         {
  
             node.Left.Accept(this, null);
             node.Right.Accept(this, null);
 
-            //Console.WriteLine("left: " + node.Left.Accept(this, null));
-            //Console.WriteLine("right: " + node.Right.Accept(this, null));
-
-
             if (node.Left.Accept(this, null) != null && node.Right.Accept(this, null) != null)
             {
 
 
                 if ((BaseType)node.Left.Accept(this, null) != (BaseType)node.Right.Accept(this, null)) { 
-                    //Console.WriteLine("BinExprNode is not matching---"+ (BaseType)node.Left.Accept(this, null)+ " == " +(BaseType)node.Right.Accept(this, null)+"----------------------------------------------------------");
                     parser.SemErr("BinExprNode is not matching");
                 }
             }
@@ -159,19 +133,18 @@ namespace P4_Project.Visitors
                 parser.SemErr("BinExprNode is null");
 
             if (node.OperatorType == 9 || node.OperatorType == 10 || node.OperatorType == 11 || node.OperatorType == 12 || node.OperatorType == 13 || node.OperatorType == 14)
+            {
                 node.type = new NumberType();
+            }
             else
             {
                 node.type = new BooleanType();
             }
 
-            // node.type = (BaseType)Convert.ChangeType(node.type, TypeCode.Boolean);
-            // Console.WriteLine("BinExprNode: " + node.type);
-
             return node.type;
         }
         
-
+        //Checks for (NOT) and (UMIN) notations
         public override object Visit(UnaExprNode node, object o)
         {
             node.Expr.Accept(this, null);
@@ -183,62 +156,89 @@ namespace P4_Project.Visitors
                 node.type = new NumberType();
             }
 
-            //Console.WriteLine("UnaExprNode: " + node.type);
-
             return node.type;
         }
 
+        //checks if both types of an edgeNode is an vertex
         public override object Visit(EdgeCreateNode node, object o)
         {
             node.LeftSide.Accept(this,null);
 
+            if (node.LeftSide.type.ToString() == "vertex")
+            {
+                if (node.RightSide.Capacity > 0)
+                {
+                    foreach (Tuple<IdentNode, List<AssignNode>> n in node.RightSide)
+                    {
 
+                        if (symbolTable.Find(n.Item1.Identifier).Type != node.LeftSide.type)
+                            parser.SemErr("the edge creating doesnt involve only vertexes.");                       
+                    }
+                }
+                else
+                    parser.SemErr("No vertex in list on edgeCreateNode");
+            }
+            else
+                parser.SemErr("The edge is not between vertexes");
 
-            //node.RightSide.Accept(this,null);
-           // node.LeftSide.Accept(this,null);  
+            if (node.Operator != 16 && node.Operator != 17 && node.Operator != 18)
+                parser.SemErr("EdgeCreateNode is not of operatertype 16-17-18.");
             return null;
         }
 
+        //unfinised try on checking function returntype
         public override object Visit(FuncDeclNode node, object o)
         {
-           // Console.WriteLine("FuncDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
+            FunctionType returnType = (FunctionType)node.SymbolObject.Type;
 
+//            if (functionReturnType is null)
+//            {
+//                if (returnType.ReturnType is null)
+//                { }
+//            }
+
+//            else
+//            {
+//                if (returnType.ReturnType is null)
+//                {                         parser.SemErr("ReturnType is not corrent");
+//}
+//                else
+//                {
+
+//                    Console.WriteLine("FuncDeclNode: " + node.SymbolObject.Name + " returnType: " + returnType.ReturnType + " functiontype: " + functionReturnType);
+
+//                    if (returnType.ReturnType.ToString() != functionReturnType.ToString())
+//                        parser.SemErr("ReturnType is not corrent");
+//                }
+//            }
             //Console.WriteLine("Parameters: "+node.Parameters.statements.Count);
+
             node.Parameters.Accept(this, null);
             node.Body.Accept(this, null);
 
-
-
             return null;
         }
 
+        //Checks for default and SymbolobjectValue. If it doesnt exist, create the SymbolObject
         public override object Visit(VarDeclNode node, object o)
         {
-            // Console.WriteLine("1VarDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
-            //BaseType test = (BaseType)node.DefaultValue.Accept(this, null);
             if (node.DefaultValue != null)
             {
                 if (node.DefaultValue.Accept(this, null) != null)
                 {
 
-                    Console.WriteLine("DefaultValue: " + node.DefaultValue.Accept(this, null) + " SymbolObject: " + node.SymbolObject.Type.ToString());
-
-
-                    if (node.SymbolObject.Type != new ListType((BaseType)node.DefaultValue.Accept(this, null))||
-                            node.SymbolObject.Type != new QueueType((BaseType)node.DefaultValue.Accept(this, null)) ||
-                            node.SymbolObject.Type != new SetType((BaseType)node.DefaultValue.Accept(this, null)) ||
-                            node.SymbolObject.Type != new StackType((BaseType)node.DefaultValue.Accept(this, null)))
+                    //If the value is of type number, assume it is the same as collectiontype<number>
+                    if (node.SymbolObject.Type != new ListType((BaseType)node.DefaultValue.Accept(this, null))&&
+                            node.SymbolObject.Type != new QueueType((BaseType)node.DefaultValue.Accept(this, null)) &&
+                            node.SymbolObject.Type != new SetType((BaseType)node.DefaultValue.Accept(this, null)) &&
+                            node.SymbolObject.Type != new StackType((BaseType)node.DefaultValue.Accept(this, null)) &&
+                            node.DefaultValue.Accept(this, null).ToString() != node.SymbolObject.Type.ToString())
                     {
-                        parser.SemErr("Default value is not the same type as Collection type value.");
+                        parser.SemErr("Default value is not the same type as Symbolobject type value.");
                     }
-                    else if (node.DefaultValue.Accept(this, null).ToString() != node.SymbolObject.Type.ToString())
-                        parser.SemErr("Default value is not the same type as SymbolObject value.");
-
                 }
                 else
                 {
-                    Console.WriteLine("DefaultValue: " + node.DefaultValue.Accept(this, null) + " SymbolObject: " + node.SymbolObject.Type.ToString());
-
                     if (node.SymbolObject.Type.ToString() != "vertex" && node.SymbolObject.Type.ToString() != "edge")
                         parser.SemErr("Default value is null. And not a vertex or edge.");
                 }
@@ -249,31 +249,22 @@ namespace P4_Project.Visitors
             return null;
         }
 
+        //Creates a vertex object in SymbolTable
         public override object Visit(VertexDeclNode node, object o)
         {
-           // Console.WriteLine("VertexDeclNode: " +node.SymbolObject.Name + " " + node.SymbolObject.Type);
 
-
-            //Console.WriteLine("VarDeclNode: " + node.SymbolObject.Name + " " + node.SymbolObject.Type);
-
-            //if (symbolTable.Find(node.SymbolObject.Name)== null)
             symbolTable.NewObj(node.SymbolObject.Name, node.SymbolObject.Type, node.SymbolObject.Kind);
-
-      
-
             node.Attributes.Accept(this, null);
-            return null;// new VertexType();
+
+            return null;
         }
 
+        //Checks for an assigned value is in a correct type. like number sum = 0. Which failes if it is not a number.
         public override object Visit(AssignNode node, object o)
         {
             node.Value.Accept(this, null);
             node.Target.Accept(this, null);
-            //Print();
 
-            //BaseType tType = node.Value.type;
-            //BaseType vType = node.Value.type;
-            
             BaseType targetType = symbolTable.Find(node.Target.Identifier).Type;
             BaseType valueTarget = (BaseType)node.Value.Accept(this, null);
 
@@ -284,21 +275,19 @@ namespace P4_Project.Visitors
             else
                 parser.SemErr("AssignNode is null");
 
-           Console.WriteLine(node.Target.Identifier);
-            //Console.WriteLine("TARGET = "+ symbolTable.Find(node.Target.Identifier).Type + " Value = " + (BaseType)node.Value.Accept(this, null));
-
             return null;
         }
 
+        //visits blocknode
         public override object Visit(BlockNode node, object o)
         {
             foreach (Node n in node.statements) { 
-                //Console.WriteLine("BlockNode: " + n);
                 n.Accept(this, null);
             }
             return null;
         }
 
+        //Visits foreachNode (undone)
         public override object Visit(ForeachNode node, object o)
         {
             node.IterationVar.Accept(this,null);
@@ -307,6 +296,7 @@ namespace P4_Project.Visitors
             return node;
         }
 
+        //Visits forNode (undone)
         public override object Visit(ForNode node, object o)
         {
             node.Initializer.Accept(this, null);
@@ -316,6 +306,7 @@ namespace P4_Project.Visitors
             return null;
         }
 
+        //Visits HeadNode
         public override object Visit(HeadNode node, object o)
         { 
             
@@ -323,62 +314,46 @@ namespace P4_Project.Visitors
             return null;
         }
 
+        //Checks if the condition is a bool
         public override object Visit(IfNode node, object o)
         {
            
-
-           // Console.WriteLine("IfNode Condition "+node.Condition.Accept(this, null));
-
             node.Condition.Accept(this, null);
-            //node.ElseNode.Accept(this, null);
             node.Body.Accept(this, null);
-
-            //Console.WriteLine("IfNode Condition " + node.ElseNode.Accept(this, null));
-
-
-            //Console.WriteLine("IfNode ElseNode "+node.ElseNode.Accept(this, null));
-
-            // Type eType = (Type)node.Condition.Accept(this, null);
 
             if ((BaseType)node.Condition.Accept(this, null) != new BooleanType())
             {
                 parser.SemErr("Expression in if is not a boolean");
-
-                //Console.WriteLine("Expression in if is not a boolean");
             }
 
             if (node.Condition.Accept(this, null) == null)
             {
-                //Console.WriteLine("This is an else node");
+                //This is an else node
             }
-
-            //if (node.ElseNode.Accept(this, null) != null ){
-            //   if((BaseType)node.ElseNode.Accept(this, null) != new BooleanType())
-            //        Console.WriteLine("Expression in ElseIf is not a boolean");
-            //}
-
-            
 
             return null;
         }
 
+        //visits LonecallNode
         public override object Visit(LoneCallNode node, object o)
         {  
             node.Call.Accept(this, null);
-           // Console.WriteLine("LoneCallNode " + node.Call.Identifier);
-            //node.Call.type = symbolTable.Find(node.Call.Identifier).Type;
+
             return null;
         }
 
+        //For functionReturnType (undone)
         public override object Visit(ReturnNode node, object o)
         { 
 
             node.Ret.Accept(this, null);
-          //  Console.WriteLine("ReturnNode " + node.Ret.type);
 
-            return null;
+            functionReturnType = node.Ret.type;
+
+            return node.Ret.type;
         }
 
+        //visits WhileNode (undone)
         public override object Visit(WhileNode node, object o)
         {
             //Console.WriteLine("entering whileloop" + node.Condition.Accept(this, null).GetType());
@@ -395,9 +370,9 @@ namespace P4_Project.Visitors
             return node;
         }
         
+        //visits MagiaNode
         public override object Visit(MAGIA node, object o)
         {
-           // Print();
             node.block.Accept(this, null);
            
             return null;
@@ -413,16 +388,17 @@ namespace P4_Project.Visitors
             return null;
         }
 
+        //visits MultiDecl
         public override object Visit(MultiDecl multiDecl, object p)
         {
             foreach (Node n in multiDecl.Decls)
             {
-                //Console.WriteLine("MultiDecl: " + n);
                 n.Accept(this, null);
             }
             return null;
         }
 
+        //prints symboltable (Used for bugfixising, unused at the moment)
         public void Print()
         {
             string output = "";
