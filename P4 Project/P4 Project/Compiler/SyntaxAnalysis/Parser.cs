@@ -421,7 +421,7 @@ public class Parser {
 		i = null; 
 		ExpectWeak(22, 3);
 		CallOrID(out i);
-		i.Source = source; 
+		i.Source = (IdentNode) source; 
 	}
 
 	void Assign(out ExprNode expr) {
