@@ -15,12 +15,10 @@ namespace P4_Project.SymTab
         Parser parser;
 
         public const int var = 0, func = 1; // Kinds
-        public static Obj undefObj = new Obj("undef", null, var, null);
 
         SymbolTable parent;
         List<SymbolTable> innerScopes = new List<SymbolTable>();
         Dictionary<string, Obj> symbolDecls = new Dictionary<string, Obj>();
-
 
         //Constructor for visitor (no parser argument)
         public SymbolTable(SymbolTable _parent, Parser _parser)
@@ -52,6 +50,7 @@ namespace P4_Project.SymTab
 
             if (!symbolDecls.ContainsKey(obj.Name))
                 symbolDecls.Add(obj.Name, obj);
+            else parser.SemErr(obj.Name + " is already added to symDecls");
 
             return obj;
         }
@@ -67,7 +66,7 @@ namespace P4_Project.SymTab
             if (parent != null)
                 return parent.Find(name);
 
-            parser.SemErr($"{name} has not been declared not declared");
+            parser.SemErr($"{name} has not been declared");
 
             return null;
         }

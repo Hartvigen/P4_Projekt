@@ -6,8 +6,8 @@ Mastering Algorithms and Graphs with Illustrative Assistance.
 A project made by the university group sw406f19 from AAU. The project focuses on creating a graph programming language.
 
 # Build
-The provided code with the realted NuGet Dependencies can compile the Compiler in Visual Studio.
-The Compiler can Compile MAGIA Code to DOT code and using the Graphviz.NET NuGet Package create images directly.
+The provided code, alongside the related NuGet Dependencies, can compile the MAGIA compiler in Visual Studio.
+The MAGIA compiler can compile MAGIA Code to DOT code and using the Graphviz.NET NuGet Package create images directly.
 The Compiler is a hybrid compiler and performs a lot of Interpretation.
 
 # Contact

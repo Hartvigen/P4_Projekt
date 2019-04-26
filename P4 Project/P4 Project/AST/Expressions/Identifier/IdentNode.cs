@@ -17,7 +17,7 @@ namespace P4_Project.AST.Expressions.Identifier
         /// The identifier is the string value of the identifier, and the reference is a reference directly to the symbol table.
         /// </summary>
         public string Identifier { get; private set; }
-        public ExprNode Source { get; set; }
+        public IdentNode Source { get; private set; }
 
 
         protected IdentNode() { }
@@ -25,6 +25,14 @@ namespace P4_Project.AST.Expressions.Identifier
         protected IdentNode(string identifier)
         {
             Identifier = identifier;
+        }
+
+        public void AddBaseSource(IdentNode baseSource)
+        {
+            if (Source == null)
+                Source = baseSource;
+            else 
+                Source.AddBaseSource(baseSource);
         }
     }
 }

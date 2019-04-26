@@ -30,7 +30,7 @@ MAGIA = { Head } { Stmt } { FuncDecl } .
 
 Head = '[' ( "vertex" | "edge" ) '(' VarDecl { ',' VarDecl } ')' ']' .
 
-FuncDecl = "func" (Type | "none") IDENT '(' [ VarDecl { ',' VarDecl } ] ')' '{' { Stmt } '}' .
+FuncDecl = "func" (Type | "none") IDENT '(' [ ParamDecl { ',' ParamDecl } ] ')' '{' { Stmt } '}' .
 
 Stmt = ( StructStmt | KeywordStmt | SimpleStmt | FullDecl ).
 
@@ -49,7 +49,7 @@ StmtIf = "if" '(' Expr ')' '{' { Stmt } '}' { "elseif" '(' Expr ')' '{' { Stmt }
 KeywordStmt = ( "return" Expr | "break" | "continue" ).
 
 
-SimpleStmt = CallOrID { Member } [Assign | EdgeOneOrMore].
+SimpleStmt = CallOrID [Assign | EdgeOneOrMore].
 
 EdgeOneOrMore = EdgeOpr ( Identifier | EdgeCreate | '{' EdgeCreate { ',' EdgeCreate } '}' ).
 
@@ -63,6 +63,8 @@ FullDecl = Type ( IDENT [ Assign ] | '{' VtxDecl { ',' VtxDecl } '}' | VtxDecl )
 VtxDecl = '(' IDENT { ',' Identifier Assign } ')'.
 
 
+ParamDecl = Type IDENT.
+
 VarDecl = Type IDENT [ Assign ].
 
 Assign = '=' ( Expr | '{' Args '}' ).
@@ -75,24 +77,22 @@ ExprOR = ExprAnd { "||" ExprAnd }.
 
 ExprAnd = ExprEQ { "&&" ExprEQ }.
 
-ExprEQ = ExprRel [("==" | "!=" ) ExprRel ].
+ExprEQ = ExprRel [ ("==" | "!=" ) ExprRel ].
 
-ExprRel = ExprPlus [('<' | '>' | "<=" | ">=" ) ExprPlus ].
+ExprRel = ExprPlus [ ('<' | '>' | "<=" | ">=" ) ExprPlus ].
 
-ExprPlus = ['-' ] ExprMult {('+' | '-' ) ExprMult }.
+ExprPlus = ['-'] ExprMult { ('+' | '-' ) ExprMult }.
 
-ExprMult = ExprNot {('*' | '/' | '%' ) ExprNot }.
+ExprMult = ExprNot { ('*' | '/' | '%' ) ExprNot }.
 
 ExprNot = ['!'] Factor.
 
-Factor = Const | CallOrID { Member }. 
+Factor = Const | '(' Expr ')' | CallOrID. 
 
 
-CallOrID = Identifier ['(' Args ')'].
+CallOrID = Identifier [ '(' Args ')' ] [ '.' CallOrID ].
 
 Args = [Expr { ',' Expr } ].
-
-Member = '.' CallOrID.
 
 
 Identifier = ( IDENT ).
