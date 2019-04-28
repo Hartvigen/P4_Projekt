@@ -127,7 +127,7 @@ StmtFor<out StmtNode f> =               (. f = null; BlockNode stmtBlock = new B
         | VarDecl<out VarDeclNode vert> (. init = vert; .)
         ) WEAK ','
         Expr<out cond> WEAK ','
-        Stmt<out iter>
+        SimpleStmt<out iter>
     ')' 
     '{'                                 (. tab = tab.OpenScope(); .)
         { SYNC Stmt<out stmt>           (. stmtBlock.Add(stmt); .)
