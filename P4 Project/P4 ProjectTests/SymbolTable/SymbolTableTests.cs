@@ -1,15 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using P4_Project.Compiler.SyntaxAnalysis;
+﻿using P4_Project.Compiler.SyntaxAnalysis;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace P4_Project.SymTab.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class SymbolTableTests
     {
         private static Parser parser;
@@ -17,34 +17,34 @@ namespace P4_Project.SymTab.Tests
         private static SymbolTable symbolTable;
 
         //Generates a header attribute declaration for vertex and edge where all types are being used.
-        [ClassInitialize()]
-        public static void ClassInit(TestContext context)
+        [OneTimeSetUp]
+        public static void ClassInit()
         {
             parser = new Parser(null);
             parent = new SymbolTable(null, null);
         }
 
-        [TestInitialize]
+        [SetUp]
         public void Initialize()
         {
             symbolTable = new SymbolTable(parent,parser);
         }
 
-        [TestCleanup]
+        [TearDown]
         public void Cleanup()
         {
             symbolTable = null;
         }
 
         //As no scopes have been opened we assert there are no scopes.
-        [TestMethod()]
+        [Test]
         public void SymbolTableTests01()
         {
             Assert.IsTrue(symbolTable.GetScopes().Count == 0);
         }
 
         //For every time we open a scope another scope should exist in the symboltable.
-        [TestMethod()]
+        [Test]
         public void SymbolTableTests02()
         {
             int numberOfScopes = 42;
@@ -54,14 +54,14 @@ namespace P4_Project.SymTab.Tests
         }
 
         //Closing the scope will return the parent.
-        [TestMethod()]
+        [Test]
         public void SymbolTableTests03()
         {
             Assert.IsTrue(symbolTable.CloseScope() == parent);
         }
 
         //We are just asserting that this test can get to the end without casting exceptions, we can open a butload of scopes and go out of them again
-        [TestMethod()]
+        [Test]
         public void SymbolTableTests04()
         {
             SymbolTable parent = symbolTable;

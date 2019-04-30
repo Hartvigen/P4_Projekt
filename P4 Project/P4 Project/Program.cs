@@ -82,12 +82,6 @@ namespace P4_Project
             return parser.errors.count == 0;
         }
 
-        private static bool tryParse(string filePath)
-        {
-            Parser parser = new Parser(new Scanner(filePath));
-            parser.Parse();
-            return parser.errors.count == 0;
-        }
         private static bool applyVisitor(Visitor visitor, string inputFilePath)
         {
             if (tryParse(inputFilePath, out Parser parser))

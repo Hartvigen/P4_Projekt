@@ -1,15 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using P4_Project.Compiler.SyntaxAnalysis;
+﻿using P4_Project.Compiler.SyntaxAnalysis;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class ScannerTests
     {
         private bool TryParse(string program)
@@ -38,7 +38,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
         
         //grammatical error should give error
-        [TestMethod()]
+        [Test]
         public void ScanTest()
         {
             bool success = true;
@@ -47,7 +47,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Tests involving tab space and newline
-        [TestMethod()]
+        [Test]
         public void ScanTest2()
         {
             //we should be able to parse a file with nothing but with tabs, space and newline without causing a compilation error
@@ -69,7 +69,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //checking if tokens are read correctly by the scanner
-        [TestMethod()]
+        [Test]
         public void ScanTest3()
         {
             Assert.IsTrue(scannerFromString("a2").Scan().kind == Parser._IDENT);
@@ -83,7 +83,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //test to see if we can correctly recognize token values
-        [TestMethod()]
+        [Test]
         public void ScanTest4()
         {
             Assert.IsTrue(scannerFromString("a2").Scan().val == "a2");
@@ -104,7 +104,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //test to see if we find the correct token values when scanning through a header
-        [TestMethod()]
+        [Test]
         public void ScanTest5()
         {
             Assert.IsTrue(TryParse("[vertex(number x = 10)]"));

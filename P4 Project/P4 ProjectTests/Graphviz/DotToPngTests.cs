@@ -3,31 +3,34 @@ using System.IO;
 using GraphVizWrapper;
 using GraphVizWrapper.Commands;
 using GraphVizWrapper.Queries;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
+using System.Configuration;
 
 namespace P4_Project.Graphviz.Tests
 {
-    [TestClass()]
+    [TestFixture]
     public class DotToPngTests
     {
         private const string customFilePath = "test.png";
         private const string customDotCode = "digraph{one -> three; two -> four; three -> five; four -> six;}";
 
-        [ClassInitialize()]
-        public static void ClassInit(TestContext context)
-        {
+        [OneTimeSetUp]
+        public static void ClassInit()
+        {          
+            AppSettingsReader a = new AppSettingsReader();
+            Console.Write(a.GetValue("graphVizLocation", typeof(String)));
             if (File.Exists(DotToPng.defaultFilePath))
                 File.Delete(DotToPng.defaultFilePath);
             if (File.Exists(customFilePath))
                 File.Delete(customFilePath);
         }
 
-        [TestInitialize]
+        [SetUp]
         public void Initialize()
         {
         }
 
-        [TestCleanup]
+        [TearDown]
         public void Cleanup()
         {
             if (File.Exists(DotToPng.defaultFilePath))
@@ -56,16 +59,15 @@ namespace P4_Project.Graphviz.Tests
         }
 
         //The defualts will create an example file PNG file.
-        [TestMethod()]
+        [Test]
         public void DotToPngTestSuccess01()
         {
-            string direc = Directory.GetCurrentDirectory();
             DotToPng.createPNGFile();
             Assert.IsTrue(File.Exists(DotToPng.defaultFilePath));
         }
 
         //The custom DOT code will create an PNG file.
-        [TestMethod()]
+        [Test]
         public void DotToPngTestSuccess02()
         {
             DotToPng.createPNGFile(customDotCode);
@@ -73,7 +75,7 @@ namespace P4_Project.Graphviz.Tests
         }
 
         //The custom DOT code at a custom filepath will create an PNG file at the custom path.
-        [TestMethod()]
+        [Test]
         public void DotToPngTestSuccess03()
         {
             DotToPng.createPNGFile(customDotCode, customFilePath);
@@ -81,21 +83,21 @@ namespace P4_Project.Graphviz.Tests
         }
 
         //The custom Code and defualt code is not the same.
-        [TestMethod()]
+        [Test]
         public void DotToPngTestSuccess04()
         {
             Assert.IsTrue(customDotCode != DotToPng.defaultDotCode);
         }
 
         //The custom path and defualt path is not the same.
-        [TestMethod()]
+        [Test]
         public void DotToPngTestSuccess05()
         {
             Assert.IsTrue(customFilePath != DotToPng.defaultFilePath);
         }
 
         //The same picture will be genereate given the same code.
-        [TestMethod()]
+        [Test]
         public void DotToPngTestSuccess06()
         {
             //The defualt picture
@@ -108,7 +110,7 @@ namespace P4_Project.Graphviz.Tests
         }
 
         //The pictures are different if different Dot code is given.
-        [TestMethod()]
+        [Test]
         public void DotToPngTestSuccess07()
         {
             //The defualt picture
@@ -121,7 +123,7 @@ namespace P4_Project.Graphviz.Tests
         }
 
         //The pictures are the same if same Dot code is given even if it is custom code.
-        [TestMethod()]
+        [Test]
         public void DotToPngTestSuccess08()
         {
             //The defualt picture

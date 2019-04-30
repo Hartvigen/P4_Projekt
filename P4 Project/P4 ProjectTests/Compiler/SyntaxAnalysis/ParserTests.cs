@@ -1,15 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using P4_Project.Compiler.SyntaxAnalysis;
+﻿using P4_Project.Compiler.SyntaxAnalysis;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
-namespace P4_Project.Compiler.SyntaxAnalysis.Tests
+namespace P4_Project.Compiler.SyntaxAnalysis
 {
-    [TestClass()]
+    [TestFixture]
     public class ParserTests
     {
         static string validIdentifier = "test123";
@@ -34,8 +34,8 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         };
 
         //Generates a header attribute declaration for vertex and edge where all types are being used.
-        [ClassInitialize()]
-        public static void ClassInit(TestContext context)
+        [OneTimeSetUp]
+        public void ClassInit()
         {
             headerWithAllTypesVertex = "[vertex( ";
             headerWithAllTypesEdge = "[edge( ";
@@ -59,18 +59,6 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
 
             headerWithAllTypesVertex = headerWithAllTypesVertex.Remove(headerWithAllTypesVertex.LastIndexOf(","));
             headerWithAllTypesVertex += ")]";
-        }
-
-        [TestInitialize]
-        public void Initialize()
-        {
-
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-
         }
 
         //Will identify an ApproriateValue given a type.
@@ -143,7 +131,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //The Empty String Should be good.  
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess01()
         {
             bool success = TryParse("");
@@ -151,7 +139,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //header with valid type and identifier should be good.
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess02()
         {
             int i = 0;
@@ -171,7 +159,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //header with valid type, identifier and defualt value should be good.
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess03()
         {
             int i = 0;
@@ -190,7 +178,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //header with valid collection type and identifier should be good.
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess04()
         {
             int i = 0, j = 0;
@@ -211,7 +199,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //header with all possible types used at same time should be good.
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess05()
         {
             Assert.IsTrue(TryParse(headerWithAllTypesEdge));
@@ -220,7 +208,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //tests if functions are functional with a body and use of parameters
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess6()
         {
             string func = "[vertex(boolean what = true)] func none FuncDecl(number x){vertex(v1, what = false)}";
@@ -231,7 +219,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //tests if return is accepted
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess7()
         {
             string func = "func number FuncDecl(number x){x = 5 return x}";
@@ -239,7 +227,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //tests the syntax of using operators on numbers, both within and out of function declarations
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess8()
         {
             string func = "number x " +
@@ -255,7 +243,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty brackets should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure01()
         {
             bool success = TryParse("[]");
@@ -264,7 +252,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty brackets with edge should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure02()
         {
             bool success = TryParse("[edge]");
@@ -273,7 +261,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty brackets with vertex should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure03()
         {
             bool success = TryParse("[vertex]");
@@ -282,7 +270,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty edge header should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure04()
         {
             bool success = TryParse("[edge()]");
@@ -290,7 +278,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty vertex header should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure05()
         {
             bool success = TryParse("[vertex()]");
@@ -298,7 +286,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //header with valid type but invalid identifier should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure06()
         {
             int i = 0;
@@ -318,7 +306,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //header with valid type, identifier but invalid defualt value should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure07()
         {
             int i = 0;
@@ -340,7 +328,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //header with valid collection type and invalid identifier should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure08()
         {
             int i = 0, j = 0;
@@ -364,7 +352,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //header with valid collection type, identifier and invalid defualt value should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure09()
         {
             int i = 0, j = 0;
@@ -388,7 +376,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //A forgotten close ´"´  on a string should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure10()
         {
             bool success;
@@ -400,7 +388,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //A forgotten ´,´ in a list should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure11()
         {
             bool success;
@@ -411,7 +399,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //A wrong symbol where there should be ´,´ in a list should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure12()
         {
             bool success;
@@ -422,7 +410,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //A forgotten close ´]´ symbol should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure13()
         {
             bool success;
@@ -433,7 +421,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //A forgotten close ´)´ symbol should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure14()
         {
             bool success;
@@ -444,7 +432,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //A forgotten close ´)]´ symbol should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure15()
         {
             bool success;
@@ -455,7 +443,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //A forgotten start ´(´ symbol after "vertex" or "edge" should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure16()
         {
             bool success;
@@ -470,7 +458,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //A forgotten end ´(´ symbol after "vertex" or "edge" should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure17()
         {
             bool success;
@@ -481,7 +469,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         // a forgotten func before FuncDecl should give error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure18()
         {
             string func = "FuncDecl(number x){x = 5 return x}";
@@ -489,7 +477,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         // a forgotten FuncDecl before function should give error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure19()
         {
             string func = "func(number x){x = 5}";
@@ -497,7 +485,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         // a forgotten FuncDecl before func should give error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure20()
         {
             string str = "[vertex(edge " + validIdentifier + ")]";
@@ -505,7 +493,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Invalid single type is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure21()
         {
             string str = "[vertex(" + invalidType + " " + validIdentifier + ")]";
@@ -513,7 +501,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Invalid single type and invalid identfier is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure22()
         {
             string str = "[vertex(" + invalidType + " " + invalidIdentifier + ")]";
@@ -521,7 +509,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Invalid collection with valid single type and valid identifier is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure23()
         {
             string str = "[vertex(" + invalidCollection + "<" + singleTypes[0] + ">" + " " + validIdentifier + ")]";
@@ -529,7 +517,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Invalid collection with invalid single type and valid identifier is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure24()
         {
             string str = "[vertex(" + invalidCollection + "<" + invalidType + ">" + " " + validIdentifier + ")]";
@@ -537,7 +525,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Invalid collection with invalid single type and invalid identifier is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure25()
         {
             string str = "[vertex(" + invalidCollection + "<" + invalidType + ">" + " " + invalidIdentifier + ")]";

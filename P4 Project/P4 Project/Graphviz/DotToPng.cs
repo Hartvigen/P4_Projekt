@@ -18,7 +18,7 @@ namespace P4_Project.Graphviz
             return true;
         }
 
-        private static GraphGeneration setup()
+        public static GraphGeneration setup()
         {
             return new GraphGeneration(
                 new GetStartProcessQuery(),
