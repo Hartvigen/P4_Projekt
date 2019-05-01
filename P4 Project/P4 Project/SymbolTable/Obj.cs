@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections;
-using P4_Project.Types;
+﻿using P4_Project.Types;
 
-namespace P4_Project.SymTab
+namespace P4_Project.SymbolTable
 {
     public class Obj
     {
-        public string Name { get; set; }        // name of the object
-        public BaseType Type { get; set; }      // type of the object
-        public int Kind { get; set; }           // var, func ..
-        public SymbolTable Scope { get; set; }  // the scope of the object
+        public string Name { get; }        // name of the object
+        public BaseType Type { get; }      // type of the object
+        public int Kind { get; }           // var, func ..
+        public SymTable Scope { get; }  // the scope of the object
 
-        public Obj(string name, BaseType type, int kind, SymbolTable scope)
+        public Obj(string name, BaseType type, int kind, SymTable scope)
         {
             Name = name;
             Type = type;

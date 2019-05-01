@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -6,421 +7,434 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
+using P4_Project.Types;
 using P4_Project.Types.Functions;
 
 namespace P4_Project.Visitors
 {
     public class PrettyPrinter : Visitor
     {
-        public new string appropriateFileName = "prettyprint.txt";
-        public new StringBuilder result = new StringBuilder();
-        public new int errorCount = 0;
+        public override string AppropriateFileName { get; } = "prettyprint.txt";
+        public override StringBuilder Result { get; } = new StringBuilder();
+        
+        public override List<string> ErrorList { get; }
 
         //The level of ident is changed as the visitor moves along so this should start at 0.
-        //Changing this will not change the relative indentations.
+        //Changing this will not change the relative indentations,
+        //but can be used to change the overall indentation level.
         //Should never be negative.
-        private int indentLevel = 0;
+        private int _indentLevel = 1;
 
         //The Desired indent size can be changed here 4 is default.
-        private int indentSizeInSpaces = 4;
+        private const int IndentSizeInSpaces = 4;
 
 
         //Below is function that handles each kind of node and prints it pretty complete with
         //spaces, indentation, brackets, spaces and so on...
-        public override object Visit(CallNode node, object o)
+        public override BaseType Visit(CallNode node)
         {
             if (node.Source != null)
             {
-                node.Source.Accept(this, null);
-                result.Append(".");
+                node.Source.Accept(this);
+                Result.Append(".");
             }
-            result.Append(node.Identifier + "(");
-            node.Parameters.Accept(this, null);
-            result.Append(")");
+            Result.Append(node.Ident + "(");
+            node.Parameters.Accept(this);
+            Result.Append(")");
             return null;
         }
 
-        public override object Visit(VarNode node, object o)
+        public override BaseType Visit(VarNode node)
         {
             if (node.InParentheses)
-                result.Append("(");
+                Result.Append("(");
             if (node.Source != null)
             {
-                node.Source.Accept(this, null);
-                result.Append(".");
+                node.Source.Accept(this);
+                Result.Append(".");
             }
 
-            result.Append(node.Identifier);
+            Result.Append(node.Ident);
 
             if (node.InParentheses)
-                result.Append(")");
+                Result.Append(")");
             return null;
         }
 
-        public override object Visit(BoolConst node, object o)
+        public override BaseType Visit(BoolConst node)
         {
-            result.Append(node.GetString());
+            Result.Append(node.GetString());
             return null;
         }
 
-        public override object Visit(CollecConst node, object o)
+        public override BaseType Visit(CollecConst node)
         {
             if (node.Expressions.Count == 0)
                 return null;
-            foreach (Node n in node.Expressions)
+            
+            node.Expressions.ForEach(n =>
             {
-                n.Accept(this, null);
+                n.Accept(this);
                 CommaAndSpace();
-            }
+            });
             RemoveLastCommaAndSpace();
             return null;
         }
 
-        public override object Visit(NoneConst node, object o)
+        public override BaseType Visit(NoneConst node)
         {
-            result.Append("none");
+            Result.Append("none");
             return null;
         }
 
-        public override object Visit(NumConst node, object o)
+        public override BaseType Visit(NumConst node)
         {
-            result.Append(node.GetString());
+            Result.Append(node.GetString());
             return null;
         }
 
-        public override object Visit(TextConst node, object o)
+        public override BaseType Visit(TextConst node)
         {
-            result.Append(node.Value);
+            Result.Append(node.Value);
             return null;
         }
 
-        public override object Visit(BinExprNode node, object o)
+        public override BaseType Visit(BinExprNode node)
         {
             if (node.InParentheses)
-                result.Append("(");
-            node.Left.Accept(this, null);
-            result.Append(" " + node.GetCodeofOperator() + " ");
-            node.Right.Accept(this, null);
+                Result.Append("(");
+            node.Left.Accept(this);
+            Result.Append(" " + node.GetCodeOfOperator() + " ");
+            node.Right.Accept(this);
             if (node.InParentheses)
-                result.Append(")");
+                Result.Append(")");
             return null;
         }
 
-        public override object Visit(UnaExprNode node, object o)
+        public override BaseType Visit(UnaExprNode node)
         {
             if (node.InParentheses)
-                result.Append("(");
-            result.Append(node.GetCodeofOperator());
-            node.Expr.Accept(this, null);
+                Result.Append("(");
+            Result.Append(node.GetCodeOfOperator());
+            node.Expr.Accept(this);
             if (node.InParentheses)
-                result.Append("(");
+                Result.Append("(");
             return null;
         }
 
-        public override object Visit(EdgeCreateNode node, object o)
+        public override BaseType Visit(EdgeCreateNode node)
         {
-            node.LeftSide.Accept(this, null);
-            result.Append(" " + node.GetCodeofOperator() + " ");
+            node.LeftSide.Accept(this);
+            Result.Append(" " + node.GetCodeOfOperator() + " ");
             if (node.RightSide.Count == 1)
             {
                 if (node.RightSide[0].Item2.Count != 0)
-                    result.Append("(");
+                    Result.Append("(");
 
-                node.RightSide[0].Item1.Accept(this, null);
+                node.RightSide[0].Item1.Accept(this);
                 CommaAndSpace();
 
-                node.RightSide[0].Item2.ForEach(l => { l.Accept(this, null); RemoveIndentAndNewline(); CommaAndSpace(); });
+                node.RightSide[0].Item2.ForEach(l => { 
+                    l.Accept(this); 
+                    RemoveIndentAndNewline(); 
+                    CommaAndSpace(); 
+                });
 
                 RemoveLastCommaAndSpace();
 
                 if (node.RightSide[0].Item2.Count != 0)
-                    result.Append(")");
+                    Result.Append(")");
             }
             else
             {
-                result.Append("{");
+                Result.Append("{");
                 node.RightSide.ForEach(t =>
                 {
-                    result.Append("(");
-                    t.Item1.Accept(this, null);
+                    Result.Append("(");
+                    t.Item1.Accept(this);
                     CommaAndSpace();
 
-                    t.Item2.ForEach(l => { l.Accept(this, null); RemoveIndentAndNewline(); CommaAndSpace(); });
+                    t.Item2.ForEach(l =>
+                    {
+                        l.Accept(this); 
+                        RemoveIndentAndNewline(); 
+                        CommaAndSpace();
+                    });
 
                     RemoveLastCommaAndSpace();
-                    result.Append(")");
+                    Result.Append(")");
                     CommaAndSpace();
                 });
                 RemoveLastCommaAndSpace();
-                result.Append("}");
+                Result.Append("}");
             }
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(FuncDeclNode node, object o)
+        public override BaseType Visit(FuncDeclNode node)
         {
             IndentAndNewline();
-            result.Append("func " + (((FunctionType)node.SymbolObject.Type).ReturnType?.ToString() ?? "none") + " " + node.SymbolObject.Name + "(");
-            if (node.Parameters.statements.Count != 0)
+            Result.Append("func " + (((FunctionType)node.SymbolObject.Type).ReturnType?.ToString() ?? "none"));
+            Result.Append(" " + node.SymbolObject.Name + "(");
+            if (node.Parameters.Statements.Count != 0)
             {
-                foreach (Node n in node.Parameters.statements)
+                foreach (var n in node.Parameters.Statements)
                 {
-                    n.Accept(this, null);
+                    n.Accept(this);
                     RemoveIndentAndNewline();
                     CommaAndSpace();
                 }
                 RemoveLastCommaAndSpace();
             }
 
-            result.Append(")");
+            Result.Append(")");
             IndentAndNewline();
-            result.Append("{");
-            indentLevel++;
+            Result.Append("{");
+            _indentLevel++;
             IndentAndNewline();
-            foreach (Node n in node.Body.statements)
+            foreach (var n in node.Body.Statements)
             {
-                n.Accept(this, null);
+                n.Accept(this);
             }
             RemoveIndentAndNewline();
-            indentLevel--;
+            _indentLevel--;
             IndentAndNewline();
-            result.Append("}");
+            Result.Append("}");
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(VarDeclNode node, object o)
+        public override BaseType Visit(VarDeclNode node)
         {
-            result.Append(node.GetVarType() + " " + node.SymbolObject.Name);
+            Result.Append(node.GetVarType() + " " + node.SymbolObject.Name);
             if (node.DefaultValue != null)
             {
-                result.Append(" = ");
+                Result.Append(" = ");
                 if (node.DefaultValue.GetType() == typeof(CollecConst))
-                    result.Append("{");
-                node.DefaultValue.Accept(this, null);
+                    Result.Append("{");
+                node.DefaultValue.Accept(this);
                 if (node.DefaultValue.GetType() == typeof(CollecConst))
-                    result.Append("}");
+                    Result.Append("}");
             }
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(VertexDeclNode node, object o)
+        public override BaseType Visit(VertexDeclNode node)
         {
-            result.Append("vertex(");
-            result.Append(node.SymbolObject.Name);
+            Result.Append("vertex(");
+            Result.Append(node.SymbolObject.Name);
             CommaAndSpace();
-            node.Attributes.statements.ForEach(v => {
-                v.Accept(this, null);
+            node.Attributes.Statements.ForEach(v => {
+                v.Accept(this);
                 RemoveIndentAndNewline();
                 CommaAndSpace();
             });
             RemoveLastCommaAndSpace();
-            result.Append(")");
+            Result.Append(")");
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(AssignNode node, object o)
+        public override BaseType Visit(AssignNode node)
         {
-            node.Target.Accept(this, null);
-            result.Append(" = ");
-            node.Value.Accept(this, null);
+            node.Target.Accept(this);
+            Result.Append(" = ");
+            node.Value.Accept(this);
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(BlockNode node, object o)
+        public override BaseType Visit(BlockNode node)
         {
-            foreach (Node n in node.statements)
+            foreach (var n in node.Statements)
             {
-                if (n != null)
-                    n.Accept(this, null);
+                n?.Accept(this);
             }
             return null;
         }
 
-        public override object Visit(ForeachNode node, object o)
+        public override BaseType Visit(ForeachNode node)
         {
-            result.Append("foreach(");
-            node.IterationVar.Accept(this, null);
+            Result.Append("foreach(");
+            node.IterationVar.Accept(this);
             RemoveIndentAndNewline();
-            result.Append(" in ");
-            node.Iterator.Accept(this, null);
-            result.Append(")");
+            Result.Append(" in ");
+            node.Iterator.Accept(this);
+            Result.Append(")");
             IndentAndNewline();
-            result.Append("{");
-            indentLevel++;
+            Result.Append("{");
+            _indentLevel++;
             IndentAndNewline();
-            node.Body.Accept(this, null);
+            node.Body.Accept(this);
             RemoveIndentAndNewline();
-            indentLevel--;
+            _indentLevel--;
             IndentAndNewline();
-            result.Append("}");
+            Result.Append("}");
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(ForNode node, object o)
+        public override BaseType Visit(ForNode node)
         {
-            result.Append("for(");
-            node.Initializer.Accept(this, null);
+            Result.Append("for(");
+            node.Initializer.Accept(this);
             RemoveIndentAndNewline();
             CommaAndSpace();
-            node.Condition.Accept(this, null);
+            node.Condition.Accept(this);
             CommaAndSpace();
-            node.Iterator.Accept(this, null);
+            node.Iterator.Accept(this);
             RemoveIndentAndNewline();
-            result.Append(")");
+            Result.Append(")");
             IndentAndNewline();
-            result.Append("{");
-            indentLevel++;
+            Result.Append("{");
+            _indentLevel++;
             IndentAndNewline();
-            node.Body.Accept(this, null);
+            node.Body.Accept(this);
             RemoveIndentAndNewline();
-            indentLevel--;
+            _indentLevel--;
             IndentAndNewline();
-            result.Append("}");
+            Result.Append("}");
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(HeadNode node, object o)
+        public override BaseType Visit(HeadNode node)
         {
-            if (result.Length != 0)
+            if (Result.Length != 0)
                 RemoveIndentAndNewline();
-            result.Append("[" + node.getName() + "(");
-            foreach (Node n in node.attrDeclBlock.statements)
+            Result.Append("[" + node.GetName() + "(");
+            foreach (var n in node.attrDeclBlock.Statements)
             {
-                n.Accept(this, null);
+                n.Accept(this);
                 RemoveIndentAndNewline();
                 CommaAndSpace();
             }
             RemoveLastCommaAndSpace();
-            result.Append(")]");
+            Result.Append(")]");
             IndentAndNewline();
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(IfNode node, object o)
+        public override BaseType Visit(IfNode node)
         {
             if (node.Condition != null)
             {
-                result.Append("if (");
-                node.Condition.Accept(this, null);
-                result.Append(")");
+                Result.Append("if (");
+                node.Condition.Accept(this);
+                Result.Append(")");
             }
             IndentAndNewline();
-            result.Append("{");
-            indentLevel++;
+            Result.Append("{");
+            _indentLevel++;
             IndentAndNewline();
-            node.Body.Accept(this, null);
+            node.Body.Accept(this);
             RemoveIndentAndNewline();
-            indentLevel--;
+            _indentLevel--;
             IndentAndNewline();
-            result.Append("} ");
+            Result.Append("} ");
             if (node.ElseNode != null)
             {
-                result.Append("else");
-                node.ElseNode.Accept(this, null);
+                Result.Append("else");
+                node.ElseNode.Accept(this);
             }
             else IndentAndNewline();
             return null;
         }
 
-        public override object Visit(LoneCallNode node, object o)
+        public override BaseType Visit(LoneCallNode node)
         {
-            node.Call.Accept(this, null);
+            node.Call.Accept(this);
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(ReturnNode node, object o)
+        public override BaseType Visit(ReturnNode node)
         {
-            result.Append("return ");
-            node.Ret.Accept(this, null);
+            Result.Append("return ");
+            node.Ret.Accept(this);
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(WhileNode node, object o)
+        public override BaseType Visit(WhileNode node)
         {
-            result.Append("while(");
-            node.Condition.Accept(this, null);
-            result.Append(")");
+            Result.Append("while(");
+            node.Condition.Accept(this);
+            Result.Append(")");
             IndentAndNewline();
-            result.Append("{");
-            indentLevel++;
+            Result.Append("{");
+            _indentLevel++;
             IndentAndNewline();
-            foreach (Node n in node.Body.statements)
+            foreach (var n in node.Body.Statements)
             {
-                n.Accept(this, null);
+                n.Accept(this);
             }
             RemoveIndentAndNewline();
-            indentLevel--;
+            _indentLevel--;
             IndentAndNewline();
-            result.Append("}");
+            Result.Append("}");
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(BreakNode node, object o)
+        public override BaseType Visit(BreakNode node)
         {
-            result.Append(" break ");
+            Result.Append(" break ");
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(ContinueNode node, object o)
+        public override BaseType Visit(ContinueNode node)
         {
-            result.Append(" continue ");
+            Result.Append(" continue ");
             IndentAndNewline();
             return null;
         }
 
-        public override object Visit(MAGIA node, object o)
+        public override BaseType Visit(Magia node)
         {
-            node.block.Accept(this, null);
+            node.block.Accept(this);
             return null;
         }
 
-        public override object Visit(MultiDecl node, object o)
+        public override BaseType Visit(MultiDecl node)
         {
             if (node.Decls[0].GetType().Name == "VertexDeclNode")
             {
                 if (node.Decls.Count > 1)
                 {
-                    result.Append("vertex{");
+                    Result.Append("vertex{");
                     node.Decls.ForEach(d =>
                     {
-                        result.Append("(");
-                        result.Append(d.SymbolObject.Name);
+                        Result.Append("(");
+                        Result.Append(d.SymbolObject.Name);
                         CommaAndSpace();
-                        ((VertexDeclNode)d).Attributes.statements.ForEach(v => {
-                            v.Accept(this, null);
+                        ((VertexDeclNode)d).Attributes.Statements.ForEach(v => {
+                            v.Accept(this);
                             RemoveIndentAndNewline();
                             CommaAndSpace();
                         });
                         RemoveLastCommaAndSpace();
-                        result.Append(")");
+                        Result.Append(")");
                         CommaAndSpace();
                     });
                     RemoveLastCommaAndSpace();
-                    result.Append("}");
+                    Result.Append("}");
                 }
                 else
                 {
-                    result.Append("vertex(");
-                    node.Decls[0].Accept(this, null);
-                    result.Append(")");
+                    Result.Append("vertex(");
+                    node.Decls[0].Accept(this);
+                    Result.Append(")");
                 }
             }
             else
             {
                 Console.WriteLine(node.Decls.GetType().Name);
-                node.Decls.ForEach(n => { n.Accept(this, null); IndentAndNewline(); });
+                node.Decls.ForEach(n => { n.Accept(this); IndentAndNewline(); });
                 RemoveIndentAndNewline();
             }
             IndentAndNewline();
@@ -428,31 +442,32 @@ namespace P4_Project.Visitors
         }
 
         //Will make a newline and ident to the current indent level.
-        public void IndentAndNewline()
+        private void IndentAndNewline()
         {
-            result.Append(Environment.NewLine);
-            for (int i = indentLevel * indentSizeInSpaces; i > 0; i--)
-                result.Append(" ");
+            Result.Append(Environment.NewLine);
+            for (var i = _indentLevel * IndentSizeInSpaces; i > 0; i--)
+                Result.Append(" ");
         }
 
         //Will make a comma and space.
-        public void CommaAndSpace()
+        private void CommaAndSpace()
         {
-            result.Append(", ");
+            Result.Append(", ");
         }
 
         //First removes all the indents of the current level and then adds a newline
-        //Is acutally just a function that revereses whatever IndentAndNewline function does.
-        public void RemoveIndentAndNewline()
+        //Is actually just a function that reverses whatever IndentAndNewline function does.
+        private void RemoveIndentAndNewline()
         {
-            result.Length -= indentLevel * indentSizeInSpaces + Environment.NewLine.Length; //Moves the pointer back the appropriate amount.
+            //Moves the pointer back the appropriate amount.
+            Result.Length -= _indentLevel * IndentSizeInSpaces + Environment.NewLine.Length; 
         }
 
         //Function with the purpose of removing Comma and space,
         //It actually just moves the pointer two places back.
-        public void RemoveLastCommaAndSpace()
+        private void RemoveLastCommaAndSpace()
         {
-            result.Length -= 2; //Moves the pointer 2 back so the chars are "removed/forgotten"
+            Result.Length -= 2; //Moves the pointer 2 back so the chars are "removed/forgotten"
         }
     }
 }

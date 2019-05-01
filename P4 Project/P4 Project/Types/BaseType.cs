@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace P4_Project.Types
+﻿namespace P4_Project.Types
 {
     public abstract class BaseType
     {

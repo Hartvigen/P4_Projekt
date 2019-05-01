@@ -1,20 +1,21 @@
-﻿using P4_Project.Compiler.SyntaxAnalysis;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
-using P4_Project.Visitors.Tests.TestCode;
+using P4_Project.Compiler.SyntaxAnalysis;
+using P4_Project.Visitors;
+using P4_ProjectTests1.Visitors.TestCode;
 
-namespace P4_Project.Visitors.Tests
+namespace P4_ProjectTests1.Visitors
 {
     [TestFixture]
     public class PrettyPrinterTests
     {
-        static Parser parserWithUglyCode;
-        static Scanner scannerUgly;
+        private static Parser _parserWithUglyCode;
+        private static Scanner _scannerUgly;
 
-        static Parser parserWithPrettyCode;
-        static Scanner scannerPretty;
+        private static Parser _parserWithPrettyCode;
+        private static Scanner _scannerPretty;
         
         [OneTimeSetUp]
         public static void ClassInit()
@@ -24,14 +25,14 @@ namespace P4_Project.Visitors.Tests
         [SetUp]
         public void Initialize()
         {
-            scannerPretty = new Scanner(StreamFromString(KnownGoodFiles.prettyCode));
-            scannerUgly = new Scanner(StreamFromString(KnownGoodFiles.uglyCode));
+            _scannerPretty = new Scanner(StreamFromString(KnownGoodFiles.PrettyCode));
+            _scannerUgly = new Scanner(StreamFromString(KnownGoodFiles.UglyCode));
 
-            parserWithUglyCode = new Parser(scannerUgly);
-            parserWithPrettyCode = new Parser(scannerPretty);
+            _parserWithUglyCode = new Parser(_scannerUgly);
+            _parserWithPrettyCode = new Parser(_scannerPretty);
         }
 
-        static private MemoryStream StreamFromString(string str)
+        private static MemoryStream StreamFromString(string str)
         {
             return new MemoryStream(Encoding.UTF8.GetBytes(str));
         }
@@ -39,56 +40,56 @@ namespace P4_Project.Visitors.Tests
         [TearDown]
         public void Cleanup()
         {
-            parserWithUglyCode = null;
-            parserWithPrettyCode = null;
-            scannerPretty = null;
-            scannerUgly = null;
+            _parserWithUglyCode = null;
+            _parserWithPrettyCode = null;
+            _scannerPretty = null;
+            _scannerUgly = null;
         }
 
-        public static string Prettify(string program)
+        private static string Prettify(string program)
         {
-            Parser parser = new Parser(new Scanner(StreamFromString(program)));
+            var parser = new Parser(new Scanner(StreamFromString(program)));
             parser.Parse();
-            PrettyPrinter prettyPrinter = new PrettyPrinter();
-            parser.mainNode.Accept(prettyPrinter, null);
-            return prettyPrinter.result.ToString();
+            var prettyPrinter = new PrettyPrinter();
+            parser.mainNode.Accept(prettyPrinter);
+            return prettyPrinter.Result.ToString();
         }
 
-        //Makeing Pretty written code pretty actually makes no changes 
+        //Making Pretty written code pretty actually makes no changes 
         [Test]
         public void PrettyPrinterTest01()
         {
-            string program = Prettify(KnownGoodFiles.prettyCode);
-            string startprogram = KnownGoodFiles.prettyCode;
+            var program = Prettify(KnownGoodFiles.PrettyCode);
+            var startProgram = KnownGoodFiles.PrettyCode;
 
-            Assert.IsTrue(program == startprogram);
+            Assert.IsTrue(program == startProgram);
         }
 
-        //Prettyfying code 10 times changes nothing to the actual code. 
+        //Prettifying code 10 times changes nothing to the actual code. 
         [Test]
         public void PrettyPrinterTest02()
         {
-            string program = KnownGoodFiles.prettyCode;
+            var program = KnownGoodFiles.PrettyCode;
 
-            for (int i = 10; i > 0; i--)
+            for (var i = 10; i > 0; i--)
                 program = Prettify(program);
 
-            Assert.IsTrue(program == KnownGoodFiles.prettyCode);
+            Assert.IsTrue(program == KnownGoodFiles.PrettyCode);
         }
 
-        //Prettyfying ugly code makes the code actually different.
+        //Prettifying ugly code makes the code actually different.
         [Test]
         public void PrettyPrinterTest03()
         {
-            string program = KnownGoodFiles.uglyCode;
-            Assert.IsFalse(program == KnownGoodFiles.prettyCode);
+            var program = KnownGoodFiles.UglyCode;
+            Assert.IsFalse(program == KnownGoodFiles.PrettyCode);
         }
 
-        //Prettyfying ugly code makes the code actually different but subsequent prettyfyings does nothing..
+        //Prettifying ugly code makes the code actually different but subsequent prettifying does nothing..
         [Test]
         public void PrettyPrinterTest04()
         {
-            string program = KnownGoodFiles.uglyCode;
+            string program = KnownGoodFiles.UglyCode;
             Assert.IsFalse(Prettify(program) == program);
 
             program = Prettify(program);
@@ -96,50 +97,50 @@ namespace P4_Project.Visitors.Tests
             Assert.IsFalse(Prettify(program) != program);
         }
 
-        //The UglyCode and prettyCode arent actually the exact same code.
+        //The UglyCode and prettyCode aren't actually the exact same code.
         [Test]
         public void PrettyPrinterTest05()
         {
-            Assert.IsFalse(KnownGoodFiles.uglyCode == KnownGoodFiles.prettyCode);
+            Assert.IsFalse(KnownGoodFiles.UglyCode == KnownGoodFiles.PrettyCode);
         }
 
         //The Ugly Code gets pretty after exactly one prettify
         [Test]
         public void PrettyPrinterTest06()
         {
-            Assert.IsTrue(KnownGoodFiles.prettyCode == Prettify(KnownGoodFiles.uglyCode));
+            Assert.IsTrue(KnownGoodFiles.PrettyCode == Prettify(KnownGoodFiles.UglyCode));
         }
 
         //The Ugly code parses without error
         [Test]
         public void PrettyPrinterTest07()
         {
-            parserWithUglyCode.Parse();
-            Assert.IsTrue(parserWithUglyCode.errors.count == 0);
+            _parserWithUglyCode.Parse();
+            Assert.IsTrue(_parserWithUglyCode.errors.count == 0);
         }
 
         //The pretty code parses without error
         [Test]
         public void PrettyPrinterTest08()
         {
-            parserWithPrettyCode.Parse();
-            Assert.IsTrue(parserWithPrettyCode.errors.count == 0);
+            _parserWithPrettyCode.Parse();
+            Assert.IsTrue(_parserWithPrettyCode.errors.count == 0);
         }
 
-        //This tests the performence of the prettyprinter, it should complete the 1000 prettyfyings in under 1 second if not there is probably 
+        //This tests the performance of the PrettyPrinter, it should complete the 1000 prettifies in under 1 second if not there is probably 
         //something expensive going on depending on the speed of you computer it might be actually be okay.
         [Test]
         public void PrettyPrinterTest09()
         {
 
-            string program = KnownGoodFiles.uglyCode;
+            var program = KnownGoodFiles.UglyCode;
 
-            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            var unixTimestamp = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 
-            for (int i = 1000; i > 0; i--)
+            for (var i = 1000; i > 0; i--)
                 Prettify(program);
 
-            Int32 elapsed = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds - unixTimestamp;
+            var elapsed = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds - unixTimestamp;
 
             Assert.IsTrue(elapsed < 2);
         }

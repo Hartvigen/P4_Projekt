@@ -1,46 +1,40 @@
-﻿using P4_Project.Compiler.SyntaxAnalysis;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.SymTab.Tests
+namespace P4_ProjectTests1.SymbolTable
 {
     [TestFixture]
     public class SymbolTableTests
     {
-        private static Parser parser;
-        private static SymbolTable parent;
-        private static SymbolTable symbolTable;
+        private static Parser _parser;
+        private static P4_Project.SymbolTable.SymTable _parent;
+        private static P4_Project.SymbolTable.SymTable _symTable;
 
         //Generates a header attribute declaration for vertex and edge where all types are being used.
         [OneTimeSetUp]
         public static void ClassInit()
         {
-            parser = new Parser(null);
-            parent = new SymbolTable(null, null);
+            _parser = new Parser(null);
+            _parent = new P4_Project.SymbolTable.SymTable(null, null);
         }
 
         [SetUp]
         public void Initialize()
         {
-            symbolTable = new SymbolTable(parent,parser);
+            _symTable = new P4_Project.SymbolTable.SymTable(_parent,_parser);
         }
 
         [TearDown]
         public void Cleanup()
         {
-            symbolTable = null;
+            _symTable = null;
         }
 
         //As no scopes have been opened we assert there are no scopes.
         [Test]
         public void SymbolTableTests01()
         {
-            Assert.IsTrue(symbolTable.GetScopes().Count == 0);
+            Assert.IsTrue(_symTable.GetScopes().Count == 0);
         }
 
         //For every time we open a scope another scope should exist in the symboltable.
@@ -49,22 +43,22 @@ namespace P4_Project.SymTab.Tests
         {
             int numberOfScopes = 42;
             for(int i = numberOfScopes; i > 0; i--)
-            symbolTable.OpenScope();
-            Assert.IsTrue(symbolTable.GetScopes().Count == numberOfScopes);
+            _symTable.OpenScope();
+            Assert.IsTrue(_symTable.GetScopes().Count == numberOfScopes);
         }
 
         //Closing the scope will return the parent.
         [Test]
         public void SymbolTableTests03()
         {
-            Assert.IsTrue(symbolTable.CloseScope() == parent);
+            Assert.IsTrue(_symTable.CloseScope() == _parent);
         }
 
         //We are just asserting that this test can get to the end without casting exceptions, we can open a butload of scopes and go out of them again
         [Test]
         public void SymbolTableTests04()
         {
-            SymbolTable parent = symbolTable;
+            P4_Project.SymbolTable.SymTable parent = _symTable;
             int numberOfScopes = 42;
             for (int i = numberOfScopes; i > 0; i--)
                 parent = parent.OpenScope();

@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.Visitors;
 
-namespace P4_Project.AST.Stmts.Decls
+namespace P4_Project.AST.Stmts
 {
     /// <summary>
     /// The "EdgeDeclNode" represents the declaration of an edge between two vertices
     /// </summary>
     public class EdgeCreateNode : StmtNode
     {
-        public IdentNode LeftSide { get; private set; }
-        public int Operator { get; private set; }
+        public IdentNode LeftSide { get; }
+        public int Operator { get; }
 
-        public List<Tuple<IdentNode, List<AssignNode>>> RightSide { get; private set; } = new List<Tuple<IdentNode, List<AssignNode>>>();
+        public List<Tuple<IdentNode, List<AssignNode>>> RightSide { get; } = new List<Tuple<IdentNode, List<AssignNode>>>();
         
 
         public EdgeCreateNode(IdentNode start, int @operator)
@@ -26,9 +23,9 @@ namespace P4_Project.AST.Stmts.Decls
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
 
         public void AddRightSide(IdentNode rightVertex, List<AssignNode> attributes)
@@ -43,7 +40,7 @@ namespace P4_Project.AST.Stmts.Decls
             return Operators.getNameFromInt(Operator);
         }
 
-        public string GetCodeofOperator()
+        public string GetCodeOfOperator()
         {
             return Operators.getCodeFromInt(Operator);
         }

@@ -1,10 +1,5 @@
 ﻿using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
@@ -13,10 +8,7 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class NumConst : ExprNode
     {
-        public double Value { get; private set; }
-
-
-        public NumConst() { }
+        private double Value { get; }
 
         public NumConst(double value)
         {
@@ -24,9 +16,9 @@ namespace P4_Project.AST.Expressions.Values
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
 
         public string GetString() {

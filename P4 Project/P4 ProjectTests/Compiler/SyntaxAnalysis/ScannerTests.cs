@@ -1,20 +1,17 @@
-﻿using P4_Project.Compiler.SyntaxAnalysis;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
+using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.Compiler.SyntaxAnalysis.Tests
+namespace P4_ProjectTests1.Compiler.SyntaxAnalysis
 {
     [TestFixture]
-    public class ScannerTests
+    public sealed class ScannerTests
     {
-        private bool TryParse(string program)
+        private static bool TryParse(string program)
         {
-            Parser parser
+            var parser
                 = new Parser(
                     new Scanner(
                         StreamFromString(program)
@@ -24,25 +21,21 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             return parser.errors.count == 0;
         }
 
-        private Scanner scannerFromString(string s)
+        private Scanner ScannerFromString(string s)
         {
             return new Scanner(StreamFromString(s));
         }
 
-
-
-        private MemoryStream StreamFromString(string str)
+        private static MemoryStream StreamFromString(string str)
         {
             return new MemoryStream(Encoding.UTF8.GetBytes(str));
         }
-
         
         //grammatical error should give error
         [Test]
         public void ScanTest()
         {
-            bool success = true;
-            success = TryParse("[vertix()]");
+            var success = TryParse("[verity()]");
             Assert.IsFalse(success);
         }
 
@@ -51,9 +44,8 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         public void ScanTest2()
         {
             //we should be able to parse a file with nothing but with tabs, space and newline without causing a compilation error
-            bool success = true;
 
-            success = TryParse(" " + Environment.NewLine + "	");
+            var success = TryParse(" " + Environment.NewLine + "	");
             Assert.IsTrue(success);
 
             //a simple program in normal form which should be able to run
@@ -72,11 +64,11 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         [Test]
         public void ScanTest3()
         {
-            Assert.IsTrue(scannerFromString("a2").Scan().kind == Parser._IDENT);
+            Assert.IsTrue(ScannerFromString("a2").Scan().kind == Parser._IDENT);
 
-            Assert.IsFalse(scannerFromString(")a2").Scan().kind == Parser._IDENT);
+            Assert.IsFalse(ScannerFromString(")a2").Scan().kind == Parser._IDENT);
 
-            Scanner test = scannerFromString("a2)");
+            Scanner test = ScannerFromString("a2)");
             Assert.IsTrue(test.Scan().kind == Parser._IDENT);
             test.Scan();
             Assert.IsTrue(test.Scan().kind == Parser._EOF);
@@ -86,21 +78,21 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         [Test]
         public void ScanTest4()
         {
-            Assert.IsTrue(scannerFromString("a2").Scan().val == "a2");
+            Assert.IsTrue(ScannerFromString("a2").Scan().val == "a2");
 
-            Assert.IsTrue(scannerFromString("a2$").Scan().val == "a2");
+            Assert.IsTrue(ScannerFromString("a2$").Scan().val == "a2");
 
-            Assert.IsTrue(scannerFromString("2k k").Scan().val == "2");
+            Assert.IsTrue(ScannerFromString("2k k").Scan().val == "2");
 
-            Assert.IsTrue(scannerFromString("()").Scan().val == "(");
+            Assert.IsTrue(ScannerFromString("()").Scan().val == "(");
 
-            Assert.IsTrue(scannerFromString("vertex fur").Scan().val == "vertex");
+            Assert.IsTrue(ScannerFromString("vertex fur").Scan().val == "vertex");
 
-            Assert.IsTrue(scannerFromString("edge ry").Scan().val == "edge");
+            Assert.IsTrue(ScannerFromString("edge ry").Scan().val == "edge");
 
-            Assert.IsTrue(scannerFromString("number x = 10").Scan().val == "number");
+            Assert.IsTrue(ScannerFromString("number x = 10").Scan().val == "number");
 
-            Assert.IsTrue(scannerFromString("bool flag = true").Scan().val == "bool");
+            Assert.IsTrue(ScannerFromString("bool flag = true").Scan().val == "bool");
         }
 
         //test to see if we find the correct token values when scanning through a header
@@ -109,7 +101,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         {
             Assert.IsTrue(TryParse("[vertex(number x = 10)]"));
 
-            Scanner test = scannerFromString("[vertex(number x = 10)]");
+            Scanner test = ScannerFromString("[vertex(number x = 10)]");
             Assert.IsTrue(test.Scan().val == "[");
             Assert.IsTrue(test.Scan().val == "vertex");
             Assert.IsTrue(test.Scan().val == "(");

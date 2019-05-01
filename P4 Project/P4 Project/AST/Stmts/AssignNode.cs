@@ -1,11 +1,6 @@
 ﻿using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Stmts
 {
@@ -14,11 +9,8 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class AssignNode : StmtNode
     {
-        public IdentNode Target { get; private set; }
-        public ExprNode Value { get; private set; }
-
-
-        public AssignNode() { }
+        public IdentNode Target { get; }
+        public ExprNode Value { get; }
 
         public AssignNode(IdentNode target, ExprNode value)
         {
@@ -27,10 +19,9 @@ namespace P4_Project.AST.Stmts
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
     }
 }

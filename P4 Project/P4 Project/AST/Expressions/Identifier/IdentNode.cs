@@ -1,12 +1,4 @@
-﻿using P4_Project.SymTab;
-using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace P4_Project.AST.Expressions.Identifier
+﻿namespace P4_Project.AST.Expressions.Identifier
 {
     /// <summary>
     /// This node represents an identifier
@@ -14,25 +6,13 @@ namespace P4_Project.AST.Expressions.Identifier
     public abstract class IdentNode : ExprNode
     {
         /// <summary>
-        /// The identifier is the string value of the identifier, and the reference is a reference directly to the symbol table.
+        /// The Ident string is used as the key for looking up objects in the symbol table.
         /// </summary>
-        public string Identifier { get; private set; }
+        public string Ident { get;}
         public IdentNode Source { get; set; }
-
-
-        protected IdentNode() { }
-
-        protected IdentNode(string identifier)
+        protected IdentNode(string ident)
         {
-            Identifier = identifier;
-        }
-
-        public void AddBaseSource(IdentNode baseSource)
-        {
-            if (Source == null)
-                Source = baseSource;
-            else 
-                Source.AddBaseSource(baseSource);
+            Ident = ident;
         }
     }
 }

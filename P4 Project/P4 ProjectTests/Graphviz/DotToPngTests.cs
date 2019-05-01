@@ -1,28 +1,27 @@
 ﻿using System;
-using System.IO;
-using GraphVizWrapper;
-using GraphVizWrapper.Commands;
-using GraphVizWrapper.Queries;
-using NUnit.Framework;
 using System.Configuration;
+using System.IO;
+using System.Linq;
+using NUnit.Framework;
+using P4_Project.Graphviz;
 
-namespace P4_Project.Graphviz.Tests
+namespace P4_ProjectTests1.Graphviz
 {
     [TestFixture]
     public class DotToPngTests
     {
-        private const string customFilePath = "test.png";
-        private const string customDotCode = "digraph{one -> three; two -> four; three -> five; four -> six;}";
+        private const string CustomFilePath = "test.png";
+        private const string CustomDotCode = "digraph{one -> three; two -> four; three -> five; four -> six;}";
 
         [OneTimeSetUp]
         public static void ClassInit()
         {          
             AppSettingsReader a = new AppSettingsReader();
-            Console.Write(a.GetValue("graphVizLocation", typeof(String)));
-            if (File.Exists(DotToPng.defaultFilePath))
-                File.Delete(DotToPng.defaultFilePath);
-            if (File.Exists(customFilePath))
-                File.Delete(customFilePath);
+            Console.Write(a.GetValue("graphVizLocation", typeof(string)));
+            if (File.Exists(DotToPng.DefaultFilePath))
+                File.Delete(DotToPng.DefaultFilePath);
+            if (File.Exists(CustomFilePath))
+                File.Delete(CustomFilePath);
         }
 
         [SetUp]
@@ -33,106 +32,95 @@ namespace P4_Project.Graphviz.Tests
         [TearDown]
         public void Cleanup()
         {
-            if (File.Exists(DotToPng.defaultFilePath))
-                File.Delete(DotToPng.defaultFilePath);
-            if (File.Exists(customFilePath))
-                File.Delete(customFilePath);
+            if (File.Exists(DotToPng.DefaultFilePath))
+                File.Delete(DotToPng.DefaultFilePath);
+            if (File.Exists(CustomFilePath))
+                File.Delete(CustomFilePath);
         }
 
-        //Taken from https://www.dotnetperls.com/file-equals
-        static bool FileEquals(string path1, string path2)
+        private static bool FileEquals(string path1, string path2)
         {
-            byte[] file1 = File.ReadAllBytes(path1);
-            byte[] file2 = File.ReadAllBytes(path2);
-            if (file1.Length == file2.Length)
-            {
-                for (int i = 0; i < file1.Length; i++)
-                {
-                    if (file1[i] != file2[i])
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
+            var file1 = File.ReadAllBytes(path1);
+            var file2 = File.ReadAllBytes(path2);
+            if (file1.Length != file2.Length) return false;
+            return !file1.Where((t, i) => t != file2[i]).Any();
         }
 
-        //The defualts will create an example file PNG file.
+        //The defaults will create an example file PNG file.
         [Test]
         public void DotToPngTestSuccess01()
         {
-            DotToPng.createPNGFile();
-            Assert.IsTrue(File.Exists(DotToPng.defaultFilePath));
+            DotToPng.CreatePngFile();
+            Assert.IsTrue(File.Exists(DotToPng.DefaultFilePath));
         }
 
         //The custom DOT code will create an PNG file.
         [Test]
         public void DotToPngTestSuccess02()
         {
-            DotToPng.createPNGFile(customDotCode);
-            Assert.IsTrue(File.Exists(DotToPng.defaultFilePath));
+            DotToPng.CreatePngFile(CustomDotCode);
+            Assert.IsTrue(File.Exists(DotToPng.DefaultFilePath));
         }
 
         //The custom DOT code at a custom filepath will create an PNG file at the custom path.
         [Test]
         public void DotToPngTestSuccess03()
         {
-            DotToPng.createPNGFile(customDotCode, customFilePath);
-            Assert.IsTrue(File.Exists(customFilePath));
+            DotToPng.CreatePngFile(CustomDotCode, CustomFilePath);
+            Assert.IsTrue(File.Exists(CustomFilePath));
         }
 
-        //The custom Code and defualt code is not the same.
+        //The custom Code and default code is not the same.
         [Test]
         public void DotToPngTestSuccess04()
         {
-            Assert.IsTrue(customDotCode != DotToPng.defaultDotCode);
+            Assert.IsTrue(CustomDotCode != DotToPng.DefaultDotCode);
         }
 
-        //The custom path and defualt path is not the same.
+        //The custom path and default path is not the same.
         [Test]
         public void DotToPngTestSuccess05()
         {
-            Assert.IsTrue(customFilePath != DotToPng.defaultFilePath);
+            Assert.IsTrue(CustomFilePath != DotToPng.DefaultFilePath);
         }
 
-        //The same picture will be genereate given the same code.
+        //The same picture will be generate given the same code.
         [Test]
         public void DotToPngTestSuccess06()
         {
-            //The defualt picture
-            DotToPng.createPNGFile();
+            //The default picture
+            DotToPng.CreatePngFile();
 
             //Should be the same picture just at another filepath
-            DotToPng.createPNGFile(DotToPng.defaultDotCode, customFilePath);
+            DotToPng.CreatePngFile(DotToPng.DefaultDotCode, CustomFilePath);
 
-            Assert.IsTrue(FileEquals(customFilePath, DotToPng.defaultFilePath));
+            Assert.IsTrue(FileEquals(CustomFilePath, DotToPng.DefaultFilePath));
         }
 
         //The pictures are different if different Dot code is given.
         [Test]
         public void DotToPngTestSuccess07()
         {
-            //The defualt picture
-            DotToPng.createPNGFile();
+            //The default picture
+            DotToPng.CreatePngFile();
 
             //Should be the same picture just at another filepath
-            DotToPng.createPNGFile(customDotCode, customFilePath);
+            DotToPng.CreatePngFile(CustomDotCode, CustomFilePath);
 
-            Assert.IsTrue(!FileEquals(customFilePath, DotToPng.defaultFilePath));
+            Assert.IsTrue(!FileEquals(CustomFilePath, DotToPng.DefaultFilePath));
         }
 
         //The pictures are the same if same Dot code is given even if it is custom code.
         [Test]
         public void DotToPngTestSuccess08()
         {
-            //The defualt picture
-            DotToPng.createPNGFile(customDotCode, DotToPng.defaultFilePath);
+            //The default picture
+            DotToPng.CreatePngFile(CustomDotCode);
 
             //Should be the same picture just at another filepath
-            DotToPng.createPNGFile(customDotCode, customFilePath);
+            DotToPng.CreatePngFile(CustomDotCode, CustomFilePath);
 
-            Assert.IsTrue(FileEquals(customFilePath, DotToPng.defaultFilePath));
+            Assert.IsTrue(FileEquals(CustomFilePath, DotToPng.DefaultFilePath));
         }
     }
 }

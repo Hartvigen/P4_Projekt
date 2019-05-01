@@ -1,5 +1,4 @@
-﻿using System;
-namespace P4_Project.Types.Primitives
+﻿namespace P4_Project.Types.Primitives
 {
     public class BooleanType : BaseType
     {

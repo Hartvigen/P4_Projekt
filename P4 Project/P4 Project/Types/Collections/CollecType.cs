@@ -1,9 +1,11 @@
-﻿using System;
+﻿
+using System;
+
 namespace P4_Project.Types.Collections
 {
     public abstract class CollecType : BaseType
     {
-        public BaseType SubType { get; private set; }
+        protected BaseType SubType { get; }
 
         protected CollecType(BaseType subType)
         {

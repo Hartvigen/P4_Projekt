@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.AST;
+using P4_Project.Types;
+using P4_Project.Types.Primitives;
+using P4_Project.Types.Structures;
 
 namespace P4_Project
 {
@@ -83,6 +87,42 @@ namespace P4_Project
                 case 16: return "<-";
                 case 17: return "--";
                 case 18: return "->";
+                default: throw new Exception("Operator type: " + i + " does not have a Code associated");
+            };
+
+        }
+        
+        public static List<BaseType> getOperandTypeFronInt(int i)
+        {
+            switch (i)
+            {
+                case 1: 
+                case 2: 
+                case 15: return new List<BaseType>{new BooleanType()};
+                
+                case 3: 
+                case 4: return new List<BaseType>
+                {
+                    new NumberType(), new TextType(), new BooleanType(), new VertexType(), new EdgeType()
+                };
+                    
+                case 5: 
+                case 6:  
+                case 7: 
+                case 8: 
+                case 9: 
+                case 10: 
+                case 11: 
+                case 12: 
+                case 13: 
+                case 14: 
+                return new List<BaseType>{new NumberType()};
+
+                case 16:
+                case 17:
+                case 18:
+                    return new List<BaseType>{new VertexType()};
+                
                 default: throw new Exception("Operator type: " + i + " does not have a Code associated");
             };
 

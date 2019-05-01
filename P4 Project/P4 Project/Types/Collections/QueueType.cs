@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 namespace P4_Project.Types.Collections
 {
     public class QueueType : CollecType
@@ -9,7 +9,7 @@ namespace P4_Project.Types.Collections
 
         public override string ToString()
         {
-            return $"queue<{SubType.ToString()}>";
+            return $"queue<{SubType}>";
         }
     }
 }

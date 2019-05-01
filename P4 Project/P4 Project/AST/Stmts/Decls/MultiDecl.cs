@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts.Decls
 {
     public class MultiDecl : StmtNode
     {
-        public List<DeclNode> Decls { get; private set; }
+        public List<DeclNode> Decls { get; }
 
         public MultiDecl()
         {
@@ -14,10 +13,9 @@ namespace P4_Project.AST.Stmts.Decls
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-           return vi.Visit(this, o);
-           
+            return vi.Visit(this);
         }
 
         public void AddDecl(DeclNode decl)

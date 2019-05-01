@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using P4_Project.AST.Expressions;
+﻿using P4_Project.AST.Expressions;
 using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts
@@ -13,20 +8,16 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class ReturnNode : StmtNode
     {
-        public ExprNode Ret { get; private set; }
-
-
-        public ReturnNode() { }
+        public ExprNode Ret { get; }
 
         public ReturnNode(ExprNode ret)
         {
             Ret = ret;
         }
-
-
-        public override object Accept(Visitor vi, object o)
+        
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
     }
 }

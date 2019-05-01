@@ -1,10 +1,6 @@
-﻿using P4_Project.Types;
+﻿using System.Collections.Generic;
+using P4_Project.Types;
 using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions
 {
@@ -13,12 +9,10 @@ namespace P4_Project.AST.Expressions
     /// </summary>
     public class BinExprNode : ExprNode
     {
-        public ExprNode Left { get; private set; }
-        public ExprNode Right { get; private set; }
-        public int OperatorType { get; private set; }
-        public new BaseType type { get;  set; }
-
-        public BinExprNode() { }
+        public ExprNode Left { get; }
+        public ExprNode Right { get; }
+        public int OperatorType { get; }
+        public BaseType Type { get;  set; }
 
         public BinExprNode(ExprNode left, int operatorType, ExprNode right)
         {
@@ -28,9 +22,9 @@ namespace P4_Project.AST.Expressions
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
 
         public string GetNameOfOperator()
@@ -38,9 +32,14 @@ namespace P4_Project.AST.Expressions
             return Operators.getNameFromInt(OperatorType);
         }
 
-        public string GetCodeofOperator()
+        public string GetCodeOfOperator()
         {
             return Operators.getCodeFromInt(OperatorType);
+        }
+        
+        public List<BaseType> GetOperandTypeOfOperator()
+        {
+            return Operators.getOperandTypeFronInt(OperatorType);
         }
     }
 }

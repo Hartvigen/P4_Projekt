@@ -65,7 +65,7 @@
     <Compile Include="AST\Expressions\Values\TextConst.cs" />
     <Compile Include="AST\Expressions\ExprNode.cs" />
     <Compile Include="AST\Expressions\UnaExprNode.cs" />
-    <Compile Include="AST\MAGIA.cs" />
+    <Compile Include="AST\Magia.cs" />
     <Compile Include="AST\Node.cs" />
     <Compile Include="AST\Stmts\BreakNode.cs" />
     <Compile Include="AST\Stmts\ContinueNode.cs" />
@@ -76,7 +76,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolTable\Obj.cs" />
-    <Compile Include="SymbolTable\SymbolTable.cs" />
+    <Compile Include="SymbolTable\SymTable.cs" />
     <Compile Include="Types.cs" />
     <Compile Include="AST\Stmts\AssignNode.cs" />
     <Compile Include="AST\Stmts\Decls\DeclNode.cs" />
@@ -87,6 +87,7 @@
     <Compile Include="AST\Stmts\LoneCallNode.cs" />
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
+    <Compile Include="Types\Primitives\NoneType.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
     <Compile Include="Visitors\TypeVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />

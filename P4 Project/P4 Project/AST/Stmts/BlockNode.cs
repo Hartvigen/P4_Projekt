@@ -1,11 +1,5 @@
-﻿using P4_Project.AST;
-using P4_Project.AST.Stmts;
-using P4_Project.Visitors;
-using System;
+﻿using P4_Project.Visitors;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Stmts
 {
@@ -15,19 +9,16 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class BlockNode : StmtNode
     {
-        public List<StmtNode> statements = new List<StmtNode>();
-
-        public BlockNode() { }
+        public List<StmtNode> Statements { get; } = new List<StmtNode>();
 
         public void Add(StmtNode com)
         {
-            statements.Add(com);
+            Statements.Add(com);
         }
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
     }
 }

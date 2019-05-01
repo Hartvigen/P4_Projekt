@@ -1,10 +1,5 @@
-﻿using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using P4_Project.SymTab;
+﻿using P4_Project.SymbolTable;
+using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts.Decls
 {
@@ -13,10 +8,10 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class FuncDeclNode : DeclNode
     {
-        public BlockNode Parameters { get; private set; }
-        public BlockNode Body { get; private set; }
+        public BlockNode Parameters { get; }
+        public BlockNode Body { get; }
 
-        public FuncDeclNode() { }
+        public string returnType;
 
         public FuncDeclNode(Obj symbolObject, BlockNode parameters, BlockNode body) 
             : base(symbolObject)
@@ -25,11 +20,9 @@ namespace P4_Project.AST.Stmts.Decls
             Body = body;
         }
 
-
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
     }
 }

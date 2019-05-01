@@ -1,12 +1,7 @@
 ﻿using P4_Project.AST.Expressions;
+using P4_Project.SymbolTable;
 using P4_Project.Types;
 using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using P4_Project.SymTab;
 
 namespace P4_Project.AST.Stmts.Decls
 {
@@ -15,22 +10,20 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class VarDeclNode : DeclNode
     {
-        public ExprNode DefaultValue { get; private set; }
-        public BaseType Type;
-
-        public VarDeclNode() { }
+        public ExprNode DefaultValue { get; }
+        public readonly BaseType type;
 
         public VarDeclNode(Obj symbolObject, ExprNode defaultValue)
             : base(symbolObject)
         {
             DefaultValue = defaultValue;
-            Type = symbolObject.Type;
+            type = symbolObject.Type;
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
 
         public string GetVarType()

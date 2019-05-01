@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using P4_Project.AST.Expressions.Identifier;
+﻿using P4_Project.AST.Expressions.Identifier;
 using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts
@@ -14,18 +9,16 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class LoneCallNode : StmtNode
     {
-        public IdentNode Call { get; private set; }
-
+        public IdentNode Call { get; }
 
         public LoneCallNode(IdentNode call)
         {
             Call = call;   
         }
-
-
-        public override object Accept(Visitor vi, object o)
+        
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
     }
 }
