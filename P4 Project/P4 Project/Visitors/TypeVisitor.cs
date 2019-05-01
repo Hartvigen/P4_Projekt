@@ -129,12 +129,15 @@ namespace P4_Project.Visitors
             if (node.Left is null || node.Right is null)
             {
                 ErrorList.Add("BinExprNode has null operands");
+                if (Verbose) Console.WriteLine("BinExprNode has null operands");
                 return null;
             }
 
             var type1 = (BaseType) node.Left.Accept(this);
             var type2 = (BaseType) node.Right.Accept(this);
 
+            node.Type = Operators.GetResultingTypeFromOperandTypeAndOperator(type1, node.OperatorType)[0];
+            
             if (type1 == type2) return type1;
             ErrorList.Add("BinExprNode has differentiating operands." + " Types format: " + type1 +  " " + node.Left + " " + node.GetCodeOfOperator() + " " + type2 + " " + node.Right);
             return null;
@@ -218,7 +221,8 @@ namespace P4_Project.Visitors
                     ErrorList.Add(
                         "There was found a bad return type in Function: " + node.SymbolObject.Name + 
                         " return should be type: " + node.returnType + " but was: " + ret.Ret.Accept(this));
-                }else if (Verbose) Console.WriteLine("Found return in func: " + node.SymbolObject.Name + " with type: " + type1 + " and expected: " + type2);
+                }
+                if (Verbose) Console.WriteLine("Found return in func: " + node.SymbolObject.Name + " with type: " + type1 + " and expected: " + type2);
             });
             LeaveScope();
             return null;
@@ -236,7 +240,7 @@ namespace P4_Project.Visitors
 
             if (Table.Find(node.SymbolObject.Name) != null)
             {
-                ErrorList.Add("This was previously declared.");
+                ErrorList.Add( node.SymbolObject.Name + " was previously declared.");
                 return null;
             }
             //If there was no problems in the VarDeclNode it is added to the Table.
@@ -316,10 +320,25 @@ namespace P4_Project.Visitors
             node.ElseNode?.Accept(this);
 
             if (!(node.Condition is null))
-            if ((BaseType)node.Condition.Accept(this) != new BooleanType())
+            if (node.Condition.type != new BooleanType())
             {
-                ErrorList.Add("Expression in if is not a boolean");
-                return null;
+                if (node.Condition.type.ToString() !=  "")
+                {
+                    ErrorList.Add( "If statements must have boolean type or be null and not " + node.Condition.Accept(this));
+                    if (Verbose)
+                    {
+                        Console.WriteLine("If statements must have boolean type or be null and not " +
+                                          node.Condition.Accept(this));
+                    }
+                    return null;
+                }
+                else
+                {
+                    if (Verbose)
+                    {
+                        Console.WriteLine("Ending else node Found");
+                    }
+                }
             }
 
             //If the ElseNode exist we visit that as well.
@@ -438,13 +457,11 @@ namespace P4_Project.Visitors
         {
             Table.GetScopes().ForEach(s =>
             {
-                if (s.name != name)
-                {
-                    if (Verbose)
-                        Console.WriteLine("Entering " + name + " scope.");
-                    currentScope = s;
-                }
-                
+                if (s.name != name) return;
+                if (Verbose)
+                    Console.WriteLine("Entering " + name + " scope.");
+                currentScope = s;
+
             });
         }
         

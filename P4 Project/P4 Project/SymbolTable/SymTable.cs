@@ -77,8 +77,6 @@ namespace P4_Project.SymbolTable
             if (Parent != null)
                 return Parent.Find(name);
 
-            _parser.SemErr($"{name} has not been declared");
-
             return null;
         }
 
@@ -104,6 +102,7 @@ namespace P4_Project.SymbolTable
             {
                 Console.WriteLine("    Name: " + keyValuePair.Key + " Type: " + keyValuePair.Value.Type);
             }
+            Parent.PrintAllInCurrentScope();
         }
         
         public void PrintAllInAllScopes()

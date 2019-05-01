@@ -37,12 +37,12 @@ namespace P4_Project.AST.Stmts
 
         public string GetNameOfOperator()
         {
-            return Operators.getNameFromInt(Operator);
+            return Operators.GetNameFromInt(Operator);
         }
 
         public string GetCodeOfOperator()
         {
-            return Operators.getCodeFromInt(Operator);
+            return Operators.GetCodeFromInt(Operator);
         }
     }
 }

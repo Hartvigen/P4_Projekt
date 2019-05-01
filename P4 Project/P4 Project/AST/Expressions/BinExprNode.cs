@@ -29,17 +29,17 @@ namespace P4_Project.AST.Expressions
 
         public string GetNameOfOperator()
         {
-            return Operators.getNameFromInt(OperatorType);
+            return Operators.GetNameFromInt(OperatorType);
         }
 
         public string GetCodeOfOperator()
         {
-            return Operators.getCodeFromInt(OperatorType);
+            return Operators.GetCodeFromInt(OperatorType);
         }
         
         public List<BaseType> GetOperandTypeOfOperator()
         {
-            return Operators.getOperandTypeFronInt(OperatorType);
+            return Operators.GetOperandTypeFromInt(OperatorType);
         }
     }
 }

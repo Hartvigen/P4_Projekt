@@ -97,6 +97,7 @@ namespace P4_Project
                     File.WriteAllText(visitor.AppropriateFileName, visitor.Result.ToString());
                 else
                 {
+                    Console.WriteLine("-----------ERRORS-----------");
                     visitor.ErrorList.ForEach(Console.WriteLine);
                     return false;
                 }

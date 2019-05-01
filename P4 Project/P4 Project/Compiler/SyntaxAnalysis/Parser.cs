@@ -460,13 +460,13 @@ public class Parser {
 		op = 0;                  
 		if (la.kind == 23) {
 			Get();
-			op = Operators.LEFTARR;  
+			op = Operators.Leftarr;  
 		} else if (la.kind == 24) {
 			Get();
-			op = Operators.NONARR;   
+			op = Operators.Nonarr;   
 		} else if (la.kind == 25) {
 			Get();
-			op = Operators.RIGHTARR; 
+			op = Operators.Rightarr; 
 		} else SynErr(74);
 	}
 
@@ -520,7 +520,7 @@ public class Parser {
 		e = e1; 
 		while (la.kind == 30) {
 			Get();
-			op  = Operators.OR; 
+			op  = Operators.Or; 
 			ExprAnd(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
 		}
@@ -532,7 +532,7 @@ public class Parser {
 		e = e1; 
 		while (la.kind == 31) {
 			Get();
-			op = Operators.AND; 
+			op = Operators.And; 
 			ExprEQ(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
 		}
@@ -545,10 +545,10 @@ public class Parser {
 		if (la.kind == 32 || la.kind == 33) {
 			if (la.kind == 32) {
 				Get();
-				op = Operators.EQ; 
+				op = Operators.Eq; 
 			} else {
 				Get();
-				op = Operators.NEQ; 
+				op = Operators.Neq; 
 			}
 			ExprRel(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -562,16 +562,16 @@ public class Parser {
 		if (StartOf(20)) {
 			if (la.kind == 34) {
 				Get();
-				op = Operators.LESS; 
+				op = Operators.Less; 
 			} else if (la.kind == 35) {
 				Get();
-				op = Operators.GREATER; 
+				op = Operators.Greater; 
 			} else if (la.kind == 36) {
 				Get();
-				op = Operators.LESSEQ; 
+				op = Operators.Lesseq; 
 			} else {
 				Get();
-				op = Operators.GREATEQ; 
+				op = Operators.Greateq; 
 			}
 			ExprPlus(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -585,14 +585,14 @@ public class Parser {
 			b = true; 
 		}
 		ExprMult(out ExprNode e1);
-		if(b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1; 
+		if(b) e = new UnaExprNode(Operators.Umin, e1); else e = e1; 
 		while (la.kind == 38 || la.kind == 39) {
 			if (la.kind == 39) {
 				Get();
-				op = Operators.PLUS; 
+				op = Operators.Plus; 
 			} else {
 				Get();
-				op = Operators.BIMIN; 
+				op = Operators.Bimin; 
 			}
 			ExprMult(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -606,13 +606,13 @@ public class Parser {
 		while (la.kind == 40 || la.kind == 41 || la.kind == 42) {
 			if (la.kind == 40) {
 				Get();
-				op = Operators.MULT; 
+				op = Operators.Mult; 
 			} else if (la.kind == 41) {
 				Get();
-				op = Operators.DIV; 
+				op = Operators.Div; 
 			} else {
 				Get();
-				op = Operators.MOD; 
+				op = Operators.Mod; 
 			}
 			ExprNot(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -626,7 +626,7 @@ public class Parser {
 			b = true; 
 		}
 		Factor(out e);
-		if(b) e = new UnaExprNode(Operators.NOT, e); 
+		if(b) e = new UnaExprNode(Operators.Not, e); 
 	}
 
 	void Factor(out ExprNode e) {
