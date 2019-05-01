@@ -808,7 +808,8 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
             else if (la.kind == 1)
             {
-                CallOrID(out e);
+                CallOrID(out IdentNode ident);
+                e = ident;
             }
             else SynErr(75);
         }

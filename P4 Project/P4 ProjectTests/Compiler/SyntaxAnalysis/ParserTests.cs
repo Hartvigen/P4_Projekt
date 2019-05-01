@@ -279,9 +279,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Assert.IsTrue(y.Kind == 0);
             Assert.IsTrue(y.Type.ToString() == "number");
 
-            Assert.IsTrue(y.Name == "x");
-            Assert.IsTrue(y.Kind == 0);
-            Assert.IsTrue(y.Type.ToString() == "number");
+            Assert.IsTrue(x2.Name == "x");
+            Assert.IsTrue(x2.Kind == 0);
+            Assert.IsTrue(x2.Type.ToString() == "text");
         }
 
         //Empty brackets should be bad.

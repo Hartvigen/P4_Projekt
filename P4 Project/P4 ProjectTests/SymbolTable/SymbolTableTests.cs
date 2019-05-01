@@ -74,5 +74,12 @@ namespace P4_Project.SymTab.Tests
                 
             Assert.IsTrue(true);
         }
+
+        //next test lmao
+        [Test]
+        public void SymbolTableTest05()
+        {
+
+        }
     }
 }
