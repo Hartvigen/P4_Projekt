@@ -164,7 +164,7 @@ public class Parser {
 		Expect(1);
 		funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); 
 		ExpectWeak(7, 8);
-		tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); 
+		tab = tab.OpenScope(funcName); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); 
 		if (la.val != ")" && la.val != "{") {
 			VarDecl(out paramDecl);
 			paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); 

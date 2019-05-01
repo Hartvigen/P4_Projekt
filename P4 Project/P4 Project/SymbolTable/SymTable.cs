@@ -9,9 +9,11 @@ namespace P4_Project.SymbolTable
     {
         private readonly Parser _parser;
 
+        public string name;
+
         public const int Var = 0, Func = 1; // Kinds
 
-        private SymTable Parent { get; }
+        private SymTable Parent { get; set; }
         private List<SymTable> InnerScopes { get; } = new List<SymTable>();
         private readonly Dictionary<string, Obj> _symbolDecls = new Dictionary<string, Obj>();
 
@@ -20,6 +22,14 @@ namespace P4_Project.SymbolTable
         {
             Parent = parent;
             _parser = parser;
+            name = "";
+        }
+        
+        public SymTable(SymTable parent, Parser parser, string name)
+        {
+            Parent = parent;
+            _parser = parser;
+            this.name = name;
         }
 
 
@@ -30,16 +40,18 @@ namespace P4_Project.SymbolTable
             InnerScopes.Add(newTable);
             return newTable;
         }
+        
+        public SymTable OpenScope(string name)
+        {
+            SymTable newTable = new SymTable(this, _parser, name);
+            InnerScopes.Add(newTable);
+            return newTable;
+        }
 
         //close the current scope
         public SymTable CloseScope()
         {
             return Parent;
-        }
-
-        public SymTable EnterScope()
-        {
-            
         }
 
         //creates a new Object in the current scope
@@ -84,12 +96,22 @@ namespace P4_Project.SymbolTable
 
         public void PrintAllInCurrentScope()
         {
+            if (name != "")
+            {
+                Console.WriteLine("Named scope: " + name);
+            }
             foreach (var keyValuePair in _symbolDecls)
             {
-                Console.WriteLine("Name: " + keyValuePair.Key + " Type: " + keyValuePair.Value.Type);
+                Console.WriteLine("    Name: " + keyValuePair.Key + " Type: " + keyValuePair.Value.Type);
             }
-
-            Parent?.PrintAllInCurrentScope();
+        }
+        
+        public void PrintAllInAllScopes()
+        {
+                InnerScopes.ForEach(i =>
+                {
+                    i.PrintAllInCurrentScope();
+                });
         }
     }
 }

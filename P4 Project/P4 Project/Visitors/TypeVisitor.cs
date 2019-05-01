@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
-using System.Xml.Xsl.Runtime;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
@@ -12,6 +12,7 @@ using P4_Project.Types;
 using P4_Project.Types.Collections;
 using P4_Project.Types.Primitives;
 using P4_Project.Compiler.SyntaxAnalysis;
+using P4_Project.Graphviz;
 using P4_Project.SymbolTable;
 using P4_Project.Types.Functions;
 using P4_Project.Types.Structures;
@@ -25,22 +26,18 @@ namespace P4_Project.Visitors
         public override List<string> ErrorList { get; }
         private List<string> PreDefFunctions { get; set; }
         private static SymTable Table { get; set; }
+
+        private SymTable currentScope;
         private static Parser Parser { get; set; }
+        
         private const bool Verbose = true;
 
         public TypeVisitor(Parser parser)
         {
             Table = parser.tab;
-
-            if (Table.CloseScope() != null)
-            while (Table.CloseScope() != null)
-            {
-                if (!Verbose) continue;
-                Console.WriteLine("Closing scopes until at top!");
-                Table = Table.CloseScope();
-            }else if (Verbose) Console.WriteLine("Current Scope is top scope!");
-            
             Parser = parser;
+            Table.name = "top";
+            currentScope = Table;
             FillPreDefFunctions();
             ErrorList = new List<string>();
         }
@@ -65,20 +62,20 @@ namespace P4_Project.Visitors
         public override BaseType Visit(VarNode node)
         {
             node.Source?.Accept(this);
-            if (Table.Find(node.Ident) is null)
+            if (currentScope.Find(node.Ident) is null)
             {
                 ErrorList.Add(node.Ident + " should be declared before use!");
-                Table.PrintAllInCurrentScope();
+                currentScope.PrintAllInCurrentScope();
                 throw new Exception("Stop: " + node.Ident + " should be declared before use.");
                 return null;
             }
 
-            if (Table.Find(node.Ident).Type is null)
+            if (currentScope.Find(node.Ident).Type is null)
             {
                 ErrorList.Add(Table.Find(node.Ident) + " Has null Type!");
                 return null;
             }
-            return Table.Find(node.Ident).Type;
+            return currentScope.Find(node.Ident).Type;
         }
 
         //returns a Bool type
@@ -201,7 +198,8 @@ namespace P4_Project.Visitors
         //unfinished try on checking function return
         public override BaseType Visit(FuncDeclNode node)
         {
-            Table.OpenScope();
+            EnterScope(node.SymbolObject.Name);
+
             node.Parameters.Accept(this);   
             node.Body.Accept(this);
             
@@ -222,6 +220,7 @@ namespace P4_Project.Visitors
                         " return should be type: " + node.returnType + " but was: " + ret.Ret.Accept(this));
                 }else if (Verbose) Console.WriteLine("Found return in func: " + node.SymbolObject.Name + " with type: " + type1 + " and expected: " + type2);
             });
+            LeaveScope();
             return null;
 
         }
@@ -432,6 +431,28 @@ namespace P4_Project.Visitors
                 case "Edge": return new EdgeType();
                 case "vertices": return new ListType(new VertexType());
                 default: return null;
+            }
+        }
+
+        private void EnterScope(string name)
+        {
+            Table.GetScopes().ForEach(s =>
+            {
+                if (s.name != name)
+                {
+                    if (Verbose)
+                        Console.WriteLine("Entering " + name + " scope.");
+                    currentScope = s;
+                }
+                
+            });
+        }
+        
+        private void LeaveScope()
+        {
+            while (currentScope.CloseScope() != null)
+            {
+                currentScope = currentScope.CloseScope();
             }
         }
     }
