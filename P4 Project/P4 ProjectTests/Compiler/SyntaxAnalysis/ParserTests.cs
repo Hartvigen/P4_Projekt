@@ -242,6 +242,48 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         }
 
+        //testing whether declarations are correctly stored in the symbol table, by creating and then accesing a number declaration
+        [Test]
+        public void ParseTestSuccess9()
+        {
+            string numDec = "number x = 3";
+            Assert.IsTrue(TryParse(numDec));
+
+            Parser parser  = new Parser(new Scanner(StreamFromString(numDec)));
+            parser.Parse();
+            var x = parser.tab.Find("x");
+
+            Assert.IsTrue(x.Name == "x");
+            Assert.IsTrue(x.Kind == 0);
+            Assert.IsTrue(x.Type.ToString() == "number");
+        }
+
+        //Scopes should be accessed statically, new declarations of previous variables should also be possible in scopes
+        [Test]
+        public void ParseTestSuccess10()
+        {
+            string scopeTest = "number x = 5 if(x == 5){number y = 4 text x = 5}";
+            Assert.IsTrue(TryParse(scopeTest));
+
+            Parser parser = new Parser(new Scanner(StreamFromString(scopeTest)));
+            parser.Parse();
+            var x = parser.tab.Find("x");
+            var y = parser.tab.InnerScopes[0].Find("y");
+            var x2 = parser.tab.InnerScopes[0].Find("x");
+
+            Assert.IsTrue(x.Name == "x");
+            Assert.IsTrue(x.Kind == 0);
+            Assert.IsTrue(x.Type.ToString() == "number");
+
+            Assert.IsTrue(y.Name == "y");
+            Assert.IsTrue(y.Kind == 0);
+            Assert.IsTrue(y.Type.ToString() == "number");
+
+            Assert.IsTrue(y.Name == "x");
+            Assert.IsTrue(y.Kind == 0);
+            Assert.IsTrue(y.Type.ToString() == "number");
+        }
+
         //Empty brackets should be bad.
         [Test]
         public void ParseTestFailure01()

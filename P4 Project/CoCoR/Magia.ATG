@@ -107,7 +107,7 @@ FuncDecl<out FuncDeclNode funcNode> =                       (. funcNode = null; 
         Stmts<ref stmtBlock>
     SYNC '}'                                                (. SymbolTable funcScope = tab;
                                                                tab = tab.CloseScope(); 
-                                                               funcObj = tab.NewObj(funcName, new FunctionType(returnType, parameterTypes), func, funcScope); 
+                                                               funcObj = tab.NewObj(funcName, new FunctionType(returnType, parameterTypes), func); 
                                                                funcNode = new FuncDeclNode(funcName, funcObj, paramBlock, stmtBlock); 
                                                             .)
     .

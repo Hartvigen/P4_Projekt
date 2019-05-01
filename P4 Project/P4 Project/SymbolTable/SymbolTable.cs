@@ -27,6 +27,10 @@ namespace P4_Project.SymTab
             parser = _parser;
         }
 
+        public List<SymbolTable> InnerScopes
+        {
+            get { return innerScopes; }
+        }
 
         //open a new scope and make it the current (topScope)
         public SymbolTable OpenScope()
@@ -44,9 +48,9 @@ namespace P4_Project.SymTab
 
 
         //creates a new Object in the current scope
-        public Obj NewObj(string name, BaseType type, int kind, SymbolTable scope = null)
+        public Obj NewObj(string name, BaseType type, int kind)
         {
-            Obj obj = new Obj(name, type, kind, scope);
+            Obj obj = new Obj(name, type, kind);
 
             if (!symbolDecls.ContainsKey(obj.Name))
                 symbolDecls.Add(obj.Name, obj);

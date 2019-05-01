@@ -13,14 +13,12 @@ namespace P4_Project.SymTab
         public string Name { get; set; }        // name of the object
         public BaseType Type { get; set; }      // type of the object
         public int Kind { get; set; }           // var, func ..
-        public SymbolTable Scope { get; set; }  // the scope of the object
 
-        public Obj(string name, BaseType type, int kind, SymbolTable scope)
+        public Obj(string name, BaseType type, int kind)
         {
             Name = name;
             Type = type;
             Kind = kind;
-            Scope = scope;
         }
 
         public Obj()
@@ -28,7 +26,6 @@ namespace P4_Project.SymTab
             Name = null;
             Type = null;
             Kind = 0;
-            Scope = null;
         }
     }
 }

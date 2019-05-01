@@ -147,7 +147,7 @@ public class Parser {
 			StructStmt(out stmt);
 		} else if (la.kind == 1) {
 			SimpleStmt(out stmt);
-		} else if (la.kind == 26 || la.kind == 27 || la.kind == 28) {
+		} else if (la.kind == 25 || la.kind == 26 || la.kind == 27) {
 			KeywordStmt(out stmt);
 		} else if (StartOf(4)) {
 			FullDecl(out stmt);
@@ -167,10 +167,10 @@ public class Parser {
 		ExpectWeak(7, 8);
 		tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); 
 		if (la.val != ")" && la.val != "{") {
-			VarDecl(out paramDecl);
+			ParamDecl(out paramDecl);
 			paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); 
 			while (WeakSeparator(8,4,5) ) {
-				VarDecl(out paramDecl);
+				ParamDecl(out paramDecl);
 				paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); 
 			}
 		}
@@ -185,7 +185,7 @@ public class Parser {
 		}
 		ExpectWeak(14, 3);
 		SymbolTable funcScope = tab; tab = tab.CloseScope(); 
-		Obj funcObj = tab.NewObj(funcName, protocol, func, funcScope); 
+		Obj funcObj = tab.NewObj(funcName, protocol, func); 
 		funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
 		
 	}
@@ -195,7 +195,7 @@ public class Parser {
 		Type(out type);
 		Expect(1);
 		name = t.val; 
-		if (la.kind == 29) {
+		if (la.kind == 28) {
 			Assign(out value);
 		}
 		varDecl = new VarDeclNode(tab.NewObj(name, type, var), value); 
@@ -208,6 +208,13 @@ public class Parser {
 		} else if (StartOf(12)) {
 			CollecType(out type);
 		} else SynErr(61);
+	}
+
+	void ParamDecl(out VarDeclNode varDecl) {
+		varDecl = null; BaseType type = null; 
+		Type(out type);
+		Expect(1);
+		varDecl = new VarDeclNode(tab.NewObj(t.val, type, var), null); 
 	}
 
 	void StructStmt(out StmtNode stmt) {
@@ -226,13 +233,9 @@ public class Parser {
 	void SimpleStmt(out StmtNode stmt) {
 		stmt = null; 
 		CallOrID(out IdentNode i);
-		while (la.kind == 22) {
-			Member(i, out IdentNode target);
-			i = target; 
-		}
 		stmt = new LoneCallNode(i); 
 		if (StartOf(13)) {
-			if (la.kind == 29) {
+			if (la.kind == 28) {
 				Assign(out ExprNode expr);
 				stmt = new AssignNode(i, expr); 
 			} else {
@@ -243,14 +246,14 @@ public class Parser {
 
 	void KeywordStmt(out StmtNode stmt) {
 		stmt = null; 
-		if (la.kind == 26) {
+		if (la.kind == 25) {
 			Get();
 			Expr(out ExprNode expr);
 			stmt = new ReturnNode(expr); 
-		} else if (la.kind == 27) {
+		} else if (la.kind == 26) {
 			Get();
 			stmt = new BreakNode(); 
-		} else if (la.kind == 28) {
+		} else if (la.kind == 27) {
 			Get();
 			stmt = new ContinueNode(); 
 		} else SynErr(63);
@@ -262,7 +265,7 @@ public class Parser {
 		if (la.kind == 1) {
 			Get();
 			string name = t.val; ExprNode expr = null; 
-			if (la.kind == 29) {
+			if (la.kind == 28) {
 				Assign(out expr);
 			}
 			stmt = new VarDeclNode(tab.NewObj(name, type, var), expr); 
@@ -316,7 +319,7 @@ public class Parser {
 		ExpectWeak(8, 16);
 		Expr(out cond);
 		ExpectWeak(8, 3);
-		Stmt(out iter);
+		SimpleStmt(out iter);
 		Expect(9);
 		Expect(13);
 		tab = tab.OpenScope(); 
@@ -416,18 +419,17 @@ public class Parser {
 			i = new CallNode(i.Identifier, collec); 
 			Expect(9);
 		}
-	}
-
-	void Member(ExprNode source, out IdentNode i) {
-		i = null; 
-		ExpectWeak(22, 3);
-		CallOrID(out i);
-		i.Source = source; 
+		if (la.kind == 43) {
+			ExpectWeak(43, 3);
+			IdentNode source = i; 
+			CallOrID(out i);
+			i.AddBaseSource(source); 
+		}
 	}
 
 	void Assign(out ExprNode expr) {
 		expr = null; CollecConst collec = null; 
-		Expect(29);
+		Expect(28);
 		if (StartOf(17)) {
 			Expr(out expr);
 		} else if (la.kind == 13) {
@@ -459,13 +461,13 @@ public class Parser {
 
 	void EdgeOpr(out int op) {
 		op = 0;                  
-		if (la.kind == 23) {
+		if (la.kind == 22) {
 			Get();
 			op = Operators.LEFTARR;  
-		} else if (la.kind == 24) {
+		} else if (la.kind == 23) {
 			Get();
 			op = Operators.NONARR;   
-		} else if (la.kind == 25) {
+		} else if (la.kind == 24) {
 			Get();
 			op = Operators.RIGHTARR; 
 		} else SynErr(74);
@@ -519,7 +521,7 @@ public class Parser {
 		e = null; int op = 0; 
 		ExprAnd(out ExprNode e1);
 		e = e1; 
-		while (la.kind == 30) {
+		while (la.kind == 29) {
 			Get();
 			op  = Operators.OR; 
 			ExprAnd(out ExprNode e2);
@@ -531,7 +533,7 @@ public class Parser {
 		e = null; int op = 0; 
 		ExprEQ(out ExprNode e1);
 		e = e1; 
-		while (la.kind == 31) {
+		while (la.kind == 30) {
 			Get();
 			op = Operators.AND; 
 			ExprEQ(out ExprNode e2);
@@ -543,8 +545,8 @@ public class Parser {
 		e = null; int op = 0; 
 		ExprRel(out ExprNode e1);
 		e = e1; 
-		if (la.kind == 32 || la.kind == 33) {
-			if (la.kind == 32) {
+		if (la.kind == 31 || la.kind == 32) {
+			if (la.kind == 31) {
 				Get();
 				op = Operators.EQ; 
 			} else {
@@ -561,13 +563,13 @@ public class Parser {
 		ExprPlus(out ExprNode e1);
 		e = e1; 
 		if (StartOf(20)) {
-			if (la.kind == 34) {
+			if (la.kind == 33) {
 				Get();
 				op = Operators.LESS; 
-			} else if (la.kind == 35) {
+			} else if (la.kind == 34) {
 				Get();
 				op = Operators.GREATER; 
-			} else if (la.kind == 36) {
+			} else if (la.kind == 35) {
 				Get();
 				op = Operators.LESSEQ; 
 			} else {
@@ -581,14 +583,14 @@ public class Parser {
 
 	void ExprPlus(out ExprNode e) {
 		e = null; bool b = false; int op = 0; 
-		if (la.kind == 38) {
+		if (la.kind == 37) {
 			Get();
 			b = true; 
 		}
 		ExprMult(out ExprNode e1);
 		if(b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1; 
-		while (la.kind == 38 || la.kind == 39) {
-			if (la.kind == 39) {
+		while (la.kind == 37 || la.kind == 38) {
+			if (la.kind == 38) {
 				Get();
 				op = Operators.PLUS; 
 			} else {
@@ -604,11 +606,11 @@ public class Parser {
 		e = null; int op = 0;
 		ExprNot(out ExprNode e1);
 		e = e1; 
-		while (la.kind == 40 || la.kind == 41 || la.kind == 42) {
-			if (la.kind == 40) {
+		while (la.kind == 39 || la.kind == 40 || la.kind == 41) {
+			if (la.kind == 39) {
 				Get();
 				op = Operators.MULT; 
-			} else if (la.kind == 41) {
+			} else if (la.kind == 40) {
 				Get();
 				op = Operators.DIV; 
 			} else {
@@ -622,7 +624,7 @@ public class Parser {
 
 	void ExprNot(out ExprNode e) {
 		e = null; bool b = false;
-		if (la.kind == 43) {
+		if (la.kind == 42) {
 			Get();
 			b = true; 
 		}
@@ -634,20 +636,13 @@ public class Parser {
 		e = null; 
 		if (StartOf(21)) {
 			Const(out e);
-		} else if (la.kind == 1 || la.kind == 7) {
-			if (la.kind == 7) {
-				Get();
-				Expr(out e);
-				e.InParentheses = true; 
-				Expect(9);
-			} else {
-				CallOrID(out IdentNode ident);
-				e = ident; 
-			}
-			while (la.kind == 22) {
-				Member(e, out IdentNode target);
-				e = target; 
-			}
+		} else if (la.kind == 7) {
+			Get();
+			Expr(out e);
+			Expect(9);
+			e.InParentheses = true; 
+		} else if (la.kind == 1) {
+			CallOrID(out e);
 		} else SynErr(75);
 	}
 
@@ -695,27 +690,27 @@ public class Parser {
 		type = null; BaseType subType = null; 
 		if (la.kind == 46) {
 			Get();
-			ExpectWeak(34, 3);
+			ExpectWeak(33, 3);
 			SingleType(out subType);
-			ExpectWeak(35, 22);
+			ExpectWeak(34, 22);
 			type = new ListType(subType);  
 		} else if (la.kind == 47) {
 			Get();
-			ExpectWeak(34, 3);
+			ExpectWeak(33, 3);
 			SingleType(out subType);
-			ExpectWeak(35, 22);
+			ExpectWeak(34, 22);
 			type = new SetType(subType);   
 		} else if (la.kind == 48) {
 			Get();
-			ExpectWeak(34, 3);
+			ExpectWeak(33, 3);
 			SingleType(out subType);
-			ExpectWeak(35, 22);
+			ExpectWeak(34, 22);
 			type = new QueueType(subType); 
 		} else if (la.kind == 49) {
 			Get();
-			ExpectWeak(34, 3);
+			ExpectWeak(33, 3);
 			SingleType(out subType);
-			ExpectWeak(35, 22);
+			ExpectWeak(34, 22);
 			type = new StackType(subType); 
 		} else SynErr(78);
 	}
@@ -732,29 +727,29 @@ public class Parser {
 	}
 	
 	static readonly bool[,] set = {
-		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-		{_x,_T,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-		{_T,_T,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_x,_T,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_T,_T,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_T,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_T,_x,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_x,_T, _x,_T,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_T,_x,_T, _x,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_x,_T, _x,_T,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_T,_T,_x,_x, _T,_T,_T,_x, _x,_x,_x,_T, _x,_x,_T,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_T,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_T, _T,_T,_x,_x, _x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_T, _T,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_T, _T,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_T,_T,_x,_x, _T,_T,_T,_T, _x,_x,_x,_T, _x,_T,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_x,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x}
+		{_T,_T,_x,_x, _T,_T,_T,_T, _x,_x,_x,_T, _x,_T,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x}
 
 	};
 } // end Parser
@@ -790,28 +785,28 @@ public class Errors {
 			case 19: s = "\"if\" expected"; break;
 			case 20: s = "\"elseif\" expected"; break;
 			case 21: s = "\"else\" expected"; break;
-			case 22: s = "\".\" expected"; break;
-			case 23: s = "\"<-\" expected"; break;
-			case 24: s = "\"--\" expected"; break;
-			case 25: s = "\"->\" expected"; break;
-			case 26: s = "\"return\" expected"; break;
-			case 27: s = "\"break\" expected"; break;
-			case 28: s = "\"continue\" expected"; break;
-			case 29: s = "\"=\" expected"; break;
-			case 30: s = "\"||\" expected"; break;
-			case 31: s = "\"&&\" expected"; break;
-			case 32: s = "\"==\" expected"; break;
-			case 33: s = "\"!=\" expected"; break;
-			case 34: s = "\"<\" expected"; break;
-			case 35: s = "\">\" expected"; break;
-			case 36: s = "\"<=\" expected"; break;
-			case 37: s = "\">=\" expected"; break;
-			case 38: s = "\"-\" expected"; break;
-			case 39: s = "\"+\" expected"; break;
-			case 40: s = "\"*\" expected"; break;
-			case 41: s = "\"/\" expected"; break;
-			case 42: s = "\"%\" expected"; break;
-			case 43: s = "\"!\" expected"; break;
+			case 22: s = "\"<-\" expected"; break;
+			case 23: s = "\"--\" expected"; break;
+			case 24: s = "\"->\" expected"; break;
+			case 25: s = "\"return\" expected"; break;
+			case 26: s = "\"break\" expected"; break;
+			case 27: s = "\"continue\" expected"; break;
+			case 28: s = "\"=\" expected"; break;
+			case 29: s = "\"||\" expected"; break;
+			case 30: s = "\"&&\" expected"; break;
+			case 31: s = "\"==\" expected"; break;
+			case 32: s = "\"!=\" expected"; break;
+			case 33: s = "\"<\" expected"; break;
+			case 34: s = "\">\" expected"; break;
+			case 35: s = "\"<=\" expected"; break;
+			case 36: s = "\">=\" expected"; break;
+			case 37: s = "\"-\" expected"; break;
+			case 38: s = "\"+\" expected"; break;
+			case 39: s = "\"*\" expected"; break;
+			case 40: s = "\"/\" expected"; break;
+			case 41: s = "\"%\" expected"; break;
+			case 42: s = "\"!\" expected"; break;
+			case 43: s = "\".\" expected"; break;
 			case 44: s = "\"true\" expected"; break;
 			case 45: s = "\"false\" expected"; break;
 			case 46: s = "\"list\" expected"; break;

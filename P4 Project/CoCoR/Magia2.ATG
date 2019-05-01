@@ -82,7 +82,7 @@ FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string f
         { SYNC Stmt<out stmt>                       (. stmtBlock.Add(stmt); .)
         }
     WEAK '}'                                        (. SymbolTable funcScope = tab; tab = tab.CloseScope(); 
-                                                       Obj funcObj = tab.NewObj(funcName, protocol, func, funcScope); 
+                                                       Obj funcObj = tab.NewObj(funcName, protocol, func); 
                                                        funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
                                                     .)
 .

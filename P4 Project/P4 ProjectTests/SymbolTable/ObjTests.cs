@@ -33,13 +33,12 @@ namespace P4_Project.SymTab.Tests
             customName = "testName";
             customType = new FunctionType(null, null);
             customKind = 404;
-            customSymbolTable = new SymbolTable(null, new Parser(null));
         }
 
         [SetUp]
         public void Initialize()
         {
-            customObj = new Obj(customName, customType, customKind, customSymbolTable);
+            customObj = new Obj(customName, customType, customKind);
             nullObj = new Obj();
         }
 
@@ -57,25 +56,27 @@ namespace P4_Project.SymTab.Tests
             Assert.IsTrue(customObj.Kind == customKind);
         }
 
-        //The Constructor actually sets excpected Scope
-        [Test]
-        public void ObjTests02()
-        {
-            Assert.IsTrue(customObj.Scope == customSymbolTable);
-        }
 
         //The Constructor actually sets excpected name
         [Test]
-        public void ObjTests03()
+        public void ObjTests02()
         {
             Assert.IsTrue(customObj.Name == customName);
         }
 
         //The Constructor actually sets excpected name
         [Test]
-        public void ObjTests04()
+        public void ObjTests03()
         {
             Assert.IsTrue(customObj.Type.Equals(customType));
+        }
+
+        //The Empty Constructor Gives excpected type
+        //Note that we have to use .IsNull as the == operator is overridden and cant be used when Type is null.
+        [Test]
+        public void ObjTests04()
+        {
+            Assert.IsNull(nullObj.Type);
         }
 
         //The Empty Constructor Gives excpected kind
@@ -92,19 +93,5 @@ namespace P4_Project.SymTab.Tests
             Assert.IsTrue(nullObj.Name == null);
         }
 
-        //The Empty Constructor Gives excpected scope
-        [Test]
-        public void ObjTests07()
-        {
-            Assert.IsTrue(nullObj.Scope == null);
-        }
-
-        //The Empty Constructor Gives excpected type
-        //Note that we have to use .IsNull as the == operator is overridden and cant be used when Type is null.
-        [Test]
-        public void ObjTests08()
-        {
-            Assert.IsNull(nullObj.Type);
-        }
     }
 }
