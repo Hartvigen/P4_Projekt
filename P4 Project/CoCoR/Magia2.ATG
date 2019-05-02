@@ -81,7 +81,7 @@ FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string f
     WEAK '{'                                        (. StmtNode stmt = null; .)
         { SYNC Stmt<out stmt>                       (. stmtBlock.Add(stmt); .)
         }
-    WEAK '}'                                        (. SymbolTable funcScope = tab; tab = tab.CloseScope(); 
+    WEAK '}'                                        (. SymTable funcScope = tab; tab = tab.CloseScope(); 
                                                        Obj funcObj = tab.NewObj(funcName, protocol, func, funcScope); 
                                                        funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
                                                     .)
@@ -127,7 +127,7 @@ StmtFor<out StmtNode f> =               (. f = null; BlockNode stmtBlock = new B
         | VarDecl<out VarDeclNode vert> (. init = vert; .)
         ) WEAK ','
         Expr<out cond> WEAK ','
-        Stmt<out iter>
+        SimpleStmt<out iter>
     ')' 
     '{'                                 (. tab = tab.OpenScope(); .)
         { SYNC Stmt<out stmt>           (. stmtBlock.Add(stmt); .)

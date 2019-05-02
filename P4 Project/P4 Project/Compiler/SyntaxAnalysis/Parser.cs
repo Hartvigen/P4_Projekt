@@ -10,9 +10,9 @@ using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
-using P4_Project.SymTab;
-using static P4_Project.SymTab.SymbolTable;
+using static P4_Project.SymbolTable.SymTable;
 using System.Collections.Generic;
+using P4_Project.SymbolTable;
 
 namespace P4_Project.Compiler.SyntaxAnalysis {
 
@@ -36,15 +36,15 @@ public class Parser {
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
 
-	public MAGIA mainNode;
-	public SymbolTable tab;
+	public Magia mainNode;
+	public SymTable tab;
 
 
 
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
-		tab = new SymbolTable(null, this);
+		tab = new SymTable(null, this);
 	}
 
 	void SynErr (int n) {
@@ -116,7 +116,7 @@ public class Parser {
 			FuncDecl(out FuncDeclNode funcDecl);
 			mainBlock.Add(funcDecl);         
 		}
-		mainNode = new MAGIA(mainBlock); 
+		mainNode = new Magia(mainBlock); 
 	}
 
 	void Head(out HeadNode head) {
@@ -124,10 +124,10 @@ public class Parser {
 		Expect(4);
 		if (la.kind == 5) {
 			Get();
-			head = new HeadNode(HeadNode.VERTEX); 
+			head = new HeadNode(HeadNode.Vertex); 
 		} else if (la.kind == 6) {
 			Get();
-			head = new HeadNode(HeadNode.EDGE);   
+			head = new HeadNode(HeadNode.Edge);   
 		} else SynErr(57);
 		ExpectWeak(7, 3);
 		VarDecl(out attrDecl);
@@ -164,7 +164,7 @@ public class Parser {
 		Expect(1);
 		funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); 
 		ExpectWeak(7, 8);
-		tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); 
+		tab = tab.OpenScope(funcName); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); 
 		if (la.val != ")" && la.val != "{") {
 			VarDecl(out paramDecl);
 			paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); 
@@ -183,8 +183,8 @@ public class Parser {
 			stmtBlock.Add(stmt); 
 		}
 		ExpectWeak(14, 3);
-		SymbolTable funcScope = tab; tab = tab.CloseScope(); 
-		Obj funcObj = tab.NewObj(funcName, protocol, func, funcScope); 
+		SymTable funcScope = tab; tab = tab.CloseScope(); 
+		Obj funcObj = tab.NewObj(funcName, protocol, Func, funcScope); 
 		funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
 		
 	}
@@ -197,7 +197,7 @@ public class Parser {
 		if (la.kind == 29) {
 			Assign(out value);
 		}
-		varDecl = new VarDeclNode(tab.NewObj(name, type, var), value); 
+		varDecl = new VarDeclNode(tab.NewObj(name, type, Var), value); 
 	}
 
 	void Type(out BaseType type) {
@@ -264,7 +264,7 @@ public class Parser {
 			if (la.kind == 29) {
 				Assign(out expr);
 			}
-			stmt = new VarDeclNode(tab.NewObj(name, type, var), expr); 
+			stmt = new VarDeclNode(tab.NewObj(name, type, Var), expr); 
 		} else if (la.kind == 13) {
 			Get();
 			MultiDecl multiDecl = new MultiDecl(); 
@@ -337,7 +337,7 @@ public class Parser {
 		tab = tab.OpenScope(); 
 		Type(out BaseType type);
 		Expect(1);
-		itrVar = new VarDeclNode(tab.NewObj(t.val, type, var), null); 
+		itrVar = new VarDeclNode(tab.NewObj(t.val, type, Var), null); 
 		Expect(18);
 		Expr(out ExprNode collection);
 		Expect(9);
@@ -412,7 +412,7 @@ public class Parser {
 		if (la.kind == 7) {
 			Get();
 			Args(out CollecConst collec);
-			i = new CallNode(i.Identifier, collec); 
+			i = new CallNode(i.Ident, collec); 
 			Expect(9);
 		}
 	}
@@ -421,7 +421,7 @@ public class Parser {
 		i = null; 
 		ExpectWeak(22, 3);
 		CallOrID(out i);
-		i.Source = source; 
+		i.Source = (IdentNode) source; 
 	}
 
 	void Assign(out ExprNode expr) {
@@ -460,13 +460,13 @@ public class Parser {
 		op = 0;                  
 		if (la.kind == 23) {
 			Get();
-			op = Operators.LEFTARR;  
+			op = Operators.Leftarr;  
 		} else if (la.kind == 24) {
 			Get();
-			op = Operators.NONARR;   
+			op = Operators.Nonarr;   
 		} else if (la.kind == 25) {
 			Get();
-			op = Operators.RIGHTARR; 
+			op = Operators.Rightarr; 
 		} else SynErr(74);
 	}
 
@@ -493,7 +493,7 @@ public class Parser {
 		vertexDecl = null; VarNode varNode = null; ExprNode expr = null; 
 		Expect(7);
 		Expect(1);
-		vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new VertexType(), var)); 
+		vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new VertexType(), Var)); 
 		while (WeakSeparator(8,18,5) ) {
 			Identifier(out varNode);
 			Assign(out expr);
@@ -520,7 +520,7 @@ public class Parser {
 		e = e1; 
 		while (la.kind == 30) {
 			Get();
-			op  = Operators.OR; 
+			op  = Operators.Or; 
 			ExprAnd(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
 		}
@@ -532,7 +532,7 @@ public class Parser {
 		e = e1; 
 		while (la.kind == 31) {
 			Get();
-			op = Operators.AND; 
+			op = Operators.And; 
 			ExprEQ(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
 		}
@@ -545,10 +545,10 @@ public class Parser {
 		if (la.kind == 32 || la.kind == 33) {
 			if (la.kind == 32) {
 				Get();
-				op = Operators.EQ; 
+				op = Operators.Eq; 
 			} else {
 				Get();
-				op = Operators.NEQ; 
+				op = Operators.Neq; 
 			}
 			ExprRel(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -562,16 +562,16 @@ public class Parser {
 		if (StartOf(20)) {
 			if (la.kind == 34) {
 				Get();
-				op = Operators.LESS; 
+				op = Operators.Less; 
 			} else if (la.kind == 35) {
 				Get();
-				op = Operators.GREATER; 
+				op = Operators.Greater; 
 			} else if (la.kind == 36) {
 				Get();
-				op = Operators.LESSEQ; 
+				op = Operators.Lesseq; 
 			} else {
 				Get();
-				op = Operators.GREATEQ; 
+				op = Operators.Greateq; 
 			}
 			ExprPlus(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -585,14 +585,14 @@ public class Parser {
 			b = true; 
 		}
 		ExprMult(out ExprNode e1);
-		if(b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1; 
+		if(b) e = new UnaExprNode(Operators.Umin, e1); else e = e1; 
 		while (la.kind == 38 || la.kind == 39) {
 			if (la.kind == 39) {
 				Get();
-				op = Operators.PLUS; 
+				op = Operators.Plus; 
 			} else {
 				Get();
-				op = Operators.BIMIN; 
+				op = Operators.Bimin; 
 			}
 			ExprMult(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -606,13 +606,13 @@ public class Parser {
 		while (la.kind == 40 || la.kind == 41 || la.kind == 42) {
 			if (la.kind == 40) {
 				Get();
-				op = Operators.MULT; 
+				op = Operators.Mult; 
 			} else if (la.kind == 41) {
 				Get();
-				op = Operators.DIV; 
+				op = Operators.Div; 
 			} else {
 				Get();
-				op = Operators.MOD; 
+				op = Operators.Mod; 
 			}
 			ExprNot(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -626,7 +626,7 @@ public class Parser {
 			b = true; 
 		}
 		Factor(out e);
-		if(b) e = new UnaExprNode(Operators.NOT, e); 
+		if(b) e = new UnaExprNode(Operators.Not, e); 
 	}
 
 	void Factor(out ExprNode e) {

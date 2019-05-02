@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using P4_Project.SymTab;
+﻿using P4_Project.SymbolTable;
 
 namespace P4_Project.AST.Stmts.Decls
 {
@@ -12,12 +7,9 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public abstract class DeclNode : StmtNode
     {
-        public Obj SymbolObject { get; private set; }
+        public Obj SymbolObject { get; }
 
-
-        public DeclNode() { }
-
-        public DeclNode(Obj symbolObject)
+        protected DeclNode(Obj symbolObject)
         {
             SymbolObject = symbolObject;
         }

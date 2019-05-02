@@ -1,10 +1,5 @@
 ﻿using P4_Project.AST.Expressions.Values;
 using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Identifier
 {
@@ -13,23 +8,18 @@ namespace P4_Project.AST.Expressions.Identifier
     /// </summary>
     public class CallNode : IdentNode
     {
-        public CollecConst Parameters { get; private set; }
+        public CollecConst Parameters { get; }
 
-
-        public CallNode()
-            : base(null)
-        { }
-
-        public CallNode(string identifier, CollecConst parameters) 
-            : base(identifier)
+        public CallNode(string ident, CollecConst parameters) 
+            : base(ident)
         {
             Parameters = parameters;
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
     }
 }

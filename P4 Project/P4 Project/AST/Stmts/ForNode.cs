@@ -1,10 +1,5 @@
 ﻿using P4_Project.AST.Expressions;
 using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Stmts
 {
@@ -13,11 +8,11 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class ForNode : StmtNode
     {
-        public StmtNode Initializer { get; private set; }
-        public ExprNode Condition { get; private set; }
-        public StmtNode Iterator { get; private set; }
+        public StmtNode Initializer { get; }
+        public ExprNode Condition { get; }
+        public StmtNode Iterator { get; }
 
-        public BlockNode Body { get; private set; }
+        public BlockNode Body { get; }
 
         public ForNode(StmtNode initializer, ExprNode condition, StmtNode iterator, BlockNode body)
         {
@@ -27,10 +22,9 @@ namespace P4_Project.AST.Stmts
             Body = body;
         }
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
     }
 }

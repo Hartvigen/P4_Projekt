@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 namespace P4_Project.Types.Collections
 {
     public class ListType : CollecType
@@ -9,7 +9,7 @@ namespace P4_Project.Types.Collections
 
         public override string ToString()
         {
-            return $"list<{SubType.ToString()}>";
+            return $"list<{SubType}>";
         }
     }
 }

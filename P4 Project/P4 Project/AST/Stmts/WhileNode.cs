@@ -1,10 +1,5 @@
 ﻿using P4_Project.AST.Expressions;
 using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Stmts
 {
@@ -13,8 +8,8 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class WhileNode : StmtNode
     {
-        public ExprNode Condition { get; private set; }
-        public BlockNode Body { get; private set; }
+        public ExprNode Condition { get; }
+        public BlockNode Body { get; }
 
         public WhileNode(ExprNode condition, BlockNode block)
         {
@@ -23,10 +18,9 @@ namespace P4_Project.AST.Stmts
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
 
 

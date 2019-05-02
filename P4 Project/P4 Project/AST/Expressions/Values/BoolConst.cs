@@ -1,9 +1,4 @@
 ﻿using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions.Values
 {
@@ -12,20 +7,16 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class BoolConst : ExprNode
     {
-        public bool Value { get; private set; }
-
-
-        public BoolConst() { }
+        private bool Value { get; }
 
         public BoolConst(bool value)
         {
             Value = value;
         }
-
-
-        public override object Accept(Visitor vi, object o)
+        
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
 
         public string GetString() {

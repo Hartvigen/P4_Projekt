@@ -1,117 +1,101 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using P4_Project.AST;
-using P4_Project.AST.Expressions;
+﻿using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.SymTab;
+using P4_Project.SymbolTable;
 using P4_Project.Types;
 using P4_Project.Types.Functions;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace P4_Project.SymTab.Tests
+namespace P4_ProjectTests1.SymbolTable
 {
-    [TestClass()]
+    [TestFixture]
     public class ObjTests
     {
-        private static string customName;
-        private static BaseType customType;
-        private static int customKind;
-        private static SymbolTable customSymbolTable;
+        private static string _customName;
+        private static BaseType _customType;
+        private static int _customKind;
+        private static P4_Project.SymbolTable.SymTable _customSymTable;
+
+        private Obj _customObj;
+        private Obj _nullObj;
 
 
-        private Obj customObj;
-        private Obj nullObj;
-
-
-        [ClassInitialize()]
-        public static void ClassInit(TestContext context)
+        [OneTimeSetUp]
+        public static void ClassInit()
         {
-            customName = "testName";
-            customType = new FunctionType(null, null);
-            customKind = 404;
-            customSymbolTable = new SymbolTable(null, new Parser(null));
+            _customName = "testName";
+            _customType = new FunctionType(null, null);
+            _customKind = 404;
+            _customSymTable = new P4_Project.SymbolTable.SymTable(null, new Parser(null));
         }
 
-        [TestInitialize]
+        [SetUp]
         public void Initialize()
         {
-            customObj = new Obj(customName, customType, customKind, customSymbolTable);
-            nullObj = new Obj();
+            _customObj = new Obj(_customName, _customType, _customKind, _customSymTable);
+            _nullObj = new Obj();
         }
 
-        [TestCleanup]
+        [TearDown]
         public void Cleanup()
         {
-            customObj = null;
-            nullObj = null;
+            _customObj = null;
+            _nullObj = null;
         }
 
-        //The Constructor actually sets excpected Kind
-        [TestMethod()]
+        //The Constructor actually sets expected Kind
+        [Test]
         public void ObjTests01()
         {
-            Assert.IsTrue(customObj.Kind == customKind);
+            Assert.IsTrue(_customObj.Kind == _customKind);
         }
 
-        //The Constructor actually sets excpected Scope
-        [TestMethod()]
+        //The Constructor actually sets expected Scope
+        [Test]
         public void ObjTests02()
         {
-            Assert.IsTrue(customObj.Scope == customSymbolTable);
+            Assert.IsTrue(_customObj.Scope == _customSymTable);
         }
 
-        //The Constructor actually sets excpected name
-        [TestMethod()]
+        //The Constructor actually sets expected name
+        [Test]
         public void ObjTests03()
         {
-            Assert.IsTrue(customObj.Name == customName);
+            Assert.IsTrue(_customObj.Name == _customName);
         }
 
-        //The Constructor actually sets excpected name
-        [TestMethod()]
+        //The Constructor actually sets expected name
+        [Test]
         public void ObjTests04()
         {
-            Assert.IsTrue(customObj.Type.Equals(customType));
+            Assert.IsTrue(_customObj.Type.Equals(_customType));
         }
 
-        //The Empty Constructor Gives excpected kind
-        [TestMethod()]
+        //The Empty Constructor Gives expected kind
+        [Test]
         public void ObjTests05()
         {
-            Assert.IsTrue(nullObj.Kind == 0);
+            Assert.IsTrue(_nullObj.Kind == 0);
         }
 
-        //The Empty Constructor Gives excpected name
-        [TestMethod()]
+        //The Empty Constructor Gives expected name
+        [Test]
         public void ObjTests06()
         {
-            Assert.IsTrue(nullObj.Name == null);
+            Assert.IsTrue(_nullObj.Name == null);
         }
 
-        //The Empty Constructor Gives excpected scope
-        [TestMethod()]
+        //The Empty Constructor Gives expected scope
+        [Test]
         public void ObjTests07()
         {
-            Assert.IsTrue(nullObj.Scope == null);
+            Assert.IsTrue(_nullObj.Scope == null);
         }
 
-        //The Empty Constructor Gives excpected type
+        //The Empty Constructor Gives expected type
         //Note that we have to use .IsNull as the == operator is overridden and cant be used when Type is null.
-        [TestMethod()]
+        [Test]
         public void ObjTests08()
         {
-            Assert.IsNull(nullObj.Type);
-        }
-
-        //Since the == operator is overidden for BaseType is will throw an excpetion when null checking.
-        [TestMethod()]
-        public void ObjTests09()
-        {
-            Assert.ThrowsException<NullReferenceException>(() => nullObj.Type == null);
+            Assert.IsNull(_nullObj.Type);
         }
     }
 }

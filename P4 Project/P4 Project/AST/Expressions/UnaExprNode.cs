@@ -1,10 +1,5 @@
 ﻿using P4_Project.Types;
 using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace P4_Project.AST.Expressions
 {
@@ -13,12 +8,10 @@ namespace P4_Project.AST.Expressions
     /// </summary>
     public class UnaExprNode : ExprNode
     {
-        public ExprNode Expr { get; private set; }
-        public int OperatorType { get; private set; }
+        public ExprNode Expr { get; }
+        public int OperatorType { get; }
 
-        public BaseType type { get; set; }
-
-        public UnaExprNode() { }
+        public BaseType Type { get; set; }
 
         public UnaExprNode(int operatorType, ExprNode expr)
         {
@@ -27,19 +20,19 @@ namespace P4_Project.AST.Expressions
         }
 
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
+            return vi.Visit(this);
         }
 
         public string GetNameOfOperator()
         {
-            return Operators.getNameFromInt(OperatorType);
+            return Operators.GetNameFromInt(OperatorType);
         }
 
-        public string GetCodeofOperator()
+        public string GetCodeOfOperator()
         {
-            return Operators.getCodeFromInt(OperatorType);
+            return Operators.GetCodeFromInt(OperatorType);
         }
     }
 }

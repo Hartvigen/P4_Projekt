@@ -1,82 +1,68 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using P4_Project.Compiler.SyntaxAnalysis;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using NUnit.Framework;
+using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.Compiler.SyntaxAnalysis.Tests
+namespace P4_ProjectTests1.Compiler.SyntaxAnalysis
 {
-    [TestClass()]
-    public class ParserTests
+    [TestFixture]
+    public sealed class ParserTests
     {
-        static string validIdentifier = "test123";
-        static string validTextType = "text";
-        static string invalidIdentifier = "123test";
+        private string ValidIdentifier { get; } = "test123";
+        private string ValidTextType { get; } = "text";
+        private string InvalidIdentifier { get; } = "123test";
 
-        static string invalidType = "notAType";
-        static string invalidCollection = "notACollection";
+        private string InvalidType { get; } = "notAType";
+        private string InvalidCollection { get; } = "notACollection";
 
-        static string headerWithAllTypesVertex;
-        static string headerWithAllTypesEdge;
+        private static string _headerWithAllTypesVertex;
+        private static string _headerWithAllTypesEdge;
 
 
-        static List<string> singleTypes = new List<string>()
+        private static readonly List<string> SingleTypes = new List<string>()
         {
             "number", "text", "boolean", "vertex", "edge"
         };
 
-        static List<string> collectionTypes = new List<string>()
+        private static readonly List<string> CollectionTypes = new List<string>()
         {
             "list", "queue", "set", "stack"
         };
 
         //Generates a header attribute declaration for vertex and edge where all types are being used.
-        [ClassInitialize()]
-        public static void ClassInit(TestContext context)
+        [OneTimeSetUp]
+        public void ClassInit()
         {
-            headerWithAllTypesVertex = "[vertex( ";
-            headerWithAllTypesEdge = "[edge( ";
+            _headerWithAllTypesVertex = "[vertex( ";
+            _headerWithAllTypesEdge = "[edge( ";
 
-            for (int i = collectionTypes.Count - 1; i >= 0; i--)
+            for (int i = CollectionTypes.Count - 1; i >= 0; i--)
             {
-                headerWithAllTypesVertex += singleTypes[i] + " " + validIdentifier + i + "vertex" + ", ";
-                for (int j = singleTypes.Count - 1; j >= 0; j--)
-                    headerWithAllTypesVertex += (collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + i + j + "vertex" + ", ");
+                _headerWithAllTypesVertex += SingleTypes[i] + " " + ValidIdentifier + i + "vertex" + ", ";
+                for (int j = SingleTypes.Count - 1; j >= 0; j--)
+                    _headerWithAllTypesVertex += (CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + ValidIdentifier + i + j + "vertex" + ", ");
             }
 
-            for (int i = collectionTypes.Count - 1; i >= 0; i--)
+            for (int i = CollectionTypes.Count - 1; i >= 0; i--)
             {
-                headerWithAllTypesEdge += singleTypes[i] + " " + validIdentifier + i + "edge" + ", ";
-                for (int j = singleTypes.Count - 1; j >= 0; j--)
-                    headerWithAllTypesEdge += (collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + i + j + "edge" + ", ");
+                _headerWithAllTypesEdge += SingleTypes[i] + " " + ValidIdentifier + i + "edge" + ", ";
+                for (int j = SingleTypes.Count - 1; j >= 0; j--)
+                    _headerWithAllTypesEdge += (CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + ValidIdentifier + i + j + "edge" + ", ");
             }
 
-            headerWithAllTypesEdge = headerWithAllTypesEdge.Remove(headerWithAllTypesEdge.LastIndexOf(","));
-            headerWithAllTypesEdge += ")]";
+            _headerWithAllTypesEdge = _headerWithAllTypesEdge.Remove(_headerWithAllTypesEdge.LastIndexOf(",", StringComparison.Ordinal));
+            _headerWithAllTypesEdge += ")]";
 
-            headerWithAllTypesVertex = headerWithAllTypesVertex.Remove(headerWithAllTypesVertex.LastIndexOf(","));
-            headerWithAllTypesVertex += ")]";
+            _headerWithAllTypesVertex = _headerWithAllTypesVertex.Remove(_headerWithAllTypesVertex.LastIndexOf(",", StringComparison.Ordinal));
+            _headerWithAllTypesVertex += ")]";
         }
 
-        [TestInitialize]
-        public void Initialize()
+        //Will identify an Appropriate Value given a type.
+        private static string IdentifyAppropriateValue(string type)
         {
-
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-
-        }
-
-        //Will identify an ApproriateValue given a type.
-        private string identifyApropriateValue(string type)
-        {
-            if (collectionTypes.Contains(type))
+            if (CollectionTypes.Contains(type))
                 switch (type)
                 {
                     case "list": return "";
@@ -85,7 +71,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
                     case "queue": return "";
                     default: throw new Exception(type + " is not added to the switch but is in the list.");
                 }
-            else if (singleTypes.Contains(type))
+            else if (SingleTypes.Contains(type))
                 switch (type)
                 {
                     case "number": return "123";
@@ -98,10 +84,10 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             throw new Exception("Type was neither in type list of collection list.");
         }
 
-        //Will identify an in apropriate value given a type.
-        private string identifyInApropriateValue(string type)
+        //Will identify an in appropriate value given a type.
+        private static string IdentifyInAppropriateValue(string type)
         {
-            if (collectionTypes.Contains(type))
+            if (CollectionTypes.Contains(type))
                 switch (type)
                 {
                     case "list": return "!";
@@ -110,7 +96,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
                     case "queue": return "!";
                     default: throw new Exception(type + " is not added to the switch but is in the list of collections.");
                 }
-            else if (singleTypes.Contains(type))
+            else if (SingleTypes.Contains(type))
                 switch (type)
                 {
                     case "number": return "!";
@@ -124,9 +110,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //The actual parser.
-        protected bool TryParse(string program)
+        private static bool TryParse(string program)
         {
-            Parser parser
+            var parser
                 = new Parser(
                     new Scanner(
                         StreamFromString(program)
@@ -137,109 +123,109 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
             return parser.errors.count == 0;
         }
 
-        private MemoryStream StreamFromString(string str)
+        private static MemoryStream StreamFromString(string str)
         {
             return new MemoryStream(Encoding.UTF8.GetBytes(str));
         }
 
         //The Empty String Should be good.  
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess01()
         {
-            bool success = TryParse("");
+            var success = TryParse("");
             Assert.IsTrue(success);
         }
 
         //header with valid type and identifier should be good.
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess02()
         {
-            int i = 0;
-            bool success = true;
+            var success = true;
+            int i;
 
-            for (i = singleTypes.Count - 1; i >= 0 && success; i--)
-                success = TryParse("[vertex(" + singleTypes[i] + " " + validIdentifier + ")]");
+            for (i = SingleTypes.Count - 1; i >= 0 && success; i--)
+                success = TryParse("[vertex(" + SingleTypes[i] + " " + ValidIdentifier + ")]");
 
             if (success)
-                for (i = singleTypes.Count - 1; i >= 0 && success; i--)
-                    success = TryParse("[edge(" + singleTypes[i] + " " + validIdentifier + ")]");
+                for (i = SingleTypes.Count - 1; i >= 0 && success; i--)
+                    success = TryParse("[edge(" + SingleTypes[i] + " " + ValidIdentifier + ")]");
 
             if (!success)
-                Console.WriteLine("Failed with type: " + singleTypes[i]);
+                Console.WriteLine("Failed with type: " + SingleTypes[i]);
 
             Assert.IsTrue(success);
         }
 
-        //header with valid type, identifier and defualt value should be good.
-        [TestMethod()]
+        //header with valid type, identifier and default value should be good.
+        [Test]
         public void ParseTestSuccess03()
         {
-            int i = 0;
-            bool success = true;
+            int i;
+            var success = true;
 
-            for (i = singleTypes.Count - 1; i >= 0 && success; i--)
-                success = TryParse("[vertex(" + singleTypes[i] + " " + validIdentifier + " = " + identifyApropriateValue(singleTypes[i]) + ")]");
+            for (i = SingleTypes.Count - 1; i >= 0 && success; i--)
+                success = TryParse("[vertex(" + SingleTypes[i] + " " + ValidIdentifier + " = " + IdentifyAppropriateValue(SingleTypes[i]) + ")]");
 
-            for (i = singleTypes.Count - 1; i >= 0 && success; i--)
-                success = TryParse("[edge(" + singleTypes[i] + " " + validIdentifier + " = " + identifyApropriateValue(singleTypes[i]) + ")]");
+            for (i = SingleTypes.Count - 1; i >= 0 && success; i--)
+                success = TryParse("[edge(" + SingleTypes[i] + " " + ValidIdentifier + " = " + IdentifyAppropriateValue(SingleTypes[i]) + ")]");
 
             if (!success)
-                Console.WriteLine("Failed with type: " + singleTypes[i]);
+                Console.WriteLine("Failed with type: " + SingleTypes[i]);
 
             Assert.IsTrue(success);
         }
 
         //header with valid collection type and identifier should be good.
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess04()
         {
-            int i = 0, j = 0;
-            bool success = true;
+            int i, j = 0;
+            var success = true;
 
-            for (i = collectionTypes.Count - 1; i >= 0 && success; i--)
-                for (j = singleTypes.Count - 1; j >= 0 && success; j--)
-                    success = TryParse("[vertex(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + ")]");
+            for (i = CollectionTypes.Count - 1; i >= 0 && success; i--)
+                for (j = SingleTypes.Count - 1; j >= 0 && success; j--)
+                    success = TryParse("[vertex(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + ValidIdentifier + ")]");
 
-            for (i = collectionTypes.Count - 1; i >= 0 && success; i--)
-                for (j = singleTypes.Count - 1; j >= 0 && success; j--)
-                    success = TryParse("[edge(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + ")]");
+            for (i = CollectionTypes.Count - 1; i >= 0 && success; i--)
+                for (j = SingleTypes.Count - 1; j >= 0 && success; j--)
+                    success = TryParse("[edge(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + ValidIdentifier + ")]");
 
             if (!success)
-                Console.WriteLine("Failed with collection type: " + collectionTypes[i] + "<" + singleTypes[j] + ">");
+                Console.WriteLine("Failed with collection type: " + CollectionTypes[i] + "<" + SingleTypes[j] + ">");
 
             Assert.IsTrue(success);
         }
 
         //header with all possible types used at same time should be good.
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess05()
         {
-            Assert.IsTrue(TryParse(headerWithAllTypesEdge));
-            Assert.IsTrue(TryParse(headerWithAllTypesVertex));
-            Assert.IsTrue(TryParse(headerWithAllTypesVertex + headerWithAllTypesEdge));
+            Assert.IsTrue(TryParse(_headerWithAllTypesEdge));
+            Assert.IsTrue(TryParse(_headerWithAllTypesVertex));
+            Assert.IsTrue(TryParse(_headerWithAllTypesVertex + _headerWithAllTypesEdge));
         }
 
         //tests if functions are functional with a body and use of parameters
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess6()
         {
-            string func = "[vertex(boolean what = true)] func none FuncDecl(number x){vertex(v1, what = false)}";
+            const string func = "[vertex(boolean what = true)] func none FuncDecl(number x){vertex(v1, what = false)}";
             Assert.IsTrue(TryParse(func));
 
-            string func2 = "[vertex(boolean tst = true)] [edge(number weight = 0)] func none FuncDecl(number x, boolean boulian){vertex{(v1, tst = false), (v2, tst = true)} v1 -> (v2, weight = 10)}";
+            const string func2 = "[vertex(boolean tst = true)] [edge(number weight = 0)] func none FuncDecl(number x, boolean belgian){vertex{(v1, tst = false), (v2, tst = true)} v1 -> (v2, weight = 10)}";
             Assert.IsTrue(TryParse(func2));
         }
 
         //tests if return is accepted
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess7()
         {
-            string func = "func number FuncDecl(number x){x = 5 return x}";
+            const string func = "func number FuncDecl(number x){x = 5 return x}";
             Assert.IsTrue(TryParse(func));
         }
 
         //tests the syntax of using operators on numbers, both within and out of function declarations
-        [TestMethod()]
+        [Test]
         public void ParseTestSuccess8()
         {
             string func = "number x " +
@@ -255,7 +241,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty brackets should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure01()
         {
             bool success = TryParse("[]");
@@ -264,7 +250,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty brackets with edge should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure02()
         {
             bool success = TryParse("[edge]");
@@ -273,7 +259,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty brackets with vertex should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure03()
         {
             bool success = TryParse("[vertex]");
@@ -282,265 +268,256 @@ namespace P4_Project.Compiler.SyntaxAnalysis.Tests
         }
 
         //Empty edge header should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure04()
         {
-            bool success = TryParse("[edge()]");
+            var success = TryParse("[edge()]");
             Assert.IsFalse(success);
         }
 
         //Empty vertex header should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure05()
         {
-            bool success = TryParse("[vertex()]");
+            var success = TryParse("[vertex()]");
             Assert.IsFalse(success);
         }
 
         //header with valid type but invalid identifier should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure06()
         {
-            int i = 0;
-            bool success = false;
+            int i;
+            var success = false;
 
-            for (i = singleTypes.Count - 1; i >= 0 && !success; i--)
-                success = TryParse("[vertex(" + singleTypes[i] + " " + invalidIdentifier + ")]");
+            for (i = SingleTypes.Count - 1; i >= 0 && !success; i--)
+                success = TryParse("[vertex(" + SingleTypes[i] + " " + InvalidIdentifier + ")]");
 
-            for (i = singleTypes.Count - 1; i >= 0 && !success; i--)
-                success = TryParse("[edge(" + singleTypes[i] + " " + invalidIdentifier + ")]");
+            for (i = SingleTypes.Count - 1; i >= 0 && !success; i--)
+                success = TryParse("[edge(" + SingleTypes[i] + " " + InvalidIdentifier + ")]");
 
             if (success)
-                Console.WriteLine("It should not successfully parse with type: " + singleTypes[i] + " and invalid identifier: " + invalidIdentifier);
+                Console.WriteLine("It should not successfully parse with type: " + SingleTypes[i] + " and invalid identifier: " + InvalidIdentifier);
 
             Assert.IsFalse(success);
             Assert.IsFalse(success);
         }
 
-        //header with valid type, identifier but invalid defualt value should be bad.
-        [TestMethod()]
+        //header with valid type, identifier but invalid default value should be bad.
+        [Test]
         public void ParseTestFailure07()
         {
-            int i = 0;
-            bool success = false;
+            int i;
+            var success = false;
 
-            for (i = singleTypes.Count - 1; i >= 0 && !success; i--)
-                success = TryParse("[vertex(" + singleTypes[i] + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[i]) + ")]");
+            for (i = SingleTypes.Count - 1; i >= 0 && !success; i--)
+                success = TryParse("[vertex(" + SingleTypes[i] + " " + ValidIdentifier + " = " + IdentifyInAppropriateValue(SingleTypes[i]) + ")]");
 
             if (success)
-                Console.WriteLine("Should not parse: [vertex(" + singleTypes[i] + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[i]) + ")]");
+                Console.WriteLine("Should not parse: [vertex(" + SingleTypes[i] + " " + ValidIdentifier + " = " + IdentifyInAppropriateValue(SingleTypes[i]) + ")]");
             Assert.IsFalse(success);
 
-            for (i = singleTypes.Count - 1; i >= 0 && !success; i--)
-                success = TryParse("[edge(" + singleTypes[i] + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[i]) + ")]");
+            for (i = SingleTypes.Count - 1; i >= 0 && !success; i--)
+                success = TryParse("[edge(" + SingleTypes[i] + " " + ValidIdentifier + " = " + IdentifyInAppropriateValue(SingleTypes[i]) + ")]");
 
             if (success)
-                Console.WriteLine("Should not parse: [edge(" + singleTypes[i] + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[i]) + ")]");
+                Console.WriteLine("Should not parse: [edge(" + SingleTypes[i] + " " + ValidIdentifier + " = " + IdentifyInAppropriateValue(SingleTypes[i]) + ")]");
             Assert.IsFalse(success);
         }
 
         //header with valid collection type and invalid identifier should be bad.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure08()
         {
-            int i = 0, j = 0;
-            bool success = false;
+            int i, j = 0;
+            var success = false;
 
-            for (i = collectionTypes.Count - 1; i >= 0 && !success; i--)
-                for (j = singleTypes.Count - 1; j >= 0 && !success; j--)
-                    success = TryParse("[vertex(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + invalidIdentifier + ")]");
+            for (i = CollectionTypes.Count - 1; i >= 0 && !success; i--)
+                for (j = SingleTypes.Count - 1; j >= 0 && !success; j--)
+                    success = TryParse("[vertex(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + InvalidIdentifier + ")]");
 
             if (success)
-                Console.WriteLine("Should not parse: [vertex(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + invalidIdentifier + ")]");
+                Console.WriteLine("Should not parse: [vertex(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + InvalidIdentifier + ")]");
             Assert.IsFalse(success);
 
-            for (i = collectionTypes.Count - 1; i >= 0 && !success; i--)
-                for (j = singleTypes.Count - 1; j >= 0 && !success; j--)
-                    success = TryParse("[edge(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + invalidIdentifier + ")]");
+            for (i = CollectionTypes.Count - 1; i >= 0 && !success; i--)
+                for (j = SingleTypes.Count - 1; j >= 0 && !success; j--)
+                    success = TryParse("[edge(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + InvalidIdentifier + ")]");
 
             if (success)
-                Console.WriteLine("Should not parse: [edge(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + invalidIdentifier + ")]");
+                Console.WriteLine("Should not parse: [edge(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + InvalidIdentifier + ")]");
             Assert.IsFalse(success);
         }
 
-        //header with valid collection type, identifier and invalid defualt value should be bad.
-        [TestMethod()]
+        //header with valid collection type, identifier and invalid default value should be bad.
+        [Test]
         public void ParseTestFailure09()
         {
-            int i = 0, j = 0;
-            bool success = false;
+            int i, j = 0;
+            var success = false;
 
-            for (i = collectionTypes.Count - 1; i >= 0 && !success; i--)
-                for (j = singleTypes.Count - 1; j >= 0 && !success; j--)
-                    success = TryParse("[vertex(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[j]) + ")]");
+            for (i = CollectionTypes.Count - 1; i >= 0 && !success; i--)
+                for (j = SingleTypes.Count - 1; j >= 0 && !success; j--)
+                    success = TryParse("[vertex(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + ValidIdentifier + " = " + IdentifyInAppropriateValue(SingleTypes[j]) + ")]");
 
             if (success)
-                Console.WriteLine("Should not parse: [vertex(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[j]) + ")]");
+                Console.WriteLine("Should not parse: [vertex(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + ValidIdentifier + " = " + IdentifyInAppropriateValue(SingleTypes[j]) + ")]");
             Assert.IsFalse(success);
 
-            for (i = collectionTypes.Count - 1; i >= 0 && !success; i--)
-                for (j = singleTypes.Count - 1; j >= 0 && !success; j--)
-                    success = TryParse("[edge(" + collectionTypes[i] + "<" + singleTypes[j] + ">" + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[j]) + ")]");
+            for (i = CollectionTypes.Count - 1; i >= 0 && !success; i--)
+                for (j = SingleTypes.Count - 1; j >= 0 && !success; j--)
+                    success = TryParse("[edge(" + CollectionTypes[i] + "<" + SingleTypes[j] + ">" + " " + ValidIdentifier + " = " + IdentifyInAppropriateValue(SingleTypes[j]) + ")]");
 
             if (success)
-                Console.WriteLine("Should not parse: [edge(" + collectionTypes[i] + " < " + singleTypes[j] + " > " + " " + validIdentifier + " = " + identifyInApropriateValue(singleTypes[j]) + ")]");
+                Console.WriteLine("Should not parse: [edge(" + CollectionTypes[i] + " < " + SingleTypes[j] + " > " + " " + ValidIdentifier + " = " + IdentifyInAppropriateValue(SingleTypes[j]) + ")]");
             Assert.IsFalse(success);
         }
 
         //A forgotten close ´"´  on a string should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure10()
         {
-            bool success;
-
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
+            var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge(" + validTextType + " " + validIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
+            success = TryParse("[edge(" + ValidTextType + " " + ValidIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
             Assert.IsFalse(success);
         }
 
         //A forgotten ´,´ in a list should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure11()
         {
-            bool success;
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "  " + validTextType + " " + validIdentifier + ")]");
+            var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "  " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge(" + validTextType + " " + validIdentifier + "  " + validTextType + " " + validIdentifier + ")]");
+            success = TryParse("[edge(" + ValidTextType + " " + ValidIdentifier + "  " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
         }
 
         //A wrong symbol where there should be ´,´ in a list should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure12()
         {
-            bool success;
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + ".  " + validTextType + " " + validIdentifier + ")]");
+            var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + ".  " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge(" + validTextType + " " + validIdentifier + ".  " + validTextType + " " + validIdentifier + ")]");
+            success = TryParse("[edge(" + ValidTextType + " " + ValidIdentifier + ".  " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
         }
 
         //A forgotten close ´]´ symbol should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure13()
         {
-            bool success;
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + ")");
+            var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + ")");
             Assert.IsFalse(success);
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + ")");
+            success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + ")");
             Assert.IsFalse(success);
         }
 
         //A forgotten close ´)´ symbol should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure14()
         {
-            bool success;
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "]");
+            var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "]");
             Assert.IsFalse(success);
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "]");
+            success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "]");
             Assert.IsFalse(success);
         }
 
         //A forgotten close ´)]´ symbol should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure15()
         {
-            bool success;
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "");
+            var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "");
             Assert.IsFalse(success);
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "");
+            success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "");
             Assert.IsFalse(success);
         }
 
         //A forgotten start ´(´ symbol after "vertex" or "edge" should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure16()
         {
-            bool success;
-            success = TryParse("[vertex " + validTextType + " " + validIdentifier + ")]");
+            var success = TryParse("[vertex " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge " + validTextType + " " + validIdentifier + ")]");
+            success = TryParse("[edge " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[vertex" + validTextType + " " + validIdentifier + ")]");
+            success = TryParse("[vertex" + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
-            success = TryParse("[edge" + validTextType + " " + validIdentifier + ")]");
+            success = TryParse("[edge" + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
         }
 
         //A forgotten end ´(´ symbol after "vertex" or "edge" should give error.
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure17()
         {
-            bool success;
-            success = TryParse("[vertex(" + validTextType + " " + validIdentifier + "");
+            var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "");
             Assert.IsFalse(success);
-            success = TryParse("[edge(" + validTextType + " " + validIdentifier + "");
+            success = TryParse("[edge(" + ValidTextType + " " + ValidIdentifier + "");
             Assert.IsFalse(success);
         }
 
         // a forgotten func before FuncDecl should give error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure18()
         {
-            string func = "FuncDecl(number x){x = 5 return x}";
+            const string func = "FuncDecl(number x){x = 5 return x}";
             Assert.IsFalse(TryParse(func));
         }
 
         // a forgotten FuncDecl before function should give error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure19()
         {
-            string func = "func(number x){x = 5}";
+            const string func = "func(number x){x = 5}";
             Assert.IsFalse(TryParse(func));
         }
 
         // a forgotten FuncDecl before func should give error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure20()
         {
-            string str = "[vertex(edge " + validIdentifier + ")]";
+            var str = "[vertex(edge " + ValidIdentifier + ")]";
             Assert.IsTrue(TryParse(str));
         }
 
         //Invalid single type is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure21()
         {
-            string str = "[vertex(" + invalidType + " " + validIdentifier + ")]";
+            var str = "[vertex(" + InvalidType + " " + ValidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
         }
 
-        //Invalid single type and invalid identfier is error
-        [TestMethod()]
+        //Invalid single type and invalid identifier is error
+        [Test]
         public void ParseTestFailure22()
         {
-            string str = "[vertex(" + invalidType + " " + invalidIdentifier + ")]";
+            var str = "[vertex(" + InvalidType + " " + InvalidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
         }
 
         //Invalid collection with valid single type and valid identifier is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure23()
         {
-            string str = "[vertex(" + invalidCollection + "<" + singleTypes[0] + ">" + " " + validIdentifier + ")]";
+            var str = "[vertex(" + InvalidCollection + "<" + SingleTypes[0] + ">" + " " + ValidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
         }
 
         //Invalid collection with invalid single type and valid identifier is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure24()
         {
-            string str = "[vertex(" + invalidCollection + "<" + invalidType + ">" + " " + validIdentifier + ")]";
+            var str = "[vertex(" + InvalidCollection + "<" + InvalidType + ">" + " " + ValidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
         }
 
         //Invalid collection with invalid single type and invalid identifier is error
-        [TestMethod()]
+        [Test]
         public void ParseTestFailure25()
         {
-            string str = "[vertex(" + invalidCollection + "<" + invalidType + ">" + " " + invalidIdentifier + ")]";
+            var str = "[vertex(" + InvalidCollection + "<" + InvalidType + ">" + " " + InvalidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
         }
     }

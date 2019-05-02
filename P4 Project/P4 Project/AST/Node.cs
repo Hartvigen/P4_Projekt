@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using P4_Project.Visitors;
+﻿using P4_Project.Visitors;
 
 namespace P4_Project.AST
 {
@@ -12,6 +7,6 @@ namespace P4_Project.AST
     /// </summary>
     public abstract class Node
     {
-        public abstract object Accept(Visitor vi, object o);
+        public abstract object Accept(Visitor vi);
     }
 }

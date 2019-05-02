@@ -1,12 +1,6 @@
-﻿using P4_Project.AST.Stmts;
-using P4_Project.AST.Stmts.Decls;
+﻿using P4_Project.AST.Stmts.Decls;
 using P4_Project.Visitors;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace P4_Project.AST.Stmts
 {
@@ -15,17 +9,14 @@ namespace P4_Project.AST.Stmts
     /// </summary>
     public class HeadNode : StmtNode
     {
-        public const int VERTEX = 1, EDGE = 2;
+        public const int Vertex = 1, Edge = 2;
 
-        public int type;
-        public BlockNode attrDeclBlock = new BlockNode();
+        private readonly int _type;
+        public readonly BlockNode attrDeclBlock = new BlockNode();
 
-
-        public HeadNode() { }
-
-        public HeadNode(int _type)
+        public HeadNode(int type)
         {
-            type = _type;
+            _type = type;
         }
 
 
@@ -34,20 +25,22 @@ namespace P4_Project.AST.Stmts
             attrDeclBlock.Add(attrDecl);
         }
 
-        public override object Accept(Visitor vi, object o)
+        public override object Accept(Visitor vi)
         {
-            return vi.Visit(this, o);
-
+            return vi.Visit(this);
         }
 
-        public string getName()
+        public string GetName()
         {
-            if (type == 1)
-                return "vertex";
-            if (type == 2)
-                return "edge";
-
-            throw new Exception("type: " + type + " Is not supported");
+            switch (_type)
+            {
+                case 1:
+                    return "vertex";
+                case 2:
+                    return "edge";
+                default:
+                    throw new Exception("type: " + _type + " Is not supported");
+            }
         }
     }
 }

@@ -39,7 +39,7 @@ StructStmt = ( StmtWhile | StmtFor | StmtForeach | StmtIf ).
 
 StmtWhile = "while" '(' Expr ')' '{' { Stmt } '}' .
 
-StmtFor = "for" '(' ( SimpleStmt | VarDecl )  ',' Expr  ',' Stmt')' '{' { Stmt } '}' .
+StmtFor = "for" '(' ( SimpleStmt | VarDecl )  ',' Expr  ',' SimpleStmt')' '{' { Stmt } '}' .
 
 StmtForeach = "foreach" '(' Type IDENT "in" Expr ')' '{' { Stmt } '}' .
 
@@ -99,7 +99,7 @@ Identifier = ( IDENT ).
 
 Const = ( NUMBER | TEXT | "true"| "false" | "none" ).
 
-Type = ( SingleType | CollecType).
+Type = ( SingleType | CollecType ).
 
 CollecType = ( "list" | "set" | "queue" | "stack" ) '<' SingleType '>'.
 
