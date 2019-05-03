@@ -10,15 +10,13 @@ namespace P4_Project.AST.Stmts
     public class LoneCallNode : StmtNode
     {
         public IdentNode Call { get; }
-
         public LoneCallNode(IdentNode call)
         {
             Call = call;   
         }
-        
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

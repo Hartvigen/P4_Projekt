@@ -9,17 +9,13 @@ namespace P4_Project.AST.Stmts.Decls
     public class VertexDeclNode : DeclNode
     {
         public BlockNode Attributes { get; } = new BlockNode();
-
         public VertexDeclNode(Obj symbolObject) 
             : base(symbolObject)
         { }
-
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
-
         public void AddAttr(AssignNode assign)
         {
             Attributes.Add(assign);

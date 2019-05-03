@@ -1,8 +1,7 @@
 ﻿using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.SymbolTable;
-using P4_Project.Types;
-using P4_Project.Types.Functions;
+using P4_Project.AST;
 
 namespace P4_ProjectTests1.SymbolTable
 {
@@ -22,7 +21,7 @@ namespace P4_ProjectTests1.SymbolTable
         public static void ClassInit()
         {
             _customName = "testName";
-            _customType = new FunctionType(null, null);
+            _customType = new BaseType(null);
             _customKind = 404;
             _customSymTable = new P4_Project.SymbolTable.SymTable(null, new Parser(null));
         }
@@ -66,7 +65,7 @@ namespace P4_ProjectTests1.SymbolTable
         [Test]
         public void ObjTests04()
         {
-            Assert.IsTrue(_customObj.Type.Equals(_customType));
+            Assert.IsTrue(_customObj.type.Equals(_customType));
         }
 
         //The Empty Constructor Gives expected kind
@@ -95,7 +94,7 @@ namespace P4_ProjectTests1.SymbolTable
         [Test]
         public void ObjTests08()
         {
-            Assert.IsNull(_nullObj.Type);
+            Assert.IsNull(_nullObj.type);
         }
     }
 }

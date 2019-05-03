@@ -1,22 +1,25 @@
-﻿[vertex(number distance = 1, vertex parent = none, boolean bVal = false)]
+﻿[vertex(number distance = 1, vertex parent = none, boolean bval = false)]
 [edge(number weight = 1, text t)]
 
+vertex(v42, bval = true)
 hello("hello")
 vertex(v156)
 tester()
 number x = whileifs()
-set<vertex> vset = graph.vertices()
-graph.vertices().clear()
+set<vertex> vset = graph.GetVertices()
+graph.ClearVertices()
 VEDecls()
-exprs()
-manyparams(v156, 10, false, "hello")
+expr()
+manyparams(v1561, 10, false, "hello")
+number fortytwo = 24
 
 func number GetVal(number a)
 {
+    whileifs()
     return 3 + 4 + a
 }
 
-func none whileifs()
+func number whileifs()
 {
     number total = 2
     number sum
@@ -77,20 +80,20 @@ func none VEDecls()
     vertex{(v4), (v5, parent = v3), (v6, distance = 4, parent = v1, bval = true)}
     v1 -- v2
     v2 -- (v3, t = "Hello my lady")
-    edge e = graph.getedge(v2, v3)
+    edge e = graph.GetEdge(v2, v3)
     vertex var = v2
-    graph.removeedge(v1, v2)
-    graph.removeedge(v2, v3)
+    graph.RemoveEdge(v1, v2)
+    graph.RemoveEdge(v2, v3)
     v2 -> v3
     v3 -> {(v4), (v5, weight = 42, t = "The Answer")}
     v1 <- v6
     v2 <- {(v3), (v5, t = "the world")}
-    graph.clearedges()
-    graph.clearvertices()
+    graph.ClearEdges()
+    graph.ClearVertices()
     vertex(v1_2)
     vertex(v2_2, distance = 4, parent = v1, bval = true)
     v1 -> v2
-    graph.clearall()
+    graph.ClearAll()
 }
 
 func none expr()
@@ -106,5 +109,13 @@ func boolean manyparams(vertex v1, number n, boolean mightbetrue, text greeting)
 
 func boolean hello(text greet)
 {
-    return true
+    return false
+}
+
+func vertex funckingbreaks(vertex v1)
+{
+    text t = "true" + "false"
+    vertex(v32)
+    vertex a2 = v32
+    return v2
 }

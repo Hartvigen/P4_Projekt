@@ -8,7 +8,6 @@ namespace P4_Project.AST.Stmts.Decls
     public abstract class DeclNode : StmtNode
     {
         public Obj SymbolObject { get; }
-
         protected DeclNode(Obj symbolObject)
         {
             SymbolObject = symbolObject;

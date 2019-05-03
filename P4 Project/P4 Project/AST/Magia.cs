@@ -13,15 +13,13 @@ namespace P4_Project.AST
         /// That is, the headers, the statements of the program's body, and the function declarations.
         /// </summary>
         public readonly BlockNode block;
-
         public Magia(BlockNode block)
         {
             this.block = block;
         }
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

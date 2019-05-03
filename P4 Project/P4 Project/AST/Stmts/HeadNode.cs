@@ -10,26 +10,20 @@ namespace P4_Project.AST.Stmts
     public class HeadNode : StmtNode
     {
         public const int Vertex = 1, Edge = 2;
-
         private readonly int _type;
         public readonly BlockNode attrDeclBlock = new BlockNode();
-
         public HeadNode(int type)
         {
             _type = type;
         }
-
-
         public void AddAttr(VarDeclNode attrDecl)
         {
             attrDeclBlock.Add(attrDecl);
         }
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
-
         public string GetName()
         {
             switch (_type)

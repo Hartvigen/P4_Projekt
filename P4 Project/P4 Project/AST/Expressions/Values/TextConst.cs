@@ -8,15 +8,13 @@ namespace P4_Project.AST.Expressions.Values
     public class TextConst : ExprNode
     {
         public string Value { get; }
-        
         public TextConst(string value)
         {
             Value = value;
         }
-        
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

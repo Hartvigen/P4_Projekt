@@ -1,4 +1,4 @@
-﻿using P4_Project.Types;
+﻿using P4_Project.AST;
 using P4_Project.Visitors;
 
 namespace P4_Project.AST.Expressions
@@ -10,26 +10,20 @@ namespace P4_Project.AST.Expressions
     {
         public ExprNode Expr { get; }
         public int OperatorType { get; }
-
         public BaseType Type { get; set; }
-
         public UnaExprNode(int operatorType, ExprNode expr)
         {
             OperatorType = operatorType;
             Expr = expr;
         }
-
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
-
         public string GetNameOfOperator()
         {
             return Operators.GetNameFromInt(OperatorType);
         }
-
         public string GetCodeOfOperator()
         {
             return Operators.GetCodeFromInt(OperatorType);

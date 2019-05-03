@@ -64,7 +64,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolTable\ObjTests.cs" />
     <Compile Include="SymbolTable\SymbolTableTests.cs" />
-    <Compile Include="Visitors\TestCode\KnownGoodFiles.cs" />
     <Compile Include="Visitors\XmlTreeBuilderTests.cs" />
     <Compile Include="Visitors\PrettyPrinterTests.cs" />
   </ItemGroup>

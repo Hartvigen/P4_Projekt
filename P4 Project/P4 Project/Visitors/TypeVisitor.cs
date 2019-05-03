@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -8,468 +7,369 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.Types;
-using P4_Project.Types.Collections;
-using P4_Project.Types.Primitives;
 using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.Graphviz;
 using P4_Project.SymbolTable;
-using P4_Project.Types.Functions;
-using P4_Project.Types.Structures;
 
 namespace P4_Project.Visitors
 {
-    internal class TypeVisitor : Visitor
+    public class TypeVisitor : Visitor
     {
         public override string AppropriateFileName { get; } = "symbolInfo.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
-        public override List<string> ErrorList { get; }
-        private List<string> PreDefFunctions { get; set; }
-        private static SymTable Table { get; set; }
+        public override List<string> ErrorList { get; } = new List<string>();
+        public override SymTable Table { get; set; }
 
-        private SymTable currentScope;
-        private static Parser Parser { get; set; }
-        
-        private const bool Verbose = true;
+        private const bool Verbose = false;
 
-        public TypeVisitor(Parser parser)
+        public TypeVisitor(SymTable Table)
         {
-            Table = parser.tab;
-            Parser = parser;
+            this.Table = Table;
             Table.name = "top";
-            currentScope = Table;
-            FillPreDefFunctions();
-            ErrorList = new List<string>();
         }
 
-        public override BaseType Visit(CallNode node)
+        public override void Visit(CallNode node)
         {
-            node.Parameters.Accept(this);
+            node.Parameters.Expressions.ForEach(e=>e.Accept(this));
+
+            //We decorate the node with its type from the table
+            node.type = Table.findReturnTypeOfFunction(node.Ident);
+
+            //We check that parameter types match.
+            List<BaseType> l = Table.findParameterListOfFunction(node.Ident);
+            for (int i = l.Count - 1; i > 0; i--) {
+                if (node.Parameters.Expressions[i].type.name != l[i].name) {
+                    ErrorList.Add("Wrong parameter type for function " + node.Ident + " should be type: " + l[i] + " but was: " + node.Parameters.Expressions[i].type);
+                }
+            }
             
-            //If it is a predefined Function we can look it up else we return the value from the Table.
-            if (PreDefFunctions.Contains(node.Ident))
-            {
-                return GetTypeOfPreDefFunction(node.Ident);
-            }
-            if (Table.Find(node.Ident) is null)
-            {
-                return null;
-            }
-            return Table.Find(node.Ident).Type;
         }
 
         //finds variable type, and returns the type.
-        public override BaseType Visit(VarNode node)
+        public override void Visit(VarNode node)
         {
             node.Source?.Accept(this);
-            if (currentScope.Find(node.Ident) is null)
-            {
-                ErrorList.Add(node.Ident + " should be declared before use!");
-                currentScope.PrintAllInCurrentScope();
-                throw new Exception("Stop: " + node.Ident + " should be declared before use.");
-                return null;
-            }
 
-            if (currentScope.Find(node.Ident).Type is null)
-            {
-                ErrorList.Add(Table.Find(node.Ident) + " Has null Type!");
-                return null;
-            }
-            return currentScope.Find(node.Ident).Type;
+            //We assign the type found from the table.
+            if(Table.Find(node.Ident) != null)
+            node.type = Table.Find(node.Ident).type;
+
+            if (node.type == null)
+                return;
         }
 
         //returns a Bool type
-        public override BaseType Visit(BoolConst node)
+        public override void Visit(BoolConst node)
         {
-            return new BooleanType();
+            if (node.type is null)
+            {
+                node.type = new BaseType("boolean");
+            }
+            else if (node.type.name != "boolean")
+                ErrorList.Add("BoolConst is allways type boolean but was found to be type: " + node.type.name);
         }
 
         //Checks if all elements in a collection is the same type, and returns the type
-        public override BaseType Visit(CollecConst node)
+        public override void Visit(CollecConst node)
         {
-            if (node.Expressions == null || node.Expressions.Count == 0)
-            {
-                if (node.Expressions == null)
-                {
-                    ErrorList.Add("Collection was Null?");   
-                }
-                return null;
-            }
+            //We check that each Expression in the Collection evulates to the same type as the first one in the collection
             node.Expressions.ForEach(n =>
             {
                 n.Accept(this);
-                if (node.Expressions[0].type != n.type)
-                    ErrorList.Add("Not the same type in collection");
+                if (node.Expressions[0].type.name != n.type.name) {
+                    ErrorList.Add("Collection contains both: " + node.Expressions[0].type + " and " + n.type);
+                }
             });
-            return node.type;
+            //We collection its type defualt is list TODO: find the actual collection type
+            if(node.Expressions.Count != 0)
+                node.type = new BaseType(new BaseType("list"), node.Expressions[0].type);
         }
 
         //returns null
-        public override BaseType Visit(NoneConst node)
+        public override void Visit(NoneConst node)
         {
-            return new NoneType();
+            if (node.type is null)
+            {
+                node.type = new BaseType("none");
+            }
+            else if (node.type.name != "none")
+                ErrorList.Add("NoneConst is allways type none but was found to be type: " + node.type.name);
         }
 
         //returns a numberType
-        public override BaseType Visit(NumConst node)
+        public override void Visit(NumConst node)
         {
-            return new NumberType();
+            if(node.type is null)
+            {
+                node.type = new BaseType("number");
+            }
+            else if (node.type.name != "number")
+                    ErrorList.Add("NumConst is allways type number but was found to be type: " + node.type.name);
         }
 
         //returns a text
-        public override BaseType Visit(TextConst node)
+        public override void Visit(TextConst node)
         {
-            return new TextType();    
+            if (node.type is null)
+            {
+                node.type = new BaseType("text");
+            }
+            if (node.type.name != "text")
+                ErrorList.Add("TextConst is allways type text but was found to be type: " + node.type.name);
         }
 
         //Checks that the correct types are used in the BinExprNode
-        public override BaseType Visit(BinExprNode node)
+        public override void Visit(BinExprNode node)
         {
-            //In any BinExprNode Both Operands must be present         
-            if (node.Left is null || node.Right is null)
-            {
-                ErrorList.Add("BinExprNode has null operands");
-                if (Verbose) Console.WriteLine("BinExprNode has null operands");
-                return null;
-            }
+            node.Left.Accept(this);
+            node.Right.Accept(this);
 
-            var type1 = (BaseType) node.Left.Accept(this);
-            var type2 = (BaseType) node.Right.Accept(this);
+            var l = node.Left.type;
+            var r = node.Right.type;
 
-            node.Type = Operators.GetResultingTypeFromOperandTypeAndOperator(type1, node.OperatorType)[0];
-            
-            if (type1 == type2) return type1;
-            ErrorList.Add("BinExprNode has differentiating operands." + " Types format: " + type1 +  " " + node.Left + " " + node.GetCodeOfOperator() + " " + type2 + " " + node.Right);
-            return null;
+            if (l == null || r == null)
+                return;
+
+            if (l.name == "func")
+                l.name = l.returntype;
+
+            if (r.name == "func")
+                r.name = r.returntype;
+
+            if (Operators.GetResultingTypeFromOperandTypeAndOperator(l, node.OperatorType) is null)
+                ErrorList.Add("The operator: " + Operators.GetCodeFromInt(node.OperatorType) + " cannot be used with type: " + l);
+            else node.type = Operators.GetResultingTypeFromOperandTypeAndOperator(l, node.OperatorType);
+
+            if (l.name != r.name)
+            ErrorList.Add("BinExprNode has differentiating operand types: " + l.name +  " and " + node.GetCodeOfOperator() + " " + r.name);
         }
-        
-        //Checks for (NOT) and (UMIN) notations
-        public override BaseType Visit(UnaExprNode node)
+        public override void Visit(UnaExprNode node)
         {
             node.Expr.Accept(this);
 
-            switch (node.OperatorType)
-            {
-                case 15:
-                    node.Type = new BooleanType();
-                    break;
-                case 9:
-                    node.Type = new NumberType();
-                    break;
-                default: 
-                    Console.WriteLine("UnaExprNode can only be \"!\" or \"-\" (UnaryMinus)");
-                    break;
+            if (Operators.GetResultingTypeFromOperandTypeAndOperator(node.Expr.type, node.OperatorType) is null) {
+                ErrorList.Add("The operator: " + Operators.GetCodeFromInt(node.OperatorType) + " cannot be used with type: " + node.Expr.type);
+                return;
             }
-            return node.Type;
+            node.type = Operators.GetResultingTypeFromOperandTypeAndOperator(node.Expr.type, node.OperatorType);
         }
 
         //checks if both types of an EdgeCreateNode is an vertex
-        public override BaseType Visit(EdgeCreateNode node)
+        public override void Visit(EdgeCreateNode node)
         {
             node.LeftSide.Accept(this);
             node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
 
-            if (node.LeftSide.type is null)
-            {
-             ErrorList.Add("Leftside has no type");
-             return null;
+            if (node.LeftSide.type.name != "vertex") {
+                ErrorList.Add("Edge cannot be created with: " + node.LeftSide.Ident + " as it has type: " + node.LeftSide.type);
             }
-            if (node.LeftSide.type.ToString() == "vertex")
-            {
-                if (node.RightSide.Capacity > 0)
-                {
-                    node.RightSide.ForEach(n =>
-                    {
-                        if (Table.Find(n.Item1.Ident).Type != node.LeftSide.type)
-                        {
-                            ErrorList.Add("There is a type involved that is not a vertex.");    
-                        }
-                    });
-                }
-                else
-                    ErrorList.Add("The right side was empty.");
-            }
-            else
-                ErrorList.Add("The Left side is not a vertex.");
-
-            if (node.Operator != 16 && node.Operator != 17 && node.Operator != 18)
-                ErrorList.Add("EdgeCreateNode has wrong operator type! Must be either -> || -- || <- .");
-            
-            return null;
+            node.RightSide.ForEach(n => {
+                if (n.Item1.type.name != "vertex")
+                    ErrorList.Add("Edge cannot be created with: " + n.Item1.Ident + " as it has type: " + n.Item1.type.name);
+            });
         }
 
-        //unfinished try on checking function return
-        public override BaseType Visit(FuncDeclNode node)
+        public override void Visit(FuncDeclNode node)
         {
-            EnterScope(node.SymbolObject.Name);
-
             node.Parameters.Accept(this);   
             node.Body.Accept(this);
             
-            //We take the declared return type from the FuncDeclNode
-            node.returnType = (((FunctionType) node.SymbolObject.Type).ReturnType?.ToString() ?? "none");
-            
-            //Foreach Statement in the Body if it is a return type we make sure they match.
+            //if body has a return type we make sure they match the stated return type
             node.Body.Statements.ForEach(stmtNode =>
             {
                 if (stmtNode.GetType() != typeof(ReturnNode)) return;
-                var ret = (ReturnNode) stmtNode;
-                var type1 = ret.Ret.Accept(this) is null ? "none" : ret.Ret.Accept(this).ToString();
-                var type2 = node.returnType.ToString();
-                if (type1 != type2)
+                var retNode = (ReturnNode) stmtNode;
+                var actualReturnType = retNode.Ret.type.name;
+                var declaredReturnType = node.SymbolObject.type.returntype;
+                if (actualReturnType != declaredReturnType)
                 {
                     ErrorList.Add(
-                        "There was found a bad return type in Function: " + node.SymbolObject.Name + 
-                        " return should be type: " + node.returnType + " but was: " + ret.Ret.Accept(this));
+                        "There was found a return type in Function: " + node.SymbolObject.Name + 
+                        " with declared return type: " + declaredReturnType + " but actual return type was: " + actualReturnType);
                 }
-                if (Verbose) Console.WriteLine("Found return in func: " + node.SymbolObject.Name + " with type: " + type1 + " and expected: " + type2);
             });
-            LeaveScope();
-            return null;
-
         }
 
         //Checks for default and SymbolBaseTypeValue. If it doesnt exist, create the SymbolBaseType
-        public override BaseType Visit(VarDeclNode node)
+        public override void Visit(VarDeclNode node)
         {
-            node.DefaultValue?.Accept(this);
-            
-            //If the node has a default value then
-            if (node.DefaultValue != null)
-                return (BaseType)node.DefaultValue.Accept(this);
+            //If there is not specified any default value there is nothing to type check
+            if (node.DefaultValue == null)
+                return;
 
-            if (Table.Find(node.SymbolObject.Name) != null)
-            {
-                ErrorList.Add( node.SymbolObject.Name + " was previously declared.");
-                return null;
-            }
-            //If there was no problems in the VarDeclNode it is added to the Table.
-            Table.NewObj(node.SymbolObject.Name, node.type, node.SymbolObject.Kind);
-            return null;
+            node.DefaultValue.Accept(this);
+
+            if (node.DefaultValue.type == null)
+                return;
+
+            if (node.DefaultValue.type.name == "func")
+                if (node.DefaultValue.type.returntype != node.SymbolObject.type.name)
+                {
+                    ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with call that returns: " + node.DefaultValue.type.returntype + " when variable is type: " + node.type);
+                }
+                else return;
+            else if (node.DefaultValue.type.name != node.type.name && node.DefaultValue.type.name != "none")
+                ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with of type: " + node.DefaultValue.type + " when variable is type: " + node.type);
         }
 
         //Creates a vertex BaseType in SymbolTable
-        public override BaseType Visit(VertexDeclNode node)
+        public override void Visit(VertexDeclNode node)
         {
             node.Attributes.Accept(this);
-            Table.NewObj(node.SymbolObject.Name, node.SymbolObject.Type, node.SymbolObject.Kind);
-            return null;
+            if(Table.Find(node.SymbolObject.Name) is null)
+                Table.NewObj(node.SymbolObject.Name, node.SymbolObject.type, node.SymbolObject.Kind);
         }
 
         //Checks for an assigned value is in a correct type. like sum = 0. Which fails if sum is not a number.
-        public override BaseType Visit(AssignNode node)
+        public override void Visit(AssignNode node)
         {
             node.Target.Accept(this);
             node.Value.Accept(this);
-            if (node.Value.Accept(this) == null)
-            {
-                ErrorList.Add("Value is missing in Assign");
-                return null;
-            }
-            if(node.Target.Accept(this) == null){
-                ErrorList.Add("Target is missing in Assign");
-                return null;
+
+            if (Table.Find(node.Target.Ident) == null) {
+                ErrorList.Add(node.Target.Ident + " was not found in the symboltable.");
+                return;
             }
 
-            if (Table.Find(node.Target.Ident) == null) return null;
-            if (Table.Find(node.Target.Ident).Type != node.Value.type)
+            BaseType t = Table.Find(node.Target.Ident).type;
+            BaseType v = node.Value.type;
+
+            if (v.name == "func")
+                if (v.returntype != t.name)
+                {
+                    ErrorList.Add("Call returns a type: " + v.returntype + "but needs type: " + t.name);
+                    return;
+                }
+                else return;
+            if (t.name != v.name)
             {
-                ErrorList.Add("Incompatible types in Assign");
+                ErrorList.Add("Incompatible types in Assign of variable: " + t.name + " and " + v.name);
             }
-            return null;
         }
 
         //visits BlockNode
-        public override BaseType Visit(BlockNode node)
+        public override void Visit(BlockNode node)
         {
             node.Statements.ForEach(n => n.Accept(this));
-            return null;
         }
 
         //Visits foreachNode (undone)
-        public override BaseType Visit(ForeachNode node)
+        public override void Visit(ForeachNode node)
         {
             node.IterationVar.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
-            return null;
+
+            if (Table.Find(node.IterationVar.SymbolObject.Name) is null)
+                Table.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
+
+            if (node.Iterator.type.name != "collec")
+                ErrorList.Add("The iterator in a foreach must be a collection!");
+
+            if (node.Iterator.type.singleType.name != node.IterationVar.type.name)
+                ErrorList.Add("Foreach loop has collection type: " + node.Iterator.type.singleType.name + " and the variable has type: " + node.IterationVar.type.name);
         }
 
         //Visits forNode
-        public override BaseType Visit(ForNode node)
+        public override void Visit(ForNode node)
         {
             node.Initializer.Accept(this);
             node.Condition.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
-            return null;
         }
 
         //Visits HeadNode
-        public override BaseType Visit(HeadNode node)
-        { 
+        public override void Visit(HeadNode node)
+        {
             node.attrDeclBlock.Accept(this);
-            return null;
         }
 
         //Checks if the condition is a bool
-        public override BaseType Visit(IfNode node)
+        public override void Visit(IfNode node)
         {
             node.Condition?.Accept(this);
+
+            if (!(node.Condition is null) && node.Condition.type != null)
+                if (node.Condition.type.name != "boolean" && node.Condition.type.name != "none")
+                {
+                    if (node.Condition.type.name != "")
+                    {
+                        ErrorList.Add("If statements must have boolean type or be none and not " + node.Condition.type.name);
+                        return;
+                    } 
+                }
+
             node.Body.Accept(this);
             node.ElseNode?.Accept(this);
-
-            if (!(node.Condition is null))
-            if (node.Condition.type != new BooleanType())
-            {
-                if (node.Condition.type.ToString() !=  "")
-                {
-                    ErrorList.Add( "If statements must have boolean type or be null and not " + node.Condition.Accept(this));
-                    if (Verbose)
-                    {
-                        Console.WriteLine("If statements must have boolean type or be null and not " +
-                                          node.Condition.Accept(this));
-                    }
-                    return null;
-                }
-                else
-                {
-                    if (Verbose)
-                    {
-                        Console.WriteLine("Ending else node Found");
-                    }
-                }
-            }
 
             //If the ElseNode exist we visit that as well.
             node.ElseNode?.Accept(this);
-
-            return null;
         }
 
         //visits LoneCallNode
-        public override BaseType Visit(LoneCallNode node)
-        {  
+        public override void Visit(LoneCallNode node)
+        {
             node.Call.Accept(this);
-            return null;
         }
 
-        public override BaseType Visit(ReturnNode node)
+        public override void Visit(ReturnNode node)
         {
             node.Ret.Accept(this);
-            return node.Ret.type;
         }
 
-        //visits WhileNode (undone)
-        public override BaseType Visit(WhileNode node)
+        //visits WhileNode
+        public override void Visit(WhileNode node)
         {
             
             node.Condition.Accept(this);
-            node.Body.Accept(this);
+
+            if (node.Condition.type == null)
+                return;
 
             //The Condition must be type boolean.
-            if (node.Condition.type != new BooleanType())
+            if (node.Condition.type.name != "boolean")
             ErrorList.Add("The condition in a while loop must be boolean type!");
-            
-            return null;
 
+            node.Body.Accept(this);
         }
         
         //visits MagiaNode
-        public override BaseType Visit(Magia node)
+        public override void Visit(Magia node)
         {
+            //Dispatch starts here!
             node.block.Accept(this);
-            return null;
         }
 
-        public override BaseType Visit(BreakNode node)
+        public override void Visit(BreakNode node)
         {
-            return null;
         }
 
-        public override BaseType Visit(ContinueNode node)
+        public override void Visit(ContinueNode node)
         {
-            return null;
         }
 
         //visits MultiDecl
-        public override BaseType Visit(MultiDecl multiDecl)
+        public override void Visit(MultiDecl multiDecl)
         {
             multiDecl.Decls.ForEach(n => n.Accept(this));
-            return null;
-        }
-
-        //prints Table (Used for burglarising, unused at the moment)
-        public static void Print()
-        {
-            var output = new StringBuilder();
-
-            foreach (var keyValuePair in Table.GetDic())
-            {
-                output.Append($"Name: {keyValuePair.Key} Type: {keyValuePair.Value.Type}");
-                output.Append("\n");
-            }
-            output.Append("\n\n\n");
-
-            foreach (var table in Table.GetScopes())
-            {
-
-                foreach (var keyValuePair in table.GetDic())
-                {
-                    output.Append($"Name: {keyValuePair.Key} Type: {keyValuePair.Value.Type}");
-                    output.Append("\n");
-                }
-                output.Append("\n\n\n");
-            }
-            Console.WriteLine(output.ToString());
         }
         
-        private void FillPreDefFunctions()
-        {
-            PreDefFunctions = new List<string>
-            {
-                "Edge",
-                "vertices",
-                "clear",
-                "removeEdge",
-                "ClearEdges",
-                "ClearVertices",
-                "ClearAll"
-            };
-        }
 
-        private BaseType GetTypeOfPreDefFunction(string func)
-        {
-            if (!PreDefFunctions.Contains(func))
-            {
-                throw new NotSupportedException("The function name: " + func + " is not a predefined Function!");
-            }
 
-            switch (func)
-            {
-                case "Edge": return new EdgeType();
-                case "vertices": return new ListType(new VertexType());
-                default: return null;
-            }
-        }
-
-        private void EnterScope(string name)
+        private BaseType GetTypeOfPreDefFunction(string name)
         {
-            Table.GetScopes().ForEach(s =>
+            switch (name)
             {
-                if (s.name != name) return;
-                if (Verbose)
-                    Console.WriteLine("Entering " + name + " scope.");
-                currentScope = s;
-
-            });
-        }
-        
-        private void LeaveScope()
-        {
-            while (currentScope.CloseScope() != null)
-            {
-                currentScope = currentScope.CloseScope();
+                case "GetEdge": return new BaseType("edge");
+                case "RemoveEdge": return new BaseType("none");
+                case "GetEdges": return new BaseType(new BaseType("set"), new BaseType("edge"));
+                case "GetVertex": return new BaseType("vertex");
+                case "RemoveVertex": return new BaseType("none");
+                case "GetVertices": return new BaseType(new BaseType("set"), new BaseType("vertex"));
+                case "ClearEdges": return new BaseType("none");
+                case "ClearVertices": return new BaseType("none");
+                case "ClearAll": return new BaseType("none");
+                default: throw new Exception("\"" + name + "\"" + " is not a supported Function!");
             }
         }
     }

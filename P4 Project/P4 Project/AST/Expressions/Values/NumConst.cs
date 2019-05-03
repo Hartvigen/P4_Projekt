@@ -9,18 +9,14 @@ namespace P4_Project.AST.Expressions.Values
     public class NumConst : ExprNode
     {
         private double Value { get; }
-
         public NumConst(double value)
         {
             Value = value;
         }
-
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
-
         public string GetString() {
             return Value.ToString(CultureInfo.InvariantCulture);
         }

@@ -7,8 +7,7 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.Types;
-using P4_Project.Types.Functions;
+using P4_Project.SymbolTable;
 
 namespace P4_Project.Visitors
 {
@@ -16,14 +15,18 @@ namespace P4_Project.Visitors
     {
         public override string AppropriateFileName { get; } = "prettyprint.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
-        
-        public override List<string> ErrorList { get; }
+        public override List<string> ErrorList { get; } = new List<string>();
+        public override SymTable Table { get; set; }
 
+        public PrettyPrinter(SymTable Table)
+        {
+            this.Table = Table;
+        }
         //The level of ident is changed as the visitor moves along so this should start at 0.
         //Changing this will not change the relative indentations,
         //but can be used to change the overall indentation level.
         //Should never be negative.
-        private int _indentLevel = 1;
+        private int _indentLevel = 0;
 
         //The Desired indent size can be changed here 4 is default.
         private const int IndentSizeInSpaces = 4;
@@ -31,7 +34,7 @@ namespace P4_Project.Visitors
 
         //Below is function that handles each kind of node and prints it pretty complete with
         //spaces, indentation, brackets, spaces and so on...
-        public override BaseType Visit(CallNode node)
+        public override void Visit(CallNode node)
         {
             if (node.Source != null)
             {
@@ -41,10 +44,9 @@ namespace P4_Project.Visitors
             Result.Append(node.Ident + "(");
             node.Parameters.Accept(this);
             Result.Append(")");
-            return null;
         }
 
-        public override BaseType Visit(VarNode node)
+        public override void Visit(VarNode node)
         {
             if (node.InParentheses)
                 Result.Append("(");
@@ -58,19 +60,17 @@ namespace P4_Project.Visitors
 
             if (node.InParentheses)
                 Result.Append(")");
-            return null;
         }
 
-        public override BaseType Visit(BoolConst node)
+        public override void Visit(BoolConst node)
         {
             Result.Append(node.GetString());
-            return null;
         }
 
-        public override BaseType Visit(CollecConst node)
+        public override void Visit(CollecConst node)
         {
             if (node.Expressions.Count == 0)
-                return null;
+                return;
             
             node.Expressions.ForEach(n =>
             {
@@ -78,28 +78,24 @@ namespace P4_Project.Visitors
                 CommaAndSpace();
             });
             RemoveLastCommaAndSpace();
-            return null;
         }
 
-        public override BaseType Visit(NoneConst node)
+        public override void Visit(NoneConst node)
         {
             Result.Append("none");
-            return null;
         }
 
-        public override BaseType Visit(NumConst node)
+        public override void Visit(NumConst node)
         {
             Result.Append(node.GetString());
-            return null;
         }
 
-        public override BaseType Visit(TextConst node)
+        public override void Visit(TextConst node)
         {
             Result.Append(node.Value);
-            return null;
         }
 
-        public override BaseType Visit(BinExprNode node)
+        public override void Visit(BinExprNode node)
         {
             if (node.InParentheses)
                 Result.Append("(");
@@ -108,10 +104,9 @@ namespace P4_Project.Visitors
             node.Right.Accept(this);
             if (node.InParentheses)
                 Result.Append(")");
-            return null;
         }
 
-        public override BaseType Visit(UnaExprNode node)
+        public override void Visit(UnaExprNode node)
         {
             if (node.InParentheses)
                 Result.Append("(");
@@ -119,10 +114,9 @@ namespace P4_Project.Visitors
             node.Expr.Accept(this);
             if (node.InParentheses)
                 Result.Append("(");
-            return null;
         }
 
-        public override BaseType Visit(EdgeCreateNode node)
+        public override void Visit(EdgeCreateNode node)
         {
             node.LeftSide.Accept(this);
             Result.Append(" " + node.GetCodeOfOperator() + " ");
@@ -169,14 +163,13 @@ namespace P4_Project.Visitors
                 Result.Append("}");
             }
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(FuncDeclNode node)
+        public override void Visit(FuncDeclNode node)
         {
             IndentAndNewline();
-            Result.Append("func " + (((FunctionType)node.SymbolObject.Type).ReturnType?.ToString() ?? "none"));
-            Result.Append(" " + node.SymbolObject.Name + "(");
+            Result.Append("func " + node.SymbolObject.type.returntype + " ");
+            Result.Append(node.SymbolObject.Name + "(");
             if (node.Parameters.Statements.Count != 0)
             {
                 foreach (var n in node.Parameters.Statements)
@@ -202,26 +195,30 @@ namespace P4_Project.Visitors
             IndentAndNewline();
             Result.Append("}");
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(VarDeclNode node)
+        public override void Visit(VarDeclNode node)
         {
-            Result.Append(node.GetVarType() + " " + node.SymbolObject.Name);
+            if (node.type.name != "collec")
+                Result.Append(node.type.name);
+            else {
+                Result.Append(node.type.collectionType + "<" + node.type.singleType + ">");
+            }
+            Result.Append(" " + node.SymbolObject.Name);
             if (node.DefaultValue != null)
             {
                 Result.Append(" = ");
-                if (node.DefaultValue.GetType() == typeof(CollecConst))
+
+                if (node.DefaultValue.type.name == "collec" && node.DefaultValue.GetType() == typeof(CollecConst))
                     Result.Append("{");
                 node.DefaultValue.Accept(this);
-                if (node.DefaultValue.GetType() == typeof(CollecConst))
+                if (node.DefaultValue.type.name == "collec" && node.DefaultValue.GetType() == typeof(CollecConst))
                     Result.Append("}");
             }
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(VertexDeclNode node)
+        public override void Visit(VertexDeclNode node)
         {
             Result.Append("vertex(");
             Result.Append(node.SymbolObject.Name);
@@ -234,28 +231,25 @@ namespace P4_Project.Visitors
             RemoveLastCommaAndSpace();
             Result.Append(")");
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(AssignNode node)
+        public override void Visit(AssignNode node)
         {
             node.Target.Accept(this);
             Result.Append(" = ");
             node.Value.Accept(this);
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(BlockNode node)
+        public override void Visit(BlockNode node)
         {
             foreach (var n in node.Statements)
             {
                 n?.Accept(this);
             }
-            return null;
         }
 
-        public override BaseType Visit(ForeachNode node)
+        public override void Visit(ForeachNode node)
         {
             Result.Append("foreach(");
             node.IterationVar.Accept(this);
@@ -273,10 +267,9 @@ namespace P4_Project.Visitors
             IndentAndNewline();
             Result.Append("}");
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(ForNode node)
+        public override void Visit(ForNode node)
         {
             Result.Append("for(");
             node.Initializer.Accept(this);
@@ -297,10 +290,9 @@ namespace P4_Project.Visitors
             IndentAndNewline();
             Result.Append("}");
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(HeadNode node)
+        public override void Visit(HeadNode node)
         {
             if (Result.Length != 0)
                 RemoveIndentAndNewline();
@@ -315,10 +307,9 @@ namespace P4_Project.Visitors
             Result.Append(")]");
             IndentAndNewline();
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(IfNode node)
+        public override void Visit(IfNode node)
         {
             if (node.Condition != null)
             {
@@ -341,25 +332,22 @@ namespace P4_Project.Visitors
                 node.ElseNode.Accept(this);
             }
             else IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(LoneCallNode node)
+        public override void Visit(LoneCallNode node)
         {
             node.Call.Accept(this);
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(ReturnNode node)
+        public override void Visit(ReturnNode node)
         {
             Result.Append("return ");
             node.Ret.Accept(this);
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(WhileNode node)
+        public override void Visit(WhileNode node)
         {
             Result.Append("while(");
             node.Condition.Accept(this);
@@ -377,32 +365,28 @@ namespace P4_Project.Visitors
             IndentAndNewline();
             Result.Append("}");
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(BreakNode node)
+        public override void Visit(BreakNode node)
         {
             Result.Append(" break ");
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(ContinueNode node)
+        public override void Visit(ContinueNode node)
         {
             Result.Append(" continue ");
             IndentAndNewline();
-            return null;
         }
 
-        public override BaseType Visit(Magia node)
+        public override void Visit(Magia node)
         {
             node.block.Accept(this);
-            return null;
         }
 
-        public override BaseType Visit(MultiDecl node)
+        public override void Visit(MultiDecl node)
         {
-            if (node.Decls[0].GetType().Name == "VertexDeclNode")
+            if (node.Decls[0].SymbolObject.type.name == "vertex")
             {
                 if (node.Decls.Count > 1)
                 {
@@ -433,12 +417,11 @@ namespace P4_Project.Visitors
             }
             else
             {
-                Console.WriteLine(node.Decls.GetType().Name);
+                //Console.WriteLine(node.Decls.GetType().Name);
                 node.Decls.ForEach(n => { n.Accept(this); IndentAndNewline(); });
                 RemoveIndentAndNewline();
             }
             IndentAndNewline();
-            return null;
         }
 
         //Will make a newline and ident to the current indent level.

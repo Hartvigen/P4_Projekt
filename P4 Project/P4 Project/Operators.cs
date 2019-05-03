@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using P4_Project.Types;
-using P4_Project.Types.Primitives;
-using P4_Project.Types.Structures;
+using P4_Project.AST;
 
 namespace P4_Project
 {
@@ -93,13 +91,13 @@ namespace P4_Project
             {
                 case 1:
                 case 2:
-                case 15: return new List<BaseType> {new BooleanType()};
+                case 15: return new List<BaseType> {new BaseType("boolean")};
 
                 case 3:
                 case 4:
                     return new List<BaseType>
                     {
-                        new NumberType(), new TextType(), new BooleanType(), new VertexType(), new EdgeType()
+                        new BaseType("number"), new BaseType("text"), new BaseType("boolean"), new BaseType("vertex"), new BaseType("edge")
                     };
 
                 case 5:
@@ -112,67 +110,60 @@ namespace P4_Project
                 case 12:
                 case 13:
                 case 14:
-                    return new List<BaseType> {new NumberType()};
+                    return new List<BaseType> {new BaseType("number")};
 
                 case 16:
                 case 17:
                 case 18:
-                    return new List<BaseType> {new VertexType()};
+                    return new List<BaseType> {new BaseType("vertex")};
 
                 default: throw new Exception("Operator type: " + i + " does not have a Code associated");
             }
         }
 
-        public static List<BaseType> GetResultingTypeFromOperandTypeAndOperator(BaseType type, int i)
+        public static BaseType GetResultingTypeFromOperandTypeAndOperator(BaseType type, int i)
         {
             switch (i)
             {
                 case 10:
-                    if (type == new TextType())
-                        return new List<BaseType> {new TextType()};
-                    else if (type == new NumberType())
-                        return new List<BaseType> {new NumberType()};
-                    else
-                        throw new Exception("Operator " + GetCodeFromInt(i) +
-                                            " can only be used with number or text and not: " + type);
-                case 9:
-                case 11:
-                case 12:
-                case 13:
+                    if (type.name == "text")
+                        return new BaseType("text");
+                    else if(type.name == "number")
+                        return new BaseType("number");
+                    break;
+                case 9: 
+                case 11: 
+                case 12: 
+                case 13: 
                 case 14:
-                    if (type == new NumberType())
-
-                        return new List<BaseType> {new NumberType()};
-                    else
-                        throw new Exception("Operator " + GetCodeFromInt(i) +
-                                            " can only be used with number and not: " + type);
-                case 5:
-                case 6:
-                case 7:
+                    if (type.name == "number")
+                        return new BaseType("number");
+                    break;
+                case 3: 
+                case 4: 
+                        return new BaseType("boolean");
+                case 5: 
+                case 6: 
+                case 7: 
                 case 8:
-                    if (type == new NumberType())
-
-                        return new List<BaseType> {new NumberType()};
-                    else
-                        throw new Exception("Operator " + GetCodeFromInt(i) +
-                                            " can only be used with number and not: " + type);
-                case 3:
-                case 4:
-                    return new List<BaseType> {new BooleanType()};
+                    if (type.name == "number")
+                        return new BaseType("boolean");
+                    break;
+                case 1: 
+                case 2: 
                 case 15:
-                case 1:
-                case 2:
-                    if (type == new BooleanType())
-                        return new List<BaseType> {new BooleanType()};
-                    else
-                        throw new Exception("Operator " + GetCodeFromInt(i) +
-                                            " can only be used with boolean type and not: " + type);
-                case 16:
-                case 17:
+                    if (type.name == "boolean")
+                        return new BaseType("boolean");
+                    break;
+                case 16: 
+                case 17: 
                 case 18:
-                    return new List<BaseType> {new NoneType()};
-                default: throw new Exception("Operator type: " + i + " does not have a Code associated");
+                    if (type.name == "vertex")
+                        return new BaseType("none");
+                    break;
+               default: return null;
             }
+            return null;
         }
     }
 }

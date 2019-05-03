@@ -11,20 +11,16 @@ namespace P4_Project.AST.Stmts
     {
         public VarDeclNode IterationVar { get; }
         public ExprNode Iterator { get; }
-
         public BlockNode Body { get; }
-        
         public ForeachNode(VarDeclNode iterationVar, ExprNode iterator, BlockNode body)
         {
             IterationVar = iterationVar;
             Iterator = iterator;
             Body = body;
         }
-
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

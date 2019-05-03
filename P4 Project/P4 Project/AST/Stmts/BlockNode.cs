@@ -10,15 +10,13 @@ namespace P4_Project.AST.Stmts
     public class BlockNode : StmtNode
     {
         public List<StmtNode> Statements { get; } = new List<StmtNode>();
-
         public void Add(StmtNode com)
         {
             Statements.Add(com);
         }
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

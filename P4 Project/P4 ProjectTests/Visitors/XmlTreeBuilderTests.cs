@@ -4,13 +4,16 @@ using System.Text;
 using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.Visitors;
-using P4_ProjectTests1.Visitors.TestCode;
 
 namespace P4_ProjectTests1.Visitors
 {
     [TestFixture]
     public class XmlTreeBuilderTests
     {
+        private static string uglyprogrampath;
+        private static string prettyprogrampath;
+        private static string xmlprogrampath;
+
         [OneTimeSetUp]
         public static void ClassInit()
         {
@@ -19,6 +22,9 @@ namespace P4_ProjectTests1.Visitors
         [SetUp]
         public void Initialize()
         {
+            uglyprogrampath = TestContext.CurrentContext.TestDirectory + "/../../Visitors/TestCode/UglyCode.txt";
+            prettyprogrampath = TestContext.CurrentContext.TestDirectory + "/../../Visitors/TestCode/PrettyCode.txt";
+            xmlprogrampath = TestContext.CurrentContext.TestDirectory + "/../../Visitors/TestCode/xmltree.xml";
         }
 
         private static MemoryStream StreamFromString(string str)
@@ -44,23 +50,23 @@ namespace P4_ProjectTests1.Visitors
         [Test]
         public void XmlTreeBuilderTest01()
         {
-            var xml = ReturnXmlTree(KnownGoodFiles.PrettyCode);
-            Assert.IsTrue(xml != KnownGoodFiles.PrettyCode);
+            var xml = ReturnXmlTree(File.ReadAllText(prettyprogrampath));
+            Assert.IsTrue(xml != File.ReadAllText(prettyprogrampath));
         }
 
         //Xml Code and ugly MAGIA code is not the same
         [Test]
         public void XmlTreeBuilderTest02()
         {
-            var xml = ReturnXmlTree(KnownGoodFiles.UglyCode);
-            Assert.IsTrue(xml != KnownGoodFiles.UglyCode);
+            var xml = ReturnXmlTree(File.ReadAllText(uglyprogrampath));
+            Assert.IsTrue(xml != File.ReadAllText(uglyprogrampath));
         }
 
         //Xml is not valid MAGIA code at all!
         [Test]
         public void XmlTreeBuilderTest03()
         {
-            var xml = ReturnXmlTree(KnownGoodFiles.UglyCode);
+            var xml = ReturnXmlTree(File.ReadAllText(uglyprogrampath));
             var parser = new Parser(new Scanner(StreamFromString(xml)));
             parser.Parse();
             Assert.IsTrue(parser.errors.count > 0);
@@ -70,8 +76,8 @@ namespace P4_ProjectTests1.Visitors
         [Test]
         public void XmlTreeBuilderTest04()
         {
-            var xmlPretty = ReturnXmlTree(KnownGoodFiles.PrettyCode);
-            var xmlUgly = ReturnXmlTree(KnownGoodFiles.UglyCode);
+            var xmlPretty = ReturnXmlTree(File.ReadAllText(prettyprogrampath));
+            var xmlUgly = ReturnXmlTree(File.ReadAllText(uglyprogrampath));
             Assert.IsTrue(xmlPretty == xmlUgly);
         }
 
@@ -79,7 +85,7 @@ namespace P4_ProjectTests1.Visitors
         [Test]
         public void XmlTreeBuilderTest05()
         {
-            string xml = ReturnXmlTree(KnownGoodFiles.PrettyCode);
+            string xml = ReturnXmlTree(File.ReadAllText(prettyprogrampath));
             Assert.IsTrue((xml.Length - xml.Replace(Environment.NewLine, string.Empty).Length) % 2 == 0);
         }
 
@@ -87,16 +93,17 @@ namespace P4_ProjectTests1.Visitors
         [Test]
         public void XmlTreeBuilderTest06()
         {
-            string xml = ReturnXmlTree(KnownGoodFiles.PrettyCode);
-            Assert.IsTrue(KnownGoodFiles.XmlTree == xml);
+            string xml = ReturnXmlTree(File.ReadAllText(prettyprogrampath));
+            string loaded = File.ReadAllText(xmlprogrampath);
+            Assert.IsTrue(loaded == xml);
         }
 
         //The Xml ugly generated is equal to known good xml
         [Test]
         public void XmlTreeBuilderTest07()
         {
-            string xml = ReturnXmlTree(KnownGoodFiles.UglyCode);
-            Assert.IsTrue(KnownGoodFiles.XmlTree == xml);
+            string xml = ReturnXmlTree(File.ReadAllText(uglyprogrampath));
+            Assert.IsTrue(File.ReadAllText(xmlprogrampath) == xml);
         }
 
         //This tests the performance of the XmlTreeBuilder, it should complete the 1000 Builds in under 1 second if not there is probably 
@@ -105,7 +112,7 @@ namespace P4_ProjectTests1.Visitors
         public void XmlTreeBuilderTest08()
         {
 
-            string program = KnownGoodFiles.PrettyCode;
+            string program = File.ReadAllText(prettyprogrampath);
 
             Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 

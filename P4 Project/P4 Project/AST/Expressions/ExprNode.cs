@@ -1,4 +1,4 @@
-﻿using P4_Project.Types;
+﻿using P4_Project.AST;
 
 namespace P4_Project.AST.Expressions
 {
@@ -9,7 +9,6 @@ namespace P4_Project.AST.Expressions
     {
         public bool InParentheses { get; set; }
         public BaseType type;
-
         protected ExprNode()
         {
             type = null;

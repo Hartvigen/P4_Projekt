@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using P4_Project.Types;
+using P4_Project.AST;
 using P4_Project.Visitors;
 
 namespace P4_Project.AST.Expressions
@@ -12,34 +12,27 @@ namespace P4_Project.AST.Expressions
         public ExprNode Left { get; }
         public ExprNode Right { get; }
         public int OperatorType { get; }
-        public BaseType Type { get;  set; }
-
         public BinExprNode(ExprNode left, int operatorType, ExprNode right)
         {
             Left = left;
             Right = right;
             OperatorType = operatorType;
         }
-
-
-        public override object Accept(Visitor vi)
-        {
-            return vi.Visit(this);
-        }
-
         public string GetNameOfOperator()
         {
             return Operators.GetNameFromInt(OperatorType);
         }
-
         public string GetCodeOfOperator()
         {
             return Operators.GetCodeFromInt(OperatorType);
         }
-        
         public List<BaseType> GetOperandTypeOfOperator()
         {
             return Operators.GetOperandTypeFromInt(OperatorType);
+        }
+        public override void Accept(Visitor vi)
+        {
+            vi.Visit(this);
         }
     }
 }

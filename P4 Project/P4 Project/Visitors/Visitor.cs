@@ -6,7 +6,7 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.Types;
+using P4_Project.SymbolTable;
 
 namespace P4_Project.Visitors
 {
@@ -15,44 +15,45 @@ namespace P4_Project.Visitors
         public abstract string AppropriateFileName { get;}
         public abstract StringBuilder Result { get; }
         public abstract List<string> ErrorList { get; }
+        public abstract SymTable Table { get; set; }
 
         //Identifier
-        public abstract BaseType Visit(CallNode node);
-        public abstract BaseType Visit(VarNode node);
+        public abstract void Visit(CallNode node);
+        public abstract void Visit(VarNode node);
 
-        public abstract BaseType Visit(MultiDecl multiDecl);
+        public abstract void Visit(MultiDecl multiDecl);
 
         //Values
-        public abstract BaseType Visit(BoolConst node);
-        public abstract BaseType Visit(CollecConst node);
-        public abstract BaseType Visit(NoneConst node);
-        public abstract BaseType Visit(NumConst node);
-        public abstract BaseType Visit(TextConst node);
+        public abstract void Visit(BoolConst node);
+        public abstract void Visit(CollecConst node);
+        public abstract void Visit(NoneConst node);
+        public abstract void Visit(NumConst node);
+        public abstract void Visit(TextConst node);
 
         //Expressions
-        public abstract BaseType Visit(BinExprNode node);
-        public abstract BaseType Visit(UnaExprNode node);
+        public abstract void Visit(BinExprNode node);
+        public abstract void Visit(UnaExprNode node);
 
         //Decls
-        public abstract BaseType Visit(EdgeCreateNode node);
-        public abstract BaseType Visit(FuncDeclNode node);
-        public abstract BaseType Visit(VarDeclNode node);
-        public abstract BaseType Visit(VertexDeclNode node);
+        public abstract void Visit(EdgeCreateNode node);
+        public abstract void Visit(FuncDeclNode node);
+        public abstract void Visit(VarDeclNode node);
+        public abstract void Visit(VertexDeclNode node);
 
         //Stmts
-        public abstract BaseType Visit(AssignNode node);
-        public abstract BaseType Visit(BlockNode node);
-        public abstract BaseType Visit(ForeachNode node);
-        public abstract BaseType Visit(ForNode node);
-        public abstract BaseType Visit(HeadNode node);
-        public abstract BaseType Visit(IfNode node);
-        public abstract BaseType Visit(LoneCallNode node);
-        public abstract BaseType Visit(ReturnNode node);
-        public abstract BaseType Visit(WhileNode node);
-        public abstract BaseType Visit(BreakNode node);
-        public abstract BaseType Visit(ContinueNode node);
+        public abstract void Visit(AssignNode node);
+        public abstract void Visit(BlockNode node);
+        public abstract void Visit(ForeachNode node);
+        public abstract void Visit(ForNode node);
+        public abstract void Visit(HeadNode node);
+        public abstract void Visit(IfNode node);
+        public abstract void Visit(LoneCallNode node);
+        public abstract void Visit(ReturnNode node);
+        public abstract void Visit(WhileNode node);
+        public abstract void Visit(BreakNode node);
+        public abstract void Visit(ContinueNode node);
 
         //AST
-        public abstract BaseType Visit(Magia node);
+        public abstract void Visit(Magia node);
     }
 }

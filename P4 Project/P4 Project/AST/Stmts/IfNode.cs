@@ -11,22 +11,18 @@ namespace P4_Project.AST.Stmts
         public ExprNode Condition { get; }
         public BlockNode Body { get; }
         public IfNode ElseNode { get; private set; }
-
         public IfNode(ExprNode condition, BlockNode body)
         {
             Condition = condition;
             Body = body;
         }
-
-
         public void SetElse(IfNode elseNode)
         {
             ElseNode = elseNode;
         }
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

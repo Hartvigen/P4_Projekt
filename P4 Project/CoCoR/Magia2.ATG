@@ -44,8 +44,9 @@ IGNORE cr + lf + tab                            /* These characters are ignored 
 /* The rest of the file contains the grammar for MAGIA.  */
 PRODUCTIONS
 MAGIA =                                         (. mainNode = null; BlockNode mainBlock = new BlockNode(); .)
-    { SYNC Head<out HeadNode head>              (. mainBlock.Add(head);             .)
-    }
+    {											(. tab = tab.OpenScope() .)
+		SYNC Head<out HeadNode head>              (. mainBlock.Add(head);             .)
+    }											(.  .)
     { SYNC Stmt<out StmtNode stmt>              (. mainBlock.Add(stmt);             .)
     }
     { SYNC FuncDecl<out FuncDeclNode funcDecl>  (. mainBlock.Add(funcDecl);         .)

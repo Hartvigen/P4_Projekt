@@ -10,20 +10,14 @@ namespace P4_Project.AST.Stmts
     {
         public ExprNode Condition { get; }
         public BlockNode Body { get; }
-
         public WhileNode(ExprNode condition, BlockNode block)
         {
             Condition = condition;
             Body = block;
         }
-
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
-
-
-
     }
 }

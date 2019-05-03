@@ -9,17 +9,14 @@ namespace P4_Project.AST.Expressions.Identifier
     public class CallNode : IdentNode
     {
         public CollecConst Parameters { get; }
-
         public CallNode(string ident, CollecConst parameters) 
             : base(ident)
         {
             Parameters = parameters;
         }
-
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

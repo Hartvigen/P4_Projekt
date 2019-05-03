@@ -3,6 +3,7 @@ using P4_Project.Visitors;
 using System;
 using System.IO;
 using P4_Project.Graphviz;
+using System.Collections.Generic;
 
 namespace P4_Project
 {
@@ -17,20 +18,20 @@ namespace P4_Project
             Console.WriteLine("Doing custom work!");
             var customArgs = new string[2];
             args = customArgs;
-            args[0] = "-s";
+            args[0] = "-x";
             args[1] = defaultFile;
 
             if (args.Length > 0)
             {
+                TryParse(args[1], out var parser);
                 switch (args[0])
                 {
-                    case "-s":
-                    case "--symbolprint":
-                        Console.WriteLine("Parsing input file and assigning variables: " + args[1]);
-                        TryParse(args[1], out var parser);
-                        var visitor = new TypeVisitor(parser);
-                        TypeVisitor.Print();
-                        Console.WriteLine(ApplyVisitor(visitor,args[1]) ? "Compile Succeeded!" : "Compile failed!");
+                    case "-c":
+                    case "--compile":
+                        Console.WriteLine("Doing a complete compile on " + args[1]);
+                        List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new TypeVisitor(parser.tab)};
+                        ApplyVisitors(vils, args[1]);
+                        Console.WriteLine("Done");
                         break;
                     case "-h":
                     case "--help":
@@ -43,8 +44,9 @@ namespace P4_Project
                         break;
                     case "-p":
                     case "--prettyprint":
-                        Console.WriteLine("Parsing input file and PrettyPrinting: " + args[1]);
-                        Console.WriteLine(ApplyVisitor(new PrettyPrinter(),args[1]) ? "Compile succeeded!" : "Compile failed!");
+                        List<Visitor> vils1 = new List<Visitor> { new Cleaner(parser.tab), new TypeVisitor(parser.tab), new PrettyPrinter(parser.tab) };
+                        ApplyVisitors(vils1, args[1]);
+                        Console.WriteLine("Done");
                         break;
                     case "-x":
                     case "--xmlprint":
@@ -54,7 +56,7 @@ namespace P4_Project
                     case "-t":
                     case "--test":
                         Console.WriteLine("Printing test png called: test.png ");
-                        Console.WriteLine(DotToPng.CreatePngFile() ? "print succeeded!" : "print failed!");
+                        Console.WriteLine(DotToPng.createPNGFile() ? "print succeeded!" : "print failed!");
                         break;
                     default:
                         Console.WriteLine("Parsing input file: " + args[0]);
@@ -107,7 +109,25 @@ namespace P4_Project
             {
                 return false;
             }
-            return true;
+        }
+
+        private static void ApplyVisitors(List<Visitor> visitors, string inputFilePath)
+        {
+            if (TryParse(inputFilePath, out var parser))
+            {
+                foreach(Visitor vi in visitors)
+                {
+                    parser.mainNode.Accept(vi);
+                    if (vi.ErrorList.Count == 0)
+                        File.WriteAllText(vi.AppropriateFileName, vi.Result.ToString());
+                    else
+                    {
+                        Console.WriteLine("-----------ERRORS-----------");
+                        vi.ErrorList.ForEach(Console.WriteLine);
+                        break; //We break as the other visitors cannot be relied uppon if errors was found the previous visitor.
+                    }
+                }
+            }
         }
     }
 }

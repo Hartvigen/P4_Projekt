@@ -11,17 +11,14 @@ namespace P4_Project.AST.Stmts
     {
         public IdentNode Target { get; }
         public ExprNode Value { get; }
-
         public AssignNode(IdentNode target, ExprNode value)
         {
             Target = target;
             Value = value; 
         }
-
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AST\BaseType.cs" />
     <Compile Include="AST\Expressions\BinExprNode.cs" />
     <Compile Include="AST\Expressions\Identifier\CallNode.cs" />
     <Compile Include="AST\Expressions\Identifier\VarNode.cs" />
@@ -87,23 +88,10 @@
     <Compile Include="AST\Stmts\LoneCallNode.cs" />
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
-    <Compile Include="Types\Primitives\NoneType.cs" />
+    <Compile Include="Visitors\Cleaner.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
     <Compile Include="Visitors\TypeVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
-    <Compile Include="Types\BaseType.cs" />
-    <Compile Include="Types\Primitives\NumberType.cs" />
-    <Compile Include="Types\Primitives\BooleanType.cs" />
-    <Compile Include="Types\Structures\VertexType.cs" />
-    <Compile Include="Types\Functions\FunctionType.cs" />
-    <Compile Include="Types\Collections\SetType.cs" />
-    <Compile Include="Types\Primitives\TextType.cs" />
-    <Compile Include="Types\Collections\QueueType.cs" />
-    <Compile Include="Types\Collections\StackType.cs" />
-    <Compile Include="Types\Collections\CollecType.cs" />
-    <Compile Include="Types\Collections\ListType.cs" />
-    <Compile Include="Types\Structures\EdgeType.cs" />
-    <Compile Include="Types\Structures\GraphType.cs" />
     <Compile Include="AST\Stmts\EdgeCreateNode.cs" />
     <Compile Include="AST\Stmts\BlockNode.cs" />
     <Compile Include="AST\Stmts\ForeachNode.cs" />

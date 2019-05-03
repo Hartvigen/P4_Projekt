@@ -11,9 +11,7 @@ namespace P4_Project.AST.Stmts
         public StmtNode Initializer { get; }
         public ExprNode Condition { get; }
         public StmtNode Iterator { get; }
-
         public BlockNode Body { get; }
-
         public ForNode(StmtNode initializer, ExprNode condition, StmtNode iterator, BlockNode body)
         {
             Initializer = initializer;
@@ -21,10 +19,9 @@ namespace P4_Project.AST.Stmts
             Iterator = iterator;
             Body = body;
         }
-
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

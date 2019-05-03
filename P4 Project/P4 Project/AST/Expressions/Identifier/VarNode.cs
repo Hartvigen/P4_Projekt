@@ -10,10 +10,9 @@ namespace P4_Project.AST.Expressions.Identifier
         public VarNode(string ident)
             : base(ident)
         { }
-        
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

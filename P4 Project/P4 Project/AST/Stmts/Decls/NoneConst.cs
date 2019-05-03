@@ -8,9 +8,9 @@ namespace P4_Project.AST.Stmts.Decls
     /// </summary>
     public class NoneConst : ExprNode
     {
-        public override object Accept(Visitor vi)
+        public override void Accept(Visitor vi)
         {
-            return vi.Visit(this);
+            vi.Visit(this);
         }
     }
 }

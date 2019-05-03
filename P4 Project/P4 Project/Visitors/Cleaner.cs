@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -10,205 +11,200 @@ using P4_Project.SymbolTable;
 
 namespace P4_Project.Visitors
 {
-    public class XmlTreeBuilder : Visitor
+    public class Cleaner : Visitor
     {
-        public override string AppropriateFileName { get; } = "xmlTree.xml";
+        //This Visitor checks for obviously missing/wrong things.
+        //Like:
+        //1. Variables are declared somewhere if used
+        //2. All function calls coresponds to a function.
+        //3. Calls have the correct amount of parameters when calling
+        //4. Expressions arent outright missing or null
+        //5. functions with a non "none" return type must have atleast one return inside them!
+        //6. A few Bugs where the SymbolTable dosnt contain Obj so its created manually.
+        public override string AppropriateFileName { get; } = "Clean.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         public override SymTable Table { get; set; }
-
-        private enum Xml { START, END, BOTH }
-
-        //All the functions does the same thing:
-        //1. Start XML tag of type whatever node type is.
-        //2. Accept the node
-        //3. End XML tag of whatever node type is.
-        //That will generate a XML tree that shows the entire node structure of the program.
+        public Cleaner(SymTable Table) {
+            this.Table = Table;
+        }
         public override void Visit(CallNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Parameters.Accept(this);
-            CreateXmlTag(node, Xml.END);
+            if (!Table.FunctionExists(node.Ident))
+                ErrorList.Add("The Call for: " + node.Ident + " is not a delcared function and not a predefined function");
+
+            if(node.Parameters.Expressions.Count != Table.findParameterListOfFunction(node.Ident).Count)
+                ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " parameters and should have: " + Table.findParameterListOfFunction(node.Ident).Count + " parameters");
         }
         public override void Visit(VarNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Source?.Accept(this);
-            CreateXmlTag(node, Xml.END);
+            if (Table.Find(node.Ident) is null)
+            {
+                ErrorList.Add(node.Ident + " must be declared somewhere!");
+            }
         }
 
         public override void Visit(BoolConst node)
         {
-            CreateXmlTag(node, Xml.BOTH);
         }
 
         public override void Visit(CollecConst node)
         {
-            CreateXmlTag(node, Xml.BOTH);
         }
 
         public override void Visit(NoneConst node)
         {
-            CreateXmlTag(node, Xml.BOTH);
         }
 
         public override void Visit(NumConst node)
         {
-            CreateXmlTag(node, Xml.BOTH);
         }
 
         public override void Visit(TextConst node)
         {
-            CreateXmlTag(node, Xml.BOTH);
         }
 
         public override void Visit(BinExprNode node)
         {
-            CreateXmlTag(node, Xml.START);
+            if (node.Left is null || node.Right is null)
+            {
+                ErrorList.Add("BinExprNode has null operands");
+            }
             node.Left.Accept(this);
             node.Right.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(UnaExprNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Expr.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(EdgeCreateNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.LeftSide.Accept(this);
             node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
-            CreateXmlTag(node, Xml.END);
+
+            if (node.LeftSide is null || node.RightSide is null)
+            {
+                if (node.LeftSide == null)
+                    ErrorList.Add("The leftside is missing for operator " + node.GetCodeOfOperator());
+                if (node.RightSide == null)
+                    ErrorList.Add("The rightside is missing for operator " + node.GetCodeOfOperator());
+                return;
+            }
+
+            if(node.RightSide.Count == 0)
+                ErrorList.Add("The rightside exist but have no expressions inside " + node.GetCodeOfOperator());
         }
 
         public override void Visit(FuncDeclNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Parameters.Accept(this);
             node.Body.Accept(this);
-            CreateXmlTag(node, Xml.END);
+
+            if (node.SymbolObject.type.returntype != "none")
+            {
+                bool retExists = false;
+                node.Body.Statements.ForEach(n =>
+                {
+                    if (n.GetType() == typeof(ReturnNode))
+                        retExists = true;
+                });
+                if (retExists)
+                    return;
+                ErrorList.Add("Function: " + node.SymbolObject.Name + " has no return statement in its body and is not declared to return none!");
+            }
         }
 
         public override void Visit(VarDeclNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.DefaultValue?.Accept(this);
-            CreateXmlTag(node, Xml.END);
+            if (Table.Find(node.SymbolObject.Name) is null) {
+                Table.NewObj(node.SymbolObject.Name, node.SymbolObject.type, node.SymbolObject.Kind);
+            }
         }
 
         public override void Visit(VertexDeclNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Attributes.Accept(this);
-            CreateXmlTag(node, Xml.END);
+            if (Table.Find(node.SymbolObject.Name) is null)
+            {
+                Table.NewObj(node.SymbolObject.Name, node.SymbolObject.type, node.SymbolObject.Kind);
+            }
         }
 
         public override void Visit(AssignNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Target.Accept(this);
             node.Value.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(BlockNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Statements.ForEach(n => n.Accept(this));
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(ForeachNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.IterationVar.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(ForNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Initializer.Accept(this);
             node.Condition.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(HeadNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.attrDeclBlock.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(IfNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Condition?.Accept(this);
             node.Body.Accept(this);
             node.ElseNode?.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(LoneCallNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Call.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(ReturnNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Ret.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(WhileNode node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Condition.Accept(this);
             node.Body.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(Magia node)
         {
-            CreateXmlTag(node, Xml.START);
             node.block.Accept(this);
-            CreateXmlTag(node, Xml.END);
         }
 
         public override void Visit(BreakNode node)
         {
-            CreateXmlTag(node, Xml.BOTH);
         }
 
         public override void Visit(ContinueNode node)
         {
-            CreateXmlTag(node, Xml.BOTH);
         }
 
         public override void Visit(MultiDecl node)
         {
-            CreateXmlTag(node, Xml.START);
             node.Decls.ForEach(n => n.Accept(this));
-            CreateXmlTag(node, Xml.END);
-        }
-
-        private void CreateXmlTag(Node node, Xml state)
-        {
-            if (state == Xml.START || state == Xml.BOTH)
-                Result.AppendLine($"<{node.GetType().Name}>");
-            if (state == Xml.END || state == Xml.BOTH)
-                Result.AppendLine($"</{node.GetType().Name}>");
         }
     }
 }
