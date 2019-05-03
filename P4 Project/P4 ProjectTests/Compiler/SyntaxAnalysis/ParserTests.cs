@@ -258,7 +258,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Assert.IsTrue(x.Type.ToString() == "number");
         }
 
-        //Scopes should be accessed statically, new declarations of previous variables should also be possible in scopes
+        //Scopes should be accessed statically, new declarations of outer scope variables should also be possible in scopes
         [Test]
         public void ParseTestSuccess10()
         {

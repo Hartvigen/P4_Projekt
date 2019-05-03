@@ -26,7 +26,6 @@ namespace P4_Project
             var = 0,
             proc = 1;
 
-
         public static string getCodeFromInt(int i)
         {
             string s = i.ToString();
@@ -35,6 +34,8 @@ namespace P4_Project
                 return getStringFromInt(i);
 
             string collectiontype;
+
+            //Round down to lowest ten
             collectiontype = getStringFromInt((i / 10) * 10);
             collectiontype += "<" + getStringFromInt(i % 10) + ">";
             return collectiontype;

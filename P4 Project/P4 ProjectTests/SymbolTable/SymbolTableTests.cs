@@ -75,7 +75,7 @@ namespace P4_Project.SymTab.Tests
             Assert.IsTrue(true);
         }
 
-        //next test lmao
+        //Functions should be 1 nesting below the global scope
         [Test]
         public void SymbolTableTest05()
         {
