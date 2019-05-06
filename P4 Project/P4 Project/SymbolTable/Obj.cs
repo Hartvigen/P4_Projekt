@@ -14,7 +14,6 @@ namespace P4_Project.SymbolTable
             Name = name;
             this.type = type;
             Kind = kind;
-            Scope = scope;
         }
 
         public Obj()
@@ -22,7 +21,6 @@ namespace P4_Project.SymbolTable
             Name = null;
             type = null;
             Kind = 0;
-            Scope = null;
         }
     }
 }

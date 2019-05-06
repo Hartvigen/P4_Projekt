@@ -68,5 +68,12 @@ namespace P4_ProjectTests1.SymbolTable
                 
             Assert.IsTrue(true);
         }
+
+        //Functions should be 1 nesting below the global scope
+        [Test]
+        public void SymbolTableTest05()
+        {
+
+        }
     }
 }
