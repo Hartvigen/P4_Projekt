@@ -47,44 +47,37 @@ namespace P4_ProjectTests1.SymbolTable
             Assert.IsTrue(_customObj.Kind == _customKind);
         }
 
-        //The Constructor actually sets expected Scope
-        [Test]
-        public void ObjTests02()
-        {
-            Assert.IsTrue(_customObj.Scope == _customSymTable);
-        }
-
         //The Constructor actually sets expected name
         [Test]
-        public void ObjTests03()
+        public void ObjTests02()
         {
             Assert.IsTrue(_customObj.Name == _customName);
         }
 
         //The Constructor actually sets expected name
         [Test]
-        public void ObjTests04()
+        public void ObjTests03()
         {
             Assert.IsTrue(_customObj.type.Equals(_customType));
         }
 
         //The Empty Constructor Gives expected kind
         [Test]
-        public void ObjTests05()
+        public void ObjTests04()
         {
             Assert.IsTrue(_nullObj.Kind == 0);
         }
 
         //The Empty Constructor Gives expected name
         [Test]
-        public void ObjTests06()
+        public void ObjTests05()
         {
             Assert.IsTrue(_nullObj.Name == null);
         }
 
         //The Empty Constructor Gives expected scope
         [Test]
-        public void ObjTests07()
+        public void ObjTests06()
         {
             Assert.IsTrue(_nullObj.Scope == null);
         }
@@ -92,7 +85,7 @@ namespace P4_ProjectTests1.SymbolTable
         //The Empty Constructor Gives expected type
         //Note that we have to use .IsNull as the == operator is overridden and cant be used when Type is null.
         [Test]
-        public void ObjTests08()
+        public void ObjTests07()
         {
             Assert.IsNull(_nullObj.type);
         }

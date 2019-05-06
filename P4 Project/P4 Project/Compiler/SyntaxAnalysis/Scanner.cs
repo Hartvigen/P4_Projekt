@@ -281,18 +281,18 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             start[93] = 13;
             start[123] = 14;
             start[125] = 15;
+            start[46] = 16;
             start[60] = 32;
             start[45] = 33;
             start[61] = 34;
-            start[124] = 19;
-            start[38] = 21;
+            start[124] = 20;
+            start[38] = 22;
             start[33] = 35;
             start[62] = 36;
-            start[43] = 27;
-            start[42] = 28;
-            start[47] = 29;
-            start[37] = 30;
-            start[46] = 31;
+            start[43] = 28;
+            start[42] = 29;
+            start[47] = 30;
+            start[37] = 31;
             start[Buffer.EOF] = -1;
 
         }
@@ -449,9 +449,9 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case "if": t.kind = 19; break;
                 case "elseif": t.kind = 20; break;
                 case "else": t.kind = 21; break;
-                case "return": t.kind = 25; break;
-                case "break": t.kind = 26; break;
-                case "continue": t.kind = 27; break;
+                case "return": t.kind = 26; break;
+                case "break": t.kind = 27; break;
+                case "continue": t.kind = 28; break;
                 case "true": t.kind = 44; break;
                 case "false": t.kind = 45; break;
                 case "list": t.kind = 46; break;
@@ -547,25 +547,25 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case 18:
                     { t.kind = 24; break; }
                 case 19:
-                    if (ch == '|') { AddCh(); goto case 20; }
-                    else { goto case 0; }
+                    { t.kind = 25; break; }
                 case 20:
-                    { t.kind = 29; break; }
-                case 21:
-                    if (ch == '&') { AddCh(); goto case 22; }
+                    if (ch == '|') { AddCh(); goto case 21; }
                     else { goto case 0; }
-                case 22:
+                case 21:
                     { t.kind = 30; break; }
+                case 22:
+                    if (ch == '&') { AddCh(); goto case 23; }
+                    else { goto case 0; }
                 case 23:
                     { t.kind = 31; break; }
                 case 24:
                     { t.kind = 32; break; }
                 case 25:
-                    { t.kind = 35; break; }
+                    { t.kind = 33; break; }
                 case 26:
                     { t.kind = 36; break; }
                 case 27:
-                    { t.kind = 38; break; }
+                    { t.kind = 37; break; }
                 case 28:
                     { t.kind = 39; break; }
                 case 29:
@@ -573,29 +573,29 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 case 30:
                     { t.kind = 41; break; }
                 case 31:
-                    { t.kind = 43; break; }
+                    { t.kind = 42; break; }
                 case 32:
-                    recEnd = pos; recKind = 33;
-                    if (ch == '-') { AddCh(); goto case 16; }
-                    else if (ch == '=') { AddCh(); goto case 25; }
-                    else { t.kind = 33; break; }
-                case 33:
-                    recEnd = pos; recKind = 37;
-                    if (ch == '-') { AddCh(); goto case 17; }
-                    else if (ch == '>') { AddCh(); goto case 18; }
-                    else { t.kind = 37; break; }
-                case 34:
-                    recEnd = pos; recKind = 28;
-                    if (ch == '=') { AddCh(); goto case 23; }
-                    else { t.kind = 28; break; }
-                case 35:
-                    recEnd = pos; recKind = 42;
-                    if (ch == '=') { AddCh(); goto case 24; }
-                    else { t.kind = 42; break; }
-                case 36:
                     recEnd = pos; recKind = 34;
-                    if (ch == '=') { AddCh(); goto case 26; }
+                    if (ch == '-') { AddCh(); goto case 17; }
+                    else if (ch == '=') { AddCh(); goto case 26; }
                     else { t.kind = 34; break; }
+                case 33:
+                    recEnd = pos; recKind = 38;
+                    if (ch == '-') { AddCh(); goto case 18; }
+                    else if (ch == '>') { AddCh(); goto case 19; }
+                    else { t.kind = 38; break; }
+                case 34:
+                    recEnd = pos; recKind = 29;
+                    if (ch == '=') { AddCh(); goto case 24; }
+                    else { t.kind = 29; break; }
+                case 35:
+                    recEnd = pos; recKind = 43;
+                    if (ch == '=') { AddCh(); goto case 25; }
+                    else { t.kind = 43; break; }
+                case 36:
+                    recEnd = pos; recKind = 35;
+                    if (ch == '=') { AddCh(); goto case 27; }
+                    else { t.kind = 35; break; }
 
             }
             t.val = new String(tval, 0, tlen);

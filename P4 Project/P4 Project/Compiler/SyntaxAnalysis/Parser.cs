@@ -1,14 +1,13 @@
-
 using System;
-using static P4_Project.Types;
+using P4_Project.AST;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
+using static P4_Project.SymbolTable.SymTable;
 using System.Collections.Generic;
 using P4_Project.SymbolTable;
-using P4_Project.AST;
 
 namespace P4_Project.Compiler.SyntaxAnalysis
 {
@@ -198,7 +197,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Expect(1);
             funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode();
             ExpectWeak(7, 8);
-            tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>();
+            tab = tab.OpenScope(funcName); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>();
             if (la.val != ")" && la.val != "{")
             {
                 VarDecl(out paramDecl);
@@ -221,7 +220,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             }
             ExpectWeak(14, 3);
             SymTable funcScope = tab; tab = tab.CloseScope();
-            Obj funcObj = tab.NewObj(funcName, protocol, proc, funcScope);
+            Obj funcObj = tab.NewObj(funcName, protocol, Func, funcScope);
             funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock);
 
         }
@@ -236,7 +235,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             {
                 Assign(out value);
             }
-            varDecl = new VarDeclNode(tab.NewObj(name, type, var), value);
+            varDecl = new VarDeclNode(tab.NewObj(name, type, Var), value);
         }
 
         void Type(out BaseType type)
@@ -333,7 +332,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
                 {
                     Assign(out expr);
                 }
-                stmt = new VarDeclNode(tab.NewObj(name, type, var), expr);
+                stmt = new VarDeclNode(tab.NewObj(name, type, Var), expr);
             }
             else if (la.kind == 13)
             {
@@ -421,7 +420,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             tab = tab.OpenScope();
             Type(out BaseType type);
             Expect(1);
-            itrVar = new VarDeclNode(tab.NewObj(t.val, type, var), null);
+            itrVar = new VarDeclNode(tab.NewObj(t.val, type, Var), null);
             Expect(18);
             Expr(out ExprNode collection);
             Expect(9);
@@ -612,7 +611,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             vertexDecl = null; VarNode varNode = null; ExprNode expr = null;
             Expect(7);
             Expect(1);
-            vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new BaseType("vertex"), var));
+            vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new BaseType("vertex"), Var));
             while (WeakSeparator(8, 18, 5))
             {
                 Identifier(out varNode);

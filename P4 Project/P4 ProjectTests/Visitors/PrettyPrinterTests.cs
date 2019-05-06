@@ -63,6 +63,9 @@ namespace P4_ProjectTests1.Visitors
             parser.mainNode.Accept(typevisitor);
             parser.mainNode.Accept(prettyPrinter);
 
+            if (prettyPrinter.ErrorList.Count != 0)
+                prettyPrinter.ErrorList.ForEach(Console.WriteLine);
+
             return prettyPrinter.Result.ToString();
         }
 

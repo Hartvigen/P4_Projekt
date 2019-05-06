@@ -253,7 +253,7 @@ namespace P4_ProjectTests1.Compiler.SyntaxAnalysis
 
             Assert.IsTrue(x.Name == "x");
             Assert.IsTrue(x.Kind == 0);
-            Assert.IsTrue(x.Type.ToString() == "number");
+            Assert.IsTrue(x.type.name == "number");
         }
 
         //Scopes should be accessed statically, new declarations of outer scope variables should also be possible in scopes
@@ -266,20 +266,20 @@ namespace P4_ProjectTests1.Compiler.SyntaxAnalysis
             Parser parser = new Parser(new Scanner(StreamFromString(scopeTest)));
             parser.Parse();
             var x = parser.tab.Find("x");
-            var y = parser.tab.InnerScopes[0].Find("y");
-            var x2 = parser.tab.InnerScopes[0].Find("x");
+            var y = parser.tab.GetScopes()[0].Find("y");
+            var x2 = parser.tab.GetScopes()[0].Find("x");
 
             Assert.IsTrue(x.Name == "x");
             Assert.IsTrue(x.Kind == 0);
-            Assert.IsTrue(x.Type.ToString() == "number");
+            Assert.IsTrue(x.type.name == "number");
 
             Assert.IsTrue(y.Name == "y");
             Assert.IsTrue(y.Kind == 0);
-            Assert.IsTrue(y.Type.ToString() == "number");
+            Assert.IsTrue(y.type.name == "number");
 
             Assert.IsTrue(x2.Name == "x");
             Assert.IsTrue(x2.Kind == 0);
-            Assert.IsTrue(x2.Type.ToString() == "text");
+            Assert.IsTrue(x2.type.name == "text");
         }
 
         //Empty brackets should be bad.
