@@ -364,3 +364,5 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+P4 Project/\.idea/\.idea\.P4 Project/\.idea/
