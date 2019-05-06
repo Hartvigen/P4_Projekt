@@ -89,23 +89,6 @@ namespace P4_ProjectTests1.Visitors
             Assert.IsTrue((xml.Length - xml.Replace(Environment.NewLine, string.Empty).Length) % 2 == 0);
         }
 
-        //The Xml pretty generated is equal to known good xml
-        [Test]
-        public void XmlTreeBuilderTest06()
-        {
-            string xml = ReturnXmlTree(File.ReadAllText(prettyprogrampath));
-            string loaded = File.ReadAllText(xmlprogrampath);
-            Assert.IsTrue(loaded == xml);
-        }
-
-        //The Xml ugly generated is equal to known good xml
-        [Test]
-        public void XmlTreeBuilderTest07()
-        {
-            string xml = ReturnXmlTree(File.ReadAllText(uglyprogrampath));
-            Assert.IsTrue(File.ReadAllText(xmlprogrampath) == xml);
-        }
-
         //This tests the performance of the XmlTreeBuilder, it should complete the 1000 Builds in under 1 second if not there is probably 
         //something expensive going on depending on the speed of you computer it might be actually be okay.
         [Test]

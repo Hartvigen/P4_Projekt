@@ -18,7 +18,7 @@ namespace P4_Project
             Console.WriteLine("Doing custom work!");
             var customArgs = new string[2];
             args = customArgs;
-            args[0] = "-x";
+            args[0] = "-t";
             args[1] = defaultFile;
 
             if (args.Length > 0)
@@ -56,7 +56,7 @@ namespace P4_Project
                     case "-t":
                     case "--test":
                         Console.WriteLine("Printing test png called: test.png ");
-                        Console.WriteLine(DotToPng.createPNGFile() ? "print succeeded!" : "print failed!");
+                        Console.WriteLine(DotToPng.CreatePNGFile() ? "print succeeded!" : "print failed!");
                         break;
                     default:
                         Console.WriteLine("Parsing input file: " + args[0]);
