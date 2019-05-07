@@ -74,12 +74,22 @@ namespace P4_ProjectTests1.Visitors
             Assert.IsTrue(program.ErrorList.Count == 0);
         }
 
-        //function should allow for a correct return statement
+        //functions that do not have return type none, must have atleast one return statement in their body
         [Test]
         public void CleanerTestSuccess04()
         {
             var program = Clean("number x = fun() " +
                                 "func number fun(){return 5}");
+
+            Assert.IsTrue(program.ErrorList.Count == 0);
+        }
+
+        //Errors should not be thrown if we only have one of each header
+        [Test]
+        public void CleanerTestSuccess05()
+        {
+            var program = Clean("[vertex(vertex x, number y)] " +
+                                "[edge(edge ed, number y)]");
 
             Assert.IsTrue(program.ErrorList.Count == 0);
         }
