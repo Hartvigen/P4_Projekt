@@ -129,6 +129,7 @@ namespace P4_Project.SymbolTable
         {
             return (IsPreDefFunctions(name) || _symbolDecls.ContainsKey(name));
         }
+
         public List<BaseType> findParameterListOfFunction(string name)
         {
             if (IsPreDefFunctions(name)) return FindParameterListOfPreDefFunctions(name);

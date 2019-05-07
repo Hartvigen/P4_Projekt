@@ -160,6 +160,18 @@ namespace P4_Project.Visitors
         public override void Visit(HeadNode node)
         {
             node.attrDeclBlock.Accept(this);
+            if(node.type.name == "edge" && !edgeHeadExists)
+            {
+                edgeHeadExists = true;
+                return;
+            }
+
+            if (node.type.name == "vertex" && !vertexHeadExists)
+            {
+                vertexHeadExists = true;
+                return;
+            }
+
             if (edgeHeadExists && node.type.name == "edge")
                 ErrorList.Add("Only one edgeheader is allowed!");
             else if(vertexHeadExists && node.type.name == "vertex")

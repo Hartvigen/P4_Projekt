@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.Compiler.SyntaxAnalysis
+namespace P4_ProjectTests1.Compiler.SyntaxAnalysis
 {
     [TestFixture]
     public sealed class ParserTests
@@ -282,9 +282,15 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Assert.IsTrue(x2.type.name == "text");
         }
 
+        [Test]
+        public void ParseTestSuccess11()
+        {
+            string funcTest = " func none FuncDecl(number x){x = 4 * 5 + 3 - 3}";
+        }
+
         //Empty brackets should be bad.
         [Test]
-        public void ParseTest01()
+        public void ParseTestFailure01()
         {
             bool success = TryParse("[]");
 
@@ -293,7 +299,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Empty brackets with edge should be bad.
         [Test]
-        public void ParseTest02()
+        public void ParseTestFailure02()
         {
             bool success = TryParse("[edge]");
 
@@ -302,7 +308,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Empty brackets with vertex should be bad.
         [Test]
-        public void ParseTest03()
+        public void ParseTestFailure03()
         {
             bool success = TryParse("[vertex]");
 
@@ -311,7 +317,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Empty edge header should be bad.
         [Test]
-        public void ParseTest04()
+        public void ParseTestFailure04()
         {
             var success = TryParse("[edge()]");
             Assert.IsFalse(success);
@@ -319,7 +325,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Empty vertex header should be bad.
         [Test]
-        public void ParseTest05()
+        public void ParseTestFailure05()
         {
             var success = TryParse("[vertex()]");
             Assert.IsFalse(success);
@@ -327,7 +333,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //header with valid type but invalid identifier should be bad.
         [Test]
-        public void ParseTest06()
+        public void ParseTestFailure06()
         {
             int i;
             var success = false;
@@ -347,7 +353,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //header with valid type, identifier but invalid default value should be bad.
         [Test]
-        public void ParseTest07()
+        public void ParseTestFailure07()
         {
             int i;
             var success = false;
@@ -369,7 +375,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //header with valid collection type and invalid identifier should be bad.
         [Test]
-        public void ParseTest08()
+        public void ParseTestFailure08()
         {
             int i, j = 0;
             var success = false;
@@ -393,7 +399,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //header with valid collection type, identifier and invalid default value should be bad.
         [Test]
-        public void ParseTest09()
+        public void ParseTestFailure09()
         {
             int i, j = 0;
             var success = false;
@@ -417,7 +423,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //A forgotten close ´"´  on a string should give error.
         [Test]
-        public void ParseTest10()
+        public void ParseTestFailure10()
         {
             var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + " = " + "\"I have forgotten to close this string" + ")]");
             Assert.IsFalse(success);
@@ -427,7 +433,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //A forgotten ´,´ in a list should give error.
         [Test]
-        public void ParseTest11()
+        public void ParseTestFailure11()
         {
             var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "  " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
@@ -437,7 +443,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //A wrong symbol where there should be ´,´ in a list should give error.
         [Test]
-        public void ParseTest12()
+        public void ParseTestFailure12()
         {
             var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + ".  " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
@@ -447,7 +453,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //A forgotten close ´]´ symbol should give error.
         [Test]
-        public void ParseTest13()
+        public void ParseTestFailure13()
         {
             var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + ")");
             Assert.IsFalse(success);
@@ -457,7 +463,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //A forgotten close ´)´ symbol should give error.
         [Test]
-        public void ParseTest14()
+        public void ParseTestFailure14()
         {
             var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "]");
             Assert.IsFalse(success);
@@ -467,7 +473,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //A forgotten close ´)]´ symbol should give error.
         [Test]
-        public void ParseTest15()
+        public void ParseTestFailure15()
         {
             var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "");
             Assert.IsFalse(success);
@@ -477,7 +483,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //A forgotten start ´(´ symbol after "vertex" or "edge" should give error.
         [Test]
-        public void ParseTest16()
+        public void ParseTestFailure16()
         {
             var success = TryParse("[vertex " + ValidTextType + " " + ValidIdentifier + ")]");
             Assert.IsFalse(success);
@@ -491,7 +497,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //A forgotten end ´(´ symbol after "vertex" or "edge" should give error.
         [Test]
-        public void ParseTest17()
+        public void ParseTestFailure17()
         {
             var success = TryParse("[vertex(" + ValidTextType + " " + ValidIdentifier + "");
             Assert.IsFalse(success);
@@ -501,7 +507,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         // a forgotten func before FuncDecl should give error
         [Test]
-        public void ParseTest18()
+        public void ParseTestFailure18()
         {
             const string func = "FuncDecl(number x){x = 5 return x}";
             Assert.IsFalse(TryParse(func));
@@ -509,7 +515,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         // a forgotten FuncDecl before function should give error
         [Test]
-        public void ParseTest19()
+        public void ParseTestFailure19()
         {
             const string func = "func(number x){x = 5}";
             Assert.IsFalse(TryParse(func));
@@ -517,7 +523,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         // a forgotten FuncDecl before func should give error
         [Test]
-        public void ParseTest20()
+        public void ParseTestFailure20()
         {
             var str = "[vertex(edge " + ValidIdentifier + ")]";
             Assert.IsTrue(TryParse(str));
@@ -525,7 +531,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Invalid single type is error
         [Test]
-        public void ParseTest21()
+        public void ParseTestFailure21()
         {
             var str = "[vertex(" + InvalidType + " " + ValidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
@@ -533,7 +539,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Invalid single type and invalid identifier is error
         [Test]
-        public void ParseTest22()
+        public void ParseTestFailure22()
         {
             var str = "[vertex(" + InvalidType + " " + InvalidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
@@ -541,7 +547,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Invalid collection with valid single type and valid identifier is error
         [Test]
-        public void ParseTest23()
+        public void ParseTestFailure23()
         {
             var str = "[vertex(" + InvalidCollection + "<" + SingleTypes[0] + ">" + " " + ValidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
@@ -549,7 +555,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Invalid collection with invalid single type and valid identifier is error
         [Test]
-        public void ParseTest24()
+        public void ParseTestFailure24()
         {
             var str = "[vertex(" + InvalidCollection + "<" + InvalidType + ">" + " " + ValidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
@@ -557,7 +563,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
         //Invalid collection with invalid single type and invalid identifier is error
         [Test]
-        public void ParseTest25()
+        public void ParseTestFailure25()
         {
             var str = "[vertex(" + InvalidCollection + "<" + InvalidType + ">" + " " + InvalidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
