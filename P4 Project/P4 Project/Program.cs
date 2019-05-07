@@ -123,9 +123,8 @@ namespace P4_Project
                         File.WriteAllText(vi.AppropriateFileName, vi.Result.ToString());
                     else
                     {
-
                         printErrors(vi);
-                        break; //We break as the other visitors cannot be relied uppon if errors was found the previous visitor.
+                        break; //We break out of the loop as the other visitors cannot be relied uppon if errors was found the visitor.
                     }
                 }
             }
