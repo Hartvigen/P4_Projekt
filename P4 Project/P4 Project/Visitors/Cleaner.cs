@@ -57,6 +57,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(CollecConst node)
         {
+            node.Expressions.ForEach(n=>n.Accept(this));
         }
 
         public override void Visit(NoneConst node)

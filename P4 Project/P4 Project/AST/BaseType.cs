@@ -10,6 +10,10 @@ namespace P4_Project.AST
         public BaseType collectionType;
         public List<BaseType> parameterTypes;
         public BaseType singleType;
+
+        //If it can be reached from its declaration it is declared for the scope.
+        public bool reachableByDecleration;
+
         //For all kinds of nodes
         public BaseType(string type) {
             this.name = type;
