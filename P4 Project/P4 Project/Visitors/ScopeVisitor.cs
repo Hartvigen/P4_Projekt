@@ -179,7 +179,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(Magia node)
         {
-            
+                
             node.block.Accept(this);
             
         }

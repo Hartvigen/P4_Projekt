@@ -175,6 +175,7 @@
     <Content Include="Graphviz\bin\unflatten.exe" />
     <Content Include="Graphviz\bin\vmalloc.dll" />
     <Content Include="Graphviz\bin\zlib1.dll" />
+    <Content Include="Visitors\TestCode\MAGIAFile.txt" />
     <Content Include="Visitors\TestCode\PrettyCode.txt" />
     <Content Include="Visitors\TestCode\UglyCode.txt" />
     <Content Include="Visitors\TestCode\xmltree.xml" />

@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using P4_Project.Graphviz;
 using System.Collections.Generic;
+using System.Text;
 
 namespace P4_Project
 {
@@ -18,7 +19,7 @@ namespace P4_Project
             Console.WriteLine("Doing custom work!");
             var customArgs = new string[2];
             args = customArgs;
-            args[0] = "-p";
+            args[0] = "-c";
             args[1] = defaultFile;
 
             if (args.Length > 0)
@@ -29,7 +30,7 @@ namespace P4_Project
                     case "-c":
                     case "--compile":
                         Console.WriteLine("Doing a complete compile on " + args[1]);
-                        List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new TypeVisitor(parser.tab)};
+                        List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new TypeVisitor(parser.tab), new ScopeVisitor(parser.tab)};
                         ApplyVisitors(vils, args[1]);
                         Console.WriteLine("Done");
                         break;
@@ -122,12 +123,43 @@ namespace P4_Project
                         File.WriteAllText(vi.AppropriateFileName, vi.Result.ToString());
                     else
                     {
-                        Console.WriteLine("-----------ERRORS-----------");
-                        vi.ErrorList.ForEach(Console.WriteLine);
+
+                        printErrors(vi);
                         break; //We break as the other visitors cannot be relied uppon if errors was found the previous visitor.
                     }
                 }
             }
+        }
+
+        private static void printErrors(Visitor vi) {
+            //If there are no errors we print nothing.
+            if (vi.ErrorList.Count == 0)
+                return;
+
+            //Check if one or more.
+            var error = "ERRORS";
+            if (vi.ErrorList.Count == 1)
+                error = "ERROR";
+
+            var seperator = "--------------------";
+            var fl = seperator + error + seperator;
+            Console.WriteLine(fl);
+
+            //Calculates correct Seperator length dependent on name size
+            var i = vi.GetType().Name.Length;
+            var j = fl.Length;
+
+            var str = new StringBuilder();
+            for (var k = (j - i) / 2; k > 0; k--) {
+                str.Append("-");
+            }
+
+            seperator = str.ToString();
+
+            if(str.Length * 2 + i != j)
+                Console.WriteLine(seperator + vi.GetType().Name + seperator + "-");
+            else Console.WriteLine(seperator + vi.GetType().Name + seperator);
+            vi.ErrorList.ForEach(Console.WriteLine);
         }
     }
 }
