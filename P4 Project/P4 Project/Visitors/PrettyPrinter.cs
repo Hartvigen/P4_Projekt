@@ -296,7 +296,7 @@ namespace P4_Project.Visitors
         {
             if (Result.Length != 0)
                 RemoveIndentAndNewline();
-            Result.Append("[" + node.GetName() + "(");
+            Result.Append("[" + node.type.name + "(");
             foreach (var n in node.attrDeclBlock.Statements)
             {
                 n.Accept(this);

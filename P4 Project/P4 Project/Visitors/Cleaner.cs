@@ -20,11 +20,16 @@ namespace P4_Project.Visitors
         //3. Calls have the correct amount of parameters when calling
         //4. Expressions arent outright missing or null
         //5. functions with a non "none" return type must have atleast one return inside them!
-        //6. A few Bugs where the SymbolTable dosnt contain Obj so its created manually.
+        //6. Checks that at maximum one of each type header exists!
+        //7. A few Bugs where the SymbolTable dosnt contain Obj so its created manually.
         public override string AppropriateFileName { get; } = "Clean.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         public override SymTable Table { get; set; }
+
+        private bool vertexHeadExists;
+        private bool edgeHeadExists;
+
         public Cleaner(SymTable Table) {
             this.Table = Table;
         }
@@ -155,6 +160,10 @@ namespace P4_Project.Visitors
         public override void Visit(HeadNode node)
         {
             node.attrDeclBlock.Accept(this);
+            if (edgeHeadExists && node.type.name == "edge")
+                ErrorList.Add("Only one edgeheader is allowed!");
+            else if(vertexHeadExists && node.type.name == "vertex")
+                ErrorList.Add("Only one vertexheader is allowed!");
         }
 
         public override void Visit(IfNode node)

@@ -4,7 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_ProjectTests1.Compiler.SyntaxAnalysis
+namespace P4_Project.Compiler.SyntaxAnalysis
 {
     [TestFixture]
     public sealed class ScannerTests

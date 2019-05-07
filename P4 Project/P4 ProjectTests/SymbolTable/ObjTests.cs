@@ -3,7 +3,7 @@ using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.SymbolTable;
 using P4_Project.AST;
 
-namespace P4_ProjectTests1.SymbolTable
+namespace P4_Project.SymbolTable
 {
     [TestFixture]
     public class ObjTests

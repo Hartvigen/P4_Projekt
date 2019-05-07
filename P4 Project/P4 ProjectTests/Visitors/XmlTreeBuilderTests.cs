@@ -5,7 +5,7 @@ using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.Visitors;
 
-namespace P4_ProjectTests1.Visitors
+namespace P4_Project.Visitors
 {
     [TestFixture]
     public class XmlTreeBuilderTests

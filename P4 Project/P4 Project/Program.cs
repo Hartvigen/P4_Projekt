@@ -18,7 +18,7 @@ namespace P4_Project
             Console.WriteLine("Doing custom work!");
             var customArgs = new string[2];
             args = customArgs;
-            args[0] = "-t";
+            args[0] = "-p";
             args[1] = defaultFile;
 
             if (args.Length > 0)

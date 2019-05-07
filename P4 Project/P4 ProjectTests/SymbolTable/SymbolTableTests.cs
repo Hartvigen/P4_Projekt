@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_ProjectTests1.SymbolTable
+namespace P4_Project.SymbolTable
 {
     [TestFixture]
     public class SymbolTableTests
