@@ -71,7 +71,7 @@ namespace P4_ProjectTests1.SymbolTable
 
         //Functions should be 1 nesting below the global scope
         [Test]
-        public void SymbolTableTest05()
+        public void SymbolTableTests05()
         {
 
         }

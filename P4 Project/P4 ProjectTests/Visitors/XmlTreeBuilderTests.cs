@@ -92,7 +92,7 @@ namespace P4_ProjectTests1.Visitors
         //This tests the performance of the XmlTreeBuilder, it should complete the 1000 Builds in under 1 second if not there is probably 
         //something expensive going on depending on the speed of you computer it might be actually be okay.
         [Test]
-        public void XmlTreeBuilderTest08()
+        public void XmlTreeBuilderTest06()
         {
 
             string program = File.ReadAllText(prettyprogrampath);

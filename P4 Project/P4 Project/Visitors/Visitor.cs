@@ -15,7 +15,7 @@ namespace P4_Project.Visitors
         public abstract string AppropriateFileName { get;}
         public abstract StringBuilder Result { get; }
         public abstract List<string> ErrorList { get; }
-        public abstract SymTable Table { get; set; }
+        public abstract SymTable Table { get; set; } 
 
         //Identifier
         public abstract void Visit(CallNode node);

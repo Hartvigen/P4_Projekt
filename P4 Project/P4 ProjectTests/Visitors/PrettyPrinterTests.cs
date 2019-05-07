@@ -128,7 +128,7 @@ namespace P4_ProjectTests1.Visitors
         //This tests the performance of the PrettyPrinter, it should complete the 1000 prettifies in under 1 second if not there is probably 
         //something expensive going on depending on the speed of you computer it might be actually be okay.
         [Test]
-        public void PrettyPrinterTest09()
+        public void PrettyPrinterTest07()
         {
 
             var program = File.ReadAllText(prettyprogrampath);
