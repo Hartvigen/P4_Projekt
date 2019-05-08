@@ -10,7 +10,7 @@ set<vertex> vset = graph.GetVertices()
 graph.ClearVertices()
 VEDecls()
 expr()
-manyparams(v1561, 10, false, "hello")
+manyparams(v156, 10, false, "hello")
 number fortytwo = 24
 
 func number GetVal(number a)

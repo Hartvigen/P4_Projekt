@@ -12,9 +12,11 @@ namespace P4_Project.SymbolTable
         public string name;
 
         public const int Var = 0, Func = 1; // Kinds
+
+        public bool header;
         private SymTable Parent { get; set; }
         private List<SymTable> InnerScopes { get; } = new List<SymTable>();
-        private readonly Dictionary<string, Obj> _symbolDecls = new Dictionary<string, Obj>();
+        private Dictionary<string, Obj> _symbolDecls = new Dictionary<string, Obj>();
 
         //Constructor for visitor (no parser argument)
         public SymTable(SymTable parent, Parser parser)
@@ -61,11 +63,26 @@ namespace P4_Project.SymbolTable
             if (!_symbolDecls.ContainsKey(obj.Name))
                 _symbolDecls.Add(obj.Name, obj);
             else Console.WriteLine(obj.Name + " is already added to symDecls");
-
             return obj;
         }
 
+        //Adds a new Object in the current scope
+        public void AddObj(Obj obj)
+        {
+            if (!_symbolDecls.ContainsKey(obj.Name))
+                _symbolDecls.Add(obj.Name, obj);
+            else Console.WriteLine(obj.Name + " is already added to symDecls");
+        }
 
+        //Removes a Object in the current scope
+        public void RemoveObj(Obj obj)
+        {
+            if (!_symbolDecls.ContainsKey(obj.Name)) {
+                Console.WriteLine("Cannot remove Obj: " + obj.Name + " as it doesnt exist in this dictionary");
+                return;
+            }
+            _symbolDecls.Remove(obj.Name);
+        }
 
         //search for a name in all open scopes and return its object node
         public Obj Find(string name)

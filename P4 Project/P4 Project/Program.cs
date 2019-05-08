@@ -30,7 +30,7 @@ namespace P4_Project
                     case "-c":
                     case "--compile":
                         Console.WriteLine("Doing a complete compile on " + args[1]);
-                        List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new TypeVisitor(parser.tab), new ScopeVisitor(parser.tab)};
+                        List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new TypeVisitor(parser.tab), new ScopePlacerVisitor(parser.tab)};
                         ApplyVisitors(vils, args[1]);
                         Console.WriteLine("Done");
                         break;

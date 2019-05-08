@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
@@ -11,213 +11,244 @@ using P4_Project.SymbolTable;
 
 namespace P4_Project.Visitors
 {
-    public class Cleaner : Visitor
+    public class ScopePlacerVisitor : Visitor
     {
-        //This Visitor checks for obviously missing/wrong things.
-        //Like:
-        //1. Variables are declared somewhere if used
-        //2. All function calls coresponds to a function.
-        //3. Calls have the correct amount of parameters when calling
-        //4. Expressions arent outright missing or null
-        //5. functions with a non "none" return type must have atleast one return inside them!
-        //6. Checks that at maximum one of each type header exists!
-        //7. A few Bugs where the SymbolTable dosnt contain Obj so its created manually.
-        public override string AppropriateFileName { get; } = "Clean.txt";
+        public override string AppropriateFileName { get; } = "ScopeErrors.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         public override SymTable Table { get; set; }
 
-        private bool vertexHeadExists;
-        private bool edgeHeadExists;
+        private bool inVertexHead;
+        private bool inEdgeHead;
+        private bool inFunction;
 
-        public Cleaner(SymTable Table) {
-            this.Table = Table;
+        public ScopePlacerVisitor(SymTable table)
+        {
+            Table = table;
         }
+
         public override void Visit(CallNode node)
         {
+            
             node.Parameters.Accept(this);
-            if (!Table.FunctionExists(node.Ident))
-                ErrorList.Add("The Call for: " + node.Ident + " is not a declared function and not a predefined function");
-
-            if(node.Parameters.Expressions.Count != Table.findParameterListOfFunction(node.Ident).Count)
-                ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " parameters and should have: " + Table.findParameterListOfFunction(node.Ident).Count + " parameters");
+            
         }
         public override void Visit(VarNode node)
         {
             node.Source?.Accept(this);
-            if (Table.Find(node.Ident) is null)
-            {
-                ErrorList.Add(node.Ident + " must be declared somewhere!");
-            }
         }
 
         public override void Visit(BoolConst node)
         {
+            
         }
 
         public override void Visit(CollecConst node)
         {
-            node.Expressions.ForEach(n=>n.Accept(this));
+            
         }
 
         public override void Visit(NoneConst node)
         {
+            
         }
 
         public override void Visit(NumConst node)
         {
+            
         }
 
         public override void Visit(TextConst node)
         {
+            
         }
 
         public override void Visit(BinExprNode node)
         {
-            if (node.Left is null || node.Right is null)
-            {
-                ErrorList.Add("BinExprNode has null operands");
-            }
+            
             node.Left.Accept(this);
             node.Right.Accept(this);
+            
         }
 
         public override void Visit(UnaExprNode node)
         {
+            
             node.Expr.Accept(this);
+            
         }
 
         public override void Visit(EdgeCreateNode node)
         {
+            
             node.LeftSide.Accept(this);
             node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
-
-            if(node.RightSide.Count == 0)
-                ErrorList.Add("The rightSide exist but have no expressions inside " + node.GetCodeOfOperator());
+            
         }
 
         public override void Visit(FuncDeclNode node)
         {
+            inFunction = true;
+
+            //We remove the FuncDecl from top scope as it is in the functionscope
+            Table.RemoveObj(node.SymbolObject);
+
             node.Parameters.Accept(this);
             node.Body.Accept(this);
 
-            if (node.SymbolObject.type.returntype != "none")
-            {
-                bool retExists = false;
-                node.Body.Statements.ForEach(n =>
-                {
-                    if (n.GetType() == typeof(ReturnNode))
-                        retExists = true;
-                });
-                if (retExists)
-                    return;
-                ErrorList.Add("Function: " + node.SymbolObject.Name + " has no return statement in its body and is not declared to return none!");
-            }
+            inFunction = false;
         }
 
         public override void Visit(VarDeclNode node)
         {
             node.DefaultValue?.Accept(this);
-            if (Table.Find(node.SymbolObject.Name) is null) {
-                Table.NewObj(node.SymbolObject.Name, node.SymbolObject.type, node.SymbolObject.Kind);
+
+            //We make sure to move the VarDeclNode from the generel symboltable to a head symboltable if it exists inside a headnode.
+            if (inEdgeHead || inVertexHead)
+            {
+                Table.GetScopes().ForEach(t =>
+                {
+                    if (t.header)
+                    {
+                        t.GetScopes().ForEach(h =>
+                        {
+                            if (h.name == "vertex" && inVertexHead)
+                            {
+                                Obj obj = Table.Find(node.SymbolObject.Name);
+                                h.AddObj(obj);
+                                Table.RemoveObj(obj);
+                            }
+                            else if (h.name == "edge" && inEdgeHead)
+                            {
+                                Obj obj = Table.Find(node.SymbolObject.Name);
+                                h.AddObj(obj);
+                                Table.RemoveObj(obj);
+                            }
+                        });
+                    }
+                });
+            }
+            else if (inFunction) {
+                //If we are in a function we can reach all variables 
             }
         }
 
         public override void Visit(VertexDeclNode node)
         {
+            
             node.Attributes.Accept(this);
-            if (Table.Find(node.SymbolObject.Name) is null)
-            {
-                Table.NewObj(node.SymbolObject.Name, node.SymbolObject.type, node.SymbolObject.Kind);
-            }
+            
         }
 
         public override void Visit(AssignNode node)
         {
+            
             node.Target.Accept(this);
             node.Value.Accept(this);
+            
         }
 
         public override void Visit(BlockNode node)
         {
+            
             node.Statements.ForEach(n => n.Accept(this));
+            
         }
 
         public override void Visit(ForeachNode node)
         {
+            
             node.IterationVar.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
+            
         }
 
         public override void Visit(ForNode node)
         {
+            
             node.Initializer.Accept(this);
             node.Condition.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
+            
         }
 
         public override void Visit(HeadNode node)
         {
+            //Finds the head scope and enters this headnode
+            SymTable h = new SymTable(null,null, node.type.name);
+            Table.GetScopes().ForEach(t => { if (t.header) t.GetScopes().Add(h);});
+
+            //Set bool that we are in a head.
+            if (node.type.name == "vertex")
+                inVertexHead = true;
+            else inEdgeHead = true;
+
+            //Visit every node in the head.
             node.attrDeclBlock.Accept(this);
-            if(node.type.name == "edge" && !edgeHeadExists)
-            {
-                edgeHeadExists = true;
-                return;
-            }
-
-            if (node.type.name == "vertex" && !vertexHeadExists)
-            {
-                vertexHeadExists = true;
-                return;
-            }
-
-            if (edgeHeadExists && node.type.name == "edge")
-                ErrorList.Add("Only one edgeheader is allowed!");
-            else if(vertexHeadExists && node.type.name == "vertex")
-                ErrorList.Add("Only one vertexheader is allowed!");
+             
+            //Remove the indicator.
+            inEdgeHead = false;
+            inVertexHead = false;
         }
 
         public override void Visit(IfNode node)
         {
+            
             node.Condition?.Accept(this);
             node.Body.Accept(this);
             node.ElseNode?.Accept(this);
+            
         }
 
         public override void Visit(LoneCallNode node)
         {
+            
             node.Call.Accept(this);
+            
         }
 
         public override void Visit(ReturnNode node)
         {
+            
             node.Ret.Accept(this);
+            
         }
 
         public override void Visit(WhileNode node)
         {
+            
             node.Condition.Accept(this);
             node.Body.Accept(this);
+            
         }
 
         public override void Visit(Magia node)
         {
+            //Create a HeaderScope
+            SymTable t = new SymTable(null, null, " ");
+            t.header = true;
+            Table.GetScopes().Add(t);
             node.block.Accept(this);
+
+            Console.WriteLine("Done");
         }
 
         public override void Visit(BreakNode node)
         {
+            
         }
 
         public override void Visit(ContinueNode node)
         {
+            
         }
 
         public override void Visit(MultiDecl node)
         {
             node.Decls.ForEach(n => n.Accept(this));
+            
         }
     }
 }

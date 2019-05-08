@@ -90,7 +90,7 @@
     <Compile Include="AST\Stmts\StmtNode.cs" />
     <Compile Include="Visitors\Cleaner.cs" />
     <Compile Include="Visitors\PrettyPrinter.cs" />
-    <Compile Include="Visitors\ScopeVisitor.cs" />
+    <Compile Include="Visitors\ScopePlacerVisitor.cs" />
     <Compile Include="Visitors\TypeVisitor.cs" />
     <Compile Include="Visitors\Visitor.cs" />
     <Compile Include="AST\Stmts\EdgeCreateNode.cs" />
