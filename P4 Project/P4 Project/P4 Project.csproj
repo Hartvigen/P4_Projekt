@@ -74,6 +74,7 @@
     <Compile Include="Compiler\SyntaxAnalysis\Scanner.cs" />
     <Compile Include="Graphviz\DotToPng.cs" />
     <Compile Include="Operators.cs" />
+    <Compile Include="PreDefined.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolTable\Obj.cs" />
@@ -88,10 +89,11 @@
     <Compile Include="AST\Stmts\LoneCallNode.cs" />
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
+    <Compile Include="Visitors\AttributeMover.cs" />
     <Compile Include="Visitors\Cleaner.cs" />
-    <Compile Include="Visitors\PrettyPrinter.cs" />
-    <Compile Include="Visitors\ScopePlacerVisitor.cs" />
-    <Compile Include="Visitors\TypeVisitor.cs" />
+    <Compile Include="Visitors\Extra\PrettyPrinter.cs" />
+    <Compile Include="Visitors\ScopeChecker.cs" />
+    <Compile Include="Visitors\TypeChecker.cs" />
     <Compile Include="Visitors\Visitor.cs" />
     <Compile Include="AST\Stmts\EdgeCreateNode.cs" />
     <Compile Include="AST\Stmts\BlockNode.cs" />
@@ -100,7 +102,7 @@
     <Compile Include="AST\Stmts\IfNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
     <Compile Include="AST\Stmts\Decls\MultiDecl.cs" />
-    <Compile Include="Visitors\XmlTreeBuilder.cs" />
+    <Compile Include="Visitors\Extra\XmlTreeBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

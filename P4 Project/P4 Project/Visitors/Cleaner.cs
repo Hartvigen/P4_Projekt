@@ -15,13 +15,11 @@ namespace P4_Project.Visitors
     {
         //This Visitor checks for obviously missing/wrong things.
         //Like:
-        //1. Variables are declared somewhere if used
-        //2. All function calls coresponds to a function.
-        //3. Calls have the correct amount of parameters when calling
-        //4. Expressions arent outright missing or null
-        //5. functions with a non "none" return type must have atleast one return inside them!
-        //6. Checks that at maximum one of each type header exists!
-        //7. A few Bugs where the SymbolTable dosnt contain Obj so its created manually.
+        //1. All function calls coresponds to a function.
+        //2. Calls have the correct amount of parameters when calling
+        //3. Expressions arent outright missing or null
+        //4. functions with a non "none" return type must have atleast one return inside them!
+        //5. Checks that at maximum one of each type header exists!
         public override string AppropriateFileName { get; } = "Clean.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
@@ -36,19 +34,18 @@ namespace P4_Project.Visitors
         public override void Visit(CallNode node)
         {
             node.Parameters.Accept(this);
+
+            //1. All function calls coresponds to a function.
             if (!Table.FunctionExists(node.Ident))
                 ErrorList.Add("The Call for: " + node.Ident + " is not a declared function and not a predefined function");
 
-            if(node.Parameters.Expressions.Count != Table.findParameterListOfFunction(node.Ident).Count)
+            //2. Calls have the correct amount of parameters when calling
+            if (node.Parameters.Expressions.Count != Table.findParameterListOfFunction(node.Ident).Count)
                 ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " parameters and should have: " + Table.findParameterListOfFunction(node.Ident).Count + " parameters");
         }
         public override void Visit(VarNode node)
         {
             node.Source?.Accept(this);
-            if (Table.Find(node.Ident) is null)
-            {
-                ErrorList.Add(node.Ident + " must be declared somewhere!");
-            }
         }
 
         public override void Visit(BoolConst node)
@@ -74,6 +71,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(BinExprNode node)
         {
+            //3. Expressions arent outright missing or null
             if (node.Left is null || node.Right is null)
             {
                 ErrorList.Add("BinExprNode has null operands");
@@ -92,7 +90,8 @@ namespace P4_Project.Visitors
             node.LeftSide.Accept(this);
             node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
 
-            if(node.RightSide.Count == 0)
+            //3. Expressions arent outright missing or null
+            if (node.RightSide.Count == 0)
                 ErrorList.Add("The rightSide exist but have no expressions inside " + node.GetCodeOfOperator());
         }
 
@@ -101,6 +100,7 @@ namespace P4_Project.Visitors
             node.Parameters.Accept(this);
             node.Body.Accept(this);
 
+            //4. functions with a non "none" return type must have atleast one return inside them!
             if (node.SymbolObject.type.returntype != "none")
             {
                 bool retExists = false;
@@ -118,18 +118,11 @@ namespace P4_Project.Visitors
         public override void Visit(VarDeclNode node)
         {
             node.DefaultValue?.Accept(this);
-            if (Table.Find(node.SymbolObject.Name) is null) {
-                Table.NewObj(node.SymbolObject.Name, node.SymbolObject.type, node.SymbolObject.Kind);
-            }
         }
 
         public override void Visit(VertexDeclNode node)
         {
             node.Attributes.Accept(this);
-            if (Table.Find(node.SymbolObject.Name) is null)
-            {
-                Table.NewObj(node.SymbolObject.Name, node.SymbolObject.type, node.SymbolObject.Kind);
-            }
         }
 
         public override void Visit(AssignNode node)
@@ -161,7 +154,9 @@ namespace P4_Project.Visitors
         public override void Visit(HeadNode node)
         {
             node.attrDeclBlock.Accept(this);
-            if(node.type.name == "edge" && !edgeHeadExists)
+
+            //5. Checks that at maximum one of each type header exists!
+            if (node.type.name == "edge" && !edgeHeadExists)
             {
                 edgeHeadExists = true;
                 return;
@@ -204,7 +199,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(Magia node)
         {
-            node.block.Accept(this);
+            node.block.Accept(this);            
         }
 
         public override void Visit(BreakNode node)

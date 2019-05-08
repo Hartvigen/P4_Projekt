@@ -12,19 +12,18 @@ using P4_Project.SymbolTable;
 
 namespace P4_Project.Visitors
 {
-    public class TypeVisitor : Visitor
+    public class TypeChecker : Visitor
     {
         public override string AppropriateFileName { get; } = "symbolInfo.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         public override SymTable Table { get; set; }
+        private SymTable activeScope;
 
-        private const bool Verbose = false;
-
-        public TypeVisitor(SymTable Table)
+        public TypeChecker(SymTable Table)
         {
             this.Table = Table;
-            Table.name = "top";
+            activeScope = Table;
         }
 
         public override void Visit(CallNode node)
@@ -50,8 +49,8 @@ namespace P4_Project.Visitors
             node.Source?.Accept(this);
 
             //We assign the type found from the table.
-            if(Table.Find(node.Ident) != null)
-            node.type = Table.Find(node.Ident).type;
+            if(activeScope.Find(node.Ident) != null)
+            node.type = activeScope.Find(node.Ident).type;
 
             if (node.type == null)
                 return;
@@ -157,7 +156,24 @@ namespace P4_Project.Visitors
         public override void Visit(EdgeCreateNode node)
         {
             node.LeftSide.Accept(this);
-            node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
+            node.RightSide.ForEach(t => {
+                t.Item1.Accept(this);
+                t.Item2.ForEach(s => {
+                    if (s.GetType() == typeof(AssignNode))
+                    {
+                        AssignNode a = (AssignNode)s;
+                        //We dont care about the right side of the assign it must still be valid according to all scoperules
+                        a.Value.Accept(this);
+
+                        //We find the header scope for edge take the type of the attribute
+                        Table.GetScopes().ForEach(h => {
+                            if (h.header && h.name == "edge")
+                                if (h.Find(a.Target.Ident).type.name != a.Value.type.name)
+                                    ErrorList.Add(a.Target.Ident + " is type: " + a.Target.type.name + " so type: " + a.Value.type.name + " is not a valid type to assign.");
+                        });
+                    }
+                });
+            });
 
             if (node.LeftSide.type.name != "vertex") {
                 ErrorList.Add("Edge cannot be created with: " + node.LeftSide.Ident + " as it has type: " + node.LeftSide.type);
@@ -170,6 +186,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(FuncDeclNode node)
         {
+            enterFunction(node.SymbolObject.Name);
             node.Parameters.Accept(this);   
             node.Body.Accept(this);
             
@@ -178,6 +195,7 @@ namespace P4_Project.Visitors
             {
                 if (stmtNode.GetType() != typeof(ReturnNode)) return;
                 var retNode = (ReturnNode) stmtNode;
+
                 var actualReturnType = retNode.Ret.type.name;
                 var declaredReturnType = node.SymbolObject.type.returntype;
                 if (actualReturnType != declaredReturnType)
@@ -187,6 +205,7 @@ namespace P4_Project.Visitors
                         " with declared return type: " + declaredReturnType + " but actual return type was: " + actualReturnType);
                 }
             });
+            leaveFunction();
         }
 
         //Checks for default and SymbolBaseTypeValue. If it doesnt exist, create the SymbolBaseType
@@ -214,9 +233,21 @@ namespace P4_Project.Visitors
         //Creates a vertex BaseType in SymbolTable
         public override void Visit(VertexDeclNode node)
         {
-            node.Attributes.Accept(this);
-            if(Table.Find(node.SymbolObject.Name) is null)
-                Table.NewObj(node.SymbolObject.Name, node.SymbolObject.type, node.SymbolObject.Kind);
+            //Vertex cant be typechecked like normal as their type is not stored in activeScope
+            if (node.Attributes.Statements.Count != 0)
+            {
+                node.Attributes.Statements.ForEach(s => {
+                    if (s.GetType() == typeof(AssignNode))
+                    {
+                        AssignNode a = (AssignNode)s;
+                        a.Value.Accept(this);
+                        //We find the header scope for vertex and if the attribute is not there it is invalid.
+                        Table.vertexAttr.GetDic().TryGetValue(a.Target.Ident, out Obj o);
+                        if(o.type.name != a.Value.type.name)
+                            ErrorList.Add(o.Name + " is type " + o.type.name + " cannot be assigned type: " + a.Value.type.name);
+                    }
+                });
+            }
         }
 
         //Checks for an assigned value is in a correct type. like sum = 0. Which fails if sum is not a number.
@@ -225,12 +256,15 @@ namespace P4_Project.Visitors
             node.Target.Accept(this);
             node.Value.Accept(this);
 
-            if (Table.Find(node.Target.Ident) == null) {
+            if (activeScope.Find(node.Target.Ident) == null) {
+                //If there is a source it is not a problem
+                if (node.Target.Source != null)
+                    return;
                 ErrorList.Add(node.Target.Ident + " was not found in the symboltable.");
                 return;
             }
 
-            BaseType t = Table.Find(node.Target.Ident).type;
+            BaseType t = activeScope.Find(node.Target.Ident).type;
             BaseType v = node.Value.type;
 
             if (v.name == "func")
@@ -246,39 +280,39 @@ namespace P4_Project.Visitors
             }
         }
 
-        //visits BlockNode
         public override void Visit(BlockNode node)
         {
             node.Statements.ForEach(n => n.Accept(this));
         }
 
-        //Visits foreachNode (undone)
         public override void Visit(ForeachNode node)
         {
+            EnterNextScope();
             node.IterationVar.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
 
-            if (Table.Find(node.IterationVar.SymbolObject.Name) is null)
-                Table.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
+            if (activeScope.Find(node.IterationVar.SymbolObject.Name) is null)
+                activeScope.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
 
             if (node.Iterator.type.name != "collec")
                 ErrorList.Add("The iterator in a foreach must be a collection!");
 
             if (node.Iterator.type.singleType.name != node.IterationVar.type.name)
                 ErrorList.Add("Foreach loop has collection type: " + node.Iterator.type.singleType.name + " and the variable has type: " + node.IterationVar.type.name);
+            LeaveThisScope();
         }
 
-        //Visits forNode
         public override void Visit(ForNode node)
         {
+            EnterNextScope();
             node.Initializer.Accept(this);
             node.Condition.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
+            LeaveThisScope();
         }
 
-        //Visits HeadNode
         public override void Visit(HeadNode node)
         {
             node.attrDeclBlock.Accept(this);
@@ -287,6 +321,7 @@ namespace P4_Project.Visitors
         //Checks if the condition is a bool
         public override void Visit(IfNode node)
         {
+            EnterNextScope();
             node.Condition?.Accept(this);
 
             if (!(node.Condition is null) && node.Condition.type != null)
@@ -298,15 +333,11 @@ namespace P4_Project.Visitors
                         return;
                     } 
                 }
-
             node.Body.Accept(this);
-            node.ElseNode?.Accept(this);
-
-            //If the ElseNode exist we visit that as well.
+            LeaveThisScope();
             node.ElseNode?.Accept(this);
         }
 
-        //visits LoneCallNode
         public override void Visit(LoneCallNode node)
         {
             node.Call.Accept(this);
@@ -317,10 +348,9 @@ namespace P4_Project.Visitors
             node.Ret.Accept(this);
         }
 
-        //visits WhileNode
         public override void Visit(WhileNode node)
         {
-            
+            EnterNextScope();
             node.Condition.Accept(this);
 
             if (node.Condition.type == null)
@@ -331,12 +361,14 @@ namespace P4_Project.Visitors
             ErrorList.Add("The condition in a while loop must be boolean type!");
 
             node.Body.Accept(this);
+
+            LeaveThisScope();
         }
         
-        //visits MagiaNode
         public override void Visit(Magia node)
         {
-            //Dispatch starts here!
+            //We resetr the ScopePositions
+            Table.resetScopePositions();
             node.block.Accept(this);
         }
 
@@ -347,30 +379,34 @@ namespace P4_Project.Visitors
         public override void Visit(ContinueNode node)
         {
         }
-
-        //visits MultiDecl
         public override void Visit(MultiDecl multiDecl)
         {
             multiDecl.Decls.ForEach(n => n.Accept(this));
         }
-        
 
-
-        private BaseType GetTypeOfPreDefFunction(string name)
+        private void LeaveThisScope()
         {
-            switch (name)
-            {
-                case "GetEdge": return new BaseType("edge");
-                case "RemoveEdge": return new BaseType("none");
-                case "GetEdges": return new BaseType(new BaseType("set"), new BaseType("edge"));
-                case "GetVertex": return new BaseType("vertex");
-                case "RemoveVertex": return new BaseType("none");
-                case "GetVertices": return new BaseType(new BaseType("set"), new BaseType("vertex"));
-                case "ClearEdges": return new BaseType("none");
-                case "ClearVertices": return new BaseType("none");
-                case "ClearAll": return new BaseType("none");
-                default: throw new Exception("\"" + name + "\"" + " is not a supported Function!");
-            }
+            activeScope = activeScope.CloseScope();
+        }
+
+        private void EnterNextScope()
+        {
+            activeScope = activeScope.EnterNextScope();
+        }
+
+        private void enterFunction(string name)
+        {
+            Table.GetScopes().ForEach(s => {
+                if (s.name == name)
+                {
+                    activeScope = s;
+                }
+            });
+        }
+
+        private void leaveFunction()
+        {
+            activeScope = Table;
         }
     }
 }

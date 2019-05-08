@@ -56,7 +56,7 @@ namespace P4_Project.Visitors
             var parser = new Parser(new Scanner(StreamFromString(program)));
             parser.Parse();
             var cleaner = new Cleaner(parser.tab);
-            var typevisitor = new TypeVisitor(parser.tab);
+            var typevisitor = new TypeSetter(parser.tab);
             var prettyPrinter = new PrettyPrinter(parser.tab);
 
             parser.mainNode.Accept(cleaner);

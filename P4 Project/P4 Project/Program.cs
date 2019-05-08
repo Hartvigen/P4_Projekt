@@ -30,7 +30,8 @@ namespace P4_Project
                     case "-c":
                     case "--compile":
                         Console.WriteLine("Doing a complete compile on " + args[1]);
-                        List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new TypeVisitor(parser.tab), new ScopePlacerVisitor(parser.tab)};
+                        parser.tab.name = "top";
+                        List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab)};
                         ApplyVisitors(vils, args[1]);
                         Console.WriteLine("Done");
                         break;
@@ -45,7 +46,7 @@ namespace P4_Project
                         break;
                     case "-p":
                     case "--prettyprint":
-                        List<Visitor> vils1 = new List<Visitor> { new Cleaner(parser.tab), new TypeVisitor(parser.tab), new PrettyPrinter(parser.tab) };
+                        List<Visitor> vils1 = new List<Visitor> { new Cleaner(parser.tab), new ScopeChecker(parser.tab), new PrettyPrinter(parser.tab) };
                         ApplyVisitors(vils1, args[1]);
                         Console.WriteLine("Done");
                         break;
