@@ -13,13 +13,13 @@ namespace P4_Project.Visitors
 {
     public class Cleaner : Visitor
     {
-        //This Visitor checks for obviously missing/wrong things.
-        //Like:
-        //1. All function calls coresponds to a function.
-        //2. Calls have the correct amount of parameters when calling
-        //3. Expressions arent outright missing or null
-        //4. functions with a non "none" return type must have atleast one return inside them!
-        //5. Checks that at maximum one of each type header exists!
+        //This Visitor checks for obviously missing/wrong things. 
+        //Like: 
+        //1. All function calls coresponds to a function. 
+        //2. Calls have the correct amount of parameters when calling 
+        //3. Expressions arent outright missing or null 
+        //4. functions with a non "none" return type must have atleast one return inside them! 
+        //5. Checks that at maximum one of each type header exists! 
         public override string AppropriateFileName { get; } = "Clean.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
@@ -35,11 +35,11 @@ namespace P4_Project.Visitors
         {
             node.Parameters.Accept(this);
 
-            //1. All function calls coresponds to a function.
+            //1. All function calls coresponds to a function. 
             if (!Table.FunctionExists(node.Ident))
                 ErrorList.Add("The Call for: " + node.Ident + " is not a declared function and not a predefined function");
 
-            //2. Calls have the correct amount of parameters when calling
+            //2. Calls have the correct amount of parameters when calling 
             if (node.Parameters.Expressions.Count != Table.findParameterListOfFunction(node.Ident).Count)
                 ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " parameters and should have: " + Table.findParameterListOfFunction(node.Ident).Count + " parameters");
         }
@@ -90,7 +90,7 @@ namespace P4_Project.Visitors
             node.LeftSide.Accept(this);
             node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
 
-            //3. Expressions arent outright missing or null
+            //3. Expressions arent outright missing or null 
             if (node.RightSide.Count == 0)
                 ErrorList.Add("The rightSide exist but have no expressions inside " + node.GetCodeOfOperator());
         }
@@ -100,7 +100,7 @@ namespace P4_Project.Visitors
             node.Parameters.Accept(this);
             node.Body.Accept(this);
 
-            //4. functions with a non "none" return type must have atleast one return inside them!
+            //4. functions with a non "none" return type must have atleast one return inside them! 
             if (node.SymbolObject.type.returntype != "none")
             {
                 bool retExists = false;
@@ -155,7 +155,7 @@ namespace P4_Project.Visitors
         {
             node.attrDeclBlock.Accept(this);
 
-            //5. Checks that at maximum one of each type header exists!
+            //5. Checks that at maximum one of each type header exists! 
             if (node.type.name == "edge" && !edgeHeadExists)
             {
                 edgeHeadExists = true;

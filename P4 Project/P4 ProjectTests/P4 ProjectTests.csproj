@@ -67,6 +67,7 @@
     <Compile Include="SymbolTable\ObjTests.cs" />
     <Compile Include="SymbolTable\SymbolTableTests.cs" />
     <Compile Include="Visitors\CleanerTests.cs" />
+    <Compile Include="Visitors\ScopeTests.cs" />
     <Compile Include="Visitors\XmlTreeBuilderTests.cs" />
     <Compile Include="Visitors\PrettyPrinterTests.cs" />
   </ItemGroup>

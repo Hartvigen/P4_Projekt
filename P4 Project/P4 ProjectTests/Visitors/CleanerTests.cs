@@ -28,21 +28,9 @@ namespace P4_Project.Visitors
             return cleaner;
         }
 
-        //if a variable has been previously declared, accessing it should not cause any errors.
-        //we also check for the type of the variable as a double check, though this test is already done in the in the SymbolTableTest
-        [Test]
-        public void CleanerTestSuccess01()
-        {
-            var program = Clean("number x = 5 " +
-                                "x = 3");
-
-            Assert.IsTrue(program.ErrorList.Count == 0);
-            Assert.IsTrue(program.Table.Find("x").type.name.Equals("number"));
-        }
-
         //We should be able to call a declared function
         [Test]
-        public void CleanerTestSuccess02()
+        public void CleanerTestSuccess01()
         {
             var program = Clean("fun() " +
                                 "func fun(){}");
@@ -52,7 +40,7 @@ namespace P4_Project.Visitors
 
         //we should be able to call a function if we use the correct parameters
         [Test]
-        public void CleanerTestSuccess03()
+        public void CleanerTestSuccess02()
         {
             var program = Clean("fun(5) " +
                                 "func fun(number x){}");
@@ -76,7 +64,7 @@ namespace P4_Project.Visitors
 
         //functions that do not have return type none, must have atleast one return statement in their body
         [Test]
-        public void CleanerTestSuccess04()
+        public void CleanerTestSuccess03()
         {
             var program = Clean("number x = fun() " +
                                 "func number fun(){return 5}");
@@ -86,7 +74,7 @@ namespace P4_Project.Visitors
 
         //Errors should not be thrown if we only have one of each header
         [Test]
-        public void CleanerTestSuccess05()
+        public void CleanerTestSuccess04()
         {
             var program = Clean("[vertex(vertex x, number y)] " +
                                 "[edge(edge ed, number y)]");
@@ -94,19 +82,9 @@ namespace P4_Project.Visitors
             Assert.IsTrue(program.ErrorList.Count == 0);
         }
 
-        //We should not be able to access a variable that has not been previously declared
-        [Test]
-        public void CleanerTestFailure01()
-        {
-            var program = Clean("x = 5");
-
-            program.ErrorList.ForEach(Console.WriteLine);
-            Assert.IsFalse(program.ErrorList.Count == 0);
-        }
-
         //we should not be able to provide parameters for a function which doesn't take any
         [Test]
-        public void CleanerTestFailure02()
+        public void CleanerTestFailure01()
         {
             var program = Clean("number x = 5 " +
                                 "fun(x) " +
@@ -118,7 +96,7 @@ namespace P4_Project.Visitors
 
         //We should not be able to call a function with the wrong parameters
         [Test]
-        public void CleanerTestFailure03()
+        public void CleanerTestFailure02()
         {
             var program = Clean("fun() " +
                                 "func fun(number x){}");
@@ -129,7 +107,7 @@ namespace P4_Project.Visitors
 
         //a with a return type that is not "none" must have atleast one return in its expression
         [Test]
-        public void CleanerTestFailure04()
+        public void CleanerTestFailure03()
         {
             var program = Clean("fun(5) " +
                                 "func number fun(number x){}");
@@ -140,7 +118,7 @@ namespace P4_Project.Visitors
 
         //two of the same headers should not be able to exist at once
         [Test]
-        public void CleanerTestFailure05()
+        public void CleanerTestFailure04()
         {
             var program = Clean("[vertex(number length)] " +
                                 "[vertex(number langth)]");

@@ -13,9 +13,9 @@ namespace P4_Project.Visitors
 {
     public class ScopeChecker : Visitor
     {
-        /// <summary>
-        /// This class make sure that variables are declared before use.
-        /// </summary>
+        /// <summary> 
+        /// This class make sure that variables are declared before use. 
+        /// </summary> 
         public override string AppropriateFileName { get; } = "Errors";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
@@ -37,7 +37,7 @@ namespace P4_Project.Visitors
         {
             node.Source?.Accept(this);
 
-            //If the Source (and type of) is not null this must be an attribute of the source type 
+            //If the Source (and type of) is not null this must be an attribute of the source type  
             if (node.Source != null)
             {
                 if (activeScope.Find(node.Source.Ident) == null)
@@ -54,7 +54,7 @@ namespace P4_Project.Visitors
                 return;
             }
 
-            //If the source (or type of) is null we have to able to find the decleration in the scope and already reached!
+            //If the source (or type of) is null we have to able to find the decleration in the scope and already reached! 
             if (activeScope.Find(node.Ident) == null)
             {
                 ErrorList.Add(node.Ident + " is not in the scope!");
@@ -111,9 +111,9 @@ namespace P4_Project.Visitors
                     if (s.GetType() == typeof(AssignNode))
                     {
                         AssignNode a = (AssignNode)s;
-                        //We dont care about the right side of the assign it must still be valid according to all scoperules
+                        //We dont care about the right side of the assign it must still be valid according to all scoperules 
                         a.Value.Accept(this);
-                        //We find the header scope for edge and if the attribute is not there it is invalid.
+                        //We find the header scope for edge and if the attribute is not there it is invalid. 
                         Table.GetScopes().ForEach(h => {
                             if (h.header && h.name == "edge")
                                 if (h.Find(a.Target.Ident) == null)
@@ -136,7 +136,7 @@ namespace P4_Project.Visitors
         {
             node.DefaultValue?.Accept(this);
 
-            //It is marked that this decleration has been reached!
+            //It is marked that this decleration has been reached! 
             activeScope.Find(node.SymbolObject.Name).type.reached = true;
         }
         public override void Visit(VertexDeclNode node)
@@ -147,17 +147,17 @@ namespace P4_Project.Visitors
                     if (s.GetType() == typeof(AssignNode))
                     {
                         AssignNode a = (AssignNode)s;
-                        //We dont care about the right side of the assign it must still be valid according to all scoperules
+                        //We dont care about the right side of the assign it must still be valid according to all scoperules 
                         a.Value.Accept(this);
 
-                        //We find the header scope for vertex and if the attribute is not there it is invalid.
+                        //We find the header scope for vertex and if the attribute is not there it is invalid. 
                         if(!Table.vertexAttr.GetDic().ContainsKey(a.Target.Ident))
                             ErrorList.Add(a.Target.Ident + " is not a valid attribute for vertex");
                     }
                 });
             }
 
-            //The vertex has no been reached so we se declareted to true
+            //The vertex has no been reached so we se declareted to true 
             activeScope.Find(node.SymbolObject.Name).type.reached = true;
         }
 

@@ -3,9 +3,9 @@ using P4_Project.Visitors;
 
 namespace P4_Project.AST.Expressions
 {
-    /// <summary>
-    /// A unary expression is used for an expression where a boolean is either negated by the '!' operator or a number is made negative by a pre-fix '-'
-    /// </summary>
+    /// <summary> 
+    /// A unary expression is used for an expression where a boolean is either negated by the '!' operator or a number is made negative by a pre-fix '-' 
+    /// </summary> 
     public class UnaExprNode : ExprNode
     {
         public ExprNode Expr { get; }
@@ -28,5 +28,6 @@ namespace P4_Project.AST.Expressions
         {
             return Operators.GetCodeFromInt(OperatorType);
         }
+
     }
 }
