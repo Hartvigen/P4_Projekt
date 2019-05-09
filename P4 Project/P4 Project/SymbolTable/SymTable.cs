@@ -18,6 +18,14 @@ namespace P4_Project.SymbolTable
         private List<SymTable> InnerScopes { get; } = new List<SymTable>();
         private Dictionary<string, Obj> _symbolDecls = new Dictionary<string, Obj>();
 
+        public SymTable vertexAttr;
+        public SymTable edgeAttr;
+
+        //Used to keep track of the next Innerscope
+        private int position = 0;
+
+        public BaseType type;
+
         //Constructor for visitor (no parser argument)
         public SymTable(SymTable parent, Parser parser)
         {
@@ -90,9 +98,14 @@ namespace P4_Project.SymbolTable
             if (_symbolDecls.TryGetValue(name, out var value))
                 return value;
 
-            if (Parent != null && Parent.name != "top")
+            //We only ask parent if it is not the scope named top that also has a null parent as that would mean it was a true top scope.
+            //This allows for functions to actually be named "top" as their otherwise could have been problems with that.
+            if (Parent != null)
+            {
+                if (Parent.name == "top" && Parent.Parent == null)
+                        return null;
                 return Parent.Find(name);
-
+            }
             return null;
         }
 
@@ -108,38 +121,15 @@ namespace P4_Project.SymbolTable
             return _symbolDecls;
         }
 
-        public void PrintAllInCurrentScope()
-        {
-            if (name != "")
-            {
-                Console.WriteLine("Named scope: " + name);
-            }
-            foreach (var keyValuePair in _symbolDecls)
-            {
-                Console.WriteLine("    Name: " + keyValuePair.Key + " Type: " + keyValuePair.Value.type);
-            }
-            if(Parent !=  null)
-            Parent.PrintAllInCurrentScope();
-        }
-        
-        public void PrintAllInAllScopes()
-        {
-                InnerScopes.ForEach(i =>
-                {
-                    i.PrintAllInCurrentScope();
-                });
-        }
-
         public BaseType findReturnTypeOfFunction(string name)
         {
             if (IsPreDefFunctions(name))
                 return FindReturnOfPreDefFunctions(name);
-            
-            if (_symbolDecls.ContainsKey(name))
-            {
-                _symbolDecls.TryGetValue(name, out Obj value);
-                return value.type;
-            }else throw new Exception("Name " + name + " does not belong to a function.");
+            foreach (var s in InnerScopes) {
+                if(s.name == name)
+                    return s.type;
+            }
+            throw new Exception("Name " + name + " does not belong to a function.");
         }
 
         public bool FunctionExists(string name)
@@ -150,25 +140,20 @@ namespace P4_Project.SymbolTable
         public List<BaseType> findParameterListOfFunction(string name)
         {
             if (IsPreDefFunctions(name)) return FindParameterListOfPreDefFunctions(name);
-            if (_symbolDecls.ContainsKey(name))
+            //Complicated piece of code that can either find the function in its propper place or in symbdecls becuase function is used in the cleaner before functions gets cleaned up.
+            foreach (var s in InnerScopes)
             {
-                _symbolDecls.TryGetValue(name, out Obj value);
-                return value.type.parameterTypes;
-            }else throw new Exception("Name " + name + " does not belong to a function.");
+                if (s.name == name)
+                    if (s.type == null) {
+                        _symbolDecls.TryGetValue(name, out Obj o);
+                        return o.type.parameterTypes;
+                    }else return s.type.parameterTypes;
+            }
+            throw new Exception("Name " + name + " does not belong to a function.");
         }
         private bool IsPreDefFunctions(string name)
         {
-            switch (name) { 
-                case "GetEdge": return true;
-                case "RemoveEdge": return true;
-                case "GetEdges": return true;
-                case "RemoveVertex": return true;
-                case "GetVertices": return true;
-                case "ClearEdges": return true;
-                case "ClearVertices": return true;
-                case "ClearAll": return true;
-                default: return false;
-            }
+            return PreDefined.preDefinedFunctions.Contains(name);
         }
 
         private BaseType FindReturnOfPreDefFunctions(string name)
@@ -201,6 +186,30 @@ namespace P4_Project.SymbolTable
                 case "ClearAll": return new List<BaseType>();
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
+        }
+
+        public SymTable EnterNextScope() {
+            position++;
+
+            //If we have reached a position higher than their are scopes availble we it must be an error!
+            if (position > InnerScopes.Count)
+                throw new Exception("Ran out of scopes");
+            return InnerScopes[position - 1];
+        }
+
+        public bool isAttribute(string typeName, string attrName) {
+            bool found = false;
+            if (typeName == "vertex")
+                return vertexAttr._symbolDecls.ContainsKey(attrName);
+            else if(typeName == "edge")
+                return edgeAttr._symbolDecls.ContainsKey(attrName);
+
+            throw new Exception(typeName + " is not possible to hold attributes");
+        }
+
+        public void resetScopePositions() {
+            position = 0;
+            InnerScopes.ForEach(s => s.resetScopePositions());
         }
     }
 }

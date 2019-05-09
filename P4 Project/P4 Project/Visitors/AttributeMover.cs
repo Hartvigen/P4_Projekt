@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -11,27 +10,24 @@ using P4_Project.SymbolTable;
 
 namespace P4_Project.Visitors
 {
-    public class ScopePlacerVisitor : Visitor
+    public class AttributeMover : Visitor
     {
-        public override string AppropriateFileName { get; } = "ScopeErrors.txt";
+        //This Visitor will fix attributes and functions
+        //Like:
+        //1. Remove the function "SymbolObject" and set it as type on function scope.
+        //2. Move attributes from top scope to their own special scope.
+        //3. Add the defualt attributes
+        //4. Add the defualt functions
+        public override string AppropriateFileName { get; } = "AttributeMover.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         public override SymTable Table { get; set; }
-
-        private bool inVertexHead;
-        private bool inEdgeHead;
-        private bool inFunction;
-
-        public ScopePlacerVisitor(SymTable table)
-        {
-            Table = table;
+        public AttributeMover(SymTable Table) {
+            this.Table = Table;
         }
-
         public override void Visit(CallNode node)
         {
-            
             node.Parameters.Accept(this);
-            
         }
         public override void Visit(VarNode node)
         {
@@ -40,215 +36,173 @@ namespace P4_Project.Visitors
 
         public override void Visit(BoolConst node)
         {
-            
         }
 
         public override void Visit(CollecConst node)
         {
-            
+            node.Expressions.ForEach(n=>n.Accept(this));
         }
 
         public override void Visit(NoneConst node)
         {
-            
         }
 
         public override void Visit(NumConst node)
         {
-            
         }
 
         public override void Visit(TextConst node)
         {
-            
         }
 
         public override void Visit(BinExprNode node)
         {
-            
             node.Left.Accept(this);
             node.Right.Accept(this);
-            
         }
 
         public override void Visit(UnaExprNode node)
         {
-            
             node.Expr.Accept(this);
-            
         }
 
         public override void Visit(EdgeCreateNode node)
         {
-            
             node.LeftSide.Accept(this);
             node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
-            
         }
 
         public override void Visit(FuncDeclNode node)
         {
-            inFunction = true;
-
-            //We remove the FuncDecl from top scope as it is in the functionscope
-            Table.RemoveObj(node.SymbolObject);
-
+            //1. Remove the function "SymbolObject" and set it as type on function scope.
+            Table.GetScopes().ForEach(s => {
+                if (s.name == node.SymbolObject.Name)
+                {
+                    s.type = node.SymbolObject.type;
+                    Table.RemoveObj(node.SymbolObject);
+                }
+            });
             node.Parameters.Accept(this);
             node.Body.Accept(this);
-
-            inFunction = false;
         }
 
         public override void Visit(VarDeclNode node)
         {
             node.DefaultValue?.Accept(this);
-
-            //We make sure to move the VarDeclNode from the generel symboltable to a head symboltable if it exists inside a headnode.
-            if (inEdgeHead || inVertexHead)
-            {
-                Table.GetScopes().ForEach(t =>
-                {
-                    if (t.header)
-                    {
-                        t.GetScopes().ForEach(h =>
-                        {
-                            if (h.name == "vertex" && inVertexHead)
-                            {
-                                Obj obj = Table.Find(node.SymbolObject.Name);
-                                h.AddObj(obj);
-                                Table.RemoveObj(obj);
-                            }
-                            else if (h.name == "edge" && inEdgeHead)
-                            {
-                                Obj obj = Table.Find(node.SymbolObject.Name);
-                                h.AddObj(obj);
-                                Table.RemoveObj(obj);
-                            }
-                        });
-                    }
-                });
-            }
-            else if (inFunction) {
-                //If we are in a function we can reach all variables 
-            }
         }
 
         public override void Visit(VertexDeclNode node)
         {
-            
             node.Attributes.Accept(this);
-            
         }
 
         public override void Visit(AssignNode node)
         {
-            
             node.Target.Accept(this);
             node.Value.Accept(this);
-            
         }
 
         public override void Visit(BlockNode node)
         {
-            
             node.Statements.ForEach(n => n.Accept(this));
-            
         }
 
         public override void Visit(ForeachNode node)
         {
-            
             node.IterationVar.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
-            
         }
 
         public override void Visit(ForNode node)
         {
-            
             node.Initializer.Accept(this);
             node.Condition.Accept(this);
             node.Iterator.Accept(this);
             node.Body.Accept(this);
-            
         }
 
         public override void Visit(HeadNode node)
         {
-            //Finds the head scope and enters this headnode
-            SymTable h = new SymTable(null,null, node.type.name);
-            Table.GetScopes().ForEach(t => { if (t.header) t.GetScopes().Add(h);});
+            //2. Move attributes from top scope to their own special scope.
 
-            //Set bool that we are in a head.
+            //Add defualt attributes
             if (node.type.name == "vertex")
-                inVertexHead = true;
-            else inEdgeHead = true;
+            {
+                PreDefined.preDefinedAttributesVertex.ForEach(va =>
+                {
+                    Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.getTypeOfAttribute(va)), 0, null));
+                });
+                //Add user defined attributes
+                node.attrDeclBlock.Statements.ForEach(s => {
+                    VarDeclNode v = (VarDeclNode)s;
+                    Table.vertexAttr.AddObj(v.SymbolObject);
+                    Table.RemoveObj(v.SymbolObject);
+                });
+            }
+            else if (node.type.name == "edge")
+            {
+                PreDefined.preDefinedAttributesEdge.ForEach(va =>
+                {
+                    Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.getTypeOfAttribute(va)), 0, null));
+                });
+                //Add user defined attributes
+                node.attrDeclBlock.Statements.ForEach(s => {
+                    VarDeclNode v = (VarDeclNode)s;
+                    Table.edgeAttr.AddObj(v.SymbolObject);
+                    Table.RemoveObj(v.SymbolObject);
+                });
+            }
 
-            //Visit every node in the head.
-            node.attrDeclBlock.Accept(this);
-             
-            //Remove the indicator.
-            inEdgeHead = false;
-            inVertexHead = false;
+            
         }
 
         public override void Visit(IfNode node)
         {
-            
             node.Condition?.Accept(this);
             node.Body.Accept(this);
             node.ElseNode?.Accept(this);
-            
         }
 
         public override void Visit(LoneCallNode node)
         {
-            
             node.Call.Accept(this);
-            
         }
 
         public override void Visit(ReturnNode node)
         {
-            
             node.Ret.Accept(this);
-            
         }
 
         public override void Visit(WhileNode node)
         {
-            
             node.Condition.Accept(this);
             node.Body.Accept(this);
-            
         }
 
         public override void Visit(Magia node)
         {
-            //Create a HeaderScope
-            SymTable t = new SymTable(null, null, " ");
-            t.header = true;
-            Table.GetScopes().Add(t);
+            //Creates a scope just for header attributes
+            SymTable v = new SymTable(null, null, " ");
+            v.header = true;
+            Table.vertexAttr = v;
+            SymTable e = new SymTable(null, null, " ");
+            e.header = true;
+            Table.edgeAttr = e;
             node.block.Accept(this);
-
-            Console.WriteLine("Done");
         }
 
         public override void Visit(BreakNode node)
         {
-            
         }
 
         public override void Visit(ContinueNode node)
         {
-            
         }
 
         public override void Visit(MultiDecl node)
         {
             node.Decls.ForEach(n => n.Accept(this));
-            
         }
     }
 }

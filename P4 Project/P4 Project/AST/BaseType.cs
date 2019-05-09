@@ -12,7 +12,7 @@ namespace P4_Project.AST
         public BaseType singleType;
 
         //If it can be reached from its declaration it is declared for the scope.
-        public bool reachableByDecleration;
+        public bool reached;
 
         //For all kinds of nodes
         public BaseType(string type) {
