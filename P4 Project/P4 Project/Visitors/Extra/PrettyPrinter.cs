@@ -13,7 +13,7 @@ namespace P4_Project.Visitors
 {
     public class PrettyPrinter : Visitor
     {
-        public override string AppropriateFileName { get; } = "prettyprint.txt";
+        public override string AppropriateFileName { get; } = "PrettyCode.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         public override SymTable Table { get; set; }

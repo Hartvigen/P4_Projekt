@@ -15,7 +15,13 @@ number fortytwo = 24
 
 func number GetVal(number a)
 {
-    whileifs()
+    if (true)
+    {
+        text t = "asdasd"
+    } else
+    {
+        text r = "ddgfdfs"
+    } 
     return 3 + 4 + a
 }
 
@@ -39,12 +45,11 @@ func number whileifs()
             if (total == 7)
             {
                 total = total + GetVal(total)
-            } elseif (total == 10)
+      } elseif (total == 10)
             {
                 total = GetVal(total)
             } else
-            {
-                total = 0
+            {     total = 0
             } 
             b = true
         } 
@@ -57,61 +62,75 @@ func number whileifs()
     number i
     for(i = sum, i > 0, i = i - 1)
     {
-
-
-
-
         total = total + sum / i
     }
-    return total}
+    return total
+}
 
 func none tester()
 {
     number p = 1.5
     list<number> nlist = {1, 2, 3, 4, 5}
+    VEDecls()
     foreach(number n in nlist)
     {
         p = p + n
     }
+    if (true)
+    {
+        number k = 58
+        p = p + k
+    } 
 }
 
 func none VEDecls()
 {
     vertex(v1)
     vertex(v2, distance = 4, parent = v1, bval = true)
-					    vertex(v3, bval = true)
-    vertex{(v4), (v5, parent = v3), (v6, distance = 4, parent = v1, bval = true)}
+    vertex(v3, bval = true)
+    vertex{(v4), (v5, parent = v3), (v6, distance = 1, parent = v1, bval = true)}
     v1 -- v2
-					    v2 -- (v3, t = "Hello my lady")
+    v2 -- (v3, t = "Hello my lady")
     edge e = graph.GetEdge(v2, v3)
     vertex var = v2
-				    graph.RemoveEdge(v1, v2)
+    graph.RemoveEdge(v1, v2)
     graph.RemoveEdge(v2, v3)
     v2 -> v3
     v3 -> {(v4), (v5, weight = 42, t = "The Answer")}
     v1 <- v6
     v2 <- {(v3), (v5, t = "the world")}
     graph.ClearEdges()
-			    graph.ClearVertices()
+    graph.ClearVertices()
     vertex(v1_2)
     vertex(v2_2, distance = 4, parent = v1, bval = true)
     v1 -> v2
-    graph.ClearAll()
+    v1.distance = 5
+    ClearAll()
 }
 
 func none expr()
 {
-    vertex(v2_3, distance = 4, parent = v1, bval = true)
+    vertex(v2_3, distance = 4, bval = true)
+    vertex(v2)
     boolean b = 5 != 6 && 5 - 8 + 9 * (v2.distance) > -8 + 11 % 3 || 5 == 8 || 11 * (54 - 6) < -4
 }
-
 func boolean manyparams(vertex v1, number n, boolean mightbetrue, text greeting)
 {
-    return false
+return false
 }
-
 func boolean hello(text greet)
 {
+    if (false)
+    {
+        if (false)
+        {
+            number x = 0
+        } 
+    } 
+    if (1 == 0)
+    {
+        return true
+    } 
     return false
 }
 
@@ -120,5 +139,5 @@ func vertex funckingbreaks(vertex v1)
     text t = "true" + "false"
     vertex(v32)
     vertex a2 = v32
-    return v2
+    return v32
 }

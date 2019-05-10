@@ -46,7 +46,8 @@ namespace P4_Project
                         break;
                     case "-p":
                     case "--prettyprint":
-                        List<Visitor> vils1 = new List<Visitor> { new Cleaner(parser.tab), new ScopeChecker(parser.tab), new PrettyPrinter(parser.tab) };
+                        parser.tab.name = "top";
+                        List<Visitor> vils1 = new List<Visitor> { new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab), new PrettyPrinter(parser.tab) };
                         ApplyVisitors(vils1, args[1]);
                         Console.WriteLine("Done");
                         break;

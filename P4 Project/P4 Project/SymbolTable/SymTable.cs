@@ -203,11 +203,27 @@ namespace P4_Project.SymbolTable
                 return vertexAttr._symbolDecls.ContainsKey(attrName);
             else if(typeName == "edge")
                 return edgeAttr._symbolDecls.ContainsKey(attrName);
-
             throw new Exception(typeName + " is not possible to hold attributes");
         }
 
-        public void resetScopePositions() {
+		public BaseType getTypeOfAttribute(string typeName, string attrName) {
+			if (isAttribute(typeName, attrName)) {
+				if (typeName == "vertex")
+				{
+					vertexAttr._symbolDecls.TryGetValue(attrName, out Obj o);
+					return o.type;
+				}
+				else if (typeName == "edge")
+				{
+					edgeAttr._symbolDecls.TryGetValue(attrName, out Obj o);
+					return o.type;
+				}
+			}
+			throw new Exception(typeName + " is not possible to hold attributes");
+		}
+
+
+		public void resetScopePositions() {
             position = 0;
             InnerScopes.ForEach(s => s.resetScopePositions());
         }

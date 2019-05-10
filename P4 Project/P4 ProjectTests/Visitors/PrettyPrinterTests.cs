@@ -56,15 +56,21 @@ namespace P4_Project.Visitors
             var parser = new Parser(new Scanner(StreamFromString(program)));
             parser.Parse();
             var cleaner = new Cleaner(parser.tab);
+			var attr = new AttributeMover(parser.tab);
             var typevisitor = new TypeChecker(parser.tab);
             var prettyPrinter = new PrettyPrinter(parser.tab);
 
             parser.mainNode.Accept(cleaner);
-            parser.mainNode.Accept(typevisitor);
-            parser.mainNode.Accept(prettyPrinter);
+			cleaner.ErrorList.ForEach(Console.WriteLine);
 
-            if (prettyPrinter.ErrorList.Count != 0)
-                prettyPrinter.ErrorList.ForEach(Console.WriteLine);
+			parser.mainNode.Accept(attr);
+			attr.ErrorList.ForEach(Console.WriteLine);
+
+			parser.mainNode.Accept(typevisitor);
+			typevisitor.ErrorList.ForEach(Console.WriteLine);
+
+			parser.mainNode.Accept(prettyPrinter);
+			prettyPrinter.ErrorList.ForEach(Console.WriteLine);
 
             return prettyPrinter.Result.ToString();
         }

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace P4_ProjectTests1.Visitors
+namespace P4_Project.Visitors
 {
     class ScopeTests
     {

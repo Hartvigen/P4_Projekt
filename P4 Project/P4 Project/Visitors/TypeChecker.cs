@@ -52,9 +52,23 @@ namespace P4_Project.Visitors
             if(activeScope.Find(node.Ident) != null)
             node.type = activeScope.Find(node.Ident).type;
 
-            if (node.type == null)
-                return;
-        }
+			//If the Source exist we can find the type as from the attribute that matches from the source
+			if (node.type == null && node.Source != null && node.Source.type != null) {
+				if (Table.isAttribute(node.Source.type.name, node.Ident)) {
+					node.type = Table.getTypeOfAttribute(node.Source.type.name, node.Ident);
+				}
+			}
+
+
+
+
+			if (node.type == null && node.Source != null) {
+				ErrorList.Add("No type given var: " + node.Source.Ident + "." + node.Ident);
+				return;
+			}
+			if (node.type == null)
+				ErrorList.Add("No type given var: " + node.Ident);
+		}
 
         //returns a Bool type
         public override void Visit(BoolConst node)
