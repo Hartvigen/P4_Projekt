@@ -5,6 +5,7 @@ using System.IO;
 using P4_Project.Graphviz;
 using System.Collections.Generic;
 using System.Text;
+using P4_Project.Compiler.Executor;
 
 namespace P4_Project
 {
@@ -33,6 +34,7 @@ namespace P4_Project
                         parser.tab.name = "top";
                         List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab)};
                         ApplyVisitors(vils, args[1]);
+                        Executor executor = new Executor(parser);
                         Console.WriteLine("Done");
                         break;
                     case "-h":

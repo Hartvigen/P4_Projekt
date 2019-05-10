@@ -1,24 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace P4_Project.AST
 {
+    /// <summary>
+    /// Class is used in most of the compiler in some capacity.
+    /// It has the responsebility to be able to reflect any type in the entire langauge.
+    /// </summary>
     public class BaseType
     {
+        //Generel Type name
         public string name;
+
+        //Function Type
         public string returntype = "none";
-        public BaseType collectionType;
         public List<BaseType> parameterTypes;
+
+        //CollectionTypes
+        public BaseType collectionType;
         public BaseType singleType;
 
-        //If it can be reached from its declaration it is declared for the scope.
+        //Used to do a little reachability analysis
         public bool reached;
 
-        //For all kinds of nodes
+        /// <summary>
+        /// Constructor used to create a simple type
+        /// </summary>
+        /// <param name="type">The type name eg. number, vertex ..</param>
         public BaseType(string type) {
             this.name = type;
         }
-        //For the FuncDeclNode
+
+        /// <summary>
+        /// Constructor used for creating a function BaseType
+        /// </summary>
+        /// <param name="returntype">The Return type of the function</param>
+        /// <param name="parameterTypes">A List of all the parameters the function needs can be empty but not null</param>
         public BaseType(BaseType returntype, List<BaseType> parameterTypes)
         {
             this.name = "func";
@@ -26,16 +42,17 @@ namespace P4_Project.AST
                 this.returntype = returntype.name;
             this.parameterTypes = parameterTypes;
         }
-        //For the Collections
+        
+        /// <summary>
+        /// Constructor used for creating collection types
+        /// </summary>
+        /// <param name="singleType">The subtype the collection is holding</param>
+        /// <param name="collectionType">The collection type eg. Set, Stack ..</param>
         public BaseType(BaseType singleType, BaseType collectionType)
         {
             this.name = "collec";
             this.collectionType = collectionType;
             this.singleType = singleType;
-        }
-        public override string ToString()
-        {
-            return name;
         }
     }
 }

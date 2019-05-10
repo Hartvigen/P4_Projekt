@@ -70,6 +70,9 @@
     <Compile Include="AST\Node.cs" />
     <Compile Include="AST\Stmts\BreakNode.cs" />
     <Compile Include="AST\Stmts\ContinueNode.cs" />
+    <Compile Include="Compiler\Interpreter\edge.cs" />
+    <Compile Include="Compiler\Interpreter\Interpreter.cs" />
+    <Compile Include="Compiler\Interpreter\vertex.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\Parser.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\Scanner.cs" />
     <Compile Include="Graphviz\DotToPng.cs" />
@@ -89,12 +92,12 @@
     <Compile Include="AST\Stmts\LoneCallNode.cs" />
     <Compile Include="AST\Stmts\ReturnNode.cs" />
     <Compile Include="AST\Stmts\StmtNode.cs" />
-    <Compile Include="Visitors\AttributeMover.cs" />
-    <Compile Include="Visitors\Cleaner.cs" />
-    <Compile Include="Visitors\Extra\PrettyPrinter.cs" />
-    <Compile Include="Visitors\ScopeChecker.cs" />
-    <Compile Include="Visitors\TypeChecker.cs" />
-    <Compile Include="Visitors\Visitor.cs" />
+    <Compile Include="Compiler\SemanticAnalysis\Visitors\AttributeMover.cs" />
+    <Compile Include="Compiler\SemanticAnalysis\Visitors\Cleaner.cs" />
+    <Compile Include="Compiler\SemanticAnalysis\Visitors\Extra\PrettyPrinter.cs" />
+    <Compile Include="Compiler\SemanticAnalysis\Visitors\ScopeChecker.cs" />
+    <Compile Include="Compiler\SemanticAnalysis\Visitors\TypeChecker.cs" />
+    <Compile Include="Compiler\SemanticAnalysis\Visitors\Visitor.cs" />
     <Compile Include="AST\Stmts\EdgeCreateNode.cs" />
     <Compile Include="AST\Stmts\BlockNode.cs" />
     <Compile Include="AST\Stmts\ForeachNode.cs" />
@@ -102,7 +105,7 @@
     <Compile Include="AST\Stmts\IfNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
     <Compile Include="AST\Stmts\Decls\MultiDecl.cs" />
-    <Compile Include="Visitors\Extra\XmlTreeBuilder.cs" />
+    <Compile Include="Compiler\SemanticAnalysis\Visitors\Extra\XmlTreeBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -111,10 +114,7 @@
     <None Include="Graphviz\bin\Settings.ini" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Compiler\CodeGeneration\" />
-    <Folder Include="Compiler\SemanticAnalysis\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Graphviz\bin\acyclic.exe" />
     <Content Include="Graphviz\bin\ann.dll" />
