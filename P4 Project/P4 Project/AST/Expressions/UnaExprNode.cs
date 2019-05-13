@@ -1,4 +1,5 @@
-﻿using P4_Project.AST;
+﻿using System.Collections.Generic;
+using P4_Project.AST;
 using P4_Project.Visitors;
 
 namespace P4_Project.AST.Expressions
@@ -29,5 +30,9 @@ namespace P4_Project.AST.Expressions
             return Operators.GetCodeFromInt(OperatorType);
         }
 
+        public override List<string> getValue()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

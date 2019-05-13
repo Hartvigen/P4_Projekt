@@ -1,4 +1,5 @@
-﻿using P4_Project.Visitors;
+﻿using System.Collections.Generic;
+using P4_Project.Visitors;
 
 namespace P4_Project.AST.Expressions.Values
 {
@@ -16,8 +17,11 @@ namespace P4_Project.AST.Expressions.Values
         {
             vi.Visit(this);
         }
-        public string GetString() {
-            return Value ? "true" : "false";
+        public override List<string> getValue()
+        {
+            List<string> values = new List<string>();
+            values.Add(Value ? "true" : "false");
+            return values;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using P4_Project.AST.Expressions;
+﻿using System.Collections.Generic;
+using P4_Project.AST.Expressions;
 using P4_Project.Visitors;
 
 namespace P4_Project.AST.Stmts.Decls
@@ -11,6 +12,11 @@ namespace P4_Project.AST.Stmts.Decls
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
+        }
+
+        public override List<string> getValue()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -40,6 +40,8 @@ namespace P4_Project
                 return "0";
             if (type.name == "text")
                 return "";
+            if (type.name == "boolean")
+                return "false";
             if (type.name == "vertex" || type.name == "edge" || type.name == "collec")
                 return "none";
             throw new Exception("Type has no predefined value! :: " + type.name + " ::");

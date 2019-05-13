@@ -1,4 +1,5 @@
 ﻿using P4_Project.Visitors;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace P4_Project.AST.Expressions.Values
@@ -19,6 +20,13 @@ namespace P4_Project.AST.Expressions.Values
         }
         public string GetString() {
             return Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public override List<string> getValue()
+        {
+            List<string> values = new List<string>();
+            values.Add("" + Value);
+            return values;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using P4_Project.AST;
+﻿using System.Collections.Generic;
+using P4_Project.AST;
 
 namespace P4_Project.AST.Expressions
 {
@@ -13,5 +14,7 @@ namespace P4_Project.AST.Expressions
         {
             type = null;
         }
+
+        public abstract List<string> getValue();
     }
 }

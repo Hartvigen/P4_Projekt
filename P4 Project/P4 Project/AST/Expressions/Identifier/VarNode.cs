@@ -1,4 +1,5 @@
-﻿using P4_Project.Visitors;
+﻿using System.Collections.Generic;
+using P4_Project.Visitors;
 
 namespace P4_Project.AST.Expressions.Identifier
 {
@@ -13,6 +14,11 @@ namespace P4_Project.AST.Expressions.Identifier
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
+        }
+
+        public override List<string> getValue()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

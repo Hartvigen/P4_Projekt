@@ -64,7 +64,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(BoolConst node)
         {
-            Result.Append(node.GetString());
+            Result.Append(node.getValue()[0]);
         }
 
         public override void Visit(CollecConst node)
