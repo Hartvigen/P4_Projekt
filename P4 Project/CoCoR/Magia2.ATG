@@ -336,14 +336,14 @@ ExprNot<out ExprNode e>             (. e = null; bool b = false;.)
     .
 
 /*------------------------------------------------------------------------*/
-Factor<out ExprNode e>              (. e = null; .)
+Factor<out ExprNode e>                      (. e = null; .)
     = Const<out e>
-    | '(' Expr<out e> ')'           (. e.InParentheses = true; .)
-    | CallOrID<out IdentNode expr>  (. e = expr; .)
+    | '(' Expr<out e> ')'                   (. e.InParentheses = true; .)
+    | CallOrID<out IdentNode expr>          (. e = expr; .)
     | 
       CollecType<out BaseType type>
       '{' 
-        Args<type, out collec>      (. e = collec; .)
+        Args<type, out CollecConst collec>  (. e = collec; .)
       '}'
     .       
 
@@ -367,7 +367,8 @@ Args<BaseType type, out CollecConst collec> =   (. collec = new CollecConst(type
         {
             WEAK ',' Expr<out expr>             (. collec.Add(expr); .)
         }
-    ].
+    ]
+.
 
 
 /*------------------------------------------------------------------------*/
