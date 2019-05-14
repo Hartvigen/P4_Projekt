@@ -39,7 +39,7 @@ StructStmt = ( StmtWhile | StmtFor | StmtForeach | StmtIf ).
 
 StmtWhile = "while" '(' Expr ')' '{' { Stmt } '}' .
 
-StmtFor = "for" '(' ( SimpleStmt | VarDecl )  ',' Expr  ',' Identifier Assign ')' '{' { Stmt } '}' .
+StmtFor = "for" '(' ( SimpleStmt | VarDecl )  ',' Expr  ',' SymbolRef Assign ')' '{' { Stmt } '}' .
 
 StmtForeach = "foreach" '(' Type IDENT "in" Expr ')' '{' { Stmt } '}' .
 
@@ -51,16 +51,16 @@ KeywordStmt = ( "return" Expr | "break" | "continue" ).
 
 SimpleStmt = CallOrID [ Assign | EdgeOneOrMore ].
 
-EdgeOneOrMore = EdgeOpr ( Identifier | EdgeCreate | '{' EdgeCreate { ',' EdgeCreate } '}' ).
+EdgeOneOrMore = EdgeOpr ( SymbolRef | EdgeCreate | '{' EdgeCreate { ',' EdgeCreate } '}' ).
 
 EdgeOpr = ( "<-" | "--" | "->" ).
 
-EdgeCreate = '(' Identifier { ',' Identifier Assign } ')'.
+EdgeCreate = '(' SymbolRef { ',' SymbolRef Assign } ')'.
 
 
 FullDecl = Type ( IDENT [ Assign ] | '{' VtxDecl { ',' VtxDecl } '}' | VtxDecl ).
 
-VtxDecl = '(' IDENT { ',' Identifier Assign } ')'.
+VtxDecl = '(' IDENT { ',' SymbolRef Assign } ')'.
 
 
 ParamDecl = Type IDENT.
@@ -90,12 +90,12 @@ ExprNot = ['!'] Factor.
 Factor = Const | '(' Expr ')' | CallOrID. 
 
 
-CallOrID = Identifier [ '(' Args ')' ] [ '.' CallOrID ].
+CallOrID = SymbolRef [ '(' Args ')' ] [ '.' CallOrID ].
 
 Args = [Expr { ',' Expr } ].
 
 
-Identifier = ( IDENT ).
+SymbolRef = ( IDENT ).
 
 Const = ( NUMBER | TEXT | "true"| "false" | "none" ).
 

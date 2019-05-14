@@ -69,14 +69,14 @@ Head<out HeadNode head> =                       (. head = null; VarDeclNode attr
 
 
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string funcName = ""; BaseType returnType = null; FunctionType protocol = null; .)
+FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string funcName = ""; BaseType returnType = null; BaseType protocol = null; .)
     "func" (Type<out returnType> | "none") IDENT    (. funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); .)
     WEAK '('                                        (. tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); .)
         [ IF(la.val != ")" && la.val != "{") 
           ParamDecl<out paramDecl>                    (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
           { WEAK ',' ParamDecl<out paramDecl>         (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
           }
-        ]                                           (. protocol = new FunctionType(returnType, parameterTypes); .)
+        ]                                           (. protocol = new BaseType(returnType, parameterTypes); .)
     WEAK ')'
     WEAK '{'                                        (. StmtNode stmt = null; .)
         { SYNC Stmt<out stmt>                       (. stmtBlock.Add(stmt); .)
@@ -127,7 +127,7 @@ StmtFor<out StmtNode f> =               (. f = null; BlockNode stmtBlock = new B
         | VarDecl<out VarDeclNode vert> (. init = vert; .)
         ) WEAK ','
         Expr<out cond> WEAK ','
-        Identifier<out VarNode target>
+        SymbolRef<out VarNode target>
         Assign<out ExprNode expr>       (. iter = new AssignNode(target, expr); .)
     ')' 
     '{'                                 (. tab = tab.OpenScope(); .)
@@ -187,7 +187,7 @@ SimpleStmt<out StmtNode stmt> =         (. stmt = null; .)
 EdgeOneOrMore<IdentNode start, out StmtNode stmt> = (. stmt = null; EdgeCreateNode edge; .)
     EdgeOpr<out int op>                             (. stmt = edge = new EdgeCreateNode(start, op); .)
     ( 
-        Identifier<out VarNode end>                 (. edge.AddRightSide(end, new List<AssignNode>()); .)
+        SymbolRef<out VarNode end>                 (. edge.AddRightSide(end, new List<AssignNode>()); .)
     | 
         EdgeCreate<edge>
     | 
@@ -209,8 +209,8 @@ EdgeOpr<out int op> =   (. op = 0;                  .)
 /*------------------------------------------------------------------------*/
 EdgeCreate<EdgeCreateNode edge> =           (. VarNode varNode = null; ExprNode expr = null; List<AssignNode> attributes = new List<AssignNode>(); .)
     '(' 
-        Identifier<out VarNode right>
-        { WEAK ',' Identifier<out varNode>
+        SymbolRef<out VarNode right>
+        { WEAK ',' SymbolRef<out varNode>
           Assign<out expr>                  (. attributes.Add(new AssignNode(varNode, expr)); .)
         }                                   (. edge.AddRightSide(right, attributes); .)
     ')'
@@ -247,8 +247,8 @@ FullDecl<out StmtNode stmt> =               (. stmt = null; VertexDeclNode verte
 /*------------------------------------------------------------------------*/
 VtxDecl<out VertexDeclNode vertexDecl> =    (. vertexDecl = null; VarNode varNode = null; ExprNode expr = null; .)
     '(' 
-        IDENT                               (. vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new VertexType(), var)); .)
-        { WEAK ',' Identifier<out varNode>
+        IDENT                               (. vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new BaseType("vertex"), var)); .)
+        { WEAK ',' SymbolRef<out varNode>
           Assign<out expr>                  (. vertexDecl.AddAttr(new AssignNode(varNode, expr)); .)
         }
     ')'
@@ -351,7 +351,7 @@ Factor<out ExprNode e>      (. e = null; .)
 
 /*------------------------------------------------------------------------*/
 CallOrID<out IdentNode i> =                 (. i = null; .)
-    Identifier<out VarNode varNode>         (. i = varNode; .)
+    SymbolRef<out VarNode varNode>         (. i = varNode; .)
     [
         '(' 
             Args<out CollecConst collec>    (. i = new CallNode(i.Identifier, collec); .)
@@ -373,7 +373,7 @@ Args<out CollecConst collec> =      (. collec = new CollecConst(); ExprNode expr
 
 
 /*------------------------------------------------------------------------*/
-Identifier<out VarNode varNode> =   (. varNode = null; .)
+SymbolRef<out VarNode varNode> =   (. varNode = null; .)
     (
         IDENT                       (. varNode = new VarNode(t.val); .)
     ).
@@ -396,18 +396,18 @@ Type<out BaseType type> =        (. type = null; .)
 /*------------------------------------------------------------------------*/
 /* Types is, like Operators, a file in the solution containing enumerate values for all types. */
 CollecType<out BaseType type> =                                (. type = null; BaseType subType = null; .)
-    ( "list" WEAK '<' SingleType<out subType> WEAK '>'         (. type = new ListType(subType);  .)
-    | "set" WEAK '<' SingleType<out subType> WEAK '>'          (. type = new SetType(subType);   .)
-    | "queue" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new QueueType(subType); .)
-    | "stack" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new StackType(subType); .)
+    ( "list" WEAK '<' SingleType<out subType> WEAK '>'         (. type = new BaseType(subType, new BaseType("list"));  .)
+    | "set" WEAK '<' SingleType<out subType> WEAK '>'          (. type = new BaseType(subType, new BaseType("set"));   .)
+    | "queue" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new BaseType(subType, new Basetype("queue")); .)
+    | "stack" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new BaseType(subType, new BaseType("stack")); .)
     ).
 /*------------------------------------------------------------------------*/
 SingleType<out BaseType type> = (. type = null; .)
-    ( "number"                  (. type = new NumberType();  .)
-    | "boolean"                 (. type = new BooleanType(); .)
-    | "text"                    (. type = new TextType();    .)
-    | "vertex"                  (. type = new VertexType();  .)
-    | "edge"                    (. type = new EdgeType();    .)
+    ( "number"                  (. type = new BaseType("number");  .)
+    | "boolean"                 (. type = new BaseType("boolean"); .)
+    | "text"                    (. type = new BaseType("text");    .)
+    | "vertex"                  (. type = new BaseType("vertex");  .)
+    | "edge"                    (. type = new BaseType("edge");    .)
     ).
 
 /*------------------------------------------------------------------------*/
