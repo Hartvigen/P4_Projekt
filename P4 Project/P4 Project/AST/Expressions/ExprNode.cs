@@ -10,6 +10,7 @@ namespace P4_Project.AST.Expressions
     {
         public bool InParentheses { get; set; }
         public BaseType type;
+        
         protected ExprNode()
         {
             type = null;

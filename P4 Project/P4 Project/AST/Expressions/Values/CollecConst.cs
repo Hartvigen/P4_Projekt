@@ -10,6 +10,15 @@ namespace P4_Project.AST.Expressions.Values
     public class CollecConst : ExprNode
     {
         public List<ExprNode> Expressions { get; private set; } = new List<ExprNode>();
+
+
+        public CollecConst(BaseType _type)
+            : base()
+        {
+            type = _type;
+        }
+
+
         public void Add(ExprNode expr)
         {
             Expressions.Add(expr);

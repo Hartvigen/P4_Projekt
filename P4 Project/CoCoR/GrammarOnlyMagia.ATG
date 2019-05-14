@@ -51,11 +51,11 @@ KeywordStmt = ( "return" Expr | "break" | "continue" ).
 
 SimpleStmt = CallOrID [ Assign | EdgeOneOrMore ].
 
-EdgeOneOrMore = EdgeOpr ( SymbolRef | EdgeCreate | '{' EdgeCreate { ',' EdgeCreate } '}' ).
+EdgeOneOrMore = EdgeOpr ( CallOrID | EdgeCreate | '{' EdgeCreate { ',' EdgeCreate } '}' ).
 
 EdgeOpr = ( "<-" | "--" | "->" ).
 
-EdgeCreate = '(' SymbolRef { ',' SymbolRef Assign } ')'.
+EdgeCreate = '(' CallOrID { ',' SymbolRef Assign } ')'.
 
 
 FullDecl = Type ( IDENT [ Assign ] | '{' VtxDecl { ',' VtxDecl } '}' | VtxDecl ).
@@ -67,7 +67,7 @@ ParamDecl = Type IDENT.
 
 VarDecl = Type IDENT [ Assign ].
 
-Assign = '=' ( Expr | '{' Args '}' ).
+Assign = '=' Expr.
 
 
 
@@ -87,12 +87,12 @@ ExprMult = ExprNot { ('*' | '/' | '%' ) ExprNot }.
 
 ExprNot = ['!'] Factor.
 
-Factor = Const | '(' Expr ')' | CallOrID. 
+Factor = Const | '(' Expr ')' | CallOrID | CollecType '{' Args '}'. 
 
 
-CallOrID = SymbolRef [ '(' Args ')' ] [ '.' CallOrID ].
+CallOrID = SymbolRef [ '(' Args ')' ] { '.' SymbolRef }.
 
-Args = [Expr { ',' Expr } ].
+Args = [ Expr { ',' Expr } ].
 
 
 SymbolRef = ( IDENT ).
