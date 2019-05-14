@@ -44,21 +44,21 @@ IGNORE cr + lf + tab                            /* These characters are ignored 
 /* The rest of the file contains the grammar for MAGIA.  */
 PRODUCTIONS
 MAGIA =                                         (. mainNode = null; BlockNode mainBlock = new BlockNode(); .)
-    {											(. tab = tab.OpenScope() .)
-		SYNC Head<out HeadNode head>              (. mainBlock.Add(head);             .)
+    {											(. tab = tab.OpenScope();           .)
+		SYNC Head<out HeadNode head>            (. mainBlock.Add(head);             .)
     }											(.  .)
     { SYNC Stmt<out StmtNode stmt>              (. mainBlock.Add(stmt);             .)
     }
     { SYNC FuncDecl<out FuncDeclNode funcDecl>  (. mainBlock.Add(funcDecl);         .)
-    }                                           (. mainNode = new MAGIA(mainBlock); .)
+    }                                           (. mainNode = new Magia(mainBlock); .)
 .
 
 
 /*------------------------------------------------------------------------*/
 Head<out HeadNode head> =                       (. head = null; VarDeclNode attrDecl = null; .)
     '[' 
-        ( "vertex"                              (. head = new HeadNode(HeadNode.VERTEX); .) /* TODO: Enter vertex symbol table */
-        | "edge"                                (. head = new HeadNode(HeadNode.EDGE);   .) /* TODO: Enter edge symbol table */
+        ( "vertex"                              (. head = new HeadNode(HeadNode.Vertex); .) /* TODO: Enter vertex symbol table */
+        | "edge"                                (. head = new HeadNode(HeadNode.Edge);   .) /* TODO: Enter edge symbol table */
         ) 
         WEAK '(' 
             VarDecl<out attrDecl>               (. head?.AddAttr(attrDecl); .)
@@ -72,7 +72,7 @@ Head<out HeadNode head> =                       (. head = null; VarDeclNode attr
 /*------------------------------------------------------------------------*/
 FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string funcName = ""; BaseType returnType = null; BaseType protocol = null; .)
     "func" (Type<out returnType> | "none") IDENT    (. funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); .)
-    WEAK '('                                        (. tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); .)
+    WEAK '('                                        (. tab = tab.OpenScope(funcName); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); .)
         [ IF(la.val != ")" && la.val != "{") 
           ParamDecl<out paramDecl>                    (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
           { WEAK ',' ParamDecl<out paramDecl>         (. paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); .)
@@ -83,7 +83,7 @@ FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string f
         { SYNC Stmt<out stmt>                       (. stmtBlock.Add(stmt); .)
         }
     WEAK '}'                                        (. SymTable funcScope = tab; tab = tab.CloseScope(); 
-                                                       Obj funcObj = tab.NewObj(funcName, protocol, func, funcScope); 
+                                                       Obj funcObj = tab.NewObj(funcName, protocol, Func, funcScope); 
                                                        funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
                                                     .)
 .
@@ -141,7 +141,7 @@ StmtFor<out StmtNode f> =               (. f = null; BlockNode stmtBlock = new B
 StmtForeach<out StmtNode f> =           (. f = null; StmtNode stmt = null; .)
     "foreach"                           (. VarDeclNode itrVar = null; BlockNode stmtBlock = new BlockNode(); .)
     '('                                 (. tab = tab.OpenScope(); .)
-        Type<out BaseType type> IDENT   (. itrVar = new VarDeclNode(tab.NewObj(t.val, type, var), null); .)
+        Type<out BaseType type> IDENT   (. itrVar = new VarDeclNode(tab.NewObj(t.val, type, Var), null); .)
         "in" 
         Expr<out ExprNode collection> 
     ')' 
@@ -185,10 +185,10 @@ SimpleStmt<out StmtNode stmt> =         (. stmt = null; .)
 .
 
 /*------------------------------------------------------------------------*/
-EdgeOneOrMore<IdentNode start, out StmtNode stmt> = (. stmt = null; EdgeCreateNode edge; .)
-    EdgeOpr<out int op>                             (. stmt = edge = new EdgeCreateNode(start, op); .)
+EdgeOneOrMore<IdentNode leftSide, out StmtNode stmt> = (. stmt = null; EdgeCreateNode edge; .)
+    EdgeOpr<out int op>                             (. stmt = edge = new EdgeCreateNode(leftSide, op); .)
     ( 
-        SymbolRef<out VarNode end>                 (. edge.AddRightSide(end, new List<AssignNode>()); .)
+        CallOrID<out IdentNode end>                 (. edge.AddRightSide(end, new List<AssignNode>()); .)
     | 
         EdgeCreate<edge>
     | 
@@ -201,16 +201,16 @@ EdgeOneOrMore<IdentNode start, out StmtNode stmt> = (. stmt = null; EdgeCreateNo
 
 /*------------------------------------------------------------------------*/
 EdgeOpr<out int op> =   (. op = 0;                  .)
-    ( "<-"              (. op = Operators.LEFTARR;  .)
-    | "--"              (. op = Operators.NONARR;   .)
-    | "->"              (. op = Operators.RIGHTARR; .)
+    ( "<-"              (. op = Operators.Leftarr;  .)
+    | "--"              (. op = Operators.Nonarr;   .)
+    | "->"              (. op = Operators.Rightarr; .)
     )
 .
 
 /*------------------------------------------------------------------------*/
 EdgeCreate<EdgeCreateNode edge> =           (. VarNode varNode = null; ExprNode expr = null; List<AssignNode> attributes = new List<AssignNode>(); .)
     '(' 
-        SymbolRef<out VarNode right>
+        CallOrID<out IdentNode right>
         { WEAK ',' SymbolRef<out varNode>
           Assign<out expr>                  (. attributes.Add(new AssignNode(varNode, expr)); .)
         }                                   (. edge.AddRightSide(right, attributes); .)
@@ -233,7 +233,7 @@ FullDecl<out StmtNode stmt> =               (. stmt = null; VertexDeclNode verte
     ( 
       IDENT                                 (. string name = t.val; ExprNode expr = null; .)
       [ Assign<out expr>
-      ]                                     (. stmt = new VarDeclNode(tab.NewObj(name, type, var), expr); .)
+      ]                                     (. stmt = new VarDeclNode(tab.NewObj(name, type, Var), expr); .)
     |
       '{'                                   (. MultiDecl multiDecl = new MultiDecl(); .)
         VtxDecl<out vertexDecl>             (. multiDecl.AddDecl(vertexDecl); .)
@@ -248,7 +248,7 @@ FullDecl<out StmtNode stmt> =               (. stmt = null; VertexDeclNode verte
 /*------------------------------------------------------------------------*/
 VtxDecl<out VertexDeclNode vertexDecl> =    (. vertexDecl = null; VarNode varNode = null; ExprNode expr = null; .)
     '(' 
-        IDENT                               (. vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new BaseType("vertex"), var)); .)
+        IDENT                               (. vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new BaseType("vertex"), Var)); .)
         { WEAK ',' SymbolRef<out varNode>
           Assign<out expr>                  (. vertexDecl.AddAttr(new AssignNode(varNode, expr)); .)
         }
@@ -258,7 +258,7 @@ VtxDecl<out VertexDeclNode vertexDecl> =    (. vertexDecl = null; VarNode varNod
 
 /*------------------------------------------------------------------------*/
 ParamDecl<out VarDeclNode varDecl> =  (. varDecl = null; BaseType type = null; .)
-    Type<out type> IDENT              (. varDecl = new VarDeclNode(tab.NewObj(t.val, type, var), null); .)
+    Type<out type> IDENT              (. varDecl = new VarDeclNode(tab.NewObj(t.val, type, Var), null); .)
 .
 
 
@@ -266,19 +266,12 @@ ParamDecl<out VarDeclNode varDecl> =  (. varDecl = null; BaseType type = null; .
 VarDecl<out VarDeclNode varDecl> =  (. varDecl = null; BaseType type = null; string name = null; ExprNode value = null; .)
     Type<out type> IDENT            (. name = t.val; .)                             
     [ Assign<out value>
-    ]                               (. varDecl = new VarDeclNode(tab.NewObj(name, type, var), value); .)
+    ]                               (. varDecl = new VarDeclNode(tab.NewObj(name, type, Var), value); .)
 .
 
 /*------------------------------------------------------------------------*/
 Assign<out ExprNode expr> = (. expr = null; CollecConst collec = null; .)
-    '=' 
-    ( 
-      Expr<out expr>
-    | 
-      '{' 
-        Args<out collec>    (. expr = collec; .)
-      '}'
-    )
+    '=' Expr<out expr>
 .
 
 
@@ -289,92 +282,96 @@ Expr<out ExprNode e>                (. e = null; .)
 /*------------------------------------------------------------------------*/
 ExprOR<out ExprNode e>              (. e = null; int op = 0; .)
     = ExprAnd<out ExprNode e1>      (. e = e1; .)
-    { "||"                          (. op  = Operators.OR; .)
+    { "||"                          (. op  = Operators.Or; .)
       ExprAnd<out ExprNode e2>      (. e = new BinExprNode(e, op, e2); .)                                
     }.
 
 /*------------------------------------------------------------------------*/
 ExprAnd<out ExprNode e>             (. e = null; int op = 0; .)
     = ExprEQ<out ExprNode e1>       (. e = e1; .)
-    { "&&"                          (. op = Operators.AND; .)
+    { "&&"                          (. op = Operators.And; .)
       ExprEQ<out ExprNode e2>       (. e = new BinExprNode(e, op, e2); .)
     }.
 
 /*------------------------------------------------------------------------*/
 ExprEQ<out ExprNode e>              (. e = null; int op = 0; .)
     = ExprRel<out ExprNode e1>      (. e = e1; .)
-    [("=="                          (. op = Operators.EQ; .)
-    | "!="                          (. op = Operators.NEQ; .)
+    [("=="                          (. op = Operators.Eq; .)
+    | "!="                          (. op = Operators.Neq; .)
     ) ExprRel<out ExprNode e2>      (. e = new BinExprNode(e, op, e2); .)
     ].
 
 /*------------------------------------------------------------------------*/
 ExprRel<out ExprNode e>             (. e = null; int op = 0; .)
     = ExprPlus<out ExprNode e1>     (. e = e1; .)
-    [('<'                           (. op = Operators.LESS; .)
-    | '>'                           (. op = Operators.GREATER; .)
-    | "<="                          (. op = Operators.LESSEQ; .)
-    | ">="                          (. op = Operators.GREATEQ; .)
+    [('<'                           (. op = Operators.Less; .)
+    | '>'                           (. op = Operators.Greater; .)
+    | "<="                          (. op = Operators.Lesseq; .)
+    | ">="                          (. op = Operators.Greateq; .)
     ) ExprPlus<out ExprNode e2>     (. e = new BinExprNode(e, op, e2); .)
     ].
 
 /*------------------------------------------------------------------------*/
 ExprPlus<out ExprNode e>            (. e = null; bool b = false; int op = 0; .)
     = ['-'                          (. b = true; .)
-    ] ExprMult<out ExprNode e1>     (. if(b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1; .)
-    {('+'                           (. op = Operators.PLUS; .)
-    | '-'                           (. op = Operators.BIMIN; .)
+    ] ExprMult<out ExprNode e1>     (. if(b) e = new UnaExprNode(Operators.Umin, e1); else e = e1; .)
+    {('+'                           (. op = Operators.Plus; .)
+    | '-'                           (. op = Operators.Bimin; .)
     ) ExprMult<out ExprNode e2>     (. e = new BinExprNode(e, op, e2); .)
     }.
 
 /*------------------------------------------------------------------------*/
 ExprMult<out ExprNode e>            (. e = null; int op = 0;.)
     = ExprNot<out ExprNode e1>      (. e = e1; .)
-    {('*'                           (. op = Operators.MULT; .)
-    | '/'                           (. op = Operators.DIV; .)
-    | '%'                           (. op = Operators.MOD; .)
+    {('*'                           (. op = Operators.Mult; .)
+    | '/'                           (. op = Operators.Div; .)
+    | '%'                           (. op = Operators.Mod; .)
     ) ExprNot<out ExprNode e2>      (. e = new BinExprNode(e, op, e2); .)
     }.
 
 /*------------------------------------------------------------------------*/
 ExprNot<out ExprNode e>             (. e = null; bool b = false;.)
     = ['!'                          (. b = true; .)
-    ] Factor<out e>                 (. if(b) e = new UnaExprNode(Operators.NOT, e); .)
+    ] Factor<out e>                 (. if(b) e = new UnaExprNode(Operators.Not, e); .)
     .
 
 /*------------------------------------------------------------------------*/
-Factor<out ExprNode e>      (. e = null; .)
+Factor<out ExprNode e>              (. e = null; .)
     = Const<out e>
-    | '(' Expr<out e> ')'   (. e.InParentheses = true; .)
-    | CallOrID<out e>
-    .        
+    | '(' Expr<out e> ')'           (. e.InParentheses = true; .)
+    | CallOrID<out IdentNode expr>  (. e = expr; .)
+    | 
+      CollecType<out BaseType type>
+      '{' 
+        Args<type, out collec>      (. e = collec; .)
+      '}'
+    .       
 
 
 /*------------------------------------------------------------------------*/
-CallOrID<out IdentNode i> =                 (. i = null; .)
-    SymbolRef<out VarNode varNode>         (. i = varNode; .)
+CallOrID<out IdentNode i> =                     (. i = null; IdentNode bottom = null; .)
+    SymbolRef<out VarNode varNode>              (. i = varNode; .)
     [
         '(' 
-            Args<out CollecConst collec>    (. i = new CallNode(i.Identifier, collec); .)
+            Args<null, out CollecConst collec>  (. i = new CallNode(i.Ident, collec); .)
         ')'
-    ]
-    [
-        WEAK '.'                            (. IdentNode source = i; .)
-        CallOrID<out i>                     (. i.AddBaseSource(source); .)
-    ].
+    ]                                           (. bottom = i; .)
+    {
+        WEAK '.' SymbolRef<out VarNode member>  (. bottom.Source = member; bottom = member; .)
+    }.
 
 /*------------------------------------------------------------------------*/
-Args<out CollecConst collec> =      (. collec = new CollecConst(); ExprNode expr; .)
+Args<BaseType type, out CollecConst collec> =   (. collec = new CollecConst(type); ExprNode expr; .)
     [
-        Expr<out expr>              (. collec.Add(expr); .)
+        Expr<out expr>                          (. collec.Add(expr); .)
         {
-            WEAK ',' Expr<out expr> (. collec.Add(expr); .)
+            WEAK ',' Expr<out expr>             (. collec.Add(expr); .)
         }
     ].
 
 
 /*------------------------------------------------------------------------*/
-SymbolRef<out VarNode varNode> =   (. varNode = null; .)
+SymbolRef<out VarNode varNode> =    (. varNode = null; .)
     (
         IDENT                       (. varNode = new VarNode(t.val); .)
     ).
@@ -399,7 +396,7 @@ Type<out BaseType type> =        (. type = null; .)
 CollecType<out BaseType type> =                                (. type = null; BaseType subType = null; .)
     ( "list" WEAK '<' SingleType<out subType> WEAK '>'         (. type = new BaseType(subType, new BaseType("list"));  .)
     | "set" WEAK '<' SingleType<out subType> WEAK '>'          (. type = new BaseType(subType, new BaseType("set"));   .)
-    | "queue" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new BaseType(subType, new Basetype("queue")); .)
+    | "queue" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new BaseType(subType, new BaseType("queue")); .)
     | "stack" WEAK '<' SingleType<out subType> WEAK '>'        (. type = new BaseType(subType, new BaseType("stack")); .)
     ).
 /*------------------------------------------------------------------------*/
