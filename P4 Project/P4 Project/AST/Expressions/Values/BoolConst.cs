@@ -8,7 +8,7 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class BoolConst : ExprNode
     {
-        private bool Value { get; }
+        public bool Value { get; }
         public BoolConst(bool value)
         {
             Value = value;
@@ -17,11 +17,9 @@ namespace P4_Project.AST.Expressions.Values
         {
             vi.Visit(this);
         }
-        public override List<string> getValue()
+        public override string ToString()
         {
-            List<string> values = new List<string>();
-            values.Add(Value ? "true" : "false");
-            return values;
+            return Value ? "true" : "false";
         }
     }
 }

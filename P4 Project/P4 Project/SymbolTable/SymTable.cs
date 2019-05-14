@@ -146,7 +146,7 @@ namespace P4_Project.SymbolTable
                 if (s.name == name)
                     if (s.type == null) {
                         _symbolDecls.TryGetValue(name, out Obj o);
-                        return o.type.parameterTypes;
+                        return o.Type.parameterTypes;
                     }else return s.type.parameterTypes;
             }
             throw new Exception("Name " + name + " does not belong to a function.");
@@ -190,7 +190,6 @@ namespace P4_Project.SymbolTable
 
         public SymTable EnterNextScope() {
             position++;
-
             //If we have reached a position higher than their are scopes availble we it must be an error!
             if (position > InnerScopes.Count)
                 throw new Exception("Ran out of scopes");
@@ -211,12 +210,12 @@ namespace P4_Project.SymbolTable
 				if (typeName == "vertex")
 				{
 					vertexAttr._symbolDecls.TryGetValue(attrName, out Obj o);
-					return o.type;
+					return o.Type;
 				}
 				else if (typeName == "edge")
 				{
 					edgeAttr._symbolDecls.TryGetValue(attrName, out Obj o);
-					return o.type;
+					return o.Type;
 				}
 			}
 			throw new Exception(typeName + " is not possible to hold attributes");

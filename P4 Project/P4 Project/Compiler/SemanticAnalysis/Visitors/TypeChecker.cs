@@ -50,7 +50,7 @@ namespace P4_Project.Visitors
 
             //We assign the type found from the table.
             if(activeScope.Find(node.Ident) != null)
-            node.type = activeScope.Find(node.Ident).type;
+            node.type = activeScope.Find(node.Ident).Type;
 
 			//If the Source exist we can find the type as from the attribute that matches from the source
 			if (node.type == null && node.Source != null && node.Source.type != null) {
@@ -92,9 +92,8 @@ namespace P4_Project.Visitors
                     ErrorList.Add("Collection contains both: " + node.Expressions[0].type + " and " + n.type);
                 }
             });
-            //We collection its type defualt is list TODO: find the actual collection type
-            if(node.Expressions.Count != 0)
-                node.type = new BaseType(new BaseType("list"), node.Expressions[0].type);
+            //The collection its type defualt is list TODO: find the actual collection type
+            node.type = new BaseType(new BaseType("list"), node.Expressions[0].type);
         }
 
         //returns null
@@ -182,7 +181,7 @@ namespace P4_Project.Visitors
                         //We find the header scope for edge take the type of the attribute
                         Table.GetScopes().ForEach(h => {
                             if (h.header && h.name == "edge")
-                                if (h.Find(a.Target.Ident).type.name != a.Value.type.name)
+                                if (h.Find(a.Target.Ident).Type.name != a.Value.type.name)
                                     ErrorList.Add(a.Target.Ident + " is type: " + a.Target.type.name + " so type: " + a.Value.type.name + " is not a valid type to assign.");
                         });
                     }
@@ -211,7 +210,7 @@ namespace P4_Project.Visitors
                 var retNode = (ReturnNode) stmtNode;
 
                 var actualReturnType = retNode.Ret.type.name;
-                var declaredReturnType = node.SymbolObject.type.returntype;
+                var declaredReturnType = node.SymbolObject.Type.returntype;
                 if (actualReturnType != declaredReturnType)
                 {
                     ErrorList.Add(
@@ -235,7 +234,7 @@ namespace P4_Project.Visitors
                 return;
 
             if (node.DefaultValue.type.name == "func")
-                if (node.DefaultValue.type.returntype != node.SymbolObject.type.name)
+                if (node.DefaultValue.type.returntype != node.SymbolObject.Type.name)
                 {
                     ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with call that returns: " + node.DefaultValue.type.returntype + " when variable is type: " + node.type);
                 }
@@ -257,8 +256,8 @@ namespace P4_Project.Visitors
                         a.Value.Accept(this);
                         //We find the header scope for vertex and if the attribute is not there it is invalid.
                         Table.vertexAttr.GetDic().TryGetValue(a.Target.Ident, out Obj o);
-                        if(o.type.name != a.Value.type.name)
-                            ErrorList.Add(o.Name + " is type " + o.type.name + " cannot be assigned type: " + a.Value.type.name);
+                        if(o.Type.name != a.Value.type.name)
+                            ErrorList.Add(o.Name + " is type " + o.Type.name + " cannot be assigned type: " + a.Value.type.name);
                     }
                 });
             }
@@ -278,7 +277,7 @@ namespace P4_Project.Visitors
                 return;
             }
 
-            BaseType t = activeScope.Find(node.Target.Ident).type;
+            BaseType t = activeScope.Find(node.Target.Ident).Type;
             BaseType v = node.Value.type;
 
             if (v.name == "func")
@@ -322,6 +321,8 @@ namespace P4_Project.Visitors
             EnterNextScope();
             node.Initializer.Accept(this);
             node.Condition.Accept(this);
+            if (node.Condition.type.name != "boolean")
+                ErrorList.Add("Condition of forloop must be type boolean");
             node.Iterator.Accept(this);
             node.Body.Accept(this);
             LeaveThisScope();

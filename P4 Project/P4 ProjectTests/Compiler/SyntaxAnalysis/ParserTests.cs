@@ -253,7 +253,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
             Assert.IsTrue(x.Name == "x");
             Assert.IsTrue(x.Kind == 0);
-            Assert.IsTrue(x.type.name == "number");
+            Assert.IsTrue(x.Type.name == "number");
         }
 
         //Scopes should be accessed statically, new declarations of outer scope variables should also be possible in scopes
@@ -271,15 +271,15 @@ namespace P4_Project.Compiler.SyntaxAnalysis
 
             Assert.IsTrue(x.Name == "x");
             Assert.IsTrue(x.Kind == 0);
-            Assert.IsTrue(x.type.name == "number");
+            Assert.IsTrue(x.Type.name == "number");
 
             Assert.IsTrue(y.Name == "y");
             Assert.IsTrue(y.Kind == 0);
-            Assert.IsTrue(y.type.name == "number");
+            Assert.IsTrue(y.Type.name == "number");
 
             Assert.IsTrue(x2.Name == "x");
             Assert.IsTrue(x2.Kind == 0);
-            Assert.IsTrue(x2.type.name == "text");
+            Assert.IsTrue(x2.Type.name == "text");
         }
 
         [Test]

@@ -17,12 +17,5 @@ namespace P4_Project.AST.Expressions.Values
         {
             vi.Visit(this);
         }
-
-        public override List<string> getValue()
-        {
-            List<string> values = new List<string>();
-            values.Add(Value);
-            return values;
-        }
     }
 }

@@ -21,18 +21,5 @@ namespace P4_Project.AST.Expressions
         {
             vi.Visit(this);
         }
-        public string GetNameOfOperator()
-        {
-            return Operators.GetNameFromInt(OperatorType);
-        }
-        public string GetCodeOfOperator()
-        {
-            return Operators.GetCodeFromInt(OperatorType);
-        }
-
-        public override List<string> getValue()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

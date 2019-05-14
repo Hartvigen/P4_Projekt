@@ -34,10 +34,5 @@ namespace P4_Project.AST.Expressions
         {
             vi.Visit(this);
         }
-
-        public override List<string> getValue()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

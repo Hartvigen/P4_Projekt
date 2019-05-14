@@ -25,7 +25,10 @@ namespace P4_Project
 
             if (args.Length > 0)
             {
-                TryParse(args[1], out var parser);
+                if (!TryParse(args[1], out var parser))
+                {
+                    Console.WriteLine("Couldn't even parse the file!");
+                }else
                 switch (args[0])
                 {
                     case "-c":
