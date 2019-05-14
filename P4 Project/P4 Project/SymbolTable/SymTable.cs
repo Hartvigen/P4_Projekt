@@ -70,7 +70,11 @@ namespace P4_Project.SymbolTable
 
             if (!_symbolDecls.ContainsKey(obj.Name))
                 _symbolDecls.Add(obj.Name, obj);
-            else Console.WriteLine(obj.Name + " is already added to symDecls");
+            else
+            {
+                Console.WriteLine(obj.Name + " is already added to symDecls");
+                _parser.SemErr(obj.Name + " has already been declared");
+            }
             return obj;
         }
 

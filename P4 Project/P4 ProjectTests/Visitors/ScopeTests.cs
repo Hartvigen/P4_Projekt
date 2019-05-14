@@ -42,11 +42,61 @@ namespace P4_Project.Visitors
             Assert.IsTrue(program.Table.Find("x").type.name.Equals("number"));
         }
 
+        //we should be able to access a variable from any legal scope
+        [Test]
+        public void ScopeTestSuccess02()
+        {
+            var program = Scop("number x = 2 " +
+                               "x = 3" +
+                               "if(true){" +
+                               "x = 2}");
+
+            Assert.IsTrue(program.ErrorList.Count == 0);
+        }
+
+        //We should be able to declare and access a new variable in a scope, despite it already having been declared in a higher scope
+        [Test]
+        public void ScopeTestSuccess03()
+        {
+            var program = Scop("number x = 5" +
+                               "if(true){" +
+                               "x = 3 " +
+                               "boolean x = true " +
+                               "x = false}");
+
+            program.ErrorList.ForEach(Console.WriteLine);
+            Assert.IsTrue(program.ErrorList.Count == 0);
+        }
+
+
         //We should not be able to access a variable that has not been previously declared
         [Test]
         public void ScopeTestFailure01()
         {
             var program = Scop("x = 5");
+
+            program.ErrorList.ForEach(Console.WriteLine);
+            Assert.IsFalse(program.ErrorList.Count == 0);
+        }
+
+        //We should not be able to access a variable that is out of scope
+        [Test]
+        public void ScopeTestFailure02()
+        {
+            var program = Scop("if(true){" +
+                               "number x = 5} " +
+                               "x = 3");
+
+            program.ErrorList.ForEach(Console.WriteLine);
+            Assert.IsFalse(program.ErrorList.Count == 0);
+        }
+
+        //We should not be able to declare a variable with the same name twice in the same scope
+        [Test]
+        public void ScopeTestFailure03()
+        {
+            var program = Scop("number x = 5" +
+                               "boolean x = true");
 
             program.ErrorList.ForEach(Console.WriteLine);
             Assert.IsFalse(program.ErrorList.Count == 0);

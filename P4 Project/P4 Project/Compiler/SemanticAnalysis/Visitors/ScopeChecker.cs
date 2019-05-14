@@ -13,9 +13,15 @@ namespace P4_Project.Visitors
 {
     public class ScopeChecker : Visitor
     {
-        /// <summary> 
-        /// This class make sure that variables are declared before use. 
-        /// </summary> 
+        //The Scope visitor ensures that all accessed variables are in their legitimate scopes
+        //The Scope Visitor does NOT create the scopes, that is handled as the symboltable is filled in the parser
+        //This visitor does however ensure that:
+        //1. Variables have been declared in a legal scope before being accessed
+        //2. Only parameters declared in the vertex and edge head can be given when declaring a vertex or edge
+        //3. That we are in the correct scope at any given time in a program
+        //4. That we cannot assign a variable to a value of a different type (for example setting a number variable x to true should not be possible)
+        //5. Variables have been assigned a value before we try to use them
+
         public override string AppropriateFileName { get; } = "Errors";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
@@ -157,7 +163,7 @@ namespace P4_Project.Visitors
                 });
             }
 
-            //The vertex has no been reached so we se declareted to true 
+            //The vertex has not been reached so we set declareted to true 
             activeScope.Find(node.SymbolObject.Name).type.reached = true;
         }
 

@@ -282,10 +282,27 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             Assert.IsTrue(x2.type.name == "text");
         }
 
+        //we should be able to access a function parameter in the function body
         [Test]
         public void ParseTestSuccess11()
         {
-            string funcTest = " func none FuncDecl(number x){x = 4 * 5 + 3 - 3}";
+            string funcTest = "func none FuncDecl(number x){x = 4 * 5 + 3 - 3}";
+            Assert.IsTrue(TryParse(funcTest));
+
+        }
+
+        //We can declare multiple functions in the program
+        [Test]
+        public void ParseTestSuccess12()
+        {
+            string program = "func none FuncDeclA(){} " +
+                             "func none FuncDeclB(){} " +
+                             "func none FuncDeclC(){} " +
+                             "func none FuncDeclD(){} " +
+                             "func none FuncDeclE(){} " +
+                             "func none FuncDeclF(){} ";
+
+            Assert.IsTrue(TryParse(program));
         }
 
         //Empty brackets should be bad.
@@ -568,5 +585,16 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             var str = "[vertex(" + InvalidCollection + "<" + InvalidType + ">" + " " + InvalidIdentifier + ")]";
             Assert.IsFalse(TryParse(str));
         }
+
+
+        //We should not be able to declare a variable with the same name twice in the same scope
+        [Test]
+        public void ParseTestFailure26()
+        {
+            Assert.IsFalse(TryParse("number x = 5" +
+                               "boolean x = true"));
+        }
+
+
     }
 }
