@@ -9,7 +9,7 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class NumConst : ExprNode
     {
-        private double Value { get; }
+        public double Value { get; }
         public NumConst(double value)
         {
             Value = value;
@@ -20,13 +20,6 @@ namespace P4_Project.AST.Expressions.Values
         }
         public string GetString() {
             return Value.ToString(CultureInfo.InvariantCulture);
-        }
-
-        public override List<string> getValue()
-        {
-            List<string> values = new List<string>();
-            values.Add("" + Value);
-            return values;
         }
     }
 }

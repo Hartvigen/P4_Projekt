@@ -64,7 +64,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(BoolConst node)
         {
-            Result.Append(node.getValue()[0]);
+            Result.Append(node);
         }
 
         public override void Visit(CollecConst node)
@@ -110,7 +110,7 @@ namespace P4_Project.Visitors
         {
             if (node.InParentheses)
                 Result.Append("(");
-            Result.Append(node.GetCodeOfOperator());
+            Result.Append(Operators.GetCodeFromInt(node.OperatorType));
             node.Expr.Accept(this);
             if (node.InParentheses)
                 Result.Append("(");
@@ -168,7 +168,7 @@ namespace P4_Project.Visitors
         public override void Visit(FuncDeclNode node)
         {
             IndentAndNewline();
-            Result.Append("func " + node.SymbolObject.type.returntype + " ");
+            Result.Append("func " + node.SymbolObject.Type.returntype + " ");
             Result.Append(node.SymbolObject.Name + "(");
             if (node.Parameters.Statements.Count != 0)
             {
@@ -386,7 +386,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(MultiDecl node)
         {
-            if (node.Decls[0].SymbolObject.type.name == "vertex")
+            if (node.Decls[0].SymbolObject.Type.name == "vertex")
             {
                 if (node.Decls.Count > 1)
                 {

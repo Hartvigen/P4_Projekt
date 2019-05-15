@@ -1,18 +1,13 @@
 
 using System;
-using P4_Project.Types;
-using P4_Project.Types.Primitives;
-using P4_Project.Types.Collections;
-using P4_Project.Types.Structures;
-using P4_Project.Types.Functions;
 using P4_Project.AST;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
-using P4_Project.SymTab;
-using static P4_Project.SymTab.SymbolTable;
+using P4_Project.SymbolTable;
+using static P4_Project.SymbolTable.SymTable;
 using System.Collections.Generic;
 
 namespace P4_Project.Compiler.SyntaxAnalysis {
@@ -37,15 +32,15 @@ public class Parser {
 	public Token la;   // lookahead token
 	int errDist = minErrDist;
 
-	public MAGIA mainNode;
-	public SymbolTable tab;
+	public Magia mainNode;
+	public SymTable tab;
 
 
 
 	public Parser(Scanner scanner) {
 		this.scanner = scanner;
 		errors = new Errors();
-		tab = new SymbolTable(null, this);
+		tab = new SymTable(null, this);
 	}
 
 	void SynErr (int n) {
@@ -103,10 +98,12 @@ public class Parser {
 	void MAGIA() {
 		mainNode = null; BlockNode mainBlock = new BlockNode(); 
 		while (la.kind == 4) {
+			tab = tab.OpenScope();           
 			while (!(la.kind == 0 || la.kind == 4)) {SynErr(54); Get();}
 			Head(out HeadNode head);
 			mainBlock.Add(head);             
 		}
+		
 		while (StartOf(1)) {
 			while (!(StartOf(2))) {SynErr(55); Get();}
 			Stmt(out StmtNode stmt);
@@ -117,7 +114,7 @@ public class Parser {
 			FuncDecl(out FuncDeclNode funcDecl);
 			mainBlock.Add(funcDecl);         
 		}
-		mainNode = new MAGIA(mainBlock); 
+		mainNode = new Magia(mainBlock); 
 	}
 
 	void Head(out HeadNode head) {
@@ -125,10 +122,10 @@ public class Parser {
 		Expect(4);
 		if (la.kind == 5) {
 			Get();
-			head = new HeadNode(HeadNode.VERTEX); 
+			head = new HeadNode(HeadNode.Vertex); 
 		} else if (la.kind == 6) {
 			Get();
-			head = new HeadNode(HeadNode.EDGE);   
+			head = new HeadNode(HeadNode.Edge);   
 		} else SynErr(57);
 		ExpectWeak(7, 3);
 		VarDecl(out attrDecl);
@@ -155,7 +152,7 @@ public class Parser {
 	}
 
 	void FuncDecl(out FuncDeclNode funcNode) {
-		funcNode = null; string funcName = ""; BaseType returnType = null; FunctionType protocol = null; 
+		funcNode = null; string funcName = ""; BaseType returnType = null; BaseType protocol = null; 
 		Expect(11);
 		if (StartOf(4)) {
 			Type(out returnType);
@@ -165,7 +162,7 @@ public class Parser {
 		Expect(1);
 		funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); 
 		ExpectWeak(7, 8);
-		tab = tab.OpenScope(); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); 
+		tab = tab.OpenScope(funcName); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); 
 		if (la.val != ")" && la.val != "{") {
 			ParamDecl(out paramDecl);
 			paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); 
@@ -174,7 +171,7 @@ public class Parser {
 				paramBlock.Add(paramDecl); parameterTypes.Add(paramDecl.SymbolObject.Type); 
 			}
 		}
-		protocol = new FunctionType(returnType, parameterTypes); 
+		protocol = new BaseType(returnType, parameterTypes); 
 		ExpectWeak(9, 9);
 		ExpectWeak(13, 10);
 		StmtNode stmt = null; 
@@ -184,8 +181,8 @@ public class Parser {
 			stmtBlock.Add(stmt); 
 		}
 		ExpectWeak(14, 3);
-		SymbolTable funcScope = tab; tab = tab.CloseScope(); 
-		Obj funcObj = tab.NewObj(funcName, protocol, func); 
+		SymTable funcScope = tab; tab = tab.CloseScope(); 
+		Obj funcObj = tab.NewObj(funcName, protocol, Func, funcScope); 
 		funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
 		
 	}
@@ -198,7 +195,7 @@ public class Parser {
 		if (la.kind == 28) {
 			Assign(out value);
 		}
-		varDecl = new VarDeclNode(tab.NewObj(name, type, var), value); 
+		varDecl = new VarDeclNode(tab.NewObj(name, type, Var), value); 
 	}
 
 	void Type(out BaseType type) {
@@ -214,7 +211,7 @@ public class Parser {
 		varDecl = null; BaseType type = null; 
 		Type(out type);
 		Expect(1);
-		varDecl = new VarDeclNode(tab.NewObj(t.val, type, var), null); 
+		varDecl = new VarDeclNode(tab.NewObj(t.val, type, Var), null); 
 	}
 
 	void StructStmt(out StmtNode stmt) {
@@ -268,7 +265,7 @@ public class Parser {
 			if (la.kind == 28) {
 				Assign(out expr);
 			}
-			stmt = new VarDeclNode(tab.NewObj(name, type, var), expr); 
+			stmt = new VarDeclNode(tab.NewObj(name, type, Var), expr); 
 		} else if (la.kind == 13) {
 			Get();
 			MultiDecl multiDecl = new MultiDecl(); 
@@ -319,7 +316,9 @@ public class Parser {
 		ExpectWeak(8, 16);
 		Expr(out cond);
 		ExpectWeak(8, 3);
-		SimpleStmt(out iter);
+		SymbolRef(out VarNode target);
+		Assign(out ExprNode expr);
+		iter = new AssignNode(target, expr); 
 		Expect(9);
 		Expect(13);
 		tab = tab.OpenScope(); 
@@ -341,7 +340,7 @@ public class Parser {
 		tab = tab.OpenScope(); 
 		Type(out BaseType type);
 		Expect(1);
-		itrVar = new VarDeclNode(tab.NewObj(t.val, type, var), null); 
+		itrVar = new VarDeclNode(tab.NewObj(t.val, type, Var), null); 
 		Expect(18);
 		Expr(out ExprNode collection);
 		Expect(9);
@@ -409,43 +408,40 @@ public class Parser {
 		ExprOR(out e);
 	}
 
-	void CallOrID(out IdentNode i) {
-		i = null; 
-		Identifier(out VarNode varNode);
-		i = varNode; 
-		if (la.kind == 7) {
-			Get();
-			Args(out CollecConst collec);
-			i = new CallNode(i.Identifier, collec); 
-			Expect(9);
-		}
-		if (la.kind == 43) {
-			ExpectWeak(43, 3);
-			IdentNode source = i; 
-			CallOrID(out i);
-			i.AddBaseSource(source); 
-		}
+	void SymbolRef(out VarNode varNode) {
+		varNode = null; 
+		Expect(1);
+		varNode = new VarNode(t.val); 
 	}
 
 	void Assign(out ExprNode expr) {
 		expr = null; CollecConst collec = null; 
 		Expect(28);
-		if (StartOf(17)) {
-			Expr(out expr);
-		} else if (la.kind == 13) {
-			Get();
-			Args(out collec);
-			expr = collec; 
-			Expect(14);
-		} else SynErr(72);
+		Expr(out expr);
 	}
 
-	void EdgeOneOrMore(IdentNode start, out StmtNode stmt) {
+	void CallOrID(out IdentNode i) {
+		i = null; 
+		SymbolRef(out VarNode varNode);
+		i = varNode; 
+		if (la.kind == 7) {
+			Get();
+			Args(null, out CollecConst collec);
+			i = new CallNode(i.Ident, collec); 
+			Expect(9);
+		}
+		while (WeakSeparator(43,17,18) ) {
+			SymbolRef(out VarNode member);
+			member.Source = i; i = member; 
+		}
+	}
+
+	void EdgeOneOrMore(IdentNode leftSide, out StmtNode stmt) {
 		stmt = null; EdgeCreateNode edge; 
 		EdgeOpr(out int op);
-		stmt = edge = new EdgeCreateNode(start, op); 
+		stmt = edge = new EdgeCreateNode(leftSide, op); 
 		if (la.kind == 1) {
-			Identifier(out VarNode end);
+			CallOrID(out IdentNode end);
 			edge.AddRightSide(end, new List<AssignNode>()); 
 		} else if (la.kind == 7) {
 			EdgeCreate(edge);
@@ -456,35 +452,29 @@ public class Parser {
 				EdgeCreate(edge);
 			}
 			Expect(14);
-		} else SynErr(73);
+		} else SynErr(72);
 	}
 
 	void EdgeOpr(out int op) {
 		op = 0;                  
 		if (la.kind == 22) {
 			Get();
-			op = Operators.LEFTARR;  
+			op = Operators.Leftarr;  
 		} else if (la.kind == 23) {
 			Get();
-			op = Operators.NONARR;   
+			op = Operators.Nonarr;   
 		} else if (la.kind == 24) {
 			Get();
-			op = Operators.RIGHTARR; 
-		} else SynErr(74);
-	}
-
-	void Identifier(out VarNode varNode) {
-		varNode = null; 
-		Expect(1);
-		varNode = new VarNode(t.val); 
+			op = Operators.Rightarr; 
+		} else SynErr(73);
 	}
 
 	void EdgeCreate(EdgeCreateNode edge) {
 		VarNode varNode = null; ExprNode expr = null; List<AssignNode> attributes = new List<AssignNode>(); 
 		Expect(7);
-		Identifier(out VarNode right);
-		while (WeakSeparator(8,18,5) ) {
-			Identifier(out varNode);
+		CallOrID(out IdentNode right);
+		while (WeakSeparator(8,17,5) ) {
+			SymbolRef(out varNode);
 			Assign(out expr);
 			attributes.Add(new AssignNode(varNode, expr)); 
 		}
@@ -496,25 +486,13 @@ public class Parser {
 		vertexDecl = null; VarNode varNode = null; ExprNode expr = null; 
 		Expect(7);
 		Expect(1);
-		vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new VertexType(), var)); 
-		while (WeakSeparator(8,18,5) ) {
-			Identifier(out varNode);
+		vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new BaseType("vertex"), Var)); 
+		while (WeakSeparator(8,17,5) ) {
+			SymbolRef(out varNode);
 			Assign(out expr);
 			vertexDecl.AddAttr(new AssignNode(varNode, expr)); 
 		}
 		Expect(9);
-	}
-
-	void Args(out CollecConst collec) {
-		collec = new CollecConst(); ExprNode expr; 
-		if (StartOf(17)) {
-			Expr(out expr);
-			collec.Add(expr); 
-			while (WeakSeparator(8,17,19) ) {
-				Expr(out expr);
-				collec.Add(expr); 
-			}
-		}
 	}
 
 	void ExprOR(out ExprNode e) {
@@ -523,7 +501,7 @@ public class Parser {
 		e = e1; 
 		while (la.kind == 29) {
 			Get();
-			op  = Operators.OR; 
+			op  = Operators.Or; 
 			ExprAnd(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
 		}
@@ -535,7 +513,7 @@ public class Parser {
 		e = e1; 
 		while (la.kind == 30) {
 			Get();
-			op = Operators.AND; 
+			op = Operators.And; 
 			ExprEQ(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
 		}
@@ -548,10 +526,10 @@ public class Parser {
 		if (la.kind == 31 || la.kind == 32) {
 			if (la.kind == 31) {
 				Get();
-				op = Operators.EQ; 
+				op = Operators.Eq; 
 			} else {
 				Get();
-				op = Operators.NEQ; 
+				op = Operators.Neq; 
 			}
 			ExprRel(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -562,19 +540,19 @@ public class Parser {
 		e = null; int op = 0; 
 		ExprPlus(out ExprNode e1);
 		e = e1; 
-		if (StartOf(20)) {
+		if (StartOf(19)) {
 			if (la.kind == 33) {
 				Get();
-				op = Operators.LESS; 
+				op = Operators.Less; 
 			} else if (la.kind == 34) {
 				Get();
-				op = Operators.GREATER; 
+				op = Operators.Greater; 
 			} else if (la.kind == 35) {
 				Get();
-				op = Operators.LESSEQ; 
+				op = Operators.Lesseq; 
 			} else {
 				Get();
-				op = Operators.GREATEQ; 
+				op = Operators.Greateq; 
 			}
 			ExprPlus(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -588,14 +566,14 @@ public class Parser {
 			b = true; 
 		}
 		ExprMult(out ExprNode e1);
-		if(b) e = new UnaExprNode(Operators.UMIN, e1); else e = e1; 
+		if(b) e = new UnaExprNode(Operators.Umin, e1); else e = e1; 
 		while (la.kind == 37 || la.kind == 38) {
 			if (la.kind == 38) {
 				Get();
-				op = Operators.PLUS; 
+				op = Operators.Plus; 
 			} else {
 				Get();
-				op = Operators.BIMIN; 
+				op = Operators.Bimin; 
 			}
 			ExprMult(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -609,13 +587,13 @@ public class Parser {
 		while (la.kind == 39 || la.kind == 40 || la.kind == 41) {
 			if (la.kind == 39) {
 				Get();
-				op = Operators.MULT; 
+				op = Operators.Mult; 
 			} else if (la.kind == 40) {
 				Get();
-				op = Operators.DIV; 
+				op = Operators.Div; 
 			} else {
 				Get();
-				op = Operators.MOD; 
+				op = Operators.Mod; 
 			}
 			ExprNot(out ExprNode e2);
 			e = new BinExprNode(e, op, e2); 
@@ -629,12 +607,12 @@ public class Parser {
 			b = true; 
 		}
 		Factor(out e);
-		if(b) e = new UnaExprNode(Operators.NOT, e); 
+		if(b) e = new UnaExprNode(Operators.Not, e); 
 	}
 
 	void Factor(out ExprNode e) {
 		e = null; 
-		if (StartOf(21)) {
+		if (StartOf(20)) {
 			Const(out e);
 		} else if (la.kind == 7) {
 			Get();
@@ -642,8 +620,15 @@ public class Parser {
 			Expect(9);
 			e.InParentheses = true; 
 		} else if (la.kind == 1) {
-			CallOrID(out e);
-		} else SynErr(75);
+			CallOrID(out IdentNode expr);
+			e = expr; 
+		} else if (StartOf(12)) {
+			CollecType(out BaseType type);
+			Expect(13);
+			Args(type, out collec);
+			e = collec; 
+			Expect(14);
+		} else SynErr(74);
 	}
 
 	void Const(out ExprNode e) {
@@ -663,27 +648,7 @@ public class Parser {
 		} else if (la.kind == 12) {
 			Get();
 			e = new NoneConst();                         
-		} else SynErr(76);
-	}
-
-	void SingleType(out BaseType type) {
-		type = null; 
-		if (la.kind == 50) {
-			Get();
-			type = new NumberType();  
-		} else if (la.kind == 51) {
-			Get();
-			type = new BooleanType(); 
-		} else if (la.kind == 52) {
-			Get();
-			type = new TextType();    
-		} else if (la.kind == 5) {
-			Get();
-			type = new VertexType();  
-		} else if (la.kind == 6) {
-			Get();
-			type = new EdgeType();    
-		} else SynErr(77);
+		} else SynErr(75);
 	}
 
 	void CollecType(out BaseType type) {
@@ -692,27 +657,59 @@ public class Parser {
 			Get();
 			ExpectWeak(33, 3);
 			SingleType(out subType);
-			ExpectWeak(34, 22);
-			type = new ListType(subType);  
+			ExpectWeak(34, 21);
+			type = new BaseType(subType, new BaseType("list"));  
 		} else if (la.kind == 47) {
 			Get();
 			ExpectWeak(33, 3);
 			SingleType(out subType);
-			ExpectWeak(34, 22);
-			type = new SetType(subType);   
+			ExpectWeak(34, 21);
+			type = new BaseType(subType, new BaseType("set"));   
 		} else if (la.kind == 48) {
 			Get();
 			ExpectWeak(33, 3);
 			SingleType(out subType);
-			ExpectWeak(34, 22);
-			type = new QueueType(subType); 
+			ExpectWeak(34, 21);
+			type = new BaseType(subType, new BaseType("queue")); 
 		} else if (la.kind == 49) {
 			Get();
 			ExpectWeak(33, 3);
 			SingleType(out subType);
-			ExpectWeak(34, 22);
-			type = new StackType(subType); 
-		} else SynErr(78);
+			ExpectWeak(34, 21);
+			type = new BaseType(subType, new BaseType("stack")); 
+		} else SynErr(76);
+	}
+
+	void Args(BaseType type, out CollecConst collec) {
+		collec = new CollecConst(type); ExprNode expr; 
+		if (StartOf(22)) {
+			Expr(out expr);
+			collec.Add(expr); 
+			while (WeakSeparator(8,22,23) ) {
+				Expr(out expr);
+				collec.Add(expr); 
+			}
+		}
+	}
+
+	void SingleType(out BaseType type) {
+		type = null; 
+		if (la.kind == 50) {
+			Get();
+			type = new BaseType("number");  
+		} else if (la.kind == 51) {
+			Get();
+			type = new BaseType("boolean"); 
+		} else if (la.kind == 52) {
+			Get();
+			type = new BaseType("text");    
+		} else if (la.kind == 5) {
+			Get();
+			type = new BaseType("vertex");  
+		} else if (la.kind == 6) {
+			Get();
+			type = new BaseType("edge");    
+		} else SynErr(77);
 	}
 
 
@@ -744,12 +741,13 @@ public class Parser {
 		{_x,_x,_x,_x, _x,_x,_x,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_T,_T,_T,_T, _T,_T,_T,_T, _x,_x,_x,_T, _T,_x,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_T,_T, _T,_x,_x},
-		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
+		{_T,_T,_x,_x, _x,_T,_T,_x, _T,_T,_x,_T, _x,_x,_T,_T, _T,_T,_x,_T, _x,_x,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
 		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_T,_T, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x},
 		{_x,_x,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _T,_T,_x,_x, _x,_x,_x,_x, _x,_x,_x},
-		{_T,_T,_x,_x, _T,_T,_T,_T, _x,_x,_x,_T, _x,_T,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x}
+		{_T,_T,_x,_x, _T,_T,_T,_T, _x,_x,_x,_T, _x,_T,_x,_T, _T,_T,_x,_T, _x,_x,_x,_x, _x,_T,_T,_T, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_T,_T, _T,_T,_T,_T, _T,_x,_x},
+		{_x,_T,_T,_T, _x,_x,_x,_T, _x,_x,_x,_x, _T,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _T,_T,_T,_T, _T,_T,_x,_x, _x,_x,_x},
+		{_x,_x,_x,_x, _x,_x,_x,_x, _x,_T,_x,_x, _x,_x,_T,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x,_x, _x,_x,_x}
 
 	};
 } // end Parser
@@ -835,13 +833,12 @@ public class Errors {
 			case 69: s = "this symbol not expected in StmtIf"; break;
 			case 70: s = "this symbol not expected in StmtIf"; break;
 			case 71: s = "this symbol not expected in StmtIf"; break;
-			case 72: s = "invalid Assign"; break;
-			case 73: s = "invalid EdgeOneOrMore"; break;
-			case 74: s = "invalid EdgeOpr"; break;
-			case 75: s = "invalid Factor"; break;
-			case 76: s = "invalid Const"; break;
+			case 72: s = "invalid EdgeOneOrMore"; break;
+			case 73: s = "invalid EdgeOpr"; break;
+			case 74: s = "invalid Factor"; break;
+			case 75: s = "invalid Const"; break;
+			case 76: s = "invalid CollecType"; break;
 			case 77: s = "invalid SingleType"; break;
-			case 78: s = "invalid CollecType"; break;
 
 			default: s = "error " + n; break;
 		}

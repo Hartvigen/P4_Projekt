@@ -27,15 +27,5 @@ namespace P4_Project.AST.Expressions.Values
         {
             vi.Visit(this);
         }
-
-        public override List<string> getValue()
-        {
-            List<string> values = new List<string>();
-            foreach (ExprNode e in Expressions) {
-                foreach(string s in e.getValue())
-                    values.Add(s);
-            }
-            return values;
-        }
     }
 }

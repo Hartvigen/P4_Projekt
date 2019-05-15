@@ -15,7 +15,5 @@ namespace P4_Project.AST.Expressions
         {
             type = null;
         }
-
-        public abstract List<string> getValue();
     }
 }

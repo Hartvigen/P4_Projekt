@@ -7,6 +7,8 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
+using P4_Project.Compiler.Interpreter;
+using P4_Project.Compiler.Interpreter.Types;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.SymbolTable;
 using P4_Project.Visitors;
@@ -18,36 +20,44 @@ namespace P4_Project.Compiler.Executor
         //This is the given information.
         //That will be used to execute the entire program.
         public override SymTable Table { get; set; }
-        Magia ast;
-
 
         //The Defnition of a vertex and edge attributions.
-        Dictionary<string, BaseType> vertexAttr = new Dictionary<string, BaseType>();
-        Dictionary<string, BaseType> edgeAttr = new Dictionary<string, BaseType>();
+        Dictionary<string, BaseType> defVertexAttr = new Dictionary<string, BaseType>();
+        Dictionary<string, BaseType> defEdgeAttr = new Dictionary<string, BaseType>();
 
         //The Scene will be printet when a print statement is encountered.
-        List<vertex> scene = new List<vertex>();
+        internal List<Vertex> scene = new List<Vertex>();
 
         //The functions
         Dictionary<string, FuncDeclNode> functions = new Dictionary<string, FuncDeclNode>();
+
+        //All the main nodes
         List<Node> main = new List<Node>();
+        Scope mainScope = new Scope(null);
+
+        Stack<Scope> callStack = new Stack<Scope>();
+
+        //Current scope used to keep track of the current scope at runtime
+        internal Scope currentscope;
+        internal Value currentValue;
 
         public override string AppropriateFileName { get; } = "CompileRes.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
+
         public Executor(Parser parser)
         {
             Table = parser.tab;
-            ast = parser.mainNode;
+            currentscope = mainScope;
             moveAttrDefinitions();
-            moveFunctions();
-            moveMain();
+            moveFunctions(parser.mainNode);
+            moveMain(parser.mainNode);
             start();
         }
 
-        private void moveMain()
+        private void moveMain(Magia node)
         {
-            ast.block.Statements.ForEach(s => {
+            node.block.Statements.ForEach(s => {
                 if (s.GetType() != typeof(FuncDeclNode) && s.GetType() != typeof(HeadNode))
                     main.Add(s);
             });
@@ -62,9 +72,9 @@ namespace P4_Project.Compiler.Executor
             }
         }
 
-        private void moveFunctions()
+        private void moveFunctions(Magia node)
         {
-            foreach (StmtNode s in ast.block.Statements) {
+            foreach (StmtNode s in node.block.Statements) {
                 if (s.GetType() == typeof(FuncDeclNode))
                 {
                     FuncDeclNode f = (FuncDeclNode)s;
@@ -74,7 +84,15 @@ namespace P4_Project.Compiler.Executor
         }
         private void CreateNewVertex(VertexDeclNode vertex)
         {
-            scene.Add(new vertex(vertex, vertexAttr));
+            //The vertex is created
+            Dictionary<string, Value> values = new Dictionary<string, Value>();
+            foreach (KeyValuePair<string, BaseType> vattr in defVertexAttr) {
+                values.Add(vattr.Key, new Value(PreDefined.GetDefualtValueOfAttributeType(vattr.Value)));
+            }
+            Vertex v = new Vertex(vertex, values);
+            //We add it to the scene and the currentscope
+            scene.Add(v);
+            currentscope.Values.Add(v.identifyer,new Value(v));
         }
         private void CreateNewEdge(List<Tuple<string, string>> attributesAndValues)
         {
@@ -88,57 +106,140 @@ namespace P4_Project.Compiler.Executor
         {
             foreach (KeyValuePair<string, Obj> v in Table.vertexAttr.GetDic())
             {
-                vertexAttr.Add(v.Key, v.Value.type);
+                defVertexAttr.Add(v.Key, v.Value.Type);
             }
             foreach (KeyValuePair<string, Obj> v in Table.edgeAttr.GetDic())
             {
-                edgeAttr.Add(v.Key, v.Value.type);
+                defEdgeAttr.Add(v.Key, v.Value.Type);
             }
         }
 
         public override void Visit(CallNode node)
         {
-            throw new NotImplementedException();
+            //We create a new callScope on the call stack
+            callStack.Push(new Scope(currentscope));
+            currentscope = callStack.Peek();
+
+            //Lookup the function
+            functions.TryGetValue(node.Ident, out FuncDeclNode f);
+
+            //If the function was not found we check if its a predefined function
+            if (f == null && PreDefined.preDefinedFunctions.Contains(f.SymbolObject.Name))
+            {
+                //We collect the parameters by visting each expression and adding that resulting current value to value list
+                List<Value> parameters = new List<Value>();
+                node.Parameters.Expressions.ForEach(e => {
+                    e.Accept(this);
+                    parameters.Add(currentValue);
+                });
+                PreDefined.DoPreDefFunction(f.SymbolObject.Name, this, parameters);
+                return;
+            }
+            else if (f == null) throw new Exception(node.Ident + " is not a neither a predefined function or a userdefined function");
+
+            //We add the parameters as variables in that scope using the retrieved function
+            for (int i = f.Parameters.Statements.Count; i > 0; i--)
+            {
+                VarDeclNode v = (VarDeclNode) f.Parameters.Statements[i-1];
+                node.Parameters.Expressions[i-1].Accept(this);
+                currentscope.Values.Add(v.SymbolObject.Name, currentValue);
+            }
+            //We Visit that function to execute it
+            f.Accept(this);
+            
         }
 
         public override void Visit(VarNode node)
         {
-            throw new NotImplementedException();
+            currentscope.Values.TryGetValue(node.Ident, out Value value);
+            currentValue = value;
         }
 
         public override void Visit(MultiDecl multiDecl)
         {
-            throw new NotImplementedException();
+            multiDecl.Decls.ForEach(d => d.Accept(this));
         }
 
         public override void Visit(BoolConst node)
         {
-            throw new NotImplementedException();
+            currentValue = new Value(node.Value);
         }
 
         public override void Visit(CollecConst node)
         {
-            throw new NotImplementedException();
+            if (node.type.collectionType.name == "list")
+            {
+                List<object> list = new List<object>();
+                foreach (Node n in node.Expressions)
+                {
+                    n.Accept(this);
+                    list.Add(currentValue.o);
+                }
+                currentValue = new Value(list);
+            }
+            else
+            if (node.type.collectionType.name == "set")
+            {
+                HashSet<object> set = new HashSet<object>();
+                foreach (Node n in node.Expressions)
+                {
+                    n.Accept(this);
+                    set.Add(currentValue.o);
+                }
+                currentValue = new Value(set);
+            }
+            else
+            if (node.type.collectionType.name == "stack")
+            {
+                Stack<object> stack = new Stack<object>();
+                foreach (Node n in node.Expressions)
+                {
+                    n.Accept(this);
+                    stack.Push(currentValue.o);
+                }
+                currentValue = new Value(stack);
+            }
+            else
+            if (node.type.collectionType.name == "queue")
+            {
+                Queue<object> queue = new Queue<object>();
+                foreach (Node n in node.Expressions)
+                {
+                    n.Accept(this);
+                    queue.Enqueue(currentValue.o);
+                }
+                currentValue = new Value(queue);
+            }
+            else throw new Exception(node.type.collectionType.name + " is not a collectiontype in magia!");
         }
 
         public override void Visit(NoneConst node)
         {
-            throw new NotImplementedException();
+            currentValue = new Value(new NoneConst());
         }
 
         public override void Visit(NumConst node)
         {
-            throw new NotImplementedException();
+            currentValue = new Value(node.Value);
         }
 
         public override void Visit(TextConst node)
         {
-            throw new NotImplementedException();
+            currentValue = new Value(node.Value);
         }
 
         public override void Visit(BinExprNode node)
         {
-            throw new NotImplementedException();
+            //operator 3 is '=='
+            if (node.OperatorType == 3) {
+                node.Left.Accept(this);
+                Value v1 = currentValue;
+                node.Right.Accept(this);
+                Value v2 = currentValue;
+                if (v2.o.ToString() == v1.o.ToString())
+                    currentValue = new Value(true);
+                else currentValue = new Value(false);
+            }
         }
 
         public override void Visit(UnaExprNode node)
@@ -153,17 +254,35 @@ namespace P4_Project.Compiler.Executor
 
         public override void Visit(FuncDeclNode node)
         {
-            throw new NotImplementedException();
+            node.Body.Accept(this);
+
         }
 
         public override void Visit(VarDeclNode node)
         {
-            throw new NotImplementedException();
+            //We find the inital value for the var
+            Value value;
+            if (node.DefaultValue is null) {
+                value = new Value(PreDefined.GetDefualtValueOfAttributeType(node.type));
+            } else {
+                node.DefaultValue.Accept(this);
+                value = currentValue;
+            }
+            currentscope.Values.Add(node.SymbolObject.Name, value);
         }
 
         public override void Visit(VertexDeclNode node)
         {
             CreateNewVertex(node);
+            if (node.Attributes.Statements.Count != 0) {
+                currentscope.Values.TryGetValue(node.SymbolObject.Name, out Value value);
+                Vertex v = (Vertex)value.o;
+                foreach (Node n in node.Attributes.Statements) {
+                    AssignNode a = (AssignNode)n;
+                    a.Value.Accept(this);
+                    v.updateAttribute(a.Target.Ident, currentValue);
+                }
+            }
         }
 
         public override void Visit(AssignNode node)
@@ -173,7 +292,7 @@ namespace P4_Project.Compiler.Executor
 
         public override void Visit(BlockNode node)
         {
-            throw new NotImplementedException();
+            node.Statements.ForEach(s => s.Accept(this));
         }
 
         public override void Visit(ForeachNode node)
@@ -193,17 +312,30 @@ namespace P4_Project.Compiler.Executor
 
         public override void Visit(IfNode node)
         {
-            throw new NotImplementedException();
+            node.Condition.Accept(this);
+            if (currentValue.o == typeof(bool))
+            {
+                bool b = (bool)currentValue.o;
+                if (b)
+                    node.Body.Accept(this);
+                else node?.ElseNode.Accept(this);
+            }
         }
 
         public override void Visit(LoneCallNode node)
         {
-            functions.TryGetValue(node.Call.Ident, out FuncDeclNode f);
+            currentValue = null;
+            node.Call.Accept(this);
+            currentValue = null; ;
         }
 
         public override void Visit(ReturnNode node)
         {
-            throw new NotImplementedException();
+            node.Ret.Accept(this);
+            callStack.Pop();
+            if (callStack.Count == 0) 
+                currentscope = mainScope;
+            else currentscope = callStack.Peek();
         }
 
         public override void Visit(WhileNode node)

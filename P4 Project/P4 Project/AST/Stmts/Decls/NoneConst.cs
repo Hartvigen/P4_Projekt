@@ -13,10 +13,5 @@ namespace P4_Project.AST.Stmts.Decls
         {
             vi.Visit(this);
         }
-
-        public override List<string> getValue()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

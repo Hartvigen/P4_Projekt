@@ -101,7 +101,7 @@ namespace P4_Project.Visitors
             node.Body.Accept(this);
 
             //4. functions with a non "none" return type must have atleast one return inside them! 
-            if (node.SymbolObject.type.returntype != "none")
+            if (node.SymbolObject.Type.returntype != "none")
             {
                 bool retExists = false;
                 node.Body.Statements.ForEach(n =>

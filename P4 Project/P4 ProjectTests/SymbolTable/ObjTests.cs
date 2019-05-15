@@ -58,7 +58,7 @@ namespace P4_Project.SymbolTable
         [Test]
         public void ObjTests03()
         {
-            Assert.IsTrue(_customObj.type.Equals(_customType));
+            Assert.IsTrue(_customObj.Type.Equals(_customType));
         }
 
         //The Empty Constructor Gives expected kind
@@ -87,7 +87,7 @@ namespace P4_Project.SymbolTable
         [Test]
         public void ObjTests07()
         {
-            Assert.IsNull(_nullObj.type);
+            Assert.IsNull(_nullObj.Type);
         }
     }
 }

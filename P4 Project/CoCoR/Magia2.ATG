@@ -349,16 +349,17 @@ Factor<out ExprNode e>                      (. e = null; .)
 
 
 /*------------------------------------------------------------------------*/
-CallOrID<out IdentNode i> =                     (. i = null; IdentNode bottom = null; .)
+CallOrID<out IdentNode i> =                     (. i = null; .)
     SymbolRef<out VarNode varNode>              (. i = varNode; .)
     [
         '(' 
             Args<null, out CollecConst collec>  (. i = new CallNode(i.Ident, collec); .)
         ')'
-    ]                                           (. bottom = i; .)
+    ]
     {
-        WEAK '.' SymbolRef<out VarNode member>  (. bottom.Source = member; bottom = member; .)
-    }.
+        WEAK '.' SymbolRef<out VarNode member>  (. member.Source = i; i = member; .)
+    }
+.
 
 /*------------------------------------------------------------------------*/
 Args<BaseType type, out CollecConst collec> =   (. collec = new CollecConst(type); ExprNode expr; .)

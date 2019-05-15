@@ -16,15 +16,11 @@ namespace P4_Project.AST.Stmts.Decls
             : base(symbolObject)
         {
             DefaultValue = defaultValue;
-            type = symbolObject.type;
+            type = symbolObject.Type;
         }
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);
-        }
-        public string GetVarType()
-        {
-            return SymbolObject.type.ToString();
         }
     }
 }

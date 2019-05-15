@@ -78,7 +78,7 @@ namespace P4_Project.Visitors
             Table.GetScopes().ForEach(s => {
                 if (s.name == node.SymbolObject.Name)
                 {
-                    s.type = node.SymbolObject.type;
+                    s.type = node.SymbolObject.Type;
                     Table.RemoveObj(node.SymbolObject);
                 }
             });
@@ -131,12 +131,13 @@ namespace P4_Project.Visitors
             {
                 PreDefined.preDefinedAttributesVertex.ForEach(va =>
                 {
-                    Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.getTypeOfAttribute(va)), 0, null));
+                    Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0, null));
                 });
                 //Add user defined attributes
                 node.attrDeclBlock.Statements.ForEach(s => {
                     VarDeclNode v = (VarDeclNode)s;
                     Table.vertexAttr.AddObj(v.SymbolObject);
+                    if(Table.GetDic().ContainsKey(v.SymbolObject.Name))
                     Table.RemoveObj(v.SymbolObject);
                 });
             }
@@ -144,7 +145,7 @@ namespace P4_Project.Visitors
             {
                 PreDefined.preDefinedAttributesEdge.ForEach(va =>
                 {
-                    Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.getTypeOfAttribute(va)), 0, null));
+                    Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0, null));
                 });
                 //Add user defined attributes
                 node.attrDeclBlock.Statements.ForEach(s => {

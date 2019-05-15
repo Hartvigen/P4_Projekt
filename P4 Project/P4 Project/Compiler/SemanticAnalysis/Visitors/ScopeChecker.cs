@@ -53,7 +53,7 @@ namespace P4_Project.Visitors
                 }
 
                 if (node.Source.type == null)
-                    node.Source.type = activeScope.Find(node.Source.Ident).type;
+                    node.Source.type = activeScope.Find(node.Source.Ident).Type;
 
                 if (!Table.isAttribute(node.Source.type.name, node.Ident))
                     ErrorList.Add(node.Ident + " is not a valid attributre of: " + node.Source.type.name);
@@ -64,7 +64,7 @@ namespace P4_Project.Visitors
             if (activeScope.Find(node.Ident) == null)
             {
                 ErrorList.Add(node.Ident + " is not in the scope!");
-            }else if(!activeScope.Find(node.Ident).type.reached)
+            }else if(!activeScope.Find(node.Ident).Type.reached)
                 ErrorList.Add(node.Ident + " in the scope but not declared before use!");
         }
 
@@ -143,7 +143,7 @@ namespace P4_Project.Visitors
             node.DefaultValue?.Accept(this);
 
             //It is marked that this decleration has been reached! 
-            activeScope.Find(node.SymbolObject.Name).type.reached = true;
+            activeScope.Find(node.SymbolObject.Name).Type.reached = true;
         }
         public override void Visit(VertexDeclNode node)
         {
