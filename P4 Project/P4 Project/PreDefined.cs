@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using P4_Project.AST;
-using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.Compiler.Executor;
 using P4_Project.Compiler.Interpreter;
 using P4_Project.Compiler.Interpreter.Types;
+using P4_Project.Graphviz;
 
 namespace P4_Project
 {
     public abstract class PreDefined
     {
-        public static List<string> preDefinedFunctions = new List<string>
+        public static readonly List<string> preDefinedFunctions = new List<string>
         {
                  "GetEdge",
                 "RemoveEdge",
@@ -23,57 +20,64 @@ namespace P4_Project
                  "GetVertices",
                 "ClearEdges",
                 "ClearVertices",
-               "ClearAll"
+               "ClearAll",
+               "print"
         };
 
-        public static List<string> preDefinedAttributesVertex = new List<string>
+        public static readonly List<string> preDefinedAttributesVertex = new List<string>
         {
             "label",
             "color"
         };
 
-        public static List<string> preDefinedAttributesEdge = new List<string>
+        public static readonly List<string> preDefinedAttributesEdge = new List<string>
         {
             "label",
             "color",
             "style"
         };
 
-        public static object GetDefualtValueOfAttributeType(BaseType type)
+        public static object GetDefaultValueOfAttributeType(BaseType type)
         {
-            if (type.name == "number")
-                return 0.0;
-            if (type.name == "text")
-                return "";
-            if (type.name == "boolean")
-                return false;
-            if (type.name == "vertex" || type.name == "edge" || type.name == "collec")
-                return new NoneConst();
-            throw new Exception("Type has no predefined value! :: " + type.name + " ::");
+            switch (type.name)
+            {
+                case "number":
+                    return 0.0;
+                case "text":
+                    return "";
+                case "boolean":
+                    return false;
+                case "vertex":
+                case "edge":
+                case "collec":
+                    return new NoneConst();
+                default:
+                    throw new Exception("Type: " + type.name + " has no predefined value!");
+            }
         }
 
         public static string GetTypeOfPreDefinedAttributeVertex(string name)
         {
-            if (preDefinedAttributesVertex.Contains(name))
-                switch (name) {
-                    case "label": return "text";
-                    case "color": return "text";
-                    default: throw new Exception(name + " is a predefined attribute for vertex but no type has been specified for it");
-                }
-            throw new Exception(name + " is not a predefined attribute for vertex");
+            if (!preDefinedAttributesVertex.Contains(name))
+                throw new Exception(name + " is not a predefined attribute for vertex");
+            switch (name) {
+                case "label": return "text";
+                case "color": return "text";
+                default: throw new Exception(name + " is a predefined attribute for vertex but no type has been specified for it");
+            }
         }
 
         public static string GetTypeOfPreDefinedAttributeEdge(string name)
         {
-            if (preDefinedAttributesEdge.Contains(name))
-                switch (name)
-                {
-                    case "label": return "text";
-                    case "color": return "text";
-                    case "style": return "text";
-                    default: throw new Exception(name + " is a predefined attribute for edge but no type has been specified for it");
-                }
-            throw new Exception(name + " is not a predefined attribute for edge");
+            if (!preDefinedAttributesEdge.Contains(name))
+                throw new Exception(name + " is not a predefined attribute for edge");
+            switch (name)
+            {
+                case "label": return "text";
+                case "color": return "text";
+                case "style": return "text";
+                default: throw new Exception(name + " is a predefined attribute for edge but no type has been specified for it");
+            }
         }
 
         internal static void DoPreDefFunction(string function, Executor executor, List<Value> parameters)
@@ -81,6 +85,9 @@ namespace P4_Project
             if (preDefinedFunctions.Contains(function))
                 switch (function)
                 {
+                    case "print":
+                        print(executor);
+                        break;
                     case "GetEdge":
                         GetEdge(parameters, executor);
                         break;
@@ -88,64 +95,69 @@ namespace P4_Project
                         RemoveEdge(parameters, executor);
                         break;
                     case "GetEdges":
-                        GetEdges(parameters, executor);
+                        GetEdges(executor);
                         break;
                     case "RemoveVertex":
                         RemoveVertex(parameters, executor);
                         break;
                     case "GetVertices":
-                        GetVertices(parameters, executor);
+                        GetVertices(executor);
                         break;
                     case "ClearEdges":
-                        ClearEdges(parameters, executor);
+                        ClearEdges(executor);
                         break;
                     case "ClearAll":
-                        ClearAll(parameters, executor);
+                        ClearAll(executor);
                         break;
-                    default: throw new Exception("Missing implimentation of the PreDefFunction: " + function);
+                    default: throw new Exception("Missing implementation of the PreDefFunction: " + function);
                 }
-            else throw new Exception(function + " is not a predef function!");
+            else throw new Exception(function + " is not a pre Defined Function!");
         }
 
-        private static void ClearAll(List<Value> parameters, Executor executor)
+        private static void print(Executor executor)
+        {
+            DotToPng.CreatePNGFileFromScene(executor.scene);
+        }
+
+        private static void ClearAll(Executor executor)
         {
             executor.scene.Clear();
         }
 
-        private static void ClearEdges(List<Value> parameters, Executor executor)
+        private static void ClearEdges(Executor executor)
         {
             executor.scene.ForEach(v => v.edge.Clear());
         }
 
-        private static void GetVertices(List<Value> parameters, Executor executor)
+        private static void GetVertices(Executor executor)
         {
             executor.currentValue = null;
-            List<Vertex> vertexList = new List<Vertex>();
-            foreach (Vertex v in executor.scene)
+            var vertexList = new List<Vertex>();
+            foreach (var v in executor.scene)
                 vertexList.Add(v);
-                executor.currentValue = new Value(vertexList);
+            executor.currentValue = new Value(vertexList);
         }
 
-        private static void RemoveVertex(List<Value> parameters, Executor executor)
+        private static void RemoveVertex(IReadOnlyList<Value> parameters, Executor executor)
         {
             executor.scene.Remove((Vertex)parameters[0].o);
         }
 
-        private static void GetEdges(List<Value> parameters, Executor executor)
+        private static void GetEdges(Executor executor)
         {
             executor.currentValue = null;
-            List<Edge> edgeList = new List<Edge>();
-            foreach (Vertex v in executor.scene)
+            var edgeList = new List<Edge>();
+            foreach (var v in executor.scene)
                 edgeList.AddRange(v.edge);
             executor.currentValue = new Value(edgeList);
         }
         private static void GetEdge(List<Value> parameters, Executor executor)
         {
-            Vertex v1 = (Vertex)parameters[0].o;
-            Vertex v2 = (Vertex)parameters[1].o;
-            foreach (Vertex v in executor.scene)
+            var v1 = (Vertex)parameters[0].o;
+            var v2 = (Vertex)parameters[1].o;
+            foreach (var v in executor.scene)
             {
-                foreach (Edge e in v.edge)
+                foreach (var e in v.edge)
                 {
                     if (e.hasVertex(v1, v2))
                         executor.currentValue = new Value(e);
@@ -155,24 +167,48 @@ namespace P4_Project
 
         private static void RemoveEdge(List<Value> parameters, Executor executor)
         {
-            Edge eRemove = (Edge)parameters[0].o;
-            foreach (Vertex v in executor.scene)
+            var eRemove = (Edge)parameters[0].o;
+            foreach (var v in executor.scene)
             {
-                foreach (Edge e in v.edge)
+                foreach (var e in v.edge)
                 {
-                    if (eRemove == e)
-                    { 
-                        v.edge.Remove(e);
-                        return;
-                    }
+                    if (eRemove != e) continue;
+                    v.edge.Remove(e);
+                    return;
                 }
             }
         }
 
+        public static BaseType FindReturnOfPreDefFunctions(string name)
+        {
+            switch (name)
+            {
+                case "GetEdge": return new BaseType("edge");
+                case "RemoveEdge": return new BaseType("none");
+                case "GetEdges": return new BaseType(new BaseType("set"), new BaseType("edge"));
+                case "RemoveVertex": return new BaseType("none");
+                case "GetVertices": return new BaseType(new BaseType("set"), new BaseType("vertex"));
+                case "ClearEdges": return new BaseType("none");
+                case "ClearAll": return new BaseType("none");
+                case "print": return new BaseType("none");
+                default: throw new Exception("the function: " + name + " is not a predefined function");
+            }
+        }
 
-
-
-
-
+        public static List<BaseType> FindParameterListOfPreDefFunctions(string name)
+        {
+            switch (name)
+            {
+                case "GetEdge": return new List<BaseType> {new BaseType("vertex"), new BaseType("vertex")};
+                case "RemoveEdge": return new List<BaseType> {new BaseType("edge")};
+                case "RemoveVertex": return new List<BaseType> { new BaseType("vertex") };
+                case "GetEdges": return new List<BaseType>();
+                case "GetVertices": return new List<BaseType>();
+                case "ClearEdges": return new List<BaseType>();
+                case "ClearAll": return new List<BaseType>();
+                case "print": return new List<BaseType>();
+                default: throw new Exception("the function: " + name + " is not a predefined function");
+            }
+        }
     }
 }

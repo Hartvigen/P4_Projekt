@@ -29,7 +29,7 @@ namespace P4_Project.SymbolTable
         [SetUp]
         public void Initialize()
         {
-            _customObj = new Obj(_customName, _customType, _customKind, _customSymTable);
+            _customObj = new Obj(_customName, _customType, _customKind);
             _nullObj = new Obj();
         }
 
@@ -73,13 +73,6 @@ namespace P4_Project.SymbolTable
         public void ObjTests05()
         {
             Assert.IsTrue(_nullObj.Name == null);
-        }
-
-        //The Empty Constructor Gives expected scope
-        [Test]
-        public void ObjTests06()
-        {
-            Assert.IsTrue(_nullObj.Scope == null);
         }
 
         //The Empty Constructor Gives expected type

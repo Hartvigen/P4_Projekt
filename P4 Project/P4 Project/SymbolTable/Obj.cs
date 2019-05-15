@@ -7,12 +7,11 @@ namespace P4_Project.SymbolTable
         public string Name { get; }        // name of the object
         public BaseType Type { get; }      // type of the object
         public int Kind { get; }           // var, func ..
-        public SymTable Scope { get; }  // the scope of the object
 
-        public Obj(string name, BaseType type, int kind, SymTable scope)
+        public Obj(string name, BaseType type, int kind)
         {
             Name = name;
-            this.Type = type;
+            Type = type;
             Kind = kind;
         }
 

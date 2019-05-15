@@ -1,7 +1,7 @@
 ﻿using P4_Project.AST.Expressions;
 using P4_Project.SymbolTable;
 using P4_Project.AST;
-using P4_Project.Visitors;
+using P4_Project.Compiler.SemanticAnalysis.Visitors;
 
 namespace P4_Project.AST.Stmts.Decls
 {

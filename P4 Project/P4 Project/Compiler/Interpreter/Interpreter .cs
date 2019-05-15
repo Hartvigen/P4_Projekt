@@ -9,9 +9,9 @@ using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.Compiler.Interpreter;
 using P4_Project.Compiler.Interpreter.Types;
+using P4_Project.Compiler.SemanticAnalysis.Visitors;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.SymbolTable;
-using P4_Project.Visitors;
 
 namespace P4_Project.Compiler.Executor
 {
@@ -19,7 +19,7 @@ namespace P4_Project.Compiler.Executor
     {
         //This is the given information.
         //That will be used to execute the entire program.
-        public override SymTable Table { get; set; }
+        public virtual SymTable Table { get; set; }
 
         //The Defnition of a vertex and edge attributions.
         Dictionary<string, BaseType> defVertexAttr = new Dictionary<string, BaseType>();
@@ -90,7 +90,7 @@ namespace P4_Project.Compiler.Executor
             //The vertex is created
             Dictionary<string, Value> values = new Dictionary<string, Value>();
             foreach (KeyValuePair<string, BaseType> vattr in defVertexAttr) 
-                values.Add(vattr.Key, new Value(PreDefined.GetDefualtValueOfAttributeType(vattr.Value)));
+                values.Add(vattr.Key, new Value(PreDefined.GetDefaultValueOfAttributeType(vattr.Value)));
             Vertex v = new Vertex(vertex, values);
             //We add it to the scene and the currentscope
             scene.Add(v);
@@ -103,7 +103,7 @@ namespace P4_Project.Compiler.Executor
             foreach (Tuple<IdentNode, List<AssignNode>> tuple in edge.RightSide) {
                 Dictionary<string, Value> values = new Dictionary<string, Value>();
                 foreach (KeyValuePair<string, BaseType> eattr in defEdgeAttr)
-                    values.Add(eattr.Key, new Value(PreDefined.GetDefualtValueOfAttributeType(eattr.Value)));
+                    values.Add(eattr.Key, new Value(PreDefined.GetDefaultValueOfAttributeType(eattr.Value)));
                 currentscope.TryGetValue(tuple.Item1.Ident, out Value v1);
                 Vertex to = (Vertex)v1.o;
                 Edge e = new Edge(from, edge.Operator, to, values);
@@ -315,7 +315,7 @@ namespace P4_Project.Compiler.Executor
             Value value;
 
             if (node.DefaultValue is null) {
-                value = new Value(PreDefined.GetDefualtValueOfAttributeType(node.type));
+                value = new Value(PreDefined.GetDefaultValueOfAttributeType(node.type));
             } else {
                 node.DefaultValue.Accept(this);
                 value = currentValue;

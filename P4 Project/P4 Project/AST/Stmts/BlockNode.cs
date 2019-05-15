@@ -1,5 +1,5 @@
-﻿using P4_Project.Visitors;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using P4_Project.Compiler.SemanticAnalysis.Visitors;
 
 namespace P4_Project.AST.Stmts
 {

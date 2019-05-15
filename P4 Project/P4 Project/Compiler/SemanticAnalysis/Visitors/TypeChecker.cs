@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -7,17 +6,16 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.SymbolTable;
 
-namespace P4_Project.Visitors
+namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
-    public class TypeChecker : Visitor
+    public sealed class TypeChecker : Visitor
     {
         public override string AppropriateFileName { get; } = "symbolInfo.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public override SymTable Table { get; set; }
+        public SymTable Table { get; }
         private SymTable activeScope;
 
         public TypeChecker(SymTable Table)
@@ -34,8 +32,8 @@ namespace P4_Project.Visitors
             node.type = Table.findReturnTypeOfFunction(node.Ident);
 
             //We check that parameter types match.
-            List<BaseType> l = Table.findParameterListOfFunction(node.Ident);
-            for (int i = l.Count - 1; i > 0; i--) {
+            var l = Table.findParameterListOfFunction(node.Ident);
+            for (var i = l.Count - 1; i > 0; i--) {
                 if (node.Parameters.Expressions[i].type.name != l[i].name) {
                     ErrorList.Add("Wrong parameter type for function " + node.Ident + " should be type: " + l[i] + " but was: " + node.Parameters.Expressions[i].type);
                 }
@@ -50,10 +48,10 @@ namespace P4_Project.Visitors
 
             //We assign the type found from the table.
             if(activeScope.Find(node.Ident) != null)
-            node.type = activeScope.Find(node.Ident).Type;
+                node.type = activeScope.Find(node.Ident).Type;
 
 			//If the Source exist we can find the type as from the attribute that matches from the source
-			if (node.type == null && node.Source != null && node.Source.type != null) {
+			if (node.type == null && node.Source?.type != null) {
 				if (Table.isAttribute(node.Source.type.name, node.Ident)) {
 					node.type = Table.getTypeOfAttribute(node.Source.type.name, node.Ident);
 				}
@@ -62,13 +60,17 @@ namespace P4_Project.Visitors
 
 
 
-			if (node.type == null && node.Source != null) {
-				ErrorList.Add("No type given var: " + node.Source.Ident + "." + node.Ident);
-				return;
-			}
-			if (node.type == null)
-				ErrorList.Add("No type given var: " + node.Ident);
-		}
+			switch (node.type)
+            {
+                case null when node.Source != null:
+                    ErrorList.Add("No type given var: " + node.Source.Ident + "." + node.Ident);
+                    return;
+                case null:
+                    ErrorList.Add("No type given var: " + node.Ident);
+                    break;
+                default: return;
+            }
+        }
 
         //returns a Bool type
         public override void Visit(BoolConst node)
@@ -78,13 +80,13 @@ namespace P4_Project.Visitors
                 node.type = new BaseType("boolean");
             }
             else if (node.type.name != "boolean")
-                ErrorList.Add("BoolConst is allways type boolean but was found to be type: " + node.type.name);
+                ErrorList.Add("BoolConst is always type boolean but was found to be type: " + node.type.name);
         }
 
         //Checks if all elements in a collection is the same type, and returns the type
         public override void Visit(CollecConst node)
         {
-            //We check that each Expression in the Collection evulates to the same type as the first one in the collection
+            //We check that each Expression in the Collection evaluates to the same type as the first one in the collection
             node.Expressions.ForEach(n =>
             {
                 n.Accept(this);
@@ -92,8 +94,6 @@ namespace P4_Project.Visitors
                     ErrorList.Add("Collection contains both: " + node.Expressions[0].type + " and " + n.type);
                 }
             });
-            //The collection its type defualt is list TODO: find the actual collection type
-            node.type = new BaseType(new BaseType("list"), node.Expressions[0].type);
         }
 
         //returns null
@@ -104,7 +104,7 @@ namespace P4_Project.Visitors
                 node.type = new BaseType("none");
             }
             else if (node.type.name != "none")
-                ErrorList.Add("NoneConst is allways type none but was found to be type: " + node.type.name);
+                ErrorList.Add("NoneConst is always type none but was found to be type: " + node.type.name);
         }
 
         //returns a numberType
@@ -115,7 +115,7 @@ namespace P4_Project.Visitors
                 node.type = new BaseType("number");
             }
             else if (node.type.name != "number")
-                    ErrorList.Add("NumConst is allways type number but was found to be type: " + node.type.name);
+                    ErrorList.Add("NumConst is always type number but was found to be type: " + node.type.name);
         }
 
         //returns a text
@@ -126,7 +126,7 @@ namespace P4_Project.Visitors
                 node.type = new BaseType("text");
             }
             if (node.type.name != "text")
-                ErrorList.Add("TextConst is allways type text but was found to be type: " + node.type.name);
+                ErrorList.Add("TextConst is always type text but was found to be type: " + node.type.name);
         }
 
         //Checks that the correct types are used in the BinExprNode
@@ -152,7 +152,7 @@ namespace P4_Project.Visitors
             else node.type = Operators.GetResultingTypeFromOperandTypeAndOperator(l, node.OperatorType);
 
             if (l.name != r.name)
-            ErrorList.Add("BinExprNode has differentiating operand types: " + l.name +  " and " + node.GetCodeOfOperator() + " " + r.name);
+                ErrorList.Add("BinExprNode has differentiating operand types: " + l.name +  " and " + node.GetCodeOfOperator() + " " + r.name);
         }
         public override void Visit(UnaExprNode node)
         {
@@ -172,19 +172,18 @@ namespace P4_Project.Visitors
             node.RightSide.ForEach(t => {
                 t.Item1.Accept(this);
                 t.Item2.ForEach(s => {
-                    if (s.GetType() == typeof(AssignNode))
-                    {
-                        AssignNode a = (AssignNode)s;
-                        //We dont care about the right side of the assign it must still be valid according to all scoperules
-                        a.Value.Accept(this);
+                    if (s.GetType() != typeof(AssignNode)) return;
+                    var a = s;
+                    //We dont care about the right side of the assign it must still be valid according to all scope rules
+                    a.Value.Accept(this);
 
-                        //We find the header scope for edge take the type of the attribute
-                        Table.GetScopes().ForEach(h => {
-                            if (h.header && h.name == "edge")
-                                if (h.Find(a.Target.Ident).Type.name != a.Value.type.name)
-                                    ErrorList.Add(a.Target.Ident + " is type: " + a.Target.type.name + " so type: " + a.Value.type.name + " is not a valid type to assign.");
-                        });
-                    }
+                    //We find the header scope for edge take the type of the attribute
+                    Table.GetScopes().ForEach(h =>
+                    {
+                        if (!h.header || h.name != "edge") return;
+                        if (h.Find(a.Target.Ident).Type.name != a.Value.type.name)
+                            ErrorList.Add(a.Target.Ident + " is type: " + a.Target.type.name + " so type: " + a.Value.type.name + " is not a valid type to assign.");
+                    });
                 });
             });
 
@@ -234,31 +233,27 @@ namespace P4_Project.Visitors
                 return;
 
             if (node.DefaultValue.type.name == "func")
+            {
                 if (node.DefaultValue.type.returntype != node.SymbolObject.Type.name)
-                {
                     ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with call that returns: " + node.DefaultValue.type.returntype + " when variable is type: " + node.type);
-                }
-                else return;
-            else if (node.DefaultValue.type.name != node.type.name && node.DefaultValue.type.name != "none")
+            }else if (node.DefaultValue.type.name != node.type.name && node.DefaultValue.type.name != "none")
                 ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with of type: " + node.DefaultValue.type + " when variable is type: " + node.type);
         }
 
         //Creates a vertex BaseType in SymbolTable
         public override void Visit(VertexDeclNode node)
         {
-            //Vertex cant be typechecked like normal as their type is not stored in activeScope
+            //Vertex cant be typeChecked like normal as their type is not stored in activeScope
             if (node.Attributes.Statements.Count != 0)
             {
                 node.Attributes.Statements.ForEach(s => {
-                    if (s.GetType() == typeof(AssignNode))
-                    {
-                        AssignNode a = (AssignNode)s;
-                        a.Value.Accept(this);
-                        //We find the header scope for vertex and if the attribute is not there it is invalid.
-                        Table.vertexAttr.GetDic().TryGetValue(a.Target.Ident, out Obj o);
-                        if(o.Type.name != a.Value.type.name)
-                            ErrorList.Add(o.Name + " is type " + o.Type.name + " cannot be assigned type: " + a.Value.type.name);
-                    }
+                    if (s.GetType() != typeof(AssignNode)) return;
+                    var a = (AssignNode)s;
+                    a.Value.Accept(this);
+                    //We find the header scope for vertex and if the attribute is not there it is invalid.
+                    Table.vertexAttr.GetDic().TryGetValue(a.Target.Ident, out Obj o);
+                    if(o != null && o.Type.name != a.Value.type.name)
+                        ErrorList.Add(o.Name + " is type " + o.Type.name + " cannot be assigned type: " + a.Value.type.name);
                 });
             }
         }
@@ -273,12 +268,12 @@ namespace P4_Project.Visitors
                 //If there is a source it is not a problem
                 if (node.Target.Source != null)
                     return;
-                ErrorList.Add(node.Target.Ident + " was not found in the symboltable.");
+                ErrorList.Add(node.Target.Ident + " was not found in the symbolTable.");
                 return;
             }
 
-            BaseType t = activeScope.Find(node.Target.Ident).Type;
-            BaseType v = node.Value.type;
+            var t = activeScope.Find(node.Target.Ident).Type;
+            var v = node.Value.type;
 
             if (v.name == "func")
                 if (v.returntype != t.name)
@@ -322,7 +317,7 @@ namespace P4_Project.Visitors
             node.Initializer.Accept(this);
             node.Condition.Accept(this);
             if (node.Condition.type.name != "boolean")
-                ErrorList.Add("Condition of forloop must be type boolean");
+                ErrorList.Add("Condition of for loop must be type boolean");
             node.Iterator.Accept(this);
             node.Body.Accept(this);
             LeaveThisScope();
@@ -339,7 +334,7 @@ namespace P4_Project.Visitors
             EnterNextScope();
             node.Condition?.Accept(this);
 
-            if (!(node.Condition is null) && node.Condition.type != null)
+            if (node.Condition?.type != null)
                 if (node.Condition.type.name != "boolean" && node.Condition.type.name != "none")
                 {
                     if (node.Condition.type.name != "")
@@ -373,7 +368,7 @@ namespace P4_Project.Visitors
 
             //The Condition must be type boolean.
             if (node.Condition.type.name != "boolean")
-            ErrorList.Add("The condition in a while loop must be boolean type!");
+                ErrorList.Add("The condition in a while loop must be boolean type!");
 
             node.Body.Accept(this);
 
@@ -382,7 +377,7 @@ namespace P4_Project.Visitors
         
         public override void Visit(Magia node)
         {
-            //We resetr the ScopePositions
+            //We reset the ScopePositions
             Table.resetScopePositions();
             node.block.Accept(this);
         }

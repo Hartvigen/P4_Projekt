@@ -1,5 +1,5 @@
-﻿using P4_Project.SymbolTable;
-using P4_Project.Visitors;
+﻿using P4_Project.Compiler.SemanticAnalysis.Visitors;
+using P4_Project.SymbolTable;
 
 namespace P4_Project.AST.Stmts.Decls
 {
