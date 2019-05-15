@@ -13,24 +13,19 @@ namespace P4_Project.Compiler.Interpreter.Types
         public Vertex to;
         public int opera;
 
-        public Dictionary<string, List<Value>> attributes = new Dictionary<string, List<Value>>();
+        public Dictionary<string, Value> attributes = new Dictionary<string, Value>();
 
-        public EdgeCreateNode edge;
-
-        public Edge(Vertex from, Vertex to, int opera, EdgeCreateNode edge, Dictionary<string, List<Value>> DefinedAttributes)
+        public Edge(Vertex from, int opera, Vertex to, Dictionary<string, Value> DefinedAttributes)
         {
             this.from = from;
             this.to = to;
             this.opera = opera;
-            this.edge = edge;
 
-            //Insert every DefineAttribute and give it value.
-            foreach (KeyValuePair<string, List<Value>> v in DefinedAttributes)
-            {
+            //Insert every DefinedAttribute and give it value.
+            foreach (KeyValuePair<string, Value> v in DefinedAttributes)
                 attributes.Add(v.Key, v.Value);
-            }
         }
-        public void updateAttribute(string identifyer, List<Value> value)
+        public void updateAttribute(string identifyer, Value value)
         {
             if (attributes.ContainsKey(identifyer))
                 attributes.Remove(identifyer);

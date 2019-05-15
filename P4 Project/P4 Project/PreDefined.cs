@@ -142,7 +142,7 @@ namespace P4_Project
         private static void GetEdge(List<Value> parameters, Executor executor)
         {
             Vertex v1 = (Vertex)parameters[0].o;
-            Vertex v2 = (Vertex)parameters[0].o;
+            Vertex v2 = (Vertex)parameters[1].o;
             foreach (Vertex v in executor.scene)
             {
                 foreach (Edge e in v.edge)
@@ -161,7 +161,10 @@ namespace P4_Project
                 foreach (Edge e in v.edge)
                 {
                     if (eRemove == e)
+                    { 
                         v.edge.Remove(e);
+                        return;
+                    }
                 }
             }
         }

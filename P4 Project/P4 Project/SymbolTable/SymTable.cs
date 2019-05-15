@@ -166,7 +166,6 @@ namespace P4_Project.SymbolTable
                 case "RemoveVertex": return new BaseType("none");
                 case "GetVertices": return new BaseType(new BaseType("set"), new BaseType("vertex"));
                 case "ClearEdges": return new BaseType("none");
-                case "ClearVertices": return new BaseType("none");
                 case "ClearAll": return new BaseType("none");
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
@@ -177,12 +176,11 @@ namespace P4_Project.SymbolTable
             switch (name)
             {
                 case "GetEdge": return new List<BaseType> {new BaseType("vertex"), new BaseType("vertex")};
-                case "RemoveEdge": return new List<BaseType> {new BaseType("vertex"), new BaseType("vertex")};
+                case "RemoveEdge": return new List<BaseType> {new BaseType("edge")};
                 case "RemoveVertex": return new List<BaseType> { new BaseType("vertex") };
                 case "GetEdges": return new List<BaseType>();
                 case "GetVertices": return new List<BaseType>();
                 case "ClearEdges": return new List<BaseType>();
-                case "ClearVertices": return new List<BaseType>();
                 case "ClearAll": return new List<BaseType>();
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
