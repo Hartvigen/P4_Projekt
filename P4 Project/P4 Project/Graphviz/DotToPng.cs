@@ -5,7 +5,6 @@ using System.Text;
 using GraphVizWrapper;
 using GraphVizWrapper.Commands;
 using GraphVizWrapper.Queries;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using P4_Project.Compiler.Interpreter.Types;
 
 namespace P4_Project.Graphviz
@@ -50,21 +49,21 @@ namespace P4_Project.Graphviz
             //Every graph is a directed graph and if a undirected edge
             //is encountered it is style to not look like it on a sub graph.
             s.AppendLine("digraph {");
-            
-            //All vertices are placed globally accessible by their identifier. 
+
+            //All vertices are placed globally accessible by their identifier. (string)v.attributes["label"].o)
             executorScene.ForEach(v =>
             {
-                s.Append(v.identifyer);
+                v.name = PreDefined.NextUniqueString();
+                s.Append(v.name);
                 s.Append(" [");
                 foreach (var keyValuePair in v.attributes)
                 {
                     if (PreDefined.preDefinedAttributesVertex.Contains(keyValuePair.Key))
                     {
-                        s.Append(keyValuePair.Key + " = " + (string) keyValuePair.Value.o + ", ");
+                        s.Append(keyValuePair.Key + " = " + keyValuePair.Value.o + ", ");
                     }
                 }
                 //To remove the last comma and space.
-                s.Length -= 2;
                 s.AppendLine("]");
             });
 
@@ -78,9 +77,9 @@ namespace P4_Project.Graphviz
                 v.edge.ForEach(e =>
                 {
                     if (e.opera != Operators.Nonarr) return;
-                    s.Append(e.from.identifyer);
+                    s.Append(e.from.name);
                     s.Append(" -> ");
-                    s.Append(e.to.identifyer + " [");
+                    s.Append(e.to.name + " [");
                     //For every mapped attribute we pass the value to DOT.
                     foreach (var keyValuePair in e.attributes)
                     {
@@ -90,7 +89,6 @@ namespace P4_Project.Graphviz
                         }
                     }
                     //To remove the last comma and space.
-                    s.Length -= 2;
                     s.AppendLine("]");
                 });
             });
@@ -106,14 +104,14 @@ namespace P4_Project.Graphviz
                     switch (e.opera)
                     {
                         case Operators.Rightarr:
-                            s.Append(e.@from.identifyer);
+                            s.Append(e.from.name);
                             s.Append(" -> ");
-                            s.Append(e.to.identifyer + " [");
+                            s.Append(e.to.name + " [");
                             break;
                         case Operators.Leftarr:
-                            s.Append(e.to.identifyer);
+                            s.Append(e.to.name);
                             s.Append(" -> ");
-                            s.Append(e.@from.identifyer + " [");
+                            s.Append(e.from.name + " [");
                             break;
                         default: return;
                     }
@@ -127,7 +125,6 @@ namespace P4_Project.Graphviz
                         }
                     }
                     //To remove the last comma and space.
-                    s.Length -= 2;
                     s.AppendLine("]");
                 });
             });
@@ -138,7 +135,9 @@ namespace P4_Project.Graphviz
             //The main graph is ended.
             s.AppendLine("}");
 
-            CreatePNGFile(s.ToString(), AppDomain.CurrentDomain.BaseDirectory + "done.png");
+            string finishedDot = s.ToString();
+
+            CreatePNGFile(finishedDot, AppDomain.CurrentDomain.BaseDirectory + "done.png");
         }
     }
 }

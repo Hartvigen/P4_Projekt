@@ -102,11 +102,6 @@ namespace P4_Project.SymbolTable
             if (variables.TryGetValue(Name, out var value))
                 return value;
 
-            //We only ask parent if it is not the scope named top that also has a null parent as that would mean it was a true top scope.
-            //This allows for functions to actually be named "top" as their otherwise could have been problems with that.
-            if (Parent == null) return null;
-            if (Parent.name == "top" && Parent.Parent == null)
-                return null;
             return Parent.Find(Name);
         }
 

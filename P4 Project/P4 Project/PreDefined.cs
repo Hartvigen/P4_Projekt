@@ -11,6 +11,8 @@ namespace P4_Project
 {
     public abstract class PreDefined
     {
+        static long count;
+
         public static readonly List<string> preDefinedFunctions = new List<string>
         {
                  "GetEdge",
@@ -19,9 +21,9 @@ namespace P4_Project
               "RemoveVertex",
                  "GetVertices",
                 "ClearEdges",
-                "ClearVertices",
                "ClearAll",
-               "print"
+               "Print",
+               "AsText"
         };
 
         public static readonly List<string> preDefinedAttributesVertex = new List<string>
@@ -36,6 +38,34 @@ namespace P4_Project
             "color",
             "style"
         };
+
+        public static object GetPreDefinedValueOfPreDefinedAttributeVertex(string name)
+        {
+            switch (name)
+            {
+                case "label":
+                    return "vertex";
+                case "color":
+                    return "black";
+                default:
+                    throw new Exception("Attribute: " + name + " has no predefined value for vertex!");
+            }
+        }
+
+        public static object GetPreDefinedValueOfPreDefinedAttributeEdge(string name)
+        {
+            switch (name)
+            {
+                case "label":
+                    return "defualt";
+                case "color":
+                    return "black";
+                case "style":
+                    return "none";
+                default:
+                    throw new Exception("Attribute: " + name + " has no predefined value for edge!");
+            }
+        }
 
         public static object GetDefaultValueOfAttributeType(BaseType type)
         {
@@ -54,6 +84,11 @@ namespace P4_Project
                 default:
                     throw new Exception("Type: " + type.name + " has no predefined value!");
             }
+        }
+
+        public static string NextUniqueString()
+        {
+            return "vertex" + count++;
         }
 
         public static string GetTypeOfPreDefinedAttributeVertex(string name)
@@ -85,8 +120,11 @@ namespace P4_Project
             if (preDefinedFunctions.Contains(function))
                 switch (function)
                 {
-                    case "print":
-                        print(executor);
+                    case "Print":
+                        Print(executor);
+                        break;
+                    case "AsText":
+                        AsText(parameters, executor);
                         break;
                     case "GetEdge":
                         GetEdge(parameters, executor);
@@ -114,7 +152,11 @@ namespace P4_Project
             else throw new Exception(function + " is not a pre Defined Function!");
         }
 
-        private static void print(Executor executor)
+        private static void AsText(IReadOnlyList<Value> parameters, Executor executor) {
+            if (parameters[0].type.name == "number")
+                executor.currentValue = new Value("" + (double)parameters[0].o);
+        }
+        private static void Print(Executor executor)
         {
             DotToPng.CreatePNGFileFromScene(executor.scene);
         }
@@ -190,7 +232,8 @@ namespace P4_Project
                 case "GetVertices": return new BaseType(new BaseType("set"), new BaseType("vertex"));
                 case "ClearEdges": return new BaseType("none");
                 case "ClearAll": return new BaseType("none");
-                case "print": return new BaseType("none");
+                case "Print": return new BaseType("none");
+                case "AsText": return new BaseType("text");
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
@@ -206,7 +249,8 @@ namespace P4_Project
                 case "GetVertices": return new List<BaseType>();
                 case "ClearEdges": return new List<BaseType>();
                 case "ClearAll": return new List<BaseType>();
-                case "print": return new List<BaseType>();
+                case "Print": return new List<BaseType>();
+                case "AsText": return new List<BaseType> { new BaseType("number") };
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
