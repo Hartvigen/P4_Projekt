@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.Compiler.SyntaxAnalysis
+namespace P4_ProjectTests.Compiler.SyntaxAnalysis
 {
     [TestFixture]
     public sealed class ParserTests
@@ -228,26 +228,26 @@ namespace P4_Project.Compiler.SyntaxAnalysis
         [Test]
         public void ParseTestSuccess8()
         {
-            string func = "number x " +
-                "x = 4 * 5 + 3 - 3";
+            const string func = "number x " +
+                                "x = 4 * 5 + 3 - 3";
             Assert.IsTrue(TryParse(func));
 
-            string func2 = "func none FuncDecl(number x){x = 4 * 5 + 3 - 3}";
+            const string func2 = "func none FuncDecl(number x){x = 4 * 5 + 3 - 3}";
             Assert.IsTrue(TryParse(func2));
 
-            string func3 = "func none FuncDecl(number x, number y){if(-x > y){x = y}}";
+            const string func3 = "func none FuncDecl(number x, number y){if(-x > y){x = y}}";
             Assert.IsTrue(TryParse(func3));
 
         }
 
-        //testing whether declarations are correctly stored in the symbol table, by creating and then accesing a number declaration
+        //testing whether declarations are correctly stored in the symbol table, by creating and then accessing a number declaration
         [Test]
         public void ParseTestSuccess9()
         {
-            string numDec = "number x = 3";
+            const string numDec = "number x = 3";
             Assert.IsTrue(TryParse(numDec));
 
-            Parser parser  = new Parser(new Scanner(StreamFromString(numDec)));
+            var parser  = new Parser(new Scanner(StreamFromString(numDec)));
             parser.Parse();
             var x = parser.tab.Find("x");
 

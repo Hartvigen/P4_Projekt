@@ -4,16 +4,14 @@ using System.Text;
 using NUnit.Framework;
 using P4_Project.Compiler.SemanticAnalysis.Visitors.Extra;
 using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.Visitors;
 
-namespace P4_Project.Visitors
+namespace P4_ProjectTests.Visitors
 {
     [TestFixture]
     public class XmlTreeBuilderTests
     {
-        private static string uglyprogrampath;
-        private static string prettyprogrampath;
-        private static string xmlprogrampath;
+        private static string _uglyProgramPath;
+        private static string _prettyProgramPath;
 
         [OneTimeSetUp]
         public static void ClassInit()
@@ -23,9 +21,8 @@ namespace P4_Project.Visitors
         [SetUp]
         public void Initialize()
         {
-            uglyprogrampath = TestContext.CurrentContext.TestDirectory + "/../../Visitors/TestCode/UglyCode.txt";
-            prettyprogrampath = TestContext.CurrentContext.TestDirectory + "/../../Visitors/TestCode/PrettyCode.txt";
-            xmlprogrampath = TestContext.CurrentContext.TestDirectory + "/../../Visitors/TestCode/xmltree.xml";
+            _uglyProgramPath = TestContext.CurrentContext.TestDirectory + "/../../Visitors/TestCode/UglyCode.txt";
+            _prettyProgramPath = TestContext.CurrentContext.TestDirectory + "/../../Visitors/TestCode/PrettyCode.txt";
         }
 
         private static MemoryStream StreamFromString(string str)
@@ -51,23 +48,23 @@ namespace P4_Project.Visitors
         [Test]
         public void XmlTreeBuilderTest01()
         {
-            var xml = ReturnXmlTree(File.ReadAllText(prettyprogrampath));
-            Assert.IsTrue(xml != File.ReadAllText(prettyprogrampath));
+            var xml = ReturnXmlTree(File.ReadAllText(_prettyProgramPath));
+            Assert.IsTrue(xml != File.ReadAllText(_prettyProgramPath));
         }
 
         //Xml Code and ugly MAGIA code is not the same
         [Test]
         public void XmlTreeBuilderTest02()
         {
-            var xml = ReturnXmlTree(File.ReadAllText(uglyprogrampath));
-            Assert.IsTrue(xml != File.ReadAllText(uglyprogrampath));
+            var xml = ReturnXmlTree(File.ReadAllText(_uglyProgramPath));
+            Assert.IsTrue(xml != File.ReadAllText(_uglyProgramPath));
         }
 
         //Xml is not valid MAGIA code at all!
         [Test]
         public void XmlTreeBuilderTest03()
         {
-            var xml = ReturnXmlTree(File.ReadAllText(uglyprogrampath));
+            var xml = ReturnXmlTree(File.ReadAllText(_uglyProgramPath));
             var parser = new Parser(new Scanner(StreamFromString(xml)));
             parser.Parse();
             Assert.IsTrue(parser.errors.count > 0);
@@ -77,8 +74,8 @@ namespace P4_Project.Visitors
         [Test]
         public void XmlTreeBuilderTest04()
         {
-            var xmlPretty = ReturnXmlTree(File.ReadAllText(prettyprogrampath));
-            var xmlUgly = ReturnXmlTree(File.ReadAllText(uglyprogrampath));
+            var xmlPretty = ReturnXmlTree(File.ReadAllText(_prettyProgramPath));
+            var xmlUgly = ReturnXmlTree(File.ReadAllText(_uglyProgramPath));
             Assert.IsTrue(xmlPretty == xmlUgly);
         }
 
@@ -86,7 +83,7 @@ namespace P4_Project.Visitors
         [Test]
         public void XmlTreeBuilderTest05()
         {
-            string xml = ReturnXmlTree(File.ReadAllText(prettyprogrampath));
+            string xml = ReturnXmlTree(File.ReadAllText(_prettyProgramPath));
             Assert.IsTrue((xml.Length - xml.Replace(Environment.NewLine, string.Empty).Length) % 2 == 0);
         }
 
@@ -96,7 +93,7 @@ namespace P4_Project.Visitors
         public void XmlTreeBuilderTest06()
         {
 
-            string program = File.ReadAllText(prettyprogrampath);
+            string program = File.ReadAllText(_prettyProgramPath);
 
             Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
 

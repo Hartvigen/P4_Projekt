@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.SymbolTable
+namespace P4_ProjectTests.SymbolTable
 {
     [TestFixture]
     public class SymbolTableTests
@@ -37,13 +37,13 @@ namespace P4_Project.SymbolTable
             Assert.IsTrue(_symTable.GetScopes().Count == 0);
         }
 
-        //For every time we open a scope another scope should exist in the symboltable.
+        //For every time we open a scope another scope should exist in the symbolTable.
         [Test]
         public void SymbolTableTests02()
         {
-            int numberOfScopes = 42;
-            for(int i = numberOfScopes; i > 0; i--)
-            _symTable.OpenScope();
+            const int numberOfScopes = 42;
+            for(var i = numberOfScopes; i > 0; i--)
+                _symTable.OpenScope();
             Assert.IsTrue(_symTable.GetScopes().Count == numberOfScopes);
         }
 
@@ -54,16 +54,16 @@ namespace P4_Project.SymbolTable
             Assert.IsTrue(_symTable.CloseScope() == _parent);
         }
 
-        //We are just asserting that this test can get to the end without casting exceptions, we can open a butload of scopes and go out of them again
+        //We are just asserting that this test can get to the end without casting exceptions, we can open a butt load of scopes and go out of them again
         [Test]
         public void SymbolTableTests04()
         {
-            P4_Project.SymbolTable.SymTable parent = _symTable;
-            int numberOfScopes = 42;
-            for (int i = numberOfScopes; i > 0; i--)
+            var parent = _symTable;
+            const int numberOfScopes = 42;
+            for (var i = numberOfScopes; i > 0; i--)
                 parent = parent.OpenScope();
 
-            for (int i = numberOfScopes; i > 0; i--)
+            for (var i = numberOfScopes; i > 0; i--)
                 parent = parent.CloseScope();
                 
             Assert.IsTrue(true);

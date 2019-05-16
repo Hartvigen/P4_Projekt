@@ -1,17 +1,13 @@
-﻿using NUnit.Framework;
-using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using NUnit.Framework;
 using P4_Project.Compiler.SemanticAnalysis.Visitors;
+using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.Visitors
+namespace P4_ProjectTests.Visitors
 {
-    class ScopeTests
+    internal class ScopeTests
     {
         //this class has the purpose of testing the functionality of the ScopeChecker class
 
@@ -20,15 +16,15 @@ namespace P4_Project.Visitors
             return new MemoryStream(Encoding.UTF8.GetBytes(str));
         }
 
-        private static ScopeChecker Scop(string program)
+        private static ScopeChecker Scope(string program)
         {
             var parser = new Parser(new Scanner(StreamFromString(program)));
             parser.Parse();
-            var scopChecker = new ScopeChecker(parser.tab);
+            var scopeChecker = new ScopeChecker(parser.tab);
 
-            parser.mainNode.Accept(scopChecker);
+            parser.mainNode.Accept(scopeChecker);
 
-            return scopChecker;
+            return scopeChecker;
         }
 
         //if a variable has been previously declared, accessing it should not cause any errors.
@@ -36,7 +32,7 @@ namespace P4_Project.Visitors
         [Test]
         public void ScopeTestSuccess01()
         {
-            var program = Scop("number x = 5 " +
+            var program = Scope("number x = 5 " +
                                 "x = 3");
 
             Assert.IsTrue(program.ErrorList.Count == 0);
@@ -47,7 +43,7 @@ namespace P4_Project.Visitors
         [Test]
         public void ScopeTestSuccess02()
         {
-            var program = Scop("number x = 2 " +
+            var program = Scope("number x = 2 " +
                                "x = 3" +
                                "if(true){" +
                                "x = 2}");
@@ -59,7 +55,7 @@ namespace P4_Project.Visitors
         [Test]
         public void ScopeTestSuccess03()
         {
-            var program = Scop("number x = 5" +
+            var program = Scope("number x = 5" +
                                "if(true){" +
                                "x = 3 " +
                                "boolean x = true " +
@@ -74,7 +70,7 @@ namespace P4_Project.Visitors
         [Test]
         public void ScopeTestFailure01()
         {
-            var program = Scop("x = 5");
+            var program = Scope("x = 5");
 
             program.ErrorList.ForEach(Console.WriteLine);
             Assert.IsFalse(program.ErrorList.Count == 0);
@@ -84,7 +80,7 @@ namespace P4_Project.Visitors
         [Test]
         public void ScopeTestFailure02()
         {
-            var program = Scop("if(true){" +
+            var program = Scope("if(true){" +
                                "number x = 5} " +
                                "x = 3");
 
@@ -96,7 +92,7 @@ namespace P4_Project.Visitors
         [Test]
         public void ScopeTestFailure03()
         {
-            var program = Scop("number x = 5" +
+            var program = Scope("number x = 5" +
                                "boolean x = true");
 
             program.ErrorList.ForEach(Console.WriteLine);

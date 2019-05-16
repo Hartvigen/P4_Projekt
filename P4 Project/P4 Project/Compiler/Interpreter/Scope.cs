@@ -7,7 +7,7 @@ namespace P4_Project.Compiler.Interpreter
     {
         //Relative scopes
         private Scope _parent;
-        List<Scope> _children = new List<Scope>();
+        private List<Scope> _children = new List<Scope>();
 
         //All the variables
         private readonly Dictionary<string, Value> _values = new Dictionary<string, Value>();

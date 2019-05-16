@@ -7,7 +7,7 @@ namespace P4_Project.SymbolTable
 {
     public class SymTable
     {
-        private readonly Parser parser;
+        private readonly Parser _parser;
 
         public string name;
 
@@ -16,13 +16,13 @@ namespace P4_Project.SymbolTable
         public bool header;
         private SymTable Parent { get; }
         private List<SymTable> InnerScopes { get; } = new List<SymTable>();
-        private readonly Dictionary<string, Obj> variables = new Dictionary<string, Obj>();
+        private readonly Dictionary<string, Obj> _variables = new Dictionary<string, Obj>();
 
         public SymTable vertexAttr;
         public SymTable edgeAttr;
 
         //Used to keep track of the next innerScope
-        private int position;
+        private int _position;
 
         public BaseType type;
 
@@ -30,14 +30,14 @@ namespace P4_Project.SymbolTable
         public SymTable(SymTable parent, Parser parser)
         {
             Parent = parent;
-            this.parser = parser;
+            _parser = parser;
             name = "";
         }
         
         public SymTable(SymTable parent, Parser parser, string name)
         {
             Parent = parent;
-            this.parser = parser;
+            _parser = parser;
             this.name = name;
         }
 
@@ -45,14 +45,19 @@ namespace P4_Project.SymbolTable
         //open a new scope and make it the current (topScope)
         public SymTable OpenScope()
         {
-            SymTable newTable = new SymTable(this, parser);
+            var newTable = new SymTable(this, _parser);
             InnerScopes.Add(newTable);
             return newTable;
         }
         
-        public SymTable OpenScope(string Name)
+        /// <summary>
+        /// This Constructor is used in the parser to give a function scope a name corresponding the function name.
+        /// </summary>
+        /// <param name="funcName">The function name</param>
+        /// <returns>Returns a the scope</returns>
+        public SymTable OpenScope(string funcName)
         {
-            SymTable newTable = new SymTable(this, parser, Name);
+            var newTable = new SymTable(this, _parser, funcName);
             InnerScopes.Add(newTable);
             return newTable;
         }
@@ -64,16 +69,16 @@ namespace P4_Project.SymbolTable
         }
 
         //creates a new Object in the current scope
-        public Obj NewObj(string Name, BaseType t, int kind)
+        public Obj NewObj(string objName, BaseType t, int kind)
         {
-            var obj = new Obj(Name, t, kind);
+            var obj = new Obj(objName, t, kind);
 
-            if (!variables.ContainsKey(obj.Name))
-                variables.Add(obj.Name, obj);
+            if (!_variables.ContainsKey(obj.Name))
+                _variables.Add(obj.Name, obj);
             else
             {
                 Console.WriteLine(obj.Name + " is already added to symDecls");
-                parser.SemErr(obj.Name + " has already been declared");
+                _parser.SemErr(obj.Name + " has already been declared");
             }
             return obj;
         }
@@ -81,28 +86,25 @@ namespace P4_Project.SymbolTable
         //Adds a new Object in the current scope
         public void AddObj(Obj obj)
         {
-            if (!variables.ContainsKey(obj.Name))
-                variables.Add(obj.Name, obj);
+            if (!_variables.ContainsKey(obj.Name))
+                _variables.Add(obj.Name, obj);
             else Console.WriteLine(obj.Name + " is already added to symDecls");
         }
 
         //Removes a Object in the current scope
         public void RemoveObj(Obj obj)
         {
-            if (!variables.ContainsKey(obj.Name)) {
+            if (!_variables.ContainsKey(obj.Name)) {
                 Console.WriteLine("Cannot remove Obj: " + obj.Name + " as it doesnt exist in this dictionary");
                 return;
             }
-            variables.Remove(obj.Name);
+            _variables.Remove(obj.Name);
         }
 
         //search for a name in all open scopes and return its object node
-        public Obj Find(string Name)
+        public Obj Find(string objName)
         {
-            if (variables.TryGetValue(Name, out var value))
-                return value;
-
-            return Parent.Find(Name);
+            return _variables.TryGetValue(objName, out var value) ? value : Parent.Find(objName);
         }
 
         // return all the innerScopes
@@ -114,72 +116,72 @@ namespace P4_Project.SymbolTable
         // return the dictionary
         public Dictionary<string, Obj> GetDic()
         {
-            return variables;
+            return _variables;
         }
 
-        public BaseType findReturnTypeOfFunction(string Name)
+        public BaseType FindReturnTypeOfFunction(string functionName)
         {
-            if (PreDefined.PreDefinedFunctions.Contains(Name))
-                return PreDefined.FindReturnOfPreDefFunctions(Name);
+            if (PreDefined.PreDefinedFunctions.Contains(functionName))
+                return PreDefined.FindReturnOfPreDefFunctions(functionName);
             foreach (var s in InnerScopes) {
-                if(s.name == Name)
+                if(s.name == functionName)
                     return s.type;
             }
             throw new Exception("Name " + name + " does not belong to a function.");
         }
 
-        public bool FunctionExists(string Name)
+        public bool FunctionExists(string functionName)
         {
-            return PreDefined.PreDefinedFunctions.Contains(Name) || variables.ContainsKey(Name);
+            return PreDefined.PreDefinedFunctions.Contains(functionName) || _variables.ContainsKey(functionName);
         }
 
-        public List<BaseType> findParameterListOfFunction(string Name)
+        public List<BaseType> FindParameterListOfFunction(string functionName)
         {
-            if (PreDefined.PreDefinedFunctions.Contains(Name)) return PreDefined.FindParameterListOfPreDefFunctions(Name);
+            if (PreDefined.PreDefinedFunctions.Contains(functionName)) return PreDefined.FindParameterListOfPreDefFunctions(functionName);
             //Complicated piece of code that can either find the function in its proper place or in variables because function is used in the cleaner before functions gets cleaned up.
             foreach (var s in InnerScopes)
             {
-                if (s.name != Name) continue;
+                if (s.name != functionName) continue;
                 if (s.type != null) return s.type.parameterTypes;
-                variables.TryGetValue(Name, out var o);
+                _variables.TryGetValue(functionName, out var o);
                 if (o != null) return o.Type.parameterTypes;
             }
-            throw new Exception("Name " + Name + " does not belong to a function.");
+            throw new Exception("Name " + functionName + " does not belong to a function.");
         }
 
         public SymTable EnterNextScope() {
-            position++;
+            _position++;
             //If we have reached a position higher than their are scopes available we it must be an error!
-            if (position > InnerScopes.Count)
+            if (_position > InnerScopes.Count)
                 throw new Exception("Ran out of scopes");
-            return InnerScopes[position - 1];
+            return InnerScopes[_position - 1];
         }
 
-        public bool isAttribute(string typeName, string attrName) {
+        public bool IsAttribute(string typeName, string attrName) {
             switch (typeName)
             {
                 case "vertex":
-                    return vertexAttr.variables.ContainsKey(attrName);
+                    return vertexAttr._variables.ContainsKey(attrName);
                 case "edge":
-                    return edgeAttr.variables.ContainsKey(attrName);
+                    return edgeAttr._variables.ContainsKey(attrName);
                 default:
                     throw new Exception(typeName + " is not possible to hold attributes");
             }
         }
 
-		public BaseType getTypeOfAttribute(string typeName, string attrName) {
-            if (!isAttribute(typeName, attrName)) throw new Exception(typeName + " is not possible to hold attributes");
+		public BaseType GetTypeOfAttribute(string typeName, string attrName) {
+            if (!IsAttribute(typeName, attrName)) throw new Exception(typeName + " is not possible to hold attributes");
             switch (typeName)
             {
                 case "vertex":
                 {
-                    vertexAttr.variables.TryGetValue(attrName, out var o);
+                    vertexAttr._variables.TryGetValue(attrName, out var o);
                     return o?.Type;
                 }
 
                 case "edge":
                 {
-                    edgeAttr.variables.TryGetValue(attrName, out var o);
+                    edgeAttr._variables.TryGetValue(attrName, out var o);
                     return o?.Type;
                 }
 
@@ -189,9 +191,9 @@ namespace P4_Project.SymbolTable
         }
 
 
-		public void resetScopePositions() {
-            position = 0;
-            InnerScopes.ForEach(s => s.resetScopePositions());
+		public void ResetScopePositions() {
+            _position = 0;
+            InnerScopes.ForEach(s => s.ResetScopePositions());
         }
     }
 }

@@ -84,7 +84,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolTable\Obj.cs" />
     <Compile Include="SymbolTable\SymTable.cs" />
-    <Compile Include="Types.cs" />
     <Compile Include="AST\Stmts\AssignNode.cs" />
     <Compile Include="AST\Stmts\Decls\DeclNode.cs" />
     <Compile Include="AST\Stmts\Decls\FuncDeclNode.cs" />

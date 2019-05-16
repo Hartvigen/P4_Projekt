@@ -22,13 +22,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override string AppropriateFileName { get; } = "Clean.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public SymTable Table { get; }
+        private SymTable Table { get; }
 
-        private bool vertexHeadExists;
-        private bool edgeHeadExists;
+        private bool _vertexHeadExists;
+        private bool _edgeHeadExists;
 
-        public Cleaner(SymTable Table) {
-            this.Table = Table;
+        public Cleaner(SymTable table) {
+            Table = table;
         }
         public override void Visit(CallNode node)
         {
@@ -39,8 +39,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 ErrorList.Add("The Call for: " + node.Ident + " is not a declared function and not a predefined function");
 
             //2. Calls have the correct amount of parameters when calling 
-            if (node.Parameters.Expressions.Count != Table.findParameterListOfFunction(node.Ident).Count)
-                ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " parameters and should have: " + Table.findParameterListOfFunction(node.Ident).Count + " parameters");
+            if (node.Parameters.Expressions.Count != Table.FindParameterListOfFunction(node.Ident).Count)
+                ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " parameters and should have: " + Table.FindParameterListOfFunction(node.Ident).Count + " parameters");
         }
         public override void Visit(VarNode node)
         {
@@ -155,21 +155,21 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.attrDeclBlock.Accept(this);
 
             //5. Checks that at maximum one of each type header exists! 
-            if (node.type.name == "edge" && !edgeHeadExists)
+            if (node.type.name == "edge" && !_edgeHeadExists)
             {
-                edgeHeadExists = true;
+                _edgeHeadExists = true;
                 return;
             }
 
-            if (node.type.name == "vertex" && !vertexHeadExists)
+            if (node.type.name == "vertex" && !_vertexHeadExists)
             {
-                vertexHeadExists = true;
+                _vertexHeadExists = true;
                 return;
             }
 
-            if (edgeHeadExists && node.type.name == "edge")
+            if (_edgeHeadExists && node.type.name == "edge")
                 ErrorList.Add("Only one edgeHeader is allowed!");
-            else if(vertexHeadExists && node.type.name == "vertex")
+            else if(_vertexHeadExists && node.type.name == "vertex")
                 ErrorList.Add("Only one vertexHeader is allowed!");
         }
 

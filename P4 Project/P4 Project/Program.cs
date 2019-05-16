@@ -65,7 +65,7 @@ namespace P4_Project
                     case "-t":
                     case "--test":
                         Console.WriteLine("Printing test png called: test.png ");
-                        Console.WriteLine(DotToPng.CreatePNGFile() ? "print succeeded!" : "print failed!");
+                        Console.WriteLine(DotToPng.CreatePngFile() ? "print succeeded!" : "print failed!");
                         break;
                     default:
                         Console.WriteLine("Parsing input file: " + args[0]);
@@ -114,10 +114,7 @@ namespace P4_Project
                 }
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         private static void ApplyVisitors(IEnumerable<Visitor> visitors, string inputFilePath)

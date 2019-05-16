@@ -15,13 +15,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override string AppropriateFileName { get; } = "symbolInfo.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public SymTable Table { get; }
-        private SymTable activeScope;
+        private SymTable Table { get; }
+        private SymTable _activeScope;
 
-        public TypeChecker(SymTable Table)
+        public TypeChecker(SymTable table)
         {
-            this.Table = Table;
-            activeScope = Table;
+            Table = table;
+            _activeScope = table;
         }
 
         public override void Visit(CallNode node)
@@ -29,10 +29,10 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Parameters.Expressions.ForEach(e=>e.Accept(this));
 
             //We decorate the node with its type from the table
-            node.type = Table.findReturnTypeOfFunction(node.Ident);
+            node.type = Table.FindReturnTypeOfFunction(node.Ident);
 
             //We check that parameter types match.
-            var l = Table.findParameterListOfFunction(node.Ident);
+            var l = Table.FindParameterListOfFunction(node.Ident);
             for (var i = l.Count - 1; i > 0; i--) {
                 if (node.Parameters.Expressions[i].type.name != l[i].name) {
                     ErrorList.Add("Wrong parameter type for function " + node.Ident + " should be type: " + l[i] + " but was: " + node.Parameters.Expressions[i].type);
@@ -47,13 +47,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Source?.Accept(this);
 
             //We assign the type found from the table.
-            if(activeScope.Find(node.Ident) != null)
-                node.type = activeScope.Find(node.Ident).Type;
+            if(_activeScope.Find(node.Ident) != null)
+                node.type = _activeScope.Find(node.Ident).Type;
 
 			//If the Source exist we can find the type as from the attribute that matches from the source
 			if (node.type == null && node.Source?.type != null) {
-				if (Table.isAttribute(node.Source.type.name, node.Ident)) {
-					node.type = Table.getTypeOfAttribute(node.Source.type.name, node.Ident);
+				if (Table.IsAttribute(node.Source.type.name, node.Ident)) {
+					node.type = Table.GetTypeOfAttribute(node.Source.type.name, node.Ident);
 				}
 			}
 
@@ -198,7 +198,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(FuncDeclNode node)
         {
-            enterFunction(node.SymbolObject.Name);
+            EnterFunction(node.SymbolObject.Name);
             node.Parameters.Accept(this);   
             node.Body.Accept(this);
             
@@ -217,7 +217,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                         " with declared return type: " + declaredReturnType + " but actual return type was: " + actualReturnType);
                 }
             });
-            leaveFunction();
+            LeaveFunction();
         }
 
         //Checks for default and SymbolBaseTypeValue. If it doesnt exist, create the SymbolBaseType
@@ -264,7 +264,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Target.Accept(this);
             node.Value.Accept(this);
 
-            if (activeScope.Find(node.Target.Ident) == null) {
+            if (_activeScope.Find(node.Target.Ident) == null) {
                 //If there is a source it is not a problem
                 if (node.Target.Source != null)
                     return;
@@ -272,7 +272,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 return;
             }
 
-            var t = activeScope.Find(node.Target.Ident).Type;
+            var t = _activeScope.Find(node.Target.Ident).Type;
             var v = node.Value.type;
 
             if (v.name == "func")
@@ -300,8 +300,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Iterator.Accept(this);
             node.Body.Accept(this);
 
-            if (activeScope.Find(node.IterationVar.SymbolObject.Name) is null)
-                activeScope.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
+            if (_activeScope.Find(node.IterationVar.SymbolObject.Name) is null)
+                _activeScope.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
 
             if (node.Iterator.type.name != "collec")
                 ErrorList.Add("The iterator in a foreach must be a collection!");
@@ -378,7 +378,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(Magia node)
         {
             //We reset the ScopePositions
-            Table.resetScopePositions();
+            Table.ResetScopePositions();
             node.block.Accept(this);
         }
 
@@ -396,27 +396,27 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         private void LeaveThisScope()
         {
-            activeScope = activeScope.CloseScope();
+            _activeScope = _activeScope.CloseScope();
         }
 
         private void EnterNextScope()
         {
-            activeScope = activeScope.EnterNextScope();
+            _activeScope = _activeScope.EnterNextScope();
         }
 
-        private void enterFunction(string name)
+        private void EnterFunction(string name)
         {
             Table.GetScopes().ForEach(s => {
                 if (s.name == name)
                 {
-                    activeScope = s;
+                    _activeScope = s;
                 }
             });
         }
 
-        private void leaveFunction()
+        private void LeaveFunction()
         {
-            activeScope = Table;
+            _activeScope = Table;
         }
     }
 }

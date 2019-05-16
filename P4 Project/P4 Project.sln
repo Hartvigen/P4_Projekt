@@ -29,9 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples from taste", "Exam
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{686A0241-4471-4611-8ED7-33ED85409E4A}"
-	ProjectSection(SolutionItems) = preProject
-		P4 Project\Types\BaseType.cs = P4 Project\Types\BaseType.cs
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

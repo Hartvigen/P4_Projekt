@@ -157,7 +157,7 @@ namespace P4_Project
         }
         private static void Print(Executor executor)
         {
-            DotToPng.CreatePNGFileFromScene(executor.scene);
+            DotToPng.CreatePngFileFromScene(executor.scene);
         }
 
         private static void ClearAll(Executor executor)

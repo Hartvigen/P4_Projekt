@@ -1,17 +1,13 @@
-﻿using NUnit.Framework;
-using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.Visitors;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using NUnit.Framework;
 using P4_Project.Compiler.SemanticAnalysis.Visitors;
+using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.Visitors
+namespace P4_ProjectTests.Visitors
 {
-    class CleanerTests
+    internal class CleanerTests
     {
         private static MemoryStream StreamFromString(string str)
         {
@@ -63,7 +59,7 @@ namespace P4_Project.Visitors
             Assert.IsTrue(program.ErrorList.Count == 0);
         }
 
-        //functions that do not have return type none, must have atleast one return statement in their body
+        //functions that do not have return type none, must have at least one return statement in their body
         [Test]
         public void CleanerTestSuccess03()
         {
@@ -106,7 +102,7 @@ namespace P4_Project.Visitors
             Assert.IsFalse(program.ErrorList.Count == 0);
         }
 
-        //a with a return type that is not "none" must have atleast one return in its expression
+        //a with a return type that is not "none" must have at least one return in its expression
         [Test]
         public void CleanerTestFailure03()
         {
@@ -122,14 +118,14 @@ namespace P4_Project.Visitors
         public void CleanerTestFailure04()
         {
             var program = Clean("[vertex(number length)] " +
-                                "[vertex(number langth)]");
+                                "[vertex(number length)]");
 
             program.ErrorList.ForEach(Console.WriteLine);
             Assert.IsFalse(program.ErrorList.Count == 0);
 
 
             program = Clean("[edge(number length)] " +
-                            "[edge(number langth)]");
+                            "[edge(number length)]");
 
             program.ErrorList.ForEach(Console.WriteLine);
             Assert.IsFalse(program.ErrorList.Count == 0);

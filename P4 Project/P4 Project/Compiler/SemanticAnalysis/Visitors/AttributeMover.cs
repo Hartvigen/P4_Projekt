@@ -22,9 +22,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override string AppropriateFileName { get; } = "AttributeMover.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public SymTable Table { get; }
-        public AttributeMover(SymTable Table) {
-            this.Table = Table;
+        private SymTable Table { get; }
+        public AttributeMover(SymTable table) {
+            Table = table;
         }
         public override void Visit(CallNode node)
         {

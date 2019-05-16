@@ -11,28 +11,27 @@ namespace P4_Project.Graphviz
 {
     public abstract class DotToPng
     {
-        public static readonly string defaultFilePath = AppDomain.CurrentDomain.BaseDirectory + "default.png";
-        public const string defaultDotCode = "digraph{one -> two; two -> three; three -> four; four -> one;}";
+        public static readonly string DefaultFilePath = AppDomain.CurrentDomain.BaseDirectory + "default.png";
+        public const string DefaultDotCode = "digraph{one -> two; two -> three; three -> four; four -> one;}";
 
-        public static bool CreatePNGFile(string DOT, string fileName)
+        public static void CreatePngFile(string dot, string fileName)
         {
-            var output = setup().GenerateGraph(DOT, Enums.GraphReturnType.Png);
+            var output = Setup().GenerateGraph(dot, Enums.GraphReturnType.Png);
             if (File.Exists(fileName))
                 File.Delete(fileName);
             File.WriteAllBytes(fileName, output);
-            return true;
         }
 
-        public static bool CreatePNGFile()
+        public static bool CreatePngFile()
         {
-            var output = setup().GenerateGraph(defaultDotCode, Enums.GraphReturnType.Png);
-            if (File.Exists(defaultFilePath))
-                File.Delete(defaultFilePath);
-            File.WriteAllBytes(defaultFilePath, output);
+            var output = Setup().GenerateGraph(DefaultDotCode, Enums.GraphReturnType.Png);
+            if (File.Exists(DefaultFilePath))
+                File.Delete(DefaultFilePath);
+            File.WriteAllBytes(DefaultFilePath, output);
             return true;
         }
 
-        private static GraphGeneration setup()
+        private static GraphGeneration Setup()
         {
             return new GraphGeneration(
                 new GetStartProcessQuery(),
@@ -43,7 +42,7 @@ namespace P4_Project.Graphviz
                 );
         }
 
-        public static void CreatePNGFileFromScene(List<Vertex> executorScene)
+        public static void CreatePngFileFromScene(List<Vertex> executorScene)
         {
             var s = new StringBuilder();
             //Every graph is a directed graph and if a undirected edge
@@ -135,9 +134,9 @@ namespace P4_Project.Graphviz
             //The main graph is ended.
             s.AppendLine("}");
 
-            string finishedDot = s.ToString();
+            var finishedDot = s.ToString();
 
-            CreatePNGFile(finishedDot, AppDomain.CurrentDomain.BaseDirectory + "done.png");
+            CreatePngFile(finishedDot, AppDomain.CurrentDomain.BaseDirectory + "done.png");
         }
     }
 }

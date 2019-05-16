@@ -5,9 +5,8 @@ using NUnit.Framework;
 using P4_Project.Compiler.SemanticAnalysis.Visitors;
 using P4_Project.Compiler.SemanticAnalysis.Visitors.Extra;
 using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.Visitors;
 
-namespace P4_Project.Visitors
+namespace P4_ProjectTests.Visitors
 {
     [TestFixture]
     public class PrettyPrinterTests
@@ -31,11 +30,6 @@ namespace P4_Project.Visitors
         [SetUp]
         public void Initialize()
         {
-            //_scannerPretty = new Scanner(File.ReadAllText(prettyprogrampath));
-            //_scannerUgly = new Scanner(File.ReadAllText(uglyprogrampath));
-
-            //_parserWithUglyCode = new Parser(_scannerUgly);
-            //_parserWithPrettyCode = new Parser(_scannerPretty);
         }
 
         [TearDown]
@@ -59,7 +53,7 @@ namespace P4_Project.Visitors
             parser.Parse();
             var cleaner = new Cleaner(parser.tab);
 			var attr = new AttributeMover(parser.tab);
-            var typevisitor = new TypeChecker(parser.tab);
+            var typeVisitor = new TypeChecker(parser.tab);
             var prettyPrinter = new PrettyPrinter();
 
             parser.mainNode.Accept(cleaner);
@@ -68,8 +62,8 @@ namespace P4_Project.Visitors
 			parser.mainNode.Accept(attr);
 			attr.ErrorList.ForEach(Console.WriteLine);
 
-			parser.mainNode.Accept(typevisitor);
-			typevisitor.ErrorList.ForEach(Console.WriteLine);
+			parser.mainNode.Accept(typeVisitor);
+			typeVisitor.ErrorList.ForEach(Console.WriteLine);
 
 			parser.mainNode.Accept(prettyPrinter);
 			prettyPrinter.ErrorList.ForEach(Console.WriteLine);

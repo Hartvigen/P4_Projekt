@@ -4,7 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using P4_Project.Compiler.SyntaxAnalysis;
 
-namespace P4_Project.Compiler.SyntaxAnalysis
+namespace P4_ProjectTests.Compiler.SyntaxAnalysis
 {
     [TestFixture]
     public sealed class ScannerTests
@@ -21,7 +21,7 @@ namespace P4_Project.Compiler.SyntaxAnalysis
             return parser.errors.count == 0;
         }
 
-        private Scanner ScannerFromString(string s)
+        private static Scanner ScannerFromString(string s)
         {
             return new Scanner(StreamFromString(s));
         }

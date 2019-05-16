@@ -1,9 +1,8 @@
 ﻿using NUnit.Framework;
-using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.SymbolTable;
 using P4_Project.AST;
+using P4_Project.SymbolTable;
 
-namespace P4_Project.SymbolTable
+namespace P4_ProjectTests.SymbolTable
 {
     [TestFixture]
     public class ObjTests
@@ -11,7 +10,6 @@ namespace P4_Project.SymbolTable
         private static string _customName;
         private static BaseType _customType;
         private static int _customKind;
-        private static P4_Project.SymbolTable.SymTable _customSymTable;
 
         private Obj _customObj;
         private Obj _nullObj;
@@ -23,7 +21,6 @@ namespace P4_Project.SymbolTable
             _customName = "testName";
             _customType = new BaseType(null);
             _customKind = 404;
-            _customSymTable = new P4_Project.SymbolTable.SymTable(null, new Parser(null));
         }
 
         [SetUp]
