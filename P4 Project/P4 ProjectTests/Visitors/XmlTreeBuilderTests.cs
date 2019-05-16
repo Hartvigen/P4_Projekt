@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using NUnit.Framework;
+using P4_Project.Compiler.SemanticAnalysis.Visitors.Extra;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.Visitors;
 

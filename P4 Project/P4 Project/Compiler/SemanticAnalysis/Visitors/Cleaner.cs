@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -9,21 +8,21 @@ using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.SymbolTable;
 
-namespace P4_Project.Visitors
+namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
-    public class Cleaner : Visitor
+    public sealed class Cleaner : Visitor
     {
         //This Visitor checks for obviously missing/wrong things. 
         //Like: 
-        //1. All function calls coresponds to a function. 
+        //1. All function calls corresponds to a function. 
         //2. Calls have the correct amount of parameters when calling 
-        //3. Expressions arent outright missing or null 
-        //4. functions with a non "none" return type must have atleast one return inside them! 
+        //3. Expressions aren't outright missing or null 
+        //4. functions with a non "none" return type must have at least one return inside them! 
         //5. Checks that at maximum one of each type header exists! 
         public override string AppropriateFileName { get; } = "Clean.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public override SymTable Table { get; set; }
+        public SymTable Table { get; }
 
         private bool vertexHeadExists;
         private bool edgeHeadExists;
@@ -35,7 +34,7 @@ namespace P4_Project.Visitors
         {
             node.Parameters.Accept(this);
 
-            //1. All function calls coresponds to a function. 
+            //1. All function calls corresponds to a function. 
             if (!Table.FunctionExists(node.Ident))
                 ErrorList.Add("The Call for: " + node.Ident + " is not a declared function and not a predefined function");
 
@@ -71,7 +70,7 @@ namespace P4_Project.Visitors
 
         public override void Visit(BinExprNode node)
         {
-            //3. Expressions arent outright missing or null
+            //3. Expressions aren't outright missing or null
             if (node.Left is null || node.Right is null)
             {
                 ErrorList.Add("BinExprNode has null operands");
@@ -90,7 +89,7 @@ namespace P4_Project.Visitors
             node.LeftSide.Accept(this);
             node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
 
-            //3. Expressions arent outright missing or null 
+            //3. Expressions aren't outright missing or null 
             if (node.RightSide.Count == 0)
                 ErrorList.Add("The rightSide exist but have no expressions inside " + node.GetCodeOfOperator());
         }
@@ -100,7 +99,7 @@ namespace P4_Project.Visitors
             node.Parameters.Accept(this);
             node.Body.Accept(this);
 
-            //4. functions with a non "none" return type must have atleast one return inside them! 
+            //4. functions with a non "none" return type must have at least one return inside them! 
             if (node.SymbolObject.Type.returntype != "none")
             {
                 bool retExists = false;
@@ -169,9 +168,9 @@ namespace P4_Project.Visitors
             }
 
             if (edgeHeadExists && node.type.name == "edge")
-                ErrorList.Add("Only one edgeheader is allowed!");
+                ErrorList.Add("Only one edgeHeader is allowed!");
             else if(vertexHeadExists && node.type.name == "vertex")
-                ErrorList.Add("Only one vertexheader is allowed!");
+                ErrorList.Add("Only one vertexHeader is allowed!");
         }
 
         public override void Visit(IfNode node)

@@ -14,7 +14,7 @@ namespace P4_Project.Compiler.Interpreter.Types
 
         public string identifyer;
 
-        public List<Edge> edge;
+        public List<Edge> edge = new List<Edge>();
 
         private VertexDeclNode v;
         public Vertex(VertexDeclNode vertex, Dictionary<string, Value> DefinedAttributes)

@@ -1,6 +1,6 @@
 ﻿using P4_Project.AST.Stmts.Decls;
 using P4_Project.AST.Expressions;
-using P4_Project.Visitors;
+using P4_Project.Compiler.SemanticAnalysis.Visitors;
 
 namespace P4_Project.AST.Stmts
 {

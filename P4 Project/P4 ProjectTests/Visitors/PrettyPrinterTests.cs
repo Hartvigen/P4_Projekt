@@ -2,6 +2,8 @@
 using System.IO;
 using System.Text;
 using NUnit.Framework;
+using P4_Project.Compiler.SemanticAnalysis.Visitors;
+using P4_Project.Compiler.SemanticAnalysis.Visitors.Extra;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.Visitors;
 
@@ -58,7 +60,7 @@ namespace P4_Project.Visitors
             var cleaner = new Cleaner(parser.tab);
 			var attr = new AttributeMover(parser.tab);
             var typevisitor = new TypeChecker(parser.tab);
-            var prettyPrinter = new PrettyPrinter(parser.tab);
+            var prettyPrinter = new PrettyPrinter();
 
             parser.mainNode.Accept(cleaner);
 			cleaner.ErrorList.ForEach(Console.WriteLine);

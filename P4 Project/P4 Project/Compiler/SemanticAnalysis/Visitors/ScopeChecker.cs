@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
@@ -9,9 +8,9 @@ using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.SymbolTable;
 
-namespace P4_Project.Visitors
+namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
-    public class ScopeChecker : Visitor
+    public sealed class ScopeChecker : Visitor
     {
         //The Scope visitor ensures that all accessed variables are in their legitimate scopes
         //The Scope Visitor does NOT create the scopes, that is handled as the symboltable is filled in the parser
@@ -25,7 +24,7 @@ namespace P4_Project.Visitors
         public override string AppropriateFileName { get; } = "Errors";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public override SymTable Table { get; set; }
+        public SymTable Table { get; }
         private SymTable activeScope;
         public ScopeChecker(SymTable table)
         {
@@ -48,7 +47,7 @@ namespace P4_Project.Visitors
             {
                 if (activeScope.Find(node.Source.Ident) == null)
                 {
-                    ErrorList.Add(node.Source.Ident + " has no decleration in scope.");
+                    ErrorList.Add(node.Source.Ident + " has no declaration in scope.");
                     return;
                 }
 
@@ -56,11 +55,11 @@ namespace P4_Project.Visitors
                     node.Source.type = activeScope.Find(node.Source.Ident).Type;
 
                 if (!Table.isAttribute(node.Source.type.name, node.Ident))
-                    ErrorList.Add(node.Ident + " is not a valid attributre of: " + node.Source.type.name);
+                    ErrorList.Add(node.Ident + " is not a valid attribute of: " + node.Source.type.name);
                 return;
             }
 
-            //If the source (or type of) is null we have to able to find the decleration in the scope and already reached! 
+            //If the source (or type of) is null we have to able to find the declaration in the scope and already reached! 
             if (activeScope.Find(node.Ident) == null)
             {
                 ErrorList.Add(node.Ident + " is not in the scope!");
@@ -114,18 +113,17 @@ namespace P4_Project.Visitors
             node.RightSide.ForEach(t => {
                 t.Item1.Accept(this);
                 t.Item2.ForEach(s => {
-                    if (s.GetType() == typeof(AssignNode))
+                    if (s.GetType() != typeof(AssignNode)) return;
+                    var a = s;
+                    //We dont care about the right side of the assign it must still be valid according to all scope rules 
+                    a.Value.Accept(this);
+                    //We find the header scope for edge and if the attribute is not there it is invalid. 
+                    Table.GetScopes().ForEach(h =>
                     {
-                        AssignNode a = (AssignNode)s;
-                        //We dont care about the right side of the assign it must still be valid according to all scoperules 
-                        a.Value.Accept(this);
-                        //We find the header scope for edge and if the attribute is not there it is invalid. 
-                        Table.GetScopes().ForEach(h => {
-                            if (h.header && h.name == "edge")
-                                if (h.Find(a.Target.Ident) == null)
-                                    ErrorList.Add(a.Target.Ident + " is not a valid attribute for edge");
-                        });
-                    }
+                        if (!h.header || h.name != "edge") return;
+                        if (h.Find(a.Target.Ident) == null)
+                            ErrorList.Add(a.Target.Ident + " is not a valid attribute for edge");
+                    });
                 });
             });
         }
@@ -142,7 +140,7 @@ namespace P4_Project.Visitors
         {
             node.DefaultValue?.Accept(this);
 
-            //It is marked that this decleration has been reached! 
+            //It is marked that this declaration has been reached! 
             activeScope.Find(node.SymbolObject.Name).Type.reached = true;
         }
         public override void Visit(VertexDeclNode node)
@@ -153,7 +151,7 @@ namespace P4_Project.Visitors
                     if (s.GetType() == typeof(AssignNode))
                     {
                         AssignNode a = (AssignNode)s;
-                        //We dont care about the right side of the assign it must still be valid according to all scoperules 
+                        //We dont care about the right side of the assign it must still be valid according to all scope rules 
                         a.Value.Accept(this);
 
                         //We find the header scope for vertex and if the attribute is not there it is invalid. 

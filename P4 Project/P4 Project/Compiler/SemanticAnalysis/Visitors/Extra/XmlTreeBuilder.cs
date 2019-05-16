@@ -6,16 +6,14 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.SymbolTable;
 
-namespace P4_Project.Visitors
+namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
 {
     public class XmlTreeBuilder : Visitor
     {
         public override string AppropriateFileName { get; } = "xmlTree.xml";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public override SymTable Table { get; set; }
 
         private enum Xml { START, END, BOTH }
 

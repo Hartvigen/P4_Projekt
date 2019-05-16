@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using P4_Project.Compiler.SemanticAnalysis.Visitors;
 
 namespace P4_Project.Visitors
 {

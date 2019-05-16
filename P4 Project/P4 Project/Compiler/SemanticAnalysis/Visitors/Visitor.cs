@@ -6,16 +6,14 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.SymbolTable;
 
-namespace P4_Project.Visitors
+namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
     public abstract class Visitor
     {
         public abstract string AppropriateFileName { get;}
         public abstract StringBuilder Result { get; }
         public abstract List<string> ErrorList { get; }
-        public abstract SymTable Table { get; set; } 
 
         //Identifier
         public abstract void Visit(CallNode node);

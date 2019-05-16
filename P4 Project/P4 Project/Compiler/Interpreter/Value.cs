@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using P4_Project.AST;
 using P4_Project.AST.Stmts.Decls;
@@ -8,7 +9,7 @@ namespace P4_Project.Compiler.Interpreter
 {
     public class Value
     {
-        private Dictionary<Type, int> typeMap = new Dictionary<Type, int>();
+        private static Dictionary<Type, int> typeMap = new Dictionary<Type, int>();
 
         public object o;
 
@@ -45,6 +46,13 @@ namespace P4_Project.Compiler.Interpreter
         public Value(object v)
         {
             o = v;
+            if (typeMap.Count == 0)
+                SetKeys();
+            setObjectAndType(v);
+        }
+
+        private void SetKeys()
+        {
             typeMap.Add(typeof(NoneConst), 0);
             typeMap.Add(typeof(bool), 1);
             typeMap.Add(typeof(List<bool>), 2);
@@ -71,7 +79,15 @@ namespace P4_Project.Compiler.Interpreter
             typeMap.Add(typeof(HashSet<Edge>), 23);
             typeMap.Add(typeof(Stack<Edge>), 24);
             typeMap.Add(typeof(Queue<Edge>), 25);
+            typeMap.Add(typeof(List<object>), 26);
+            typeMap.Add(typeof(HashSet<object>), 27);
+            typeMap.Add(typeof(Stack<object>), 28);
+            typeMap.Add(typeof(Queue<object>), 29);
 
+        }
+
+        private void setObjectAndType(object v)
+        {
             switch (typeMap[v.GetType()])
             {
                 case 0: none = (NoneConst)v; type = new BaseType("none"); break;
@@ -100,6 +116,210 @@ namespace P4_Project.Compiler.Interpreter
                 case 23: edgeSet = (HashSet<Edge>)v; type = new BaseType(new BaseType("edge"), new BaseType("set")); break;
                 case 24: edgeStack = (Stack<Edge>)v; type = new BaseType(new BaseType("edge"), new BaseType("stack")); break;
                 case 25: edgeQueue = (Queue<Edge>)v; type = new BaseType(new BaseType("edge"), new BaseType("queue")); break;
+                case 26: identifyObject(v); break;
+                case 27: identifyObject(v); break;
+                case 28: identifyObject(v); break;
+                case 29: identifyObject(v); break;
+                default: throw new Exception(v.GetType() + " is not supported!");
+            }
+        }
+
+        private void identifyObject(object v)
+        {
+            if (v.GetType() == typeof(List<object>))
+            {
+                List<object> l = (List<object>)v;
+                if (l[0].GetType() == typeof(bool))
+                {
+                    List<bool> b = new List<bool>();
+                    l.ForEach(bo => {
+                        b.Add((bool)bo);
+                    });
+                    setObjectAndType(b);
+                }
+                else
+                if (l[0].GetType() == typeof(double))
+                {
+                    List<double> b = new List<double>();
+                    l.ForEach(bo => {
+                        b.Add((double)bo);
+                    });
+                    setObjectAndType(b);
+                }
+                else
+                if (l[0].GetType() == typeof(string))
+                {
+                    List<string> b = new List<string>();
+                    l.ForEach(bo => {
+                        b.Add((string)bo);
+                    });
+                    setObjectAndType(b);
+                }
+                else
+                if (l[0].GetType() == typeof(Vertex))
+                {
+                    List<Vertex> b = new List<Vertex>();
+                    l.ForEach(bo => {
+                        b.Add((Vertex)bo);
+                    });
+                    setObjectAndType(b);
+                }
+                else
+                if (l[0].GetType() == typeof(Edge))
+                {
+                    List<Edge> b = new List<Edge>();
+                    l.ForEach(bo => {
+                        b.Add((Edge)bo);
+                    });
+                    setObjectAndType(b);
+                }
+            }
+            else
+            if (v.GetType() == typeof(HashSet<object>))
+            {
+                HashSet<object> l = (HashSet<object>)v;
+                if (l.GetEnumerator().Current.GetType() == typeof(bool))
+                {
+                    HashSet<bool> b = new HashSet<bool>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Add((bool)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.GetEnumerator().Current.GetType() == typeof(double))
+                {
+                    HashSet<double> b = new HashSet<double>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Add((double)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.GetEnumerator().Current.GetType() == typeof(string))
+                {
+                    HashSet<string> b = new HashSet<string>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Add((string)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.GetEnumerator().Current.GetType() == typeof(Vertex))
+                {
+                    HashSet<Vertex> b = new HashSet<Vertex>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Add((Vertex)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.GetEnumerator().Current.GetType() == typeof(Edge))
+                {
+                    HashSet<Edge> b = new HashSet<Edge>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Add((Edge)e.Current);
+                    setObjectAndType(b);
+                }
+            }
+            else
+            if (v.GetType() == typeof(Stack<object>))
+            {
+                Stack<object> l = (Stack<object>)v;
+                if (l.Peek().GetType() == typeof(bool))
+                {
+                    Stack<bool> b = new Stack<bool>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Push((bool)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.Peek().GetType() == typeof(double))
+                {
+                    Stack<double> b = new Stack<double>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Push((double)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.Peek().GetType() == typeof(string))
+                {
+                    Stack<string> b = new Stack<string>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Push((string)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.Peek().GetType() == typeof(Vertex))
+                {
+                    Stack<Vertex> b = new Stack<Vertex>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Push((Vertex)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.Peek().GetType() == typeof(Edge))
+                {
+                    Stack<Edge> b = new Stack<Edge>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Push((Edge)e.Current);
+                    setObjectAndType(b);
+                }
+            }
+            else
+            if (v.GetType() == typeof(Queue<object>))
+            {
+                Queue<object> l = (Queue<object>)v;
+                if (l.Peek().GetType() == typeof(bool))
+                {
+                    Queue<bool> b = new Queue<bool>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Enqueue((bool)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.Peek().GetType() == typeof(double))
+                {
+                    Queue<double> b = new Queue<double>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Enqueue((double)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.Peek().GetType() == typeof(string))
+                {
+                    Queue<string> b = new Queue<string>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Enqueue((string)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.Peek().GetType() == typeof(Vertex))
+                {
+                    Queue<Vertex> b = new Queue<Vertex>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Enqueue((Vertex)e.Current);
+                    setObjectAndType(b);
+                }
+                else
+                if (l.Peek().GetType() == typeof(Edge))
+                {
+                    Queue<Edge> b = new Queue<Edge>();
+                    IEnumerator e = l.GetEnumerator();
+                    while (e.MoveNext())
+                        b.Enqueue((Edge)e.Current);
+                    setObjectAndType(b);
+                }
             }
         }
     }

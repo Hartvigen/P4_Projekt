@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -8,20 +9,20 @@ using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.SymbolTable;
 
-namespace P4_Project.Visitors
+namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
-    public class AttributeMover : Visitor
+    public sealed class AttributeMover : Visitor
     {
         //This Visitor will fix attributes and functions
         //Like:
         //1. Remove the function "SymbolObject" and set it as type on function scope.
         //2. Move attributes from top scope to their own special scope.
-        //3. Add the defualt attributes
-        //4. Add the defualt functions
+        //3. Add the default attributes
+        //4. Add the default functions
         public override string AppropriateFileName { get; } = "AttributeMover.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public override SymTable Table { get; set; }
+        public SymTable Table { get; }
         public AttributeMover(SymTable Table) {
             this.Table = Table;
         }
@@ -126,36 +127,36 @@ namespace P4_Project.Visitors
         {
             //2. Move attributes from top scope to their own special scope.
 
-            //Add defualt attributes
-            if (node.type.name == "vertex")
+            switch (node.type.name)
             {
-                PreDefined.preDefinedAttributesVertex.ForEach(va =>
-                {
-                    Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0, null));
-                });
-                //Add user defined attributes
-                node.attrDeclBlock.Statements.ForEach(s => {
-                    VarDeclNode v = (VarDeclNode)s;
-                    Table.vertexAttr.AddObj(v.SymbolObject);
-                    if(Table.GetDic().ContainsKey(v.SymbolObject.Name))
-                    Table.RemoveObj(v.SymbolObject);
-                });
+                //Add default attributes
+                case "vertex":
+                    PreDefined.preDefinedAttributesVertex.ForEach(va =>
+                    {
+                        Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0));
+                    });
+                    //Add user defined attributes
+                    node.attrDeclBlock.Statements.ForEach(s => {
+                        var v = (VarDeclNode)s;
+                        Table.vertexAttr.AddObj(v.SymbolObject);
+                        if(Table.GetDic().ContainsKey(v.SymbolObject.Name))
+                            Table.RemoveObj(v.SymbolObject);
+                    });
+                    break;
+                case "edge":
+                    PreDefined.preDefinedAttributesEdge.ForEach(va =>
+                    {
+                        Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0));
+                    });
+                    //Add user defined attributes
+                    node.attrDeclBlock.Statements.ForEach(s => {
+                        var v = (VarDeclNode)s;
+                        Table.edgeAttr.AddObj(v.SymbolObject);
+                        Table.RemoveObj(v.SymbolObject);
+                    });
+                    break;
+                default: throw new Exception(node.type.name + " is not a valid type for a HeadNode");
             }
-            else if (node.type.name == "edge")
-            {
-                PreDefined.preDefinedAttributesEdge.ForEach(va =>
-                {
-                    Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0, null));
-                });
-                //Add user defined attributes
-                node.attrDeclBlock.Statements.ForEach(s => {
-                    VarDeclNode v = (VarDeclNode)s;
-                    Table.edgeAttr.AddObj(v.SymbolObject);
-                    Table.RemoveObj(v.SymbolObject);
-                });
-            }
-
-            
         }
 
         public override void Visit(IfNode node)
@@ -184,11 +185,9 @@ namespace P4_Project.Visitors
         public override void Visit(Magia node)
         {
             //Creates a scope just for header attributes
-            SymTable v = new SymTable(null, null, " ");
-            v.header = true;
+            var v = new SymTable(null, null, " ") {header = true};
             Table.vertexAttr = v;
-            SymTable e = new SymTable(null, null, " ");
-            e.header = true;
+            var e = new SymTable(null, null, " ") {header = true};
             Table.edgeAttr = e;
             node.block.Accept(this);
         }

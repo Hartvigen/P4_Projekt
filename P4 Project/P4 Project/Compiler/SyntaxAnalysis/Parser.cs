@@ -182,7 +182,7 @@ public class Parser {
 		}
 		ExpectWeak(14, 3);
 		SymTable funcScope = tab; tab = tab.CloseScope(); 
-		Obj funcObj = tab.NewObj(funcName, protocol, Func, funcScope); 
+		Obj funcObj = tab.NewObj(funcName, protocol, Func); 
 		funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
 		
 	}

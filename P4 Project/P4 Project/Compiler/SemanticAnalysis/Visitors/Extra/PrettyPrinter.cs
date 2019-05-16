@@ -7,26 +7,20 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.SymbolTable;
 
-namespace P4_Project.Visitors
+namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
 {
-    public class PrettyPrinter : Visitor
+    public sealed class PrettyPrinter : Visitor
     {
         public override string AppropriateFileName { get; } = "PrettyCode.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
-        public override SymTable Table { get; set; }
 
-        public PrettyPrinter(SymTable Table)
-        {
-            this.Table = Table;
-        }
         //The level of ident is changed as the visitor moves along so this should start at 0.
         //Changing this will not change the relative indentations,
         //but can be used to change the overall indentation level.
         //Should never be negative.
-        private int _indentLevel = 0;
+        private int _indentLevel;
 
         //The Desired indent size can be changed here 4 is default.
         private const int IndentSizeInSpaces = 4;

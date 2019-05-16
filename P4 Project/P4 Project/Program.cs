@@ -1,15 +1,16 @@
 ﻿using P4_Project.Compiler.SyntaxAnalysis;
-using P4_Project.Visitors;
 using System;
 using System.IO;
 using P4_Project.Graphviz;
 using System.Collections.Generic;
 using System.Text;
 using P4_Project.Compiler.Executor;
+using P4_Project.Compiler.SemanticAnalysis.Visitors;
+using P4_Project.Compiler.SemanticAnalysis.Visitors.Extra;
 
 namespace P4_Project
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -29,16 +30,16 @@ namespace P4_Project
                 {
                     Console.WriteLine("Couldn't even parse the file!");
                 }else
-                switch (args[0])
+                    switch (args[0])
                 {
                     case "-c":
                     case "--compile":
                         Console.WriteLine("Doing a complete compile on " + args[1]);
                         parser.tab.name = "top";
-                        List<Visitor> vils = new List<Visitor> {new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab)};
-                        ApplyVisitors(vils, args[1]);
-                        Executor executor = new Executor(parser);
-                        Console.WriteLine("Done");
+                        var list = new List<Visitor> {new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab)};
+                        ApplyVisitors(list, args[1]);
+                        var executor = new Executor(parser);
+                        Console.WriteLine(executor.ErrorList.Count == 0 ? "Done" : "Execution Failed");
                         break;
                     case "-h":
                     case "--help":
@@ -52,8 +53,8 @@ namespace P4_Project
                     case "-p":
                     case "--prettyprint":
                         parser.tab.name = "top";
-                        List<Visitor> vils1 = new List<Visitor> { new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab), new PrettyPrinter(parser.tab) };
-                        ApplyVisitors(vils1, args[1]);
+                        var list1 = new List<Visitor> { new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab), new PrettyPrinter() };
+                        ApplyVisitors(list1, args[1]);
                         Console.WriteLine("Done");
                         break;
                     case "-x":
@@ -84,7 +85,7 @@ namespace P4_Project
             Console.ReadKey();
         }
 
-        public static bool TryParse(string filePath, out Parser parser)
+        private static bool TryParse(string filePath, out Parser parser)
         {
             parser = new Parser(new Scanner(filePath));
             parser.Parse();
@@ -119,20 +120,18 @@ namespace P4_Project
             }
         }
 
-        private static void ApplyVisitors(List<Visitor> visitors, string inputFilePath)
+        private static void ApplyVisitors(IEnumerable<Visitor> visitors, string inputFilePath)
         {
-            if (TryParse(inputFilePath, out var parser))
+            if (!TryParse(inputFilePath, out var parser)) return;
+            foreach(var vi in visitors)
             {
-                foreach(Visitor vi in visitors)
+                parser.mainNode.Accept(vi);
+                if (vi.ErrorList.Count == 0)
+                    File.WriteAllText(vi.AppropriateFileName, vi.Result.ToString());
+                else
                 {
-                    parser.mainNode.Accept(vi);
-                    if (vi.ErrorList.Count == 0)
-                        File.WriteAllText(vi.AppropriateFileName, vi.Result.ToString());
-                    else
-                    {
-                        printErrors(vi);
-                        break; //We break out of the loop as the other visitors cannot be relied uppon if errors was found the visitor.
-                    }
+                    printErrors(vi);
+                    break; //We break out of the loop as the other visitors cannot be relied upon if errors was found the visitor.
                 }
             }
         }
@@ -147,11 +146,11 @@ namespace P4_Project
             if (vi.ErrorList.Count == 1)
                 error = "ERROR";
 
-            var seperator = "--------------------";
-            var fl = seperator + error + seperator;
+            var separator = "--------------------";
+            var fl = separator + error + separator;
             Console.WriteLine(fl);
 
-            //Calculates correct Seperator length dependent on name size
+            //Calculates correct Separator length dependent on name size
             var i = vi.GetType().Name.Length;
             var j = fl.Length;
 
@@ -160,11 +159,11 @@ namespace P4_Project
                 str.Append("-");
             }
 
-            seperator = str.ToString();
+            separator = str.ToString();
 
             if(str.Length * 2 + i != j)
-                Console.WriteLine(seperator + vi.GetType().Name + seperator + "-");
-            else Console.WriteLine(seperator + vi.GetType().Name + seperator);
+                Console.WriteLine(separator + vi.GetType().Name + separator + "-");
+            else Console.WriteLine(separator + vi.GetType().Name + separator);
             vi.ErrorList.ForEach(Console.WriteLine);
         }
     }
