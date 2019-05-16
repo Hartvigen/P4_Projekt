@@ -10,15 +10,21 @@ namespace P4_Project.AST.Stmts
     public class HeadNode : StmtNode
     {
         public const int Vertex = 1, Edge = 2;
-        public BaseType type;
+        public readonly BaseType type;
         public readonly BlockNode attrDeclBlock = new BlockNode();
         public HeadNode(int type)
         {
-            if (type == Vertex)
-                this.type = new BaseType("vertex");
-            else if (type == Edge)
-                this.type = new BaseType("edge");
-            else throw new Exception("type: " + type + " is not a supported type, 1 = vertex, 2 = edge!");
+            switch (type)
+            {
+                case Vertex:
+                    this.type = new BaseType("vertex");
+                    break;
+                case Edge:
+                    this.type = new BaseType("edge");
+                    break;
+                default:
+                    throw new Exception("type: " + type + " is not a supported type, 1 = vertex, 2 = edge!");
+            }
         }
         public void AddAttr(VarDeclNode attrDecl)
         {

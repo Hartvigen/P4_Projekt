@@ -142,10 +142,10 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 return;
 
             if (l.name == "func")
-                l.name = l.returntype;
+                l.name = l.returnType;
 
             if (r.name == "func")
-                r.name = r.returntype;
+                r.name = r.returnType;
 
             if (Operators.GetResultingTypeFromOperandTypeAndOperator(l, node.OperatorType) is null)
                 ErrorList.Add("The operator: " + Operators.GetCodeFromInt(node.OperatorType) + " cannot be used with type: " + l);
@@ -209,7 +209,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 var retNode = (ReturnNode) stmtNode;
 
                 var actualReturnType = retNode.Ret.type.name;
-                var declaredReturnType = node.SymbolObject.Type.returntype;
+                var declaredReturnType = node.SymbolObject.Type.returnType;
                 if (actualReturnType != declaredReturnType)
                 {
                     ErrorList.Add(
@@ -234,8 +234,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
             if (node.DefaultValue.type.name == "func")
             {
-                if (node.DefaultValue.type.returntype != node.SymbolObject.Type.name)
-                    ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with call that returns: " + node.DefaultValue.type.returntype + " when variable is type: " + node.type);
+                if (node.DefaultValue.type.returnType != node.SymbolObject.Type.name)
+                    ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with call that returns: " + node.DefaultValue.type.returnType + " when variable is type: " + node.type);
             }else if (node.DefaultValue.type.name != node.type.name && node.DefaultValue.type.name != "none")
                 ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with of type: " + node.DefaultValue.type + " when variable is type: " + node.type);
         }
@@ -276,9 +276,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             var v = node.Value.type;
 
             if (v.name == "func")
-                if (v.returntype != t.name)
+                if (v.returnType != t.name)
                 {
-                    ErrorList.Add("Call returns a type: " + v.returntype + "but needs type: " + t.name);
+                    ErrorList.Add("Call returns a type: " + v.returnType + "but needs type: " + t.name);
                     return;
                 }
                 else return;

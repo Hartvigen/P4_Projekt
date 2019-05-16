@@ -100,7 +100,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Body.Accept(this);
 
             //4. functions with a non "none" return type must have at least one return inside them! 
-            if (node.SymbolObject.Type.returntype != "none")
+            if (node.SymbolObject.Type.returnType != "none")
             {
                 bool retExists = false;
                 node.Body.Statements.ForEach(n =>

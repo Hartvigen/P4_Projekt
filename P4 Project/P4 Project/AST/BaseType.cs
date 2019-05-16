@@ -4,22 +4,22 @@ namespace P4_Project.AST
 {
     /// <summary>
     /// Class is used in most of the compiler in some capacity.
-    /// It has the responsebility to be able to reflect any type in the entire langauge.
+    /// It has the responsibility to be able to reflect any type in the entire language.
     /// </summary>
     public class BaseType
     {
-        //Generel Type name
+        //General Type name
         public string name;
 
         //Function Type
-        public string returntype = "none";
-        public List<BaseType> parameterTypes;
+        public readonly string returnType = "none";
+        public readonly List<BaseType> parameterTypes;
 
         //CollectionTypes
-        public BaseType collectionType;
-        public BaseType singleType;
+        public readonly BaseType collectionType;
+        public readonly BaseType singleType;
 
-        //Used to do a little reachability analysis
+        //Used to do a little reachable analysis
         public bool reached;
 
         /// <summary>
@@ -27,19 +27,19 @@ namespace P4_Project.AST
         /// </summary>
         /// <param name="type">The type name eg. number, vertex ..</param>
         public BaseType(string type) {
-            this.name = type;
+            name = type;
         }
 
         /// <summary>
         /// Constructor used for creating a function BaseType
         /// </summary>
-        /// <param name="returntype">The Return type of the function</param>
+        /// <param name="returnType">The Return type of the function</param>
         /// <param name="parameterTypes">A List of all the parameters the function needs can be empty but not null</param>
-        public BaseType(BaseType returntype, List<BaseType> parameterTypes)
+        public BaseType(BaseType returnType, List<BaseType> parameterTypes)
         {
-            this.name = "func";
-            if(returntype != null)
-                this.returntype = returntype.name;
+            name = "func";
+            if(returnType != null)
+                this.returnType = returnType.name;
             this.parameterTypes = parameterTypes;
         }
         
@@ -50,7 +50,7 @@ namespace P4_Project.AST
         /// <param name="collectionType">The collection type eg. Set, Stack ..</param>
         public BaseType(BaseType singleType, BaseType collectionType)
         {
-            this.name = "collec";
+            name = "collec";
             this.collectionType = collectionType;
             this.singleType = singleType;
         }

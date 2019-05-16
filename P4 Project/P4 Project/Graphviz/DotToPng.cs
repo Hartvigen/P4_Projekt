@@ -74,7 +74,7 @@ namespace P4_Project.Graphviz
             //Every edge is found and if it is undirected we append it here.
             executorScene.ForEach(v =>
             {
-                v.edge.ForEach(e =>
+                v.edges.ForEach(e =>
                 {
                     if (e.opera != Operators.Nonarr) return;
                     s.Append(e.from.name);
@@ -99,7 +99,7 @@ namespace P4_Project.Graphviz
 
             executorScene.ForEach(v =>
             {
-                v.edge.ForEach(e =>
+                v.edges.ForEach(e =>
                 {
                     switch (e.opera)
                     {

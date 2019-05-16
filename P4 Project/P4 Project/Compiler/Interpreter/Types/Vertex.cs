@@ -1,43 +1,33 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using P4_Project.AST;
-using P4_Project.AST.Expressions.Values;
-using P4_Project.AST.Stmts;
+﻿using System.Collections.Generic;
 using P4_Project.AST.Stmts.Decls;
 
 namespace P4_Project.Compiler.Interpreter.Types
 {
     public class Vertex
     {
-        public Dictionary<string, Value> attributes = new Dictionary<string, Value>();
+        public readonly Dictionary<string, Value> attributes = new Dictionary<string, Value>();
 
-        public string identifyer;
+        public readonly string identifier;
 
-        public List<Edge> edge = new List<Edge>();
-
-        private VertexDeclNode v;
+        public readonly List<Edge> edges = new List<Edge>();
 
         public string name;
-        public Vertex(VertexDeclNode vertex, Dictionary<string, Value> DefinedAttributes)
+        public Vertex(DeclNode vertex, Dictionary<string, Value> definedAttributes)
         {
-            v = vertex;
-
-            identifyer = v.SymbolObject.Name;
+            identifier = vertex.SymbolObject.Name;
 
             //Insert every predefined attribute.
-            foreach (string v in PreDefined.preDefinedAttributesVertex)
+            foreach (var v in PreDefined.preDefinedAttributesVertex)
                 attributes.Add(v, new Value(PreDefined.GetPreDefinedValueOfPreDefinedAttributeVertex(v)));
             //override with every Defined Attribute.
-            foreach (KeyValuePair<string, Value> v in DefinedAttributes) 
+            foreach (var v in definedAttributes) 
                 attributes.Add(v.Key, v.Value);
         }
 
-        public void updateAttribute(string identifyer, Value value) {
-            if (attributes.ContainsKey(identifyer))
-                attributes.Remove(identifyer);
-            attributes.Add(identifyer, value);
+        public void UpdateAttribute(string ident, Value value) {
+            if (attributes.ContainsKey(ident))
+                attributes.Remove(ident);
+            attributes.Add(ident, value);
         }
     }
 }

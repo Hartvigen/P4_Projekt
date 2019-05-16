@@ -168,7 +168,7 @@ namespace P4_Project
 
         private static void ClearEdges(Executor executor)
         {
-            executor.scene.ForEach(v => v.edge.Clear());
+            executor.scene.ForEach(v => v.edges.Clear());
         }
 
         private static void GetVertices(Executor executor)
@@ -190,7 +190,7 @@ namespace P4_Project
             executor.currentValue = null;
             var edgeList = new List<Edge>();
             foreach (var v in executor.scene)
-                edgeList.AddRange(v.edge);
+                edgeList.AddRange(v.edges);
             executor.currentValue = new Value(edgeList);
         }
         private static void GetEdge(List<Value> parameters, Executor executor)
@@ -199,9 +199,9 @@ namespace P4_Project
             var v2 = (Vertex)parameters[1].o;
             foreach (var v in executor.scene)
             {
-                foreach (var e in v.edge)
+                foreach (var e in v.edges)
                 {
-                    if (e.hasVertex(v1, v2))
+                    if (e.HasVertex(v1, v2))
                         executor.currentValue = new Value(e);
                 }
             }
@@ -212,10 +212,10 @@ namespace P4_Project
             var eRemove = (Edge)parameters[0].o;
             foreach (var v in executor.scene)
             {
-                foreach (var e in v.edge)
+                foreach (var e in v.edges)
                 {
                     if (eRemove != e) continue;
-                    v.edge.Remove(e);
+                    v.edges.Remove(e);
                     return;
                 }
             }

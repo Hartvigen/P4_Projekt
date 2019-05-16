@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using P4_Project.AST;
-using P4_Project.Compiler.SemanticAnalysis.Visitors;
+﻿using P4_Project.Compiler.SemanticAnalysis.Visitors;
 
 namespace P4_Project.AST.Expressions
 {
@@ -18,17 +16,9 @@ namespace P4_Project.AST.Expressions
             Right = right;
             OperatorType = operatorType;
         }
-        public string GetNameOfOperator()
-        {
-            return Operators.GetNameFromInt(OperatorType);
-        }
         public string GetCodeOfOperator()
         {
             return Operators.GetCodeFromInt(OperatorType);
-        }
-        public List<BaseType> GetOperandTypeOfOperator()
-        {
-            return Operators.GetOperandTypeFromInt(OperatorType);
         }
         public override void Accept(Visitor vi)
         {

@@ -162,7 +162,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
         public override void Visit(FuncDeclNode node)
         {
             IndentAndNewline();
-            Result.Append("func " + node.SymbolObject.Type.returntype + " ");
+            Result.Append("func " + node.SymbolObject.Type.returnType + " ");
             Result.Append(node.SymbolObject.Name + "(");
             if (node.Parameters.Statements.Count != 0)
             {

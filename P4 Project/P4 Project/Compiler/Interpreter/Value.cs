@@ -9,11 +9,11 @@ namespace P4_Project.Compiler.Interpreter
 {
     public class Value
     {
-        private static Dictionary<Type, int> typeMap = new Dictionary<Type, int>();
+        private static readonly Dictionary<Type, int> TypeMap = new Dictionary<Type, int>();
 
-        public object o;
+        public readonly object o;
 
-        NoneConst none;
+        NoneConst _none;
 
         bool boolean;
         List<bool> booleanList;
@@ -46,51 +46,51 @@ namespace P4_Project.Compiler.Interpreter
         public Value(object v)
         {
             o = v;
-            if (typeMap.Count == 0)
+            if (TypeMap.Count == 0)
                 SetKeys();
             setObjectAndType(v);
         }
 
         private void SetKeys()
         {
-            typeMap.Add(typeof(NoneConst), 0);
-            typeMap.Add(typeof(bool), 1);
-            typeMap.Add(typeof(List<bool>), 2);
-            typeMap.Add(typeof(HashSet<bool>), 3);
-            typeMap.Add(typeof(Stack<bool>), 4);
-            typeMap.Add(typeof(Queue<bool>), 5);
-            typeMap.Add(typeof(double), 6);
-            typeMap.Add(typeof(List<double>), 7);
-            typeMap.Add(typeof(HashSet<double>), 8);
-            typeMap.Add(typeof(Stack<double>), 9);
-            typeMap.Add(typeof(Queue<double>), 10);
-            typeMap.Add(typeof(string), 11);
-            typeMap.Add(typeof(List<string>), 12);
-            typeMap.Add(typeof(HashSet<string>), 13);
-            typeMap.Add(typeof(Stack<string>), 14);
-            typeMap.Add(typeof(Queue<string>), 15);
-            typeMap.Add(typeof(Vertex), 16);
-            typeMap.Add(typeof(List<Vertex>), 17);
-            typeMap.Add(typeof(HashSet<Vertex>), 18);
-            typeMap.Add(typeof(Stack<Vertex>), 19);
-            typeMap.Add(typeof(Queue<Vertex>), 20);
-            typeMap.Add(typeof(Edge), 21);
-            typeMap.Add(typeof(List<Edge>), 22);
-            typeMap.Add(typeof(HashSet<Edge>), 23);
-            typeMap.Add(typeof(Stack<Edge>), 24);
-            typeMap.Add(typeof(Queue<Edge>), 25);
-            typeMap.Add(typeof(List<object>), 26);
-            typeMap.Add(typeof(HashSet<object>), 27);
-            typeMap.Add(typeof(Stack<object>), 28);
-            typeMap.Add(typeof(Queue<object>), 29);
+            TypeMap.Add(typeof(NoneConst), 0);
+            TypeMap.Add(typeof(bool), 1);
+            TypeMap.Add(typeof(List<bool>), 2);
+            TypeMap.Add(typeof(HashSet<bool>), 3);
+            TypeMap.Add(typeof(Stack<bool>), 4);
+            TypeMap.Add(typeof(Queue<bool>), 5);
+            TypeMap.Add(typeof(double), 6);
+            TypeMap.Add(typeof(List<double>), 7);
+            TypeMap.Add(typeof(HashSet<double>), 8);
+            TypeMap.Add(typeof(Stack<double>), 9);
+            TypeMap.Add(typeof(Queue<double>), 10);
+            TypeMap.Add(typeof(string), 11);
+            TypeMap.Add(typeof(List<string>), 12);
+            TypeMap.Add(typeof(HashSet<string>), 13);
+            TypeMap.Add(typeof(Stack<string>), 14);
+            TypeMap.Add(typeof(Queue<string>), 15);
+            TypeMap.Add(typeof(Vertex), 16);
+            TypeMap.Add(typeof(List<Vertex>), 17);
+            TypeMap.Add(typeof(HashSet<Vertex>), 18);
+            TypeMap.Add(typeof(Stack<Vertex>), 19);
+            TypeMap.Add(typeof(Queue<Vertex>), 20);
+            TypeMap.Add(typeof(Edge), 21);
+            TypeMap.Add(typeof(List<Edge>), 22);
+            TypeMap.Add(typeof(HashSet<Edge>), 23);
+            TypeMap.Add(typeof(Stack<Edge>), 24);
+            TypeMap.Add(typeof(Queue<Edge>), 25);
+            TypeMap.Add(typeof(List<object>), 26);
+            TypeMap.Add(typeof(HashSet<object>), 27);
+            TypeMap.Add(typeof(Stack<object>), 28);
+            TypeMap.Add(typeof(Queue<object>), 29);
 
         }
 
         private void setObjectAndType(object v)
         {
-            switch (typeMap[v.GetType()])
+            switch (TypeMap[v.GetType()])
             {
-                case 0: none = (NoneConst)v; type = new BaseType("none"); break;
+                case 0: _none = (NoneConst)v; type = new BaseType("none"); break;
                 case 1: boolean = (bool)v; type = new BaseType("boolean"); break;
                 case 2: booleanList = (List<bool>)v; type = new BaseType(new BaseType("boolean"), new BaseType("list")); break;
                 case 3: booleanSet = (HashSet<bool>)v; type = new BaseType(new BaseType("boolean"), new BaseType("set")); break;

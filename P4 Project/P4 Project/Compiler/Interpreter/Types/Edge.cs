@@ -1,41 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using P4_Project.AST.Stmts;
+﻿using System.Collections.Generic;
 
 namespace P4_Project.Compiler.Interpreter.Types
 {
     public class Edge
     {
-        public Vertex from;
-        public Vertex to;
-        public int opera;
+        public readonly Vertex from;
+        public readonly Vertex to;
+        public readonly int opera;
 
-        public Dictionary<string, Value> attributes = new Dictionary<string, Value>();
+        public readonly Dictionary<string, Value> attributes = new Dictionary<string, Value>();
 
-        public Edge(Vertex from, int opera, Vertex to, Dictionary<string, Value> DefinedAttributes)
+        public Edge(Vertex from, int opera, Vertex to, Dictionary<string, Value> definedAttributes)
         {
             this.from = from;
             this.to = to;
             this.opera = opera;
 
             //Insert every predefined attribute.
-            foreach (string e in PreDefined.preDefinedAttributesEdge)
+            foreach (var e in PreDefined.preDefinedAttributesEdge)
                 attributes.Add(e, new Value(PreDefined.GetPreDefinedValueOfPreDefinedAttributeEdge(e)));
             //override with every Defined Attribute.
-            foreach (KeyValuePair<string, Value> v in DefinedAttributes)
+            foreach (var v in definedAttributes)
                 attributes.Add(v.Key, v.Value);
         }
-        public void updateAttribute(string identifyer, Value value)
+        public void UpdateAttribute(string identifier, Value value)
         {
-            if (attributes.ContainsKey(identifyer))
-                attributes.Remove(identifyer);
-            attributes.Add(identifyer, value);
+            if (attributes.ContainsKey(identifier))
+                attributes.Remove(identifier);
+            attributes.Add(identifier, value);
         }
 
-        public bool hasVertex(Vertex v1, Vertex v2) {
+        public bool HasVertex(Vertex v1, Vertex v2) {
             if (v1 == from && v2 == to)
                 return true;
             else if (v1 == to && v2 == from)

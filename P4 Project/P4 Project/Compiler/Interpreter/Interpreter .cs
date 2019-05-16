@@ -94,7 +94,7 @@ namespace P4_Project.Compiler.Executor
             Vertex v = new Vertex(vertex, values);
             //We add it to the scene and the currentscope
             scene.Add(v);
-            currentscope.createVar(v.identifyer,new Value(v));
+            currentscope.CreateVar(v.identifier,new Value(v));
         }
         private void CreateNewEdge(EdgeCreateNode edge)
         {
@@ -110,9 +110,9 @@ namespace P4_Project.Compiler.Executor
                 foreach (AssignNode l in tuple.Item2)
                 {
                     l.Value.Accept(this);
-                    e.updateAttribute(l.Target.Ident, currentValue);
+                    e.UpdateAttribute(l.Target.Ident, currentValue);
                 }
-                from.edge.Add(e);
+                from.edges.Add(e);
             }
         }
 
@@ -161,7 +161,7 @@ namespace P4_Project.Compiler.Executor
             {
                 VarDeclNode v = (VarDeclNode) f.Parameters.Statements[i-1];
                 node.Parameters.Expressions[i-1].Accept(this);
-                callStack.Peek().createVar(v.SymbolObject.Name, currentValue);
+                callStack.Peek().CreateVar(v.SymbolObject.Name, currentValue);
             }
             //We Visit that function to execute it
             f.Accept(this);
@@ -321,7 +321,7 @@ namespace P4_Project.Compiler.Executor
                 value = currentValue;
             }
 
-            currentscope.createVar(node.SymbolObject.Name, value);
+            currentscope.CreateVar(node.SymbolObject.Name, value);
         }
 
         public override void Visit(VertexDeclNode node)
@@ -333,7 +333,7 @@ namespace P4_Project.Compiler.Executor
                 foreach (Node n in node.Attributes.Statements) {
                     AssignNode a = (AssignNode)n;
                     a.Value.Accept(this);
-                    v.updateAttribute(a.Target.Ident, currentValue);
+                    v.UpdateAttribute(a.Target.Ident, currentValue);
                 }
             }
         }
@@ -345,15 +345,15 @@ namespace P4_Project.Compiler.Executor
             //If there is a source the value should not actually be assigned to this variable but rather as an attribute of the source.
             if (node.Target.Source == null)
             {
-                currentscope.updateVar(node.Target.Ident, currentValue);
+                currentscope.UpdateVar(node.Target.Ident, currentValue);
             }
             else
             {
                 object o = DecodeReference(node.Target.Source); // Yes, we need the source, in order to change the target inside the source
                 if (o is Vertex)
-                    (o as Vertex).updateAttribute(node.Target.Ident, currentValue);
+                    (o as Vertex).UpdateAttribute(node.Target.Ident, currentValue);
                 else if (o is Edge)
-                    (o as Edge).updateAttribute(node.Target.Ident, currentValue);
+                    (o as Edge).UpdateAttribute(node.Target.Ident, currentValue);
                 else
                     throw new Exception($"Tried to access attribute {node.Target.Ident} in type that is not vertex or edge.");
             }
@@ -392,7 +392,7 @@ namespace P4_Project.Compiler.Executor
         public override void Visit(ForeachNode node)
         {
             string iterationVar = node.IterationVar.SymbolObject.Name;
-            currentscope.createVar(iterationVar, null);
+            currentscope.CreateVar(iterationVar, null);
             node.Iterator.Accept(this);
 
             IEnumerable<object> l = null;
@@ -410,7 +410,7 @@ namespace P4_Project.Compiler.Executor
 
             foreach (var i in l)
             {
-                currentscope.updateVar(iterationVar, new Value(i));
+                currentscope.UpdateVar(iterationVar, new Value(i));
                 node.Body.Accept(this);
 
                 if (InterruptHandler())

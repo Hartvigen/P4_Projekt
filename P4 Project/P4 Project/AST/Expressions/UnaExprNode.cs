@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using P4_Project.AST;
-using P4_Project.Compiler.SemanticAnalysis.Visitors;
+﻿using P4_Project.Compiler.SemanticAnalysis.Visitors;
 
 namespace P4_Project.AST.Expressions
 {

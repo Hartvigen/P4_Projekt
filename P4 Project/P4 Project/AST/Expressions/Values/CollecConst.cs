@@ -9,13 +9,11 @@ namespace P4_Project.AST.Expressions.Values
     /// </summary>
     public class CollecConst : ExprNode
     {
-        public List<ExprNode> Expressions { get; private set; } = new List<ExprNode>();
-
-
-        public CollecConst(BaseType _type)
-            : base()
+        public List<ExprNode> Expressions { get; } = new List<ExprNode>();
+        
+        public CollecConst(BaseType type)
         {
-            type = _type;
+            this.type = type;
         }
 
 
