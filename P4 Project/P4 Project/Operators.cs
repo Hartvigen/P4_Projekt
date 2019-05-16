@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using P4_Project.AST;
 
 namespace P4_Project
@@ -85,52 +84,19 @@ namespace P4_Project
             }
         }
 
-        public static List<BaseType> GetOperandTypeFromInt(int i)
-        {
-            switch (i)
-            {
-                case 1:
-                case 2:
-                case 15: return new List<BaseType> {new BaseType("boolean")};
-
-                case 3:
-                case 4:
-                    return new List<BaseType>
-                    {
-                        new BaseType("number"), new BaseType("text"), new BaseType("boolean"), new BaseType("vertex"), new BaseType("edge")
-                    };
-
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                    return new List<BaseType> {new BaseType("number")};
-
-                case 16:
-                case 17:
-                case 18:
-                    return new List<BaseType> {new BaseType("vertex")};
-
-                default: throw new Exception("Operator type: " + i + " does not have a Code associated");
-            }
-        }
-
         public static BaseType GetResultingTypeFromOperandTypeAndOperator(BaseType type, int i)
         {
             switch (i)
             {
                 case 10:
-                    if (type.name == "text")
-                        return new BaseType("text");
-                    else if(type.name == "number")
-                        return new BaseType("number");
-                    break;
+                    switch (type.name)
+                    {
+                        case "text":
+                            return new BaseType("text");
+                        case "number":
+                            return new BaseType("number");
+                        default: throw  new Exception(GetCodeFromInt(i) + " cannot be used with type: " + type.name);
+                    }
                 case 9: 
                 case 11: 
                 case 12: 

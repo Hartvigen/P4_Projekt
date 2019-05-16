@@ -17,7 +17,7 @@ namespace P4_Project.Compiler.Interpreter.Types
             identifier = vertex.SymbolObject.Name;
 
             //Insert every predefined attribute.
-            foreach (var v in PreDefined.preDefinedAttributesVertex)
+            foreach (var v in PreDefined.PreDefinedAttributesVertex)
                 attributes.Add(v, new Value(PreDefined.GetPreDefinedValueOfPreDefinedAttributeVertex(v)));
             //override with every Defined Attribute.
             foreach (var v in definedAttributes) 

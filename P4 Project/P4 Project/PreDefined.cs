@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using P4_Project.AST;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.Compiler.Executor;
 using P4_Project.Compiler.Interpreter;
 using P4_Project.Compiler.Interpreter.Types;
 using P4_Project.Graphviz;
@@ -11,9 +10,9 @@ namespace P4_Project
 {
     public abstract class PreDefined
     {
-        static long count;
+        private static long _count;
 
-        public static readonly List<string> preDefinedFunctions = new List<string>
+        public static readonly List<string> PreDefinedFunctions = new List<string>
         {
                  "GetEdge",
                 "RemoveEdge",
@@ -26,13 +25,13 @@ namespace P4_Project
                "AsText"
         };
 
-        public static readonly List<string> preDefinedAttributesVertex = new List<string>
+        public static readonly List<string> PreDefinedAttributesVertex = new List<string>
         {
             "label",
             "color"
         };
 
-        public static readonly List<string> preDefinedAttributesEdge = new List<string>
+        public static readonly List<string> PreDefinedAttributesEdge = new List<string>
         {
             "label",
             "color",
@@ -57,7 +56,7 @@ namespace P4_Project
             switch (name)
             {
                 case "label":
-                    return "defualt";
+                    return "default";
                 case "color":
                     return "black";
                 case "style":
@@ -88,12 +87,12 @@ namespace P4_Project
 
         public static string NextUniqueString()
         {
-            return "vertex" + count++;
+            return "vertex" + _count++;
         }
 
         public static string GetTypeOfPreDefinedAttributeVertex(string name)
         {
-            if (!preDefinedAttributesVertex.Contains(name))
+            if (!PreDefinedAttributesVertex.Contains(name))
                 throw new Exception(name + " is not a predefined attribute for vertex");
             switch (name) {
                 case "label": return "text";
@@ -104,7 +103,7 @@ namespace P4_Project
 
         public static string GetTypeOfPreDefinedAttributeEdge(string name)
         {
-            if (!preDefinedAttributesEdge.Contains(name))
+            if (!PreDefinedAttributesEdge.Contains(name))
                 throw new Exception(name + " is not a predefined attribute for edge");
             switch (name)
             {
@@ -117,7 +116,7 @@ namespace P4_Project
 
         internal static void DoPreDefFunction(string function, Executor executor, List<Value> parameters)
         {
-            if (preDefinedFunctions.Contains(function))
+            if (PreDefinedFunctions.Contains(function))
                 switch (function)
                 {
                     case "Print":

@@ -7,13 +7,12 @@ using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
-using P4_Project.Compiler.Interpreter;
 using P4_Project.Compiler.Interpreter.Types;
 using P4_Project.Compiler.SemanticAnalysis.Visitors;
 using P4_Project.Compiler.SyntaxAnalysis;
 using P4_Project.SymbolTable;
 
-namespace P4_Project.Compiler.Executor
+namespace P4_Project.Compiler.Interpreter
 {
     public class Executor : Visitor
     {
@@ -138,7 +137,7 @@ namespace P4_Project.Compiler.Executor
             functions.TryGetValue(node.Ident, out FuncDeclNode f);
 
             //If the function was not found we check if its a predefined function
-            if (f == null && PreDefined.preDefinedFunctions.Contains(node.Ident))
+            if (f == null && PreDefined.PreDefinedFunctions.Contains(node.Ident))
             {
                 //We collect the parameters by visting each expression and adding that resulting current value to value list
                 List<Value> parameters = new List<Value>();

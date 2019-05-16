@@ -121,7 +121,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     Table.GetScopes().ForEach(h =>
                     {
                         if (!h.header || h.name != "edge") return;
-                        if (h.Find(a.Target.Ident) == null && !PreDefined.preDefinedAttributesEdge.Contains(a.Target.Ident))
+                        if (h.Find(a.Target.Ident) == null && !PreDefined.PreDefinedAttributesEdge.Contains(a.Target.Ident))
                             ErrorList.Add(a.Target.Ident + " is not a valid attribute for edge");
                     });
                 });
@@ -159,7 +159,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                         a.Value.Accept(this);
 
                         //We find the header scope for vertex and if the attribute is not there it is invalid. 
-                        if(!Table.vertexAttr.GetDic().ContainsKey(a.Target.Ident) && !PreDefined.preDefinedAttributesVertex.Contains(a.Target.Ident))
+                        if(!Table.vertexAttr.GetDic().ContainsKey(a.Target.Ident) && !PreDefined.PreDefinedAttributesVertex.Contains(a.Target.Ident))
                             ErrorList.Add(a.Target.Ident + " is not a valid attribute for vertex");
                     }
                 });

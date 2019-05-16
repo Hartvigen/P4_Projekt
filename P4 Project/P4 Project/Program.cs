@@ -4,7 +4,7 @@ using System.IO;
 using P4_Project.Graphviz;
 using System.Collections.Generic;
 using System.Text;
-using P4_Project.Compiler.Executor;
+using P4_Project.Compiler.Interpreter;
 using P4_Project.Compiler.SemanticAnalysis.Visitors;
 using P4_Project.Compiler.SemanticAnalysis.Visitors.Extra;
 
@@ -130,13 +130,13 @@ namespace P4_Project
                     File.WriteAllText(vi.AppropriateFileName, vi.Result.ToString());
                 else
                 {
-                    printErrors(vi);
+                    PrintErrors(vi);
                     break; //We break out of the loop as the other visitors cannot be relied upon if errors was found the visitor.
                 }
             }
         }
 
-        private static void printErrors(Visitor vi) {
+        private static void PrintErrors(Visitor vi) {
             //If there are no errors we print nothing.
             if (vi.ErrorList.Count == 0)
                 return;

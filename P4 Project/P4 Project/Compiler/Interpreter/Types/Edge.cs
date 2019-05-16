@@ -17,7 +17,7 @@ namespace P4_Project.Compiler.Interpreter.Types
             this.opera = opera;
 
             //Insert every predefined attribute.
-            foreach (var e in PreDefined.preDefinedAttributesEdge)
+            foreach (var e in PreDefined.PreDefinedAttributesEdge)
                 attributes.Add(e, new Value(PreDefined.GetPreDefinedValueOfPreDefinedAttributeEdge(e)));
             //override with every Defined Attribute.
             foreach (var v in definedAttributes)

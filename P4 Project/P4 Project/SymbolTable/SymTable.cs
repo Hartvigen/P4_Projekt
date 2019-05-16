@@ -119,7 +119,7 @@ namespace P4_Project.SymbolTable
 
         public BaseType findReturnTypeOfFunction(string Name)
         {
-            if (PreDefined.preDefinedFunctions.Contains(Name))
+            if (PreDefined.PreDefinedFunctions.Contains(Name))
                 return PreDefined.FindReturnOfPreDefFunctions(Name);
             foreach (var s in InnerScopes) {
                 if(s.name == Name)
@@ -130,12 +130,12 @@ namespace P4_Project.SymbolTable
 
         public bool FunctionExists(string Name)
         {
-            return PreDefined.preDefinedFunctions.Contains(Name) || variables.ContainsKey(Name);
+            return PreDefined.PreDefinedFunctions.Contains(Name) || variables.ContainsKey(Name);
         }
 
         public List<BaseType> findParameterListOfFunction(string Name)
         {
-            if (PreDefined.preDefinedFunctions.Contains(Name)) return PreDefined.FindParameterListOfPreDefFunctions(Name);
+            if (PreDefined.PreDefinedFunctions.Contains(Name)) return PreDefined.FindParameterListOfPreDefFunctions(Name);
             //Complicated piece of code that can either find the function in its proper place or in variables because function is used in the cleaner before functions gets cleaned up.
             foreach (var s in InnerScopes)
             {

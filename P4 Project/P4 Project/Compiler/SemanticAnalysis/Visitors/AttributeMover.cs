@@ -131,7 +131,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             {
                 //Add default attributes
                 case "vertex":
-                    PreDefined.preDefinedAttributesVertex.ForEach(va =>
+                    PreDefined.PreDefinedAttributesVertex.ForEach(va =>
                     {
                         Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0));
                     });
@@ -144,7 +144,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     });
                     break;
                 case "edge":
-                    PreDefined.preDefinedAttributesEdge.ForEach(va =>
+                    PreDefined.PreDefinedAttributesEdge.ForEach(va =>
                     {
                         Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0));
                     });

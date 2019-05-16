@@ -58,7 +58,7 @@ namespace P4_Project.Graphviz
                 s.Append(" [");
                 foreach (var keyValuePair in v.attributes)
                 {
-                    if (PreDefined.preDefinedAttributesVertex.Contains(keyValuePair.Key))
+                    if (PreDefined.PreDefinedAttributesVertex.Contains(keyValuePair.Key))
                     {
                         s.Append(keyValuePair.Key + " = " + keyValuePair.Value.o + ", ");
                     }
@@ -83,7 +83,7 @@ namespace P4_Project.Graphviz
                     //For every mapped attribute we pass the value to DOT.
                     foreach (var keyValuePair in e.attributes)
                     {
-                        if (PreDefined.preDefinedAttributesEdge.Contains(keyValuePair.Key))
+                        if (PreDefined.PreDefinedAttributesEdge.Contains(keyValuePair.Key))
                         {
                             s.Append(keyValuePair.Key + " = " + (string) keyValuePair.Value.o + ", ");
                         }
@@ -119,7 +119,7 @@ namespace P4_Project.Graphviz
                     //For every mapped attribute we pass the value to DOT.
                     foreach (var keyValuePair in e.attributes)
                     {
-                        if (PreDefined.preDefinedAttributesEdge.Contains(keyValuePair.Key))
+                        if (PreDefined.PreDefinedAttributesEdge.Contains(keyValuePair.Key))
                         {
                             s.Append(keyValuePair.Key + " = " + (string) keyValuePair.Value.o + ", ");
                         }
