@@ -68,12 +68,12 @@ namespace P4_Project.SymbolTable
         {
             var obj = new Obj(Name, t, kind);
 
-            if (!_symbolDecls.ContainsKey(obj.Name))
-                _symbolDecls.Add(obj.Name, obj);
+            if (!variables.ContainsKey(obj.Name))
+                variables.Add(obj.Name, obj);
             else
             {
                 Console.WriteLine(obj.Name + " is already added to symDecls");
-                _parser.SemErr(obj.Name + " has already been declared");
+                parser.SemErr(obj.Name + " has already been declared");
             }
             return obj;
         }
