@@ -166,7 +166,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             }
 
             //The vertex has not been reached so we set declareted to true 
-            activeScope.Find(node.SymbolObject.Name).type.reached = true;
+            activeScope.Find(node.SymbolObject.Name).Type.reached = true;
         }
 
         public override void Visit(AssignNode node)
