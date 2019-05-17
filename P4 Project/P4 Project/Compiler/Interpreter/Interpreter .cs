@@ -180,7 +180,6 @@ namespace P4_Project.Compiler.Interpreter
         }
 
 
-
         public override void Visit(CollecConst node)
         {
             IEnumerable<object> collec;
@@ -189,7 +188,7 @@ namespace P4_Project.Compiler.Interpreter
             switch (node.type.collectionType.name)
             {
                 case "list":
-                    collec = new List<object>();
+                    collec = new List<object>();                   
                     adder = obj => { (collec as List<object>)?.Add(obj); };
                     break;
                 case "set":
@@ -207,6 +206,7 @@ namespace P4_Project.Compiler.Interpreter
                 default:
                     throw new Exception(node.type.collectionType.name + " is not a collection type in magia!");
             }
+             
 
             foreach (var n in node.Expressions)
             {
@@ -214,6 +214,7 @@ namespace P4_Project.Compiler.Interpreter
                 adder(currentValue.o);
             }
             currentValue = new Value(collec);
+            currentValue.type = node.type;
         }
 
         

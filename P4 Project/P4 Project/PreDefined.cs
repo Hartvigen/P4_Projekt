@@ -23,7 +23,8 @@ namespace P4_Project
                 "ClearEdges",
                "ClearAll",
                "Print",
-               "AsText"
+               "AsText",
+            "Add"
         };
 
         public static readonly List<string> PreDefinedAttributesVertex = new List<string>
@@ -147,6 +148,9 @@ namespace P4_Project
                     case "ClearAll":
                         ClearAll(executor);
                         break;
+                    case "Add":
+                        Add(parameters, executor);
+                        break;
                     default: throw new Exception("Missing implementation of the PreDefFunction: " + function);
                 }
             else throw new Exception(function + " is not a pre Defined Function!");
@@ -233,6 +237,26 @@ namespace P4_Project
             }
         }
 
+        private static void Add(List<Value> parameters, Executor executor)
+        {
+            if(parameters.Count != 2)
+            {
+                throw new Exception("Add requires two parameters");
+            }
+            Console.WriteLine(parameters[0].type.collectionType.name);
+            switch(parameters[0].type.collectionType.name)
+            {
+                case "list":
+                    
+                    break;
+                case "set":
+                    Console.WriteLine("It is called a set, not a match!");
+                    break;
+                default:
+                    throw new Exception("Add only works with collections of type list or set");
+            }
+        }
+
         public static BaseType FindReturnOfPreDefFunctions(string name)
         {
             switch (name)
@@ -246,6 +270,7 @@ namespace P4_Project
                 case "ClearAll": return new BaseType("none");
                 case "Print": return new BaseType("none");
                 case "AsText": return new BaseType("text");
+                case "Add": return new BaseType("none");
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }

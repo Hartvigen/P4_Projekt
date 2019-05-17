@@ -99,44 +99,46 @@ namespace P4_Project.Compiler.Interpreter
         {
             switch (v)
             {
-                case List<object> l1:
-                    switch (l1.GetEnumerator().Current)
+                case List<object> l1:                   
+                    switch (l1[0].GetType().Name)
                     {
-                        case bool _: SetObjectAndType(new List<bool>()); break;
-                        case double _: SetObjectAndType(new List<double>()); break;
-                        case string _: SetObjectAndType(new List<string>()); break; 
-                        case Vertex _: SetObjectAndType(new List<Vertex>()); break; 
-                        case Edge _: SetObjectAndType(new List<Edge>()); break; 
+                        case "Boolean" : type = new BaseType(new BaseType("boolean"), new BaseType("list")); break;
+                        case "Double": type = new BaseType(new BaseType("number"), new BaseType("list")); break;
+                        case "String": type = new BaseType(new BaseType("text"), new BaseType("list")); break;
+                        case "Vertex": type = new BaseType(new BaseType("vertex"), new BaseType("list")); break;
+                        case "Edge" : type = new BaseType(new BaseType("edge"), new BaseType("list")); break;
+                        default: break;
                     }
                     break;
                 case HashSet<object> l2:
-                    switch (l2.GetEnumerator().Current)
+                    switch (l2.GetEnumerator())
                     {
-                        case bool _: SetObjectAndType(new HashSet<bool>()); break;
-                        case double _: SetObjectAndType(new HashSet<double>()); break;
-                        case string _: SetObjectAndType(new HashSet<string>()); break; 
-                        case Vertex _: SetObjectAndType(new HashSet<Vertex>()); break; 
-                        case Edge _: SetObjectAndType(new HashSet<Edge>()); break; 
+                        //case "Boolean": type = new BaseType(new BaseType("boolean"), new BaseType("list")); break;
+                        //case "Double": type = new BaseType(new BaseType("number"), new BaseType("list")); break;
+                        //case "String": type = new BaseType(new BaseType("text"), new BaseType("list")); break;
+                        //case "Vertex": type = new BaseType(new BaseType("vertex"), new BaseType("list")); break;
+                        //case "Edge": type = new BaseType(new BaseType("edge"), new BaseType("list")); break;
+                        default: break;
                     }
                     break;
                 case Stack<object> l3:
                     switch (l3.GetEnumerator().Current)
                     {
-                        case bool _: SetObjectAndType(new Stack<bool>()); break;
-                        case double _: SetObjectAndType(new Stack<double>()); break;
-                        case string _: SetObjectAndType(new Stack<string>()); break; 
-                        case Vertex _: SetObjectAndType(new Stack<Vertex>()); break; 
-                        case Edge _: SetObjectAndType(new Stack<Edge>()); break; 
+                        case bool _: type = new BaseType(new BaseType("stack"), new BaseType("boolean")); break;
+                        case double _: type = new BaseType(new BaseType("stack"), new BaseType("number")); break;
+                        case string _: type = new BaseType(new BaseType("stack"), new BaseType("text")); break;
+                        case Vertex _: type = new BaseType(new BaseType("stack"), new BaseType("vertex")); break;
+                        case Edge _: type = new BaseType(new BaseType("stack"), new BaseType("edge")); break;
                     }
                     break;
                 case Queue<object> l4:
                     switch (l4.GetEnumerator().Current)
                     {
-                        case bool _: SetObjectAndType(new Queue<bool>()); break;
-                        case double _: SetObjectAndType(new Queue<double>()); break;
-                        case string _: SetObjectAndType(new Queue<string>()); break; 
-                        case Vertex _: SetObjectAndType(new Queue<Vertex>()); break; 
-                        case Edge _: SetObjectAndType(new Queue<Edge>()); break; 
+                        case bool _: type = new BaseType(new BaseType("queue"), new BaseType("boolean")); break;
+                        case double _: type = new BaseType(new BaseType("queue"), new BaseType("number")); break;
+                        case string _: type = new BaseType(new BaseType("queue"), new BaseType("text")); break;
+                        case Vertex _: type = new BaseType(new BaseType("queue"), new BaseType("vertex")); break;
+                        case Edge _: type = new BaseType(new BaseType("queue"), new BaseType("edge")); break;
                     }
                     break;
             }
