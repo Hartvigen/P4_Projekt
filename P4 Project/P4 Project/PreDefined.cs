@@ -269,6 +269,26 @@ namespace P4_Project
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
+        
+        private static void Add(IReadOnlyList<Value> parameters, Executor executor)
+        {
+            if(parameters.Count != 2)
+            {
+                throw new Exception("Add requires two parameters");
+            }
+            Console.WriteLine(parameters[0].type.collectionType.name);
+            switch(parameters[0].type.collectionType.name)
+            {
+                case "list":
+                    
+                    break;
+                case "set":
+                    Console.WriteLine("It is called a set, not a match!");
+                    break;
+                default:
+                    throw new Exception("Add only works with collections of type list or set");
+            }
+        }
 
         public static List<List<BaseType>> FindListOfParameterLists(string name)
         {
