@@ -12,11 +12,11 @@ namespace P4_Project
 {
     public static class Program
     {
+        private static Parser _parser;
         public static void Main(string[] args)
         {
             if (args == null) throw new ArgumentNullException(nameof(args));
             const string defaultFile = "MAGIAFile.txt";
-
             //Uncomment these lines if you wanna play with the program            
             Console.WriteLine("Doing custom work!");
             var customArgs = new string[2];
@@ -26,7 +26,7 @@ namespace P4_Project
 
             if (args.Length > 0)
             {
-                if (!TryParse(args[1], out var parser))
+                if (!TryParse(args[1]))
                 {
                     Console.WriteLine("Couldn't even parse the file!");
                 }else
@@ -35,11 +35,9 @@ namespace P4_Project
                     case "-c":
                     case "--compile":
                         Console.WriteLine("Doing a complete compile on " + args[1]);
-                        parser.tab.name = "top";
-                        var list = new List<Visitor> {new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab)};
-                        ApplyVisitors(list, args[1]);
-                        var executor = new Executor(parser);
-                        Console.WriteLine(executor.ErrorList.Count == 0 ? "Done" : "Execution Failed");
+                        _parser.tab.name = "top";
+                        var list = new List<Visitor> {new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new Executor(_parser.tab)};
+                        Console.WriteLine(ApplyVisitors(list,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
                         break;
                     case "-h":
                     case "--help":
@@ -52,15 +50,14 @@ namespace P4_Project
                         break;
                     case "-p":
                     case "--prettyprint":
-                        parser.tab.name = "top";
-                        var list1 = new List<Visitor> { new Cleaner(parser.tab), new AttributeMover(parser.tab), new ScopeChecker(parser.tab), new TypeChecker(parser.tab), new PrettyPrinter() };
-                        ApplyVisitors(list1, args[1]);
-                        Console.WriteLine("Done");
+                        _parser.tab.name = "top";
+                        var list1 = new List<Visitor> { new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new PrettyPrinter() };
+                        Console.WriteLine(ApplyVisitors(list1,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
                         break;
                     case "-x":
                     case "--xmlprint":
                         Console.WriteLine("Parsing input file and printing XML: " + args[1]);
-                        Console.WriteLine(ApplyVisitor(new XmlTreeBuilder(),args[1]) ? "Compile succeeded!" : "Compile failed!");
+                        Console.WriteLine(ApplyVisitors(new List<Visitor>{new XmlTreeBuilder()},args[1]) ? "Compile succeeded!" : "Compile failed!");
                         break;
                     case "-t":
                     case "--test":
@@ -85,59 +82,31 @@ namespace P4_Project
             Console.ReadKey();
         }
 
-        private static bool TryParse(string filePath, out Parser parser)
-        {
-            parser = new Parser(new Scanner(filePath));
-            parser.Parse();
-            return parser.errors.count == 0;
-        }
-        
         private static bool TryParse(string filePath)
         {
-            var parser = new Parser(new Scanner(filePath));
-            parser.Parse();
-            return parser.errors.count == 0;
+            _parser = new Parser(new Scanner(filePath));
+            _parser.Parse();
+            return _parser.errors.count == 0;
         }
-
-        private static bool ApplyVisitor(Visitor visitor, string inputFilePath)
+        
+        private static bool ApplyVisitors(IEnumerable<Visitor> visitors, string inputFilePath)
         {
-            if (TryParse(inputFilePath, out var parser))
-            {
-                parser.mainNode.Accept(visitor);
-                if (visitor.ErrorList.Count == 0)
-                    File.WriteAllText(visitor.AppropriateFileName, visitor.Result.ToString());
-                else
-                {
-                    Console.WriteLine("-----------ERRORS-----------");
-                    visitor.ErrorList.ForEach(Console.WriteLine);
-                    return false;
-                }
-                return true;
-            }
-            return false;
-        }
-
-        private static void ApplyVisitors(IEnumerable<Visitor> visitors, string inputFilePath)
-        {
-            if (!TryParse(inputFilePath, out var parser)) return;
+            if (!TryParse(inputFilePath)) return false;
             foreach(var vi in visitors)
             {
-                parser.mainNode.Accept(vi);
+                _parser.mainNode.Accept(vi);
                 if (vi.ErrorList.Count == 0)
                     File.WriteAllText(vi.AppropriateFileName, vi.Result.ToString());
                 else
                 {
                     PrintErrors(vi);
-                    break; //We break out of the loop as the other visitors cannot be relied upon if errors was found the visitor.
+                    return false;
                 }
             }
+            return true;
         }
 
         private static void PrintErrors(Visitor vi) {
-            //If there are no errors we print nothing.
-            if (vi.ErrorList.Count == 0)
-                return;
-
             //Check if one or more.
             var error = "ERRORS";
             if (vi.ErrorList.Count == 1)

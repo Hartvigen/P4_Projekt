@@ -46,12 +46,11 @@ namespace P4_Project.Compiler.Interpreter
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
 
-        public Executor(Parser parser)
+        public Executor(SymTable table)
         {
-            Table = parser.tab;
+            Table = table;
             _currentScope = _mainScope;
             MoveAttrDefinitions();
-            MoveFunctions(parser.mainNode);
         }
 
         private void MoveFunctions(Magia node)
@@ -99,11 +98,13 @@ namespace P4_Project.Compiler.Interpreter
         /// </summary>
         private void MoveAttrDefinitions()
         {
-            foreach (var v in Table.vertexAttr.GetDic())
-                _defVertexAttr.Add(v.Key, v.Value.Type);
-        
-            foreach (var v in Table.edgeAttr.GetDic())
-                _defEdgeAttr.Add(v.Key, v.Value.Type);
+            if (Table.vertexAttr is null) return;
+                foreach (var v in Table.vertexAttr.GetDic())
+                    _defVertexAttr.Add(v.Key, v.Value.Type);
+            
+            if (Table.edgeAttr is null) return;
+                foreach (var v in Table.edgeAttr.GetDic())
+                    _defEdgeAttr.Add(v.Key, v.Value.Type);
         }
 
         public override void Visit(CallNode node)
@@ -531,6 +532,7 @@ namespace P4_Project.Compiler.Interpreter
         //The Magia node executes everything in it that is not a funcDeclNode and not a HeadNode.
         public override void Visit(Magia node)
         {
+            MoveFunctions(node);
             foreach(var n in node.block.Statements)
             {
                 if (n.GetType() != typeof(HeadNode) && n.GetType() != typeof(FuncDeclNode))
