@@ -86,12 +86,12 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         //Checks if all elements in a collection is the same type, and returns the type
         public override void Visit(CollecConst node)
         {
-            //We check that each Expression in the Collection evaluates to the same type as the first one in the collection
+            //We check that each Expression in the Collection evaluates to the same type as the collection
             node.Expressions.ForEach(n =>
             {
                 n.Accept(this);
-                if (node.Expressions[0].type.name != n.type.name) {
-                    ErrorList.Add("Collection contains both: " + node.Expressions[0].type + " and " + n.type);
+                if (node.type.name != n.type.name) {
+                    ErrorList.Add("Collection contains both: " + node.Expressions[0].type + " but collection is type " + node.type.name);
                 }
             });
         }
