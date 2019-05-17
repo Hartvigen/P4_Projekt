@@ -28,21 +28,18 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             node.Parameters.Expressions.ForEach(e=>e.Accept(this));
 
-            //We decorate the node with its type from the table
-            node.type = Table.FindReturnTypeOfFunction(node.Ident);
-
             //We check that parameter types match.
-            var l = Table.FindParameterListOfFunction(node.Ident);
+            var parameterList = Table.FindParameterListOfFunction(node.Ident);
 
             //If there is only one correct parameter list
-            if (l.Count == 1)
+            if (parameterList.Count == 1)
             {
-                var l1 = l[0];
-                for (var i = l.Count - 1; i > 0; i--)
+                var l1 = parameterList[0];
+                for (var i = parameterList.Count - 1; i > 0; i--)
                 {
                     if (node.Parameters.Expressions[i].type.name != l1[i].name)
                     {
-                        ErrorList.Add("Wrong parameter type for function " + node.Ident + " should be type: " + l[i] +
+                        ErrorList.Add("Wrong parameter type for function " + node.Ident + " should be type: " + parameterList[i] +
                                       " but was: " + node.Parameters.Expressions[i].type);
                     }
                 }
@@ -51,18 +48,23 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             else
             {
                 var validFound = false;
-                foreach (var baseTypes in l)
+                foreach (var parameters in parameterList)
                 {
                     validFound = true;
-                    for (var i = baseTypes.Count - 1; i > 0; i--)
+                    for (var i = parameters.Count - 1; i > 0; i--)
                     {
-                        if (node.Parameters.Expressions[i].type.name != baseTypes[i].name)
+                        if (node.Parameters.Expressions[i].type.name != parameters[i].name)
                         {
                             validFound = false;
                         }
                     }
-                    if (validFound)
-                        break;
+
+                    if (!validFound) continue;
+                    
+                    //We found a valid parameter list that it matches so given that parameter list and the function name
+                    //We find the return type
+                    node.type = Table.FindReturnTypeOfFunction(node.Ident, parameters);
+                    break;
                 }
                 if (!validFound)
                 {

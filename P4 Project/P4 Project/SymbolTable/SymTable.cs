@@ -119,10 +119,10 @@ namespace P4_Project.SymbolTable
             return _variables;
         }
 
-        public BaseType FindReturnTypeOfFunction(string functionName)
+        public BaseType FindReturnTypeOfFunction(string functionName, List<BaseType> parameters)
         {
             if (PreDefined.PreDefinedFunctions.Contains(functionName))
-                return PreDefined.FindReturnOfPreDefFunctions(functionName);
+                return PreDefined.FindReturnTypeOfPreDefFunctions(functionName, parameters);
             foreach (var s in InnerScopes) {
                 if(s.name == functionName)
                     return s.type;

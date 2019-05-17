@@ -233,7 +233,7 @@ namespace P4_Project
             }
         }
 
-        public static BaseType FindReturnOfPreDefFunctions(string name)
+        public static BaseType FindReturnTypeOfPreDefFunctions(string name, List<BaseType> parameters)
         {
             switch (name)
             {
@@ -246,6 +246,21 @@ namespace P4_Project
                 case "ClearAll": return new BaseType("none");
                 case "Print": return new BaseType("none");
                 case "AsText": return new BaseType("text");
+                case "Pop":
+                    switch (parameters[0].singleType.name)
+                    {
+                        case "vertex":
+                            return new BaseType("vertex");
+                        case "edge":
+                            return new BaseType("edge");
+                        case "number":
+                            return new BaseType("number");
+                        case "text":
+                            return new BaseType("text");
+                        case "boolean":
+                            return new BaseType("boolean");
+                        default: throw new Exception(parameters[0].singleType.name + " is not a valid type to Pop");
+                    }
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
