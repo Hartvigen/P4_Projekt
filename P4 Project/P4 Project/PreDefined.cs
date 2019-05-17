@@ -23,7 +23,8 @@ namespace P4_Project
                 "ClearEdges",
                "ClearAll",
                "Print",
-               "AsText"
+               "AsText",
+            "Add"
         };
 
         public static readonly List<string> PreDefinedAttributesVertex = new List<string>
@@ -147,6 +148,9 @@ namespace P4_Project
                     case "ClearAll":
                         ClearAll(executor);
                         break;
+                    case "Add":
+                        Add(parameters, executor);
+                        break;
                     default: throw new Exception("Missing implementation of the PreDefFunction: " + function);
                 }
             else throw new Exception(function + " is not a pre Defined Function!");
@@ -261,6 +265,7 @@ namespace P4_Project
                             return new BaseType("boolean");
                         default: throw new Exception(parameters[0].singleType.name + " is not a valid type to Pop");
                     }
+                case "Add": return new BaseType("none");
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
