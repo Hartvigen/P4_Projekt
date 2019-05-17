@@ -152,9 +152,21 @@ namespace P4_Project
             else throw new Exception(function + " is not a pre Defined Function!");
         }
 
-        private static void AsText(IReadOnlyList<Value> parameters, Executor executor) {
-            if (parameters[0].type.name == "number")
-                executor.currentValue = new Value("" + (double)parameters[0].o);
+        private static void AsText(IReadOnlyList<Value> parameters, Executor executor)
+        {
+            switch (parameters[0].type.name)
+            {
+                case "number":
+                    executor.currentValue = new Value("" + (double)parameters[0].o);
+                    break;
+                case "boolean": 
+                    executor.currentValue = new Value(((bool)parameters[0].o)? "true" : "false");
+                    break;
+                case "text":
+                    executor.currentValue = new Value("" + parameters[0].o);
+                    break;
+                default: throw new Exception(parameters[0].type.name + " is not supported in AsText!");
+            }
         }
         private static void Print(Executor executor)
         {
@@ -238,19 +250,24 @@ namespace P4_Project
             }
         }
 
-        public static List<BaseType> FindParameterListOfPreDefFunctions(string name)
+        public static List<List<BaseType>> FindListOfParameterLists(string name)
         {
             switch (name)
             {
-                case "GetEdge": return new List<BaseType> {new BaseType("vertex"), new BaseType("vertex")};
-                case "RemoveEdge": return new List<BaseType> {new BaseType("edge")};
-                case "RemoveVertex": return new List<BaseType> { new BaseType("vertex") };
-                case "GetEdges": return new List<BaseType>();
-                case "GetVertices": return new List<BaseType>();
-                case "ClearEdges": return new List<BaseType>();
-                case "ClearAll": return new List<BaseType>();
-                case "Print": return new List<BaseType>();
-                case "AsText": return new List<BaseType> { new BaseType("number") };
+                case "GetEdge": return new List<List<BaseType>>{new List<BaseType> {new BaseType("vertex"), new BaseType("vertex")}};
+                case "RemoveEdge": return new List<List<BaseType>>{new List<BaseType> {new BaseType("edge")}};
+                case "RemoveVertex": return new List<List<BaseType>>{new List<BaseType> { new BaseType("vertex") }};
+                case "GetEdges": return new List<List<BaseType>>{new List<BaseType>()};
+                case "GetVertices": return new List<List<BaseType>>{new List<BaseType>()};
+                case "ClearEdges": return new List<List<BaseType>>{new List<BaseType>()};
+                case "ClearAll": return new List<List<BaseType>>{new List<BaseType>()};
+                case "Print": return new List<List<BaseType>>{new List<BaseType>()};
+                case "AsText": return new List<List<BaseType>>
+                {
+                    new List<BaseType> { new BaseType("number") },
+                    new List<BaseType> { new BaseType("boolean") },
+                    new List<BaseType> { new BaseType("text") }
+                };
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }

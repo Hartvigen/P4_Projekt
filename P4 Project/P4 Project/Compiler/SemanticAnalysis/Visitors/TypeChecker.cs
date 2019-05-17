@@ -33,12 +33,42 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
             //We check that parameter types match.
             var l = Table.FindParameterListOfFunction(node.Ident);
-            for (var i = l.Count - 1; i > 0; i--) {
-                if (node.Parameters.Expressions[i].type.name != l[i].name) {
-                    ErrorList.Add("Wrong parameter type for function " + node.Ident + " should be type: " + l[i] + " but was: " + node.Parameters.Expressions[i].type);
+
+            //If there is only one correct parameter list
+            if (l.Count == 1)
+            {
+                var l1 = l[0];
+                for (var i = l.Count - 1; i > 0; i--)
+                {
+                    if (node.Parameters.Expressions[i].type.name != l1[i].name)
+                    {
+                        ErrorList.Add("Wrong parameter type for function " + node.Ident + " should be type: " + l[i] +
+                                      " but was: " + node.Parameters.Expressions[i].type);
+                    }
                 }
             }
-            
+            //If there are more than one parameter list (Overloading)
+            else
+            {
+                var validFound = false;
+                foreach (var baseTypes in l)
+                {
+                    validFound = true;
+                    for (var i = baseTypes.Count - 1; i > 0; i--)
+                    {
+                        if (node.Parameters.Expressions[i].type.name != baseTypes[i].name)
+                        {
+                            validFound = false;
+                        }
+                    }
+                    if (validFound)
+                        break;
+                }
+                if (!validFound)
+                {
+                    ErrorList.Add("No valid parameter set found for overloaded function: " + node.Ident);
+                }
+            }
         }
 
         //finds variable type, and returns the type.

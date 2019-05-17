@@ -135,16 +135,16 @@ namespace P4_Project.SymbolTable
             return PreDefined.PreDefinedFunctions.Contains(functionName) || _variables.ContainsKey(functionName);
         }
 
-        public List<BaseType> FindParameterListOfFunction(string functionName)
+        public List<List<BaseType>> FindParameterListOfFunction(string functionName)
         {
-            if (PreDefined.PreDefinedFunctions.Contains(functionName)) return PreDefined.FindParameterListOfPreDefFunctions(functionName);
+            if (PreDefined.PreDefinedFunctions.Contains(functionName)) return PreDefined.FindListOfParameterLists(functionName);
             //Complicated piece of code that can either find the function in its proper place or in variables because function is used in the cleaner before functions gets cleaned up.
             foreach (var s in InnerScopes)
             {
                 if (s.name != functionName) continue;
-                if (s.type != null) return s.type.parameterTypes;
+                if (s.type != null) return new List<List<BaseType>>{s.type.parameterTypes};
                 _variables.TryGetValue(functionName, out var o);
-                if (o != null) return o.Type.parameterTypes;
+                if (o != null) return new List<List<BaseType>>{o.Type.parameterTypes};
             }
             throw new Exception("Name " + functionName + " does not belong to a function.");
         }

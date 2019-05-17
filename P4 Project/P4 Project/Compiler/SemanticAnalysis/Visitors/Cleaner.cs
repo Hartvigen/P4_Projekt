@@ -38,9 +38,19 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             if (!Table.FunctionExists(node.Ident))
                 ErrorList.Add("The Call for: " + node.Ident + " is not a declared function and not a predefined function");
 
-            //2. Calls have the correct amount of parameters when calling 
-            if (node.Parameters.Expressions.Count != Table.FindParameterListOfFunction(node.Ident).Count)
-                ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " parameters and should have: " + Table.FindParameterListOfFunction(node.Ident).Count + " parameters");
+            //2. Calls have the correct amount of parameters when calling
+            var valid = false;
+            foreach (var baseTypes in Table.FindParameterListOfFunction(node.Ident))
+            {
+                if (node.Parameters.Expressions.Count != baseTypes.Count)
+                {
+                    continue;
+                }
+                valid = true;
+            }
+            
+            if (!valid)
+                ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " and should not.");
         }
         public override void Visit(VarNode node)
         {
