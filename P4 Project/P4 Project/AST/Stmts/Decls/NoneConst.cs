@@ -12,5 +12,10 @@ namespace P4_Project.AST.Stmts.Decls
         {
             vi.Visit(this);
         }
+
+        public override string ToString()
+        {
+            return "none";
+        }
     }
 }

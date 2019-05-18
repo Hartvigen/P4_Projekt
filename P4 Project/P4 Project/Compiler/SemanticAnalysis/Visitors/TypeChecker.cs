@@ -122,8 +122,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Expressions.ForEach(n =>
             {
                 n.Accept(this);
-                if (node.type.name != n.type.name) {
-                    ErrorList.Add("Collection contains both: " + node.Expressions[0].type + " but collection is type " + node.type.name);
+                if (node.type.singleType.name != n.type.name) {
+                    ErrorList.Add("Collection contains both: " + node.Expressions[0].type + " but collection is type " + node.type.singleType.name);
                 }
             });
         }

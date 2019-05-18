@@ -489,6 +489,8 @@ namespace P4_Project.Compiler.Interpreter
                     return true;
                 case ExeReturn:
                     return true;
+                case null:
+                    return false;
                 default: throw new Exception(_executionInterrupted + " is not a valid interrupt msg.");
             }
 

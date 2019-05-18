@@ -111,34 +111,40 @@ namespace P4_Project.Compiler.Interpreter
                     }
                     break;
                 case HashSet<object> l2:
-                    switch (l2.GetEnumerator())
+                    foreach (var o in l2)
                     {
-                        //case "Boolean": type = new BaseType(new BaseType("boolean"), new BaseType("list")); break;
-                        //case "Double": type = new BaseType(new BaseType("number"), new BaseType("list")); break;
-                        //case "String": type = new BaseType(new BaseType("text"), new BaseType("list")); break;
-                        //case "Vertex": type = new BaseType(new BaseType("vertex"), new BaseType("list")); break;
-                        //case "Edge": type = new BaseType(new BaseType("edge"), new BaseType("list")); break;
-                        default: break;
+                        switch (o.GetType().ToString())
+                        {
+                            case "System.Boolean": type = new BaseType(new BaseType("boolean"), new BaseType("set")); break;
+                            case "System.Double": type = new BaseType(new BaseType("number"), new BaseType("set")); break;
+                            case "System.String": type = new BaseType(new BaseType("text"), new BaseType("set")); break;
+                            case "P4_Project.Compiler.Interpreter.Types.Vertex": type = new BaseType(new BaseType("vertex"), new BaseType("set")); break;
+                            case "P4_Project.Compiler.Interpreter.Types.Edge": type = new BaseType(new BaseType("edge"), new BaseType("set")); break;
+                            default: break;
+                        }
+                        break;
                     }
                     break;
                 case Stack<object> l3:
                     switch (l3.GetEnumerator().Current)
                     {
-                        case bool _: type = new BaseType(new BaseType("stack"), new BaseType("boolean")); break;
-                        case double _: type = new BaseType(new BaseType("stack"), new BaseType("number")); break;
-                        case string _: type = new BaseType(new BaseType("stack"), new BaseType("text")); break;
-                        case Vertex _: type = new BaseType(new BaseType("stack"), new BaseType("vertex")); break;
-                        case Edge _: type = new BaseType(new BaseType("stack"), new BaseType("edge")); break;
+                        case "Boolean": type = new BaseType(new BaseType("boolean"), new BaseType("stack")); break;
+                        case "Double": type = new BaseType(new BaseType("number"), new BaseType("stack")); break;
+                        case "String": type = new BaseType(new BaseType("text"), new BaseType("stack")); break;
+                        case "Vertex": type = new BaseType(new BaseType("vertex"), new BaseType("stack")); break;
+                        case "Edge": type = new BaseType(new BaseType("edge"), new BaseType("stack")); break;
+                        default: break;
                     }
                     break;
                 case Queue<object> l4:
                     switch (l4.GetEnumerator().Current)
                     {
-                        case bool _: type = new BaseType(new BaseType("queue"), new BaseType("boolean")); break;
-                        case double _: type = new BaseType(new BaseType("queue"), new BaseType("number")); break;
-                        case string _: type = new BaseType(new BaseType("queue"), new BaseType("text")); break;
-                        case Vertex _: type = new BaseType(new BaseType("queue"), new BaseType("vertex")); break;
-                        case Edge _: type = new BaseType(new BaseType("queue"), new BaseType("edge")); break;
+                        case "Boolean": type = new BaseType(new BaseType("boolean"), new BaseType("queue")); break;
+                        case "Double": type = new BaseType(new BaseType("number"), new BaseType("queue")); break;
+                        case "String": type = new BaseType(new BaseType("text"), new BaseType("queue")); break;
+                        case "Vertex": type = new BaseType(new BaseType("vertex"), new BaseType("queue")); break;
+                        case "Edge": type = new BaseType(new BaseType("edge"), new BaseType("queue")); break;
+                        default: break;
                     }
                     break;
             }

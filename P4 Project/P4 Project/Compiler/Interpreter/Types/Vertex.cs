@@ -29,5 +29,10 @@ namespace P4_Project.Compiler.Interpreter.Types
                 attributes.Remove(ident);
             attributes.Add(ident, value);
         }
+
+        public override string ToString()
+        {
+            return identifier;
+        }
     }
 }

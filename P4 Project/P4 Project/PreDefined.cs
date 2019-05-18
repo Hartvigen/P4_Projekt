@@ -24,7 +24,8 @@ namespace P4_Project
                "ClearAll",
                "Print",
                "AsText",
-            "Add"
+            "Add",
+            "Terminal"
         };
 
         public static readonly List<string> PreDefinedAttributesVertex = new List<string>
@@ -151,6 +152,9 @@ namespace P4_Project
                     case "Add":
                         Add(parameters, executor);
                         break;
+                    case "Terminal":
+                        Terminal(parameters, executor);
+                        break;
                     default: throw new Exception("Missing implementation of the PreDefFunction: " + function);
                 }
             else throw new Exception(function + " is not a pre Defined Function!");
@@ -237,6 +241,36 @@ namespace P4_Project
             }
         }
 
+        private static void Terminal(IReadOnlyList<Value> parameters, Executor executor)
+        {
+            Console.WriteLine(parameters[0].o.ToString());
+        }
+
+        private static void Add(IReadOnlyList<Value> parameters, Executor executor)
+        {
+            switch (parameters[0].type.collectionType.name)
+            {
+                case "list":
+                    (parameters[0].o as List<object>).Add(parameters[1].o);
+                    foreach (object o in (parameters[0].o as List<object>))
+                    {
+                        Console.WriteLine(o.ToString());
+                    }
+                    break;
+                case "set":
+                    (parameters[0].o as HashSet<object>).Add(parameters[1].o);
+                    foreach (object o in (parameters[0].o as HashSet<object>))
+                    {
+                        Console.WriteLine(o.ToString());
+                    }
+
+                    break;
+                default:
+                    throw new Exception("Add only works with collections of type list or set");
+            }
+
+        }
+
         public static BaseType FindReturnTypeOfPreDefFunctions(string name, List<BaseType> parameters)
         {
             switch (name)
@@ -249,6 +283,7 @@ namespace P4_Project
                 case "ClearEdges": return new BaseType("none");
                 case "ClearAll": return new BaseType("none");
                 case "Print": return new BaseType("none");
+                case "Terminal": return new BaseType("none");
                 case "AsText": return new BaseType("text");
                 case "Pop":
                     switch (parameters[0].singleType.name)
@@ -270,25 +305,7 @@ namespace P4_Project
             }
         }
         
-        private static void Add(IReadOnlyList<Value> parameters, Executor executor)
-        {
-            if(parameters.Count != 2)
-            {
-                throw new Exception("Add requires two parameters");
-            }
-            Console.WriteLine(parameters[0].type.collectionType.name);
-            switch(parameters[0].type.collectionType.name)
-            {
-                case "list":
-                    
-                    break;
-                case "set":
-                    Console.WriteLine("It is called a set, not a match!");
-                    break;
-                default:
-                    throw new Exception("Add only works with collections of type list or set");
-            }
-        }
+        
 
         public static List<List<BaseType>> FindListOfParameterLists(string name)
         {
@@ -302,11 +319,29 @@ namespace P4_Project
                 case "ClearEdges": return new List<List<BaseType>>{new List<BaseType>()};
                 case "ClearAll": return new List<List<BaseType>>{new List<BaseType>()};
                 case "Print": return new List<List<BaseType>>{new List<BaseType>()};
+                case "Terminal": return new List<List<BaseType>> { new List<BaseType> { new BaseType("text") } };
                 case "AsText": return new List<List<BaseType>>
                 {
                     new List<BaseType> { new BaseType("number") },
                     new List<BaseType> { new BaseType("boolean") },
                     new List<BaseType> { new BaseType("text") }
+                };
+                case "Add": return new List<List<BaseType>>
+                {
+                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")), new BaseType("number")},
+                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")), new BaseType("boolean")},
+                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")), new BaseType("text")},
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("vertex")},
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("edge")},
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("none")},
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("none")},
+                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")), new BaseType("number")},
+                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")), new BaseType("boolean")},
+                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")), new BaseType("text")},
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("vertex")},
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("edge")},
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("none")},
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("none")}
                 };
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }

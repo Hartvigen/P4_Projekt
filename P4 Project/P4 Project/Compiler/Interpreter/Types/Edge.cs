@@ -37,5 +37,26 @@ namespace P4_Project.Compiler.Interpreter.Types
                 return true;
             else return false;
         }
+
+        public override string ToString()
+        {
+            string op;
+            switch (opera)
+            {
+                case 16:
+                    op = "<-";
+                    break;
+                case 17:
+                    op = "--";
+                    break;
+                case 18:
+                    op = "->";
+                    break;
+                default:
+                    throw new System.Exception("Edge from " + from.ToString() + " to " + to.ToString() + " contains an invalid edge type");
+
+            }
+            return from.ToString() + " " + op + " " + to.ToString();
+        }
     }
 }
