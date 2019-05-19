@@ -12,63 +12,62 @@ namespace P4_Project
 {
     public static class Program
     {
+        const string defaultFile = "MAGIAFile.txt";
         private static Parser _parser;
+
+
         public static void Main(string[] args)
         {
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            const string defaultFile = "MAGIAFile.txt";
             //Uncomment these lines if you wanna play with the program            
             Console.WriteLine("Doing custom work!");
-            var customArgs = new string[2];
-            args = customArgs;
-            args[0] = "-c";
-            args[1] = defaultFile;
+            args = new string[] { "-c", defaultFile };
 
             if (args.Length > 0)
             {
                 if (!TryParse(args[1]))
                 {
                     Console.WriteLine("Couldn't even parse the file!");
-                }else
-                    switch (args[0])
-                {
-                    case "-c":
-                    case "--compile":
-                        Console.WriteLine("Doing a complete compile on " + args[1]);
-                        _parser.tab.name = "top";
-                        var list = new List<Visitor> {new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new Executor(_parser.tab)};
-                        Console.WriteLine(ApplyVisitors(list,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
-                        break;
-                    case "-h":
-                    case "--help":
-                        Console.WriteLine("Compile file: MagiaC.exe [filePath]");
-                        Console.WriteLine("For help: MagiaC.exe -h || MagiaC.exe --help");
-                        Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath] || MagiaC.exe --prettyprint [filepath]");
-                        Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath] || --xmlprint [filepath]");
-                        Console.WriteLine("Create Test Png: MagiaC.exe -t || MagiaC.exe --test");
-                        Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defaultFile + "\" in its directory and compile compile that.");
-                        break;
-                    case "-p":
-                    case "--prettyprint":
-                        _parser.tab.name = "top";
-                        var list1 = new List<Visitor> { new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new PrettyPrinter() };
-                        Console.WriteLine(ApplyVisitors(list1,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
-                        break;
-                    case "-x":
-                    case "--xmlprint":
-                        Console.WriteLine("Parsing input file and printing XML: " + args[1]);
-                        Console.WriteLine(ApplyVisitors(new List<Visitor>{new XmlTreeBuilder()},args[1]) ? "Compile succeeded!" : "Compile failed!");
-                        break;
-                    case "-t":
-                    case "--test":
-                        Console.WriteLine("Printing test png called: test.png ");
-                        Console.WriteLine(DotToPng.CreatePngFile() ? "print succeeded!" : "print failed!");
-                        break;
-                    default:
-                        Console.WriteLine("Parsing input file: " + args[0]);
-                        Console.WriteLine(TryParse(args[0]) ? "Compile succeeded!" : "Compile failed!");
-                        break;
                 }
+                else
+                    switch (args[0])
+                    {
+                        case "-c":
+                        case "--compile":
+                            Console.WriteLine("Doing a complete compile on " + args[1]);
+                            _parser.tab.name = "top";
+                            var list = new List<Visitor> {new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new Executor(_parser.tab)};
+                            Console.WriteLine(ApplyVisitors(list,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
+                            break;
+                        case "-h":
+                        case "--help":
+                            Console.WriteLine("Compile file: MagiaC.exe [filePath]");
+                            Console.WriteLine("For help: MagiaC.exe -h || MagiaC.exe --help");
+                            Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath] || MagiaC.exe --prettyprint [filepath]");
+                            Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath] || --xmlprint [filepath]");
+                            Console.WriteLine("Create Test Png: MagiaC.exe -t || MagiaC.exe --test");
+                            Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defaultFile + "\" in its directory and compile compile that.");
+                            break;
+                        case "-p":
+                        case "--prettyprint":
+                            _parser.tab.name = "top";
+                            var list1 = new List<Visitor> { new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new PrettyPrinter() };
+                            Console.WriteLine(ApplyVisitors(list1,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
+                            break;
+                        case "-x":
+                        case "--xmlprint":
+                            Console.WriteLine("Parsing input file and printing XML: " + args[1]);
+                            Console.WriteLine(ApplyVisitors(new List<Visitor>{new XmlTreeBuilder()},args[1]) ? "Compile succeeded!" : "Compile failed!");
+                            break;
+                        case "-t":
+                        case "--test":
+                            Console.WriteLine("Printing test png called: test.png ");
+                            Console.WriteLine(DotToPng.CreatePngFile() ? "print succeeded!" : "print failed!");
+                            break;
+                        default:
+                            Console.WriteLine("Parsing input file: " + args[0]);
+                            Console.WriteLine(TryParse(args[0]) ? "Compile succeeded!" : "Compile failed!");
+                            break;
+                    }
             }
             else if (File.Exists(defaultFile))
             {
@@ -129,7 +128,9 @@ namespace P4_Project
 
             if(str.Length * 2 + i != j)
                 Console.WriteLine(separator + vi.GetType().Name + separator + "-");
-            else Console.WriteLine(separator + vi.GetType().Name + separator);
+            else 
+                Console.WriteLine(separator + vi.GetType().Name + separator);
+
             vi.ErrorList.ForEach(Console.WriteLine);
         }
     }
