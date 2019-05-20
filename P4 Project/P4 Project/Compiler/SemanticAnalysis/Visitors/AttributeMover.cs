@@ -131,10 +131,6 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             {
                 //Add default attributes
                 case "vertex":
-                    PreDefined.PreDefinedAttributesVertex.ForEach(va =>
-                    {
-                        Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0));
-                    });
                     //Add user defined attributes
                     node.attrDeclBlock.Statements.ForEach(s => {
                         var v = (VarDeclNode)s;
@@ -144,10 +140,6 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     });
                     break;
                 case "edge":
-                    PreDefined.PreDefinedAttributesEdge.ForEach(va =>
-                    {
-                        Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0));
-                    });
                     //Add user defined attributes
                     node.attrDeclBlock.Statements.ForEach(s => {
                         var v = (VarDeclNode)s;
@@ -187,8 +179,16 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             //Creates a scope just for header attributes
             var v = new SymTable(null, null, " ") {header = true};
             Table.vertexAttr = v;
+            PreDefined.PreDefinedAttributesVertex.ForEach(va =>
+            {
+                Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0));
+            });
             var e = new SymTable(null, null, " ") {header = true};
             Table.edgeAttr = e;
+            PreDefined.PreDefinedAttributesEdge.ForEach(va =>
+            {
+                Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0));
+            });
             node.block.Accept(this);
         }
 
