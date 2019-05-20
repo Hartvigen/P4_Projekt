@@ -10,6 +10,14 @@ using P4_Project.SymbolTable;
 
 namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
+
+    //The typechecker is responsbile for:
+    //1. Assigning variables a type when they are declared
+    //2. Assuring that each expression in a collection is of the same type as the collection itself
+    //3. Assuring that an edge can only be declared between two 
+    //4. Ensure given parameters to a function are of the correct types
+    //5. Ensuring we call the right version of a function in case of overloading
+    //6  Ensure that when a variable is assigned a value, it is of the same type as the variable
     public sealed class TypeChecker : Visitor
     {
         public override string AppropriateFileName { get; } = "symbolInfo.txt";
