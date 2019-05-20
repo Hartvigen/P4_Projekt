@@ -44,7 +44,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             node.Source?.Accept(this);
 
-            //If the Source (and type of) is not null this must be an attribute of the source type  
+            //If the Source is not null this must be an attribute of the source type  
             if (node.Source != null)
             {
                 if (ActiveScope.Find(node.Source.Ident) == null)
@@ -53,15 +53,18 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     return;
                 }
 
+                // If node does not contain the type of the variable, load that type into the node
                 if (node.Source.type == null)
                     node.Source.type = ActiveScope.Find(node.Source.Ident).Type;
 
+                // Check if 'node.Ident' is a valid atribute in the type denoded by 'node.Source.type.name'
                 if (!Table.IsAttribute(node.Source.type.name, node.Ident))
                     ErrorList.Add(node.Ident + " is not a valid attribute of: " + node.Source.type.name);
+
                 return;
             }
 
-            //If the source (or type of) is null we have to able to find the declaration in the scope and already reached! 
+            //If the source is null we have to able to find the declaration in the scope and already reached! 
             if (ActiveScope.Find(node.Ident) == null)
                 ErrorList.Add($"'{node.Ident}' is not in the scope!");
             else if (!ActiveScope.Find(node.Ident).Type.reached)
@@ -110,16 +113,15 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.RightSide.ForEach(t => {
                 t.Item1.Accept(this);
                 t.Item2.ForEach(s => {
-                    if (s.GetType() != typeof(AssignNode)) return;
-                    var a = s;
                     //We dont care about the right side of the assign it must still be valid according to all scope rules 
-                    a.Value.Accept(this);
+                    s.Value.Accept(this);
+
                     //We find the header scope for edge and if the attribute is not there it is invalid. 
                     Table.GetScopes().ForEach(h =>
                     {
-                        if (!h.header || h.name != "edge") return;
-                        if (h.Find(a.Target.Ident) == null && !PreDefined.PreDefinedAttributesEdge.Contains(a.Target.Ident))
-                            ErrorList.Add(a.Target.Ident + " is not a valid attribute for edge");
+                        if (h.header && h.name == "edge")
+                            if (h.Find(s.Target.Ident) == null && !PreDefined.PreDefinedAttributesEdge.Contains(s.Target.Ident))
+                                ErrorList.Add(s.Target.Ident + " is not a valid attribute for edge");
                     });
                 });
             });
@@ -137,9 +139,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             node.DefaultValue?.Accept(this);
 
-            if (ActiveScope.Find(node.SymbolObject.Name).Type is null)
-                ActiveScope.Find(node.SymbolObject.Name).Type = node.type;
-
+            Obj obj = ActiveScope.Find(node.SymbolObject.Name);
+            if (obj.Type is null)
+                obj.Type = node.type;
 
             //It is marked that this declaration has been reached! 
             ActiveScope.Find(node.SymbolObject.Name).Type.reached = true;
@@ -152,11 +154,12 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     if (s.GetType() == typeof(AssignNode))
                     {
                         AssignNode a = (AssignNode)s;
+
                         //We dont care about the right side of the assign it must still be valid according to all scope rules 
                         a.Value.Accept(this);
 
                         //We find the header scope for vertex and if the attribute is not there it is invalid. 
-                        if(!Table.vertexAttr.GetDic().ContainsKey(a.Target.Ident) && !PreDefined.PreDefinedAttributesVertex.Contains(a.Target.Ident))
+                        if(!Table.vertexAttr.GetVariables().ContainsKey(a.Target.Ident) && !PreDefined.PreDefinedAttributesVertex.Contains(a.Target.Ident))
                             ErrorList.Add(a.Target.Ident + " is not a valid attribute for vertex");
                     }
                 });

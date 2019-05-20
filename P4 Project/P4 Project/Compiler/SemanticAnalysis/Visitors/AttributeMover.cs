@@ -23,9 +23,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         private SymTable Table { get; }
+
+
         public AttributeMover(SymTable table) {
             Table = table;
         }
+
+
         public override void Visit(CallNode node)
         {
             node.Parameters.Accept(this);
@@ -75,12 +79,12 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(FuncDeclNode node)
         {
-            //1. Remove the function "SymbolObject" and set it as type on function scope.
+            //1. Remove the function "SymbolObject" from the list of symbols, but register type info in the function's scope.
             Table.GetScopes().ForEach(s => {
                 if (s.name == node.SymbolObject.Name)
                 {
-                    s.type = node.SymbolObject.Type;
-                    Table.RemoveObj(node.SymbolObject);
+                    s.type = node.SymbolObject.Type;    // Save function type in scope
+                    Table.RemoveObj(node.SymbolObject); // Remove function symbol
                 }
             });
             node.Parameters.Accept(this);
@@ -135,8 +139,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     node.attrDeclBlock.Statements.ForEach(s => {
                         var v = (VarDeclNode)s;
                         Table.vertexAttr.AddObj(v.SymbolObject);
-                        if(Table.GetDic().ContainsKey(v.SymbolObject.Name))
-                            Table.RemoveObj(v.SymbolObject);
+                        Table.RemoveObj(v.SymbolObject);
                     });
                     break;
                 case "edge":
@@ -147,7 +150,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                         Table.RemoveObj(v.SymbolObject);
                     });
                     break;
-                default: throw new Exception(node.type.name + " is not a valid type for a HeadNode");
+                default: 
+                    throw new Exception($"The type '{node.type.name}' is not a valid type for a HeadNode");
             }
         }
 
@@ -177,18 +181,18 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(Magia node)
         {
             //Creates a scope just for header attributes
-            var v = new SymTable(null, null, " ") {header = true};
-            Table.vertexAttr = v;
+            Table.vertexAttr = new SymTable(null, null, " ") { header = true };
             PreDefined.PreDefinedAttributesVertex.ForEach(va =>
             {
                 Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0));
             });
-            var e = new SymTable(null, null, " ") {header = true};
-            Table.edgeAttr = e;
+
+            Table.edgeAttr = new SymTable(null, null, " ") { header = true };
             PreDefined.PreDefinedAttributesEdge.ForEach(va =>
             {
                 Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0));
             });
+
             node.block.Accept(this);
         }
 

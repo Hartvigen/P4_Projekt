@@ -77,9 +77,6 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 				}
 			}
 
-
-
-
 			switch (node.type)
             {
                 case null when node.Source != null:
@@ -96,9 +93,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(BoolConst node)
         {
             if (node.type is null)
-            {
                 node.type = new BaseType("boolean");
-            }
             else if (node.type.name != "boolean")
                 ErrorList.Add("BoolConst is always type boolean but was found to be of type: " + node.type.name);
         }
@@ -109,8 +104,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             //If the Collection contains no elements it is type correct no matter what.
             if (node.Expressions.Count == 0)
                 return;
-            
-            
+
             //We check that each Expression in the Collection evaluates to the same type as the collection.
             node.Expressions.ForEach(n =>
             {
@@ -125,9 +119,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(NoneConst node)
         {
             if (node.type is null)
-            {
                 node.type = new BaseType("none");
-            }
             else if (node.type.name != "none")
                 ErrorList.Add("NoneConst is always type none but was found to be type: " + node.type.name);
         }
@@ -136,9 +128,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(NumConst node)
         {
             if(node.type is null)
-            {
                 node.type = new BaseType("number");
-            }
             else if (node.type.name != "number")
                     ErrorList.Add("NumConst is always type number but was found to be type: " + node.type.name);
         }
@@ -147,9 +137,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(TextConst node)
         {
             if (node.type is null)
-            {
                 node.type = new BaseType("text");
-            }
             if (node.type.name != "text")
                 ErrorList.Add("TextConst is always type text but was found to be type: " + node.type.name);
         }
@@ -276,7 +264,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     var a = (AssignNode)s;
                     a.Value.Accept(this);
                     //We find the header scope for vertex and if the attribute is not there it is invalid.
-                    Table.vertexAttr.GetDic().TryGetValue(a.Target.Ident, out Obj o);
+                    Table.vertexAttr.GetVariables().TryGetValue(a.Target.Ident, out Obj o);
                     if(o != null && o.Type.name != a.Value.type.name)
                         ErrorList.Add(o.Name + " is type " + o.Type.name + " cannot be assigned type: " + a.Value.type.name);
                 });
@@ -418,9 +406,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(ContinueNode node)
         {
         }
-        public override void Visit(MultiDecl multiDecl)
+        public override void Visit(MultiDecl node)
         {
-            multiDecl.Decls.ForEach(n => n.Accept(this));
+            node.Decls.ForEach(n => n.Accept(this));
         }
 
         private void LeaveThisScope()

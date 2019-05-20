@@ -114,7 +114,7 @@ namespace P4_Project.SymbolTable
         }
 
         // return the dictionary
-        public Dictionary<string, Obj> GetDic()
+        public Dictionary<string, Obj> GetVariables()
         {
             return _variables;
         }
@@ -134,7 +134,7 @@ namespace P4_Project.SymbolTable
 
         public bool FunctionExists(string functionName)
         {
-            return PreDefined.PreDefinedFunctions.Contains(functionName) || _variables.ContainsKey(functionName);
+            return PreDefined.PreDefinedFunctions.Contains(functionName) || InnerScopes.Exists(scp => scp.name == functionName);
         }
 
         public List<List<BaseType>> FindParameterListOfFunction(string functionName)

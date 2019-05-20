@@ -63,6 +63,7 @@ namespace P4_Project.Compiler.Interpreter
                 _functions.Add(f.SymbolObject.Name, f);
             }
         }
+
         private void CreateNewVertex(DeclNode vertex)
         {
             //The vertex is created
@@ -74,6 +75,7 @@ namespace P4_Project.Compiler.Interpreter
             scene.Add(v);
             _currentScope.CreateVar(v.identifier,new Value(v));
         }
+
         private void CreateNewEdge(EdgeCreateNode edge)
         {
             _currentScope.TryGetValue(edge.LeftSide.Ident, out var v);
@@ -101,11 +103,11 @@ namespace P4_Project.Compiler.Interpreter
         private void MoveAttrDefinitions()
         {
             if (Table.vertexAttr is null) return;
-                foreach (var v in Table.vertexAttr.GetDic())
+                foreach (var v in Table.vertexAttr.GetVariables())
                     _defVertexAttr.Add(v.Key, v.Value.Type);
             
             if (Table.edgeAttr is null) return;
-                foreach (var v in Table.edgeAttr.GetDic())
+                foreach (var v in Table.edgeAttr.GetVariables())
                     _defEdgeAttr.Add(v.Key, v.Value.Type);
         }
 

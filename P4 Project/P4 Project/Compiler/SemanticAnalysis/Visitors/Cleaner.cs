@@ -123,6 +123,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 });
                 if (retExists)
                     return;
+
                 ErrorList.Add($"Function '{node.SymbolObject.Name}' has no return statement in its body and is not declared to return none!");
             }
         }
