@@ -284,16 +284,17 @@ namespace P4_Project
             switch (parameters[0].type.collectionType.name)
             {
                 case "list":
-                    executor.currentValue = new Value((parameters[0].o as List<object>).Count);
+
+                    executor.currentValue = new Value( (double)(parameters[0].o as List<object>).Count);
                     break;
                 case "set":
-                    executor.currentValue = new Value((parameters[0].o as HashSet<object>).Count);
+                    executor.currentValue = new Value((double)(parameters[0].o as HashSet<object>).Count);
                     break;
                 case "stack":
-                    executor.currentValue = new Value((parameters[0].o as Stack<object>).Count);
+                    executor.currentValue = new Value((double)(parameters[0].o as Stack<object>).Count);
                     break;
                 case "queue":
-                    executor.currentValue = new Value((parameters[0].o as Queue<object>).Count);
+                    executor.currentValue = new Value((double)(parameters[0].o as Queue<object>).Count);
                     break;
                 default: throw new Exception(parameters[0].o.ToString() + " has an unknown collection type.");
             };            
@@ -340,7 +341,7 @@ namespace P4_Project
         {
             Vertex from = (parameters[0].o as Vertex);
             
-            List<Vertex> adjacentList = new List<Vertex>();
+            List<object> adjacentList = new List<object>();
             foreach(Edge adj in from.edges)
             {
                 adjacentList.Add(adj.to);

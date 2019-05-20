@@ -58,7 +58,7 @@ namespace P4_Project.Compiler.Interpreter
         }
 
         private void SetObjectAndType(object v)
-        {
+        {         
             switch (TypeMap[v.GetType()])
             {
                 case 0: type = new BaseType("none"); break;
