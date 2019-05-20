@@ -232,12 +232,12 @@ namespace P4_Project
          * Implementation of general pre-defined functions
          */
 
-        private static void Print(Executor executor)
+        private static void Print(Interpreter executor)
         {
             DotToPng.CreatePngFileFromScene(executor.scene);
         }
 
-        private static void AsText(IReadOnlyList<Value> parameters, Executor executor)
+        private static void AsText(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             switch (parameters[0].type.name)
             {
@@ -254,7 +254,7 @@ namespace P4_Project
             }
         }
 
-        private static void Terminal(IReadOnlyList<Value> parameters, Executor executor)
+        private static void Terminal(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             Console.WriteLine(parameters[0].o.ToString());
         }
@@ -263,7 +263,7 @@ namespace P4_Project
         * Implementation of collection pre-defined functions
         */
 
-        private static void Add(IReadOnlyList<Value> parameters, Executor executor)
+        private static void Add(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             switch (parameters[0].type.collectionType.name)
             {
@@ -279,7 +279,7 @@ namespace P4_Project
 
         }
 
-        private static void Size(IReadOnlyList<Value> parameters, Executor executor)
+        private static void Size(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             switch (parameters[0].type.collectionType.name)
             {
@@ -304,7 +304,7 @@ namespace P4_Project
         */
 
        
-        private static void GetEdge(List<Value> parameters, Executor executor)
+        private static void GetEdge(List<Value> parameters, Interpreter executor)
         {
             var v1 = (Vertex)parameters[0].o;
             var v2 = (Vertex)parameters[1].o;
@@ -318,7 +318,7 @@ namespace P4_Project
             }
         }
 
-        private static void GetVertices(Executor executor)
+        private static void GetVertices(Interpreter executor)
         {
             executor.currentValue = null;
             var vertexList = new List<Vertex>();
@@ -327,7 +327,7 @@ namespace P4_Project
             executor.currentValue = new Value(vertexList);
         }
 
-        private static void GetEdges(Executor executor)
+        private static void GetEdges(Interpreter executor)
         {
             executor.currentValue = null;
             var edgeList = new List<Edge>();
@@ -336,7 +336,7 @@ namespace P4_Project
             executor.currentValue = new Value(edgeList);
         }
 
-        private static void GetAdjacent(IReadOnlyList<Value> parameters, Executor executor)
+        private static void GetAdjacent(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             Vertex from = (parameters[0].o as Vertex);
             
@@ -349,12 +349,12 @@ namespace P4_Project
             executor.currentValue = new Value(adjacentList);
         }
 
-        private static void RemoveVertex(IReadOnlyList<Value> parameters, Executor executor)
+        private static void RemoveVertex(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             executor.scene.Remove((Vertex)parameters[0].o);
         }
 
-        private static void RemoveEdge(List<Value> parameters, Executor executor)
+        private static void RemoveEdge(List<Value> parameters, Interpreter executor)
         {
             var eRemove = (Edge)parameters[0].o;
             foreach (var v in executor.scene)
@@ -368,12 +368,12 @@ namespace P4_Project
             }
         }
 
-        private static void ClearEdges(Executor executor)
+        private static void ClearEdges(Interpreter executor)
         {
             executor.scene.ForEach(v => v.edges.Clear());
         }
 
-        private static void ClearAll(Executor executor)
+        private static void ClearAll(Interpreter executor)
         {
             executor.scene.Clear();
         }
