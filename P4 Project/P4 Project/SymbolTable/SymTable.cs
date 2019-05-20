@@ -123,10 +123,12 @@ namespace P4_Project.SymbolTable
         {
             if (PreDefined.PreDefinedFunctions.Contains(functionName))
                 return PreDefined.FindReturnTypeOfPreDefFunctions(functionName, parameters);
+
             foreach (var s in InnerScopes) {
                 if(s.name == functionName)
                     return s.type;
             }
+
             throw new Exception("Name " + name + " does not belong to a function.");
         }
 

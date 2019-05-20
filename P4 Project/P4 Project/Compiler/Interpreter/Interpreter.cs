@@ -14,7 +14,7 @@ using P4_Project.SymbolTable;
 
 namespace P4_Project.Compiler.Interpreter
 {
-    public sealed class Executor : Visitor
+    public sealed class Interpreter : Visitor
     {
         //This is the given information.
         //That will be used to execute the entire program.
@@ -46,12 +46,14 @@ namespace P4_Project.Compiler.Interpreter
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
 
-        public Executor(SymTable table)
+
+        public Interpreter(SymTable table)
         {
             Table = table;
             _currentScope = _mainScope;
             MoveAttrDefinitions();
         }
+
 
         private void MoveFunctions(Magia node)
         {
@@ -152,7 +154,7 @@ namespace P4_Project.Compiler.Interpreter
             }
             else
             {
-                var o = DecodeReference(node.Source); // Yes, we need the source, in order to change the attribute inside the source
+                var o = (DecodeReference(node.Source) as Value).o; // Yes, we need the source, in order to change the attribute inside the source
                 switch (o)
                 {
                     case Vertex vertex:
@@ -165,8 +167,9 @@ namespace P4_Project.Compiler.Interpreter
                     case Edge e:
                         currentValue = e.attributes[node.Ident];
                         break;
+
                     default:
-                        throw new Exception($"Tried to access attribute {node.Ident} in type that is not vertex or edge.");
+                        throw new Exception($"Tried to access attribute '{node.Ident}' in type that is not vertex or edge.");
                 }
             }
 
@@ -174,9 +177,9 @@ namespace P4_Project.Compiler.Interpreter
                 throw new Exception("current value cannot be null after var node");
         }
 
-        public override void Visit(MultiDecl multiDecl)
+        public override void Visit(MultiDecl node)
         {
-            multiDecl.Decls.ForEach(d => d.Accept(this));
+            node.Decls.ForEach(d => d.Accept(this));
         }
 
 
@@ -204,15 +207,15 @@ namespace P4_Project.Compiler.Interpreter
                     adder = obj => { (collec as Queue<object>)?.Enqueue(obj); };
                     break;
                 default:
-                    throw new Exception(node.type.collectionType.name + " is not a collection type in magia!");
+                    throw new Exception(node.type.collectionType.name + " is not a collection type in MAGIA!");
             }
-             
 
             foreach (var n in node.Expressions)
             {
                 n.Accept(this);
                 adder(currentValue.o);
             }
+
             currentValue = new Value(collec);
             currentValue.type = node.type;
         }
@@ -253,7 +256,8 @@ namespace P4_Project.Compiler.Interpreter
                 case Operators.Greater:
                     currentValue = new Value(((double)v1.o > (double)v2.o));
                     break;
-                default: throw new Exception(Operators.GetCodeFromInt(node.OperatorType) + " has not been implemented!");
+                default: 
+                    throw new Exception($"Operator '{Operators.GetCodeFromInt(node.OperatorType)}' has not been implemented!");
             }
         }
             
@@ -344,13 +348,22 @@ namespace P4_Project.Compiler.Interpreter
         {
             if (currentSource.Source == null)
             {
-                _currentScope.TryGetValue(currentSource.Ident, out var v);
-                return v.o;
+                if (currentSource is CallNode)
+                {
+                    currentSource.Accept(this);
+                    return currentValue;
+                }
+                else 
+                {
+                    _currentScope.TryGetValue(currentSource.Ident, out var v);
+                    return v.o;
+                }
+
             }
             
             var vtxOrEdge = DecodeReference(currentSource.Source);
 
-            switch (vtxOrEdge)
+            switch ((vtxOrEdge as Value).o)
             {
                 case Vertex vertex:
                     return vertex.attributes[currentSource.Ident];
@@ -359,7 +372,7 @@ namespace P4_Project.Compiler.Interpreter
             }
             
 
-            throw new Exception($"Tried to access attribute {currentSource.Ident} in type that is not vertex or edge.");
+            throw new Exception($"Tried to access attribute '{currentSource.Ident}' in type that is not vertex or edge.");
         }
 
         public override void Visit(BlockNode node)

@@ -25,19 +25,21 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         public SymTable Table { get; }
-        private SymTable _activeScope;
+        private SymTable ActiveScope { get; set; }
+
+
         public ScopeChecker(SymTable table)
         {
             Table = table;
-            _activeScope = table;
+            ActiveScope = table;
         }
+
 
         public override void Visit(CallNode node)
         {
-            
-            node.Parameters.Accept(this);
-            
+            node.Parameters.Accept(this);   
         }
+
         public override void Visit(VarNode node)
         {
             node.Source?.Accept(this);
@@ -45,14 +47,14 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             //If the Source (and type of) is not null this must be an attribute of the source type  
             if (node.Source != null)
             {
-                if (_activeScope.Find(node.Source.Ident) == null)
+                if (ActiveScope.Find(node.Source.Ident) == null)
                 {
                     ErrorList.Add(node.Source.Ident + " has no declaration in scope.");
                     return;
                 }
 
                 if (node.Source.type == null)
-                    node.Source.type = _activeScope.Find(node.Source.Ident).Type;
+                    node.Source.type = ActiveScope.Find(node.Source.Ident).Type;
 
                 if (!Table.IsAttribute(node.Source.type.name, node.Ident))
                     ErrorList.Add(node.Ident + " is not a valid attribute of: " + node.Source.type.name);
@@ -60,11 +62,10 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             }
 
             //If the source (or type of) is null we have to able to find the declaration in the scope and already reached! 
-            if (_activeScope.Find(node.Ident) == null)
-            {
-                ErrorList.Add(node.Ident + " is not in the scope!");
-            }else if(!_activeScope.Find(node.Ident).Type.reached)
-                ErrorList.Add(node.Ident + " in the scope but not declared before use!");
+            if (ActiveScope.Find(node.Ident) == null)
+                ErrorList.Add($"'{node.Ident}' is not in the scope!");
+            else if (!ActiveScope.Find(node.Ident).Type.reached)
+                ErrorList.Add($"'{node.Ident}' is in the scope, but not declared before use!");
         }
 
         public override void Visit(BoolConst node)
@@ -94,17 +95,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(BinExprNode node)
         {
-            
             node.Left.Accept(this);
             node.Right.Accept(this);
-            
         }
 
         public override void Visit(UnaExprNode node)
         {
-            
             node.Expr.Accept(this);
-            
         }
 
         public override void Visit(EdgeCreateNode node)
@@ -140,12 +137,12 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             node.DefaultValue?.Accept(this);
 
-            if (_activeScope.Find(node.SymbolObject.Name).Type is null)
-                _activeScope.Find(node.SymbolObject.Name).Type = node.type;
+            if (ActiveScope.Find(node.SymbolObject.Name).Type is null)
+                ActiveScope.Find(node.SymbolObject.Name).Type = node.type;
 
 
             //It is marked that this declaration has been reached! 
-            _activeScope.Find(node.SymbolObject.Name).Type.reached = true;
+            ActiveScope.Find(node.SymbolObject.Name).Type.reached = true;
         }
         public override void Visit(VertexDeclNode node)
         {
@@ -166,7 +163,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             }
 
             //The vertex has not been reached so we set reached to true 
-            _activeScope.Find(node.SymbolObject.Name).Type.reached = true;
+            ActiveScope.Find(node.SymbolObject.Name).Type.reached = true;
         }
 
         public override void Visit(AssignNode node)
@@ -252,12 +249,12 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         private void LeaveThisScope()
         {
-            _activeScope = _activeScope.CloseScope();
+            ActiveScope = ActiveScope.CloseScope();
         }
 
         private void EnterNextScope()
         {
-            _activeScope = _activeScope.EnterNextScope();
+            ActiveScope = ActiveScope.EnterNextScope();
         }
 
         private void EnterFunction(string name)
@@ -265,14 +262,14 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             Table.GetScopes().ForEach(s => {
                 if (s.name == name)
                 {
-                    _activeScope = s;
+                    ActiveScope = s;
                 }
             });
         }
 
         private void LeaveFunction()
         {
-            _activeScope = Table;
+            ActiveScope = Table;
         }
     }
 }

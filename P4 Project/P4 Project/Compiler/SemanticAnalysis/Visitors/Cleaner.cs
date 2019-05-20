@@ -27,30 +27,32 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         private bool _vertexHeadExists;
         private bool _edgeHeadExists;
 
+
         public Cleaner(SymTable table) {
             Table = table;
         }
+
         public override void Visit(CallNode node)
         {
             node.Parameters.Accept(this);
 
             //1. All function calls corresponds to a function. 
             if (!Table.FunctionExists(node.Ident))
-                ErrorList.Add("The Call for: " + node.Ident + " is not a declared function and not a predefined function");
+                ErrorList.Add($"Call made to function '{node.Ident}', which is not a declared function and not a predefined function");
 
             //2. Calls have the correct amount of parameters when calling
             var valid = false;
             foreach (var baseTypes in Table.FindParameterListOfFunction(node.Ident))
             {
-                if (node.Parameters.Expressions.Count != baseTypes.Count)
+                if (node.Parameters.Expressions.Count == baseTypes.Count)
                 {
-                    continue;
+                    valid = true;
+                    break;
                 }
-                valid = true;
             }
             
             if (!valid)
-                ErrorList.Add("The Call for: " + node.Ident + " have: " + node.Parameters.Expressions.Count + " and should not.");
+                ErrorList.Add($"The function '{node.Ident}' cannot be called with '{node.Parameters.Expressions.Count}' parameters");
         }
         public override void Visit(VarNode node)
         {
@@ -63,7 +65,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(CollecConst node)
         {
-            node.Expressions.ForEach(n=>n.Accept(this));
+            node.Expressions.ForEach(n => n.Accept(this));
         }
 
         public override void Visit(NoneConst node)
@@ -85,6 +87,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             {
                 ErrorList.Add("BinExprNode has null operands");
             }
+
             node.Left.Accept(this);
             node.Right.Accept(this);
         }
@@ -101,7 +104,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
             //3. Expressions aren't outright missing or null 
             if (node.RightSide.Count == 0)
-                ErrorList.Add("The rightSide exist but have no expressions inside " + node.GetCodeOfOperator());
+                ErrorList.Add("The right side of an edge creation exists, but have no expressions inside: " + node.GetCodeOfOperator());
         }
 
         public override void Visit(FuncDeclNode node)
@@ -120,7 +123,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 });
                 if (retExists)
                     return;
-                ErrorList.Add("Function: " + node.SymbolObject.Name + " has no return statement in its body and is not declared to return none!");
+                ErrorList.Add($"Function '{node.SymbolObject.Name}' has no return statement in its body and is not declared to return none!");
             }
         }
 
@@ -178,9 +181,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             }
 
             if (_edgeHeadExists && node.type.name == "edge")
-                ErrorList.Add("Only one edgeHeader is allowed!");
+                ErrorList.Add("Only one edge-header is allowed!");
             else if(_vertexHeadExists && node.type.name == "vertex")
-                ErrorList.Add("Only one vertexHeader is allowed!");
+                ErrorList.Add("Only one vertex-header is allowed!");
         }
 
         public override void Visit(IfNode node)

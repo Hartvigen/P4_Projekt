@@ -71,7 +71,7 @@
     <Compile Include="AST\Stmts\BreakNode.cs" />
     <Compile Include="AST\Stmts\ContinueNode.cs" />
     <Compile Include="Compiler\Interpreter\Types\Edge.cs" />
-    <Compile Include="Compiler\Interpreter\Interpreter .cs" />
+    <Compile Include="Compiler\Interpreter\Interpreter.cs" />
     <Compile Include="Compiler\Interpreter\Scope.cs" />
     <Compile Include="Compiler\Interpreter\Types\Vertex.cs" />
     <Compile Include="Compiler\Interpreter\Value.cs" />

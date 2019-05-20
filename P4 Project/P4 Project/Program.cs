@@ -35,7 +35,7 @@ namespace P4_Project
                         case "--compile":
                             Console.WriteLine("Doing a complete compile on " + args[1]);
                             _parser.tab.name = "top";
-                            var list = new List<Visitor> {new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new Executor(_parser.tab)};
+                            var list = new List<Visitor> {new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new Interpreter(_parser.tab)};
                             Console.WriteLine(ApplyVisitors(list,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
                             break;
                         case "-h":

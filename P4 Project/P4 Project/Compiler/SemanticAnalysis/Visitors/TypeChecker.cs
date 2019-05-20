@@ -16,60 +16,48 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
         private SymTable Table { get; }
-        private SymTable _activeScope;
+        private SymTable ActiveScope { get; set; }
+
 
         public TypeChecker(SymTable table)
         {
             Table = table;
-            _activeScope = table;
+            ActiveScope = table;
         }
+
 
         public override void Visit(CallNode node)
         {
-            node.Parameters.Expressions.ForEach(e=>e.Accept(this));
+            node.Parameters.Expressions.ForEach(e => e.Accept(this));
 
             //We check that parameter types match.
             var parameterList = Table.FindParameterListOfFunction(node.Ident);
+            bool validFound = false;
 
-            //If there is only one correct parameter list
-            if (parameterList.Count == 1)
+            foreach (var parameters in parameterList)
             {
-                var l1 = parameterList[0];
-                for (var i = parameterList.Count - 1; i > 0; i--)
+                validFound = true;
+                for (var i = parameters.Count - 1; i > 0; i--)
                 {
-                    if (node.Parameters.Expressions[i].type.name != l1[i].name)
+                    if (node.Parameters.Expressions[i].type.name != parameters[i].name)
                     {
-                        ErrorList.Add("Wrong parameter type for function " + node.Ident + " should be type: " + parameterList[i] +
-                                      " but was: " + node.Parameters.Expressions[i].type);
+                        validFound = false;
+                        break;
                     }
                 }
+
+                if (!validFound) 
+                    continue;
+                
+                //We found a valid parameter list that it matches so given that parameter list and the function name
+                //We find the return type
+                node.type = Table.FindReturnTypeOfFunction(node.Ident, parameters);
+                break;
             }
-            //If there are more than one parameter list (Overloading)
-            else
-            {
-                var validFound = false;
-                foreach (var parameters in parameterList)
-                {
-                    validFound = true;
-                    for (var i = parameters.Count - 1; i > 0; i--)
-                    {
-                        if (node.Parameters.Expressions[i].type.name != parameters[i].name)
-                        {
-                            validFound = false;
-                        }
-                    }
 
-                    if (!validFound) continue;
-                    
-                    //We found a valid parameter list that it matches so given that parameter list and the function name
-                    //We find the return type
-                    node.type = Table.FindReturnTypeOfFunction(node.Ident, parameters);
-                    break;
-                }
-                if (!validFound)
-                {
-                    ErrorList.Add("No valid parameter set found for overloaded function: " + node.Ident);
-                }
+            if (!validFound)
+            {
+                ErrorList.Add($"No valid parameter set found for overloaded function: '{node.Ident}'");
             }
         }
 
@@ -79,8 +67,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Source?.Accept(this);
 
             //We assign the type found from the table.
-            if(_activeScope.Find(node.Ident) != null)
-                node.type = _activeScope.Find(node.Ident).Type;
+            if(ActiveScope.Find(node.Ident) != null)
+                node.type = ActiveScope.Find(node.Ident).Type;
 
 			//If the Source exist we can find the type as from the attribute that matches from the source
 			if (node.type == null && node.Source?.type != null) {
@@ -112,7 +100,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 node.type = new BaseType("boolean");
             }
             else if (node.type.name != "boolean")
-                ErrorList.Add("BoolConst is always type boolean but was found to be type: " + node.type.name);
+                ErrorList.Add("BoolConst is always type boolean but was found to be of type: " + node.type.name);
         }
 
         //Checks if all elements in a collection is the same type, and returns the type
@@ -296,7 +284,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Target.Accept(this);
             node.Value.Accept(this);
 
-            if (_activeScope.Find(node.Target.Ident) == null) {
+            if (ActiveScope.Find(node.Target.Ident) == null) {
                 //If there is a source it is not a problem
                 if (node.Target.Source != null)
                     return;
@@ -304,16 +292,20 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 return;
             }
 
-            var t = _activeScope.Find(node.Target.Ident).Type;
+            var t = ActiveScope.Find(node.Target.Ident).Type;
             var v = node.Value.type;
 
             if (v.name == "func")
+            {
                 if (v.returnType != t.name)
                 {
                     ErrorList.Add("Call returns a type: " + v.returnType + "but needs type: " + t.name);
                     return;
                 }
-                else return;
+                else
+                    return;
+            }
+
             if (t.name != v.name)
             {
                 ErrorList.Add("Incompatible types in Assign of variable: " + t.name + " and " + v.name);
@@ -332,8 +324,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Iterator.Accept(this);
             node.Body.Accept(this);
 
-            if (_activeScope.Find(node.IterationVar.SymbolObject.Name) is null)
-                _activeScope.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
+            if (ActiveScope.Find(node.IterationVar.SymbolObject.Name) is null)
+                ActiveScope.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
 
             if (node.Iterator.type.name != "collec")
                 ErrorList.Add("The iterator in a foreach must be a collection!");
@@ -371,7 +363,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 {
                     if (node.Condition.type.name != "")
                     {
-                        ErrorList.Add("If statements must have boolean type or be none and not " + node.Condition.type.name);
+                        ErrorList.Add("If-statements must have boolean type or be none and not " + node.Condition.type.name);
                         return;
                     } 
                 }
@@ -428,12 +420,12 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         private void LeaveThisScope()
         {
-            _activeScope = _activeScope.CloseScope();
+            ActiveScope = ActiveScope.CloseScope();
         }
 
         private void EnterNextScope()
         {
-            _activeScope = _activeScope.EnterNextScope();
+            ActiveScope = ActiveScope.EnterNextScope();
         }
 
         private void EnterFunction(string name)
@@ -441,14 +433,14 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             Table.GetScopes().ForEach(s => {
                 if (s.name == name)
                 {
-                    _activeScope = s;
+                    ActiveScope = s;
                 }
             });
         }
 
         private void LeaveFunction()
         {
-            _activeScope = Table;
+            ActiveScope = Table;
         }
     }
 }
