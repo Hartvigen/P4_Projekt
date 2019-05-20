@@ -15,17 +15,33 @@ namespace P4_Project
 
         public static readonly List<string> PreDefinedFunctions = new List<string>
         {
-                 "GetEdge",
-                "RemoveEdge",
-                 "GetEdges",
-              "RemoveVertex",
-                 "GetVertices",
-                "ClearEdges",
-               "ClearAll",
-               "Print",
-               "AsText",
-            "Add",
-            "Terminal"
+        // General functions
+        "Print",
+        "AsText",
+        "Terminal",
+        //Collection functions
+        "Clear",
+        "Size",
+        "IsEmpty",
+        "Contains",
+        "Add",
+        "Push",
+        "Enqueue",
+        "Remove",
+        "Pop",
+        "Dequeue",
+        "Get",
+        "Peek",
+        "Union",
+        //Graph
+        "GetEdge",
+        "GetVertices",
+        "GetEdges",
+        "GetAdjacent",
+        "RemoveVertex",
+        "RemoveEdge",
+        "ClearEdges",
+        "ClearAll"
         };
 
         public static readonly List<string> PreDefinedAttributesVertex = new List<string>
@@ -122,45 +138,106 @@ namespace P4_Project
             if (PreDefinedFunctions.Contains(function))
                 switch (function)
                 {
+                    //General
                     case "Print":
                         Print(executor);
                         break;
                     case "AsText":
                         AsText(parameters, executor);
                         break;
+                    case "Terminal":
+                        Terminal(parameters, executor);
+                        break;
+                    //Collections
+                    case "Clear":
+                        //TODO
+                        //Clear(parameters, executor);
+                        break;
+                    case "Size":
+                        Size(parameters, executor);
+                        break;
+                    case "IsEmpty":
+                        //TODO
+                        //IsEmpty(parameters, executor);
+                        break;
+                    case "Contains":
+                        //TODO
+                        //Contains(parameters, executor);
+                        break;
+                    case "Add":
+                        Add(parameters, executor);
+                        break;
+                    case "Push":
+                        //TODO
+                        //Push(parameters, executor);
+                        break;
+                    case "Enqueue":
+                        //TODO
+                        //Enqueue(parameters, executor);
+                        break;
+                    case "Remove":
+                        RemoveEdge(parameters, executor);
+                        break;
+                    case "Pop":
+                        //TODO
+                        //Pop(parameters, executor);
+                        break;
+                    case "Dequeue":
+                        //TODO
+                        //Dequeue(parameters, executor);
+                        break;
+                    case "Get":
+                        //TODO
+                        //Get(parameters, executor);
+                        break;
+                    case "Peek":
+                        //TODO
+                        //Peek(parameters, executor);
+                        break;
+                    case "Union":
+                        //TODO
+                        //Union(parameters, executor);
+                        break;
+                    //Graph
                     case "GetEdge":
                         GetEdge(parameters, executor);
                         break;
-                    case "RemoveEdge":
-                        RemoveEdge(parameters, executor);
+                    case "GetVertices":
+                        GetVertices(executor);
                         break;
                     case "GetEdges":
                         GetEdges(executor);
                         break;
+                    case "GetAdjacent":
+                        GetAdjacent(parameters, executor);
+                        break;
                     case "RemoveVertex":
                         RemoveVertex(parameters, executor);
                         break;
-                    case "GetVertices":
-                        GetVertices(executor);
+                    case "RemoveEdge":
+                        RemoveEdge(parameters, executor);
                         break;
                     case "ClearEdges":
                         ClearEdges(executor);
                         break;
                     case "ClearAll":
                         ClearAll(executor);
-                        break;
-                    case "Add":
-                        Add(parameters, executor);
-                        break;
-                    case "Terminal":
-                        Terminal(parameters, executor);
-                        break;
+                        break;                    
                     default: throw new Exception("Missing implementation of the PreDefFunction: " + function);
                 }
-            else throw new Exception(function + " is not a pre Defined Function!");
+            else throw new Exception(function + " is not a pre-defined Function!");
         }
 
-        private static void AsText(IReadOnlyList<Value> parameters, Interpreter executor)
+        /*
+         * Implementation of general pre-defined functions
+         */
+
+        private static void Print(Executor executor)
+        {
+            DotToPng.CreatePngFileFromScene(executor.scene);
+        }
+
+        private static void AsText(IReadOnlyList<Value> parameters, Executor executor)
         {
             switch (parameters[0].type.name)
             {
@@ -176,44 +253,58 @@ namespace P4_Project
                 default: throw new Exception(parameters[0].type.name + " is not supported in AsText!");
             }
         }
-        private static void Print(Interpreter executor)
+
+        private static void Terminal(IReadOnlyList<Value> parameters, Executor executor)
         {
-            DotToPng.CreatePngFileFromScene(executor.scene);
+            Console.WriteLine(parameters[0].o.ToString());
         }
 
-        private static void ClearAll(Interpreter executor)
+        /*
+        * Implementation of collection pre-defined functions
+        */
+
+        private static void Add(IReadOnlyList<Value> parameters, Executor executor)
         {
-            executor.scene.Clear();
+            switch (parameters[0].type.collectionType.name)
+            {
+                case "list":
+                    (parameters[0].o as List<object>).Add(parameters[1].o);                   
+                    break;
+                case "set":
+                    (parameters[0].o as HashSet<object>).Add(parameters[1].o);
+                    break;
+                default:
+                    throw new Exception("Add only works with collections of type list or set");
+            }
+
         }
 
-        private static void ClearEdges(Interpreter executor)
+        private static void Size(IReadOnlyList<Value> parameters, Executor executor)
         {
-            executor.scene.ForEach(v => v.edges.Clear());
+            switch (parameters[0].type.collectionType.name)
+            {
+                case "list":
+                    executor.currentValue = new Value((parameters[0].o as List<object>).Count);
+                    break;
+                case "set":
+                    executor.currentValue = new Value((parameters[0].o as HashSet<object>).Count);
+                    break;
+                case "stack":
+                    executor.currentValue = new Value((parameters[0].o as Stack<object>).Count);
+                    break;
+                case "queue":
+                    executor.currentValue = new Value((parameters[0].o as Queue<object>).Count);
+                    break;
+                default: throw new Exception(parameters[0].o.ToString() + " has an unknown collection type.");
+            };            
         }
 
-        private static void GetVertices(Interpreter executor)
-        {
-            executor.currentValue = null;
-            var vertexList = new List<Vertex>();
-            foreach (var v in executor.scene)
-                vertexList.Add(v);
-            executor.currentValue = new Value(vertexList);
-        }
+        /*
+        * Implementation of graph pre-defined functions
+        */
 
-        private static void RemoveVertex(IReadOnlyList<Value> parameters, Interpreter executor)
-        {
-            executor.scene.Remove((Vertex)parameters[0].o);
-        }
-
-        private static void GetEdges(Interpreter executor)
-        {
-            executor.currentValue = null;
-            var edgeList = new List<Edge>();
-            foreach (var v in executor.scene)
-                edgeList.AddRange(v.edges);
-            executor.currentValue = new Value(edgeList);
-        }
-        private static void GetEdge(List<Value> parameters, Interpreter executor)
+       
+        private static void GetEdge(List<Value> parameters, Executor executor)
         {
             var v1 = (Vertex)parameters[0].o;
             var v2 = (Vertex)parameters[1].o;
@@ -227,7 +318,43 @@ namespace P4_Project
             }
         }
 
-        private static void RemoveEdge(List<Value> parameters, Interpreter executor)
+        private static void GetVertices(Executor executor)
+        {
+            executor.currentValue = null;
+            var vertexList = new List<Vertex>();
+            foreach (var v in executor.scene)
+                vertexList.Add(v);
+            executor.currentValue = new Value(vertexList);
+        }
+
+        private static void GetEdges(Executor executor)
+        {
+            executor.currentValue = null;
+            var edgeList = new List<Edge>();
+            foreach (var v in executor.scene)
+                edgeList.AddRange(v.edges);
+            executor.currentValue = new Value(edgeList);
+        }
+
+        private static void GetAdjacent(IReadOnlyList<Value> parameters, Executor executor)
+        {
+            Vertex from = (parameters[0].o as Vertex);
+            
+            List<Vertex> adjacentList = new List<Vertex>();
+            foreach(Edge adj in from.edges)
+            {
+                adjacentList.Add(adj.to);
+            }
+
+            executor.currentValue = new Value(adjacentList);
+        }
+
+        private static void RemoveVertex(IReadOnlyList<Value> parameters, Executor executor)
+        {
+            executor.scene.Remove((Vertex)parameters[0].o);
+        }
+
+        private static void RemoveEdge(List<Value> parameters, Executor executor)
         {
             var eRemove = (Edge)parameters[0].o;
             foreach (var v in executor.scene)
@@ -241,34 +368,14 @@ namespace P4_Project
             }
         }
 
-        private static void Terminal(IReadOnlyList<Value> parameters, Interpreter executor)
+        private static void ClearEdges(Executor executor)
         {
-            Console.WriteLine(parameters[0].o.ToString());
+            executor.scene.ForEach(v => v.edges.Clear());
         }
 
-        private static void Add(IReadOnlyList<Value> parameters, Interpreter executor)
+        private static void ClearAll(Executor executor)
         {
-            switch (parameters[0].type.collectionType.name)
-            {
-                case "list":
-                    (parameters[0].o as List<object>).Add(parameters[1].o);
-                    foreach (object o in (parameters[0].o as List<object>))
-                    {
-                        Console.WriteLine(o.ToString());
-                    }
-                    break;
-                case "set":
-                    (parameters[0].o as HashSet<object>).Add(parameters[1].o);
-                    foreach (object o in (parameters[0].o as HashSet<object>))
-                    {
-                        Console.WriteLine(o.ToString());
-                    }
-
-                    break;
-                default:
-                    throw new Exception("Add only works with collections of type list or set");
-            }
-
+            executor.scene.Clear();
         }
 
         public static BaseType FindReturnTypeOfPreDefFunctions(string name, List<BaseType> parameters)
@@ -276,10 +383,11 @@ namespace P4_Project
             switch (name)
             {
                 case "GetEdge": return new BaseType("edge");
+                case "GetAdjacent": return new BaseType(new BaseType("vertex"), new BaseType("list"));
                 case "RemoveEdge": return new BaseType("none");
-                case "GetEdges": return new BaseType(new BaseType("set"), new BaseType("edge"));
+                case "GetEdges": return new BaseType(new BaseType("edge"), new BaseType("set"));
                 case "RemoveVertex": return new BaseType("none");
-                case "GetVertices": return new BaseType(new BaseType("set"), new BaseType("vertex"));
+                case "GetVertices": return new BaseType(new BaseType("vertex"), new BaseType("set"));
                 case "ClearEdges": return new BaseType("none");
                 case "ClearAll": return new BaseType("none");
                 case "Print": return new BaseType("none");
@@ -301,6 +409,7 @@ namespace P4_Project
                         default: throw new Exception(parameters[0].singleType.name + " is not a valid type to Pop");
                     }
                 case "Add": return new BaseType("none");
+                case "Size": return new BaseType("number");
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
@@ -311,21 +420,26 @@ namespace P4_Project
         {
             switch (name)
             {
+                //General
+                case "Print": return new List<List<BaseType>> { new List<BaseType>() };
+                case "AsText":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> { new BaseType("number") },
+                        new List<BaseType> { new BaseType("boolean") },
+                        new List<BaseType> { new BaseType("text") }
+                    };
+                case "Terminal": return new List<List<BaseType>> { new List<BaseType> { new BaseType("text") } };
+                //Collections
                 case "GetEdge": return new List<List<BaseType>>{new List<BaseType> {new BaseType("vertex"), new BaseType("vertex")}};
-                case "RemoveEdge": return new List<List<BaseType>>{new List<BaseType> {new BaseType("edge")}};
+                case "GetEdges": return new List<List<BaseType>> { new List<BaseType>() };
+                case "GetAdjacent": return new List<List<BaseType>> { new List<BaseType> { new BaseType("vertex")} };
                 case "RemoveVertex": return new List<List<BaseType>>{new List<BaseType> { new BaseType("vertex") }};
-                case "GetEdges": return new List<List<BaseType>>{new List<BaseType>()};
-                case "GetVertices": return new List<List<BaseType>>{new List<BaseType>()};
+                case "RemoveEdge": return new List<List<BaseType>> { new List<BaseType> { new BaseType("edge") } };
                 case "ClearEdges": return new List<List<BaseType>>{new List<BaseType>()};
                 case "ClearAll": return new List<List<BaseType>>{new List<BaseType>()};
-                case "Print": return new List<List<BaseType>>{new List<BaseType>()};
-                case "Terminal": return new List<List<BaseType>> { new List<BaseType> { new BaseType("text") } };
-                case "AsText": return new List<List<BaseType>>
-                {
-                    new List<BaseType> { new BaseType("number") },
-                    new List<BaseType> { new BaseType("boolean") },
-                    new List<BaseType> { new BaseType("text") }
-                };
+                //Graph
+                
                 case "Add": return new List<List<BaseType>>
                 {
                     new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")), new BaseType("number")},
@@ -343,6 +457,30 @@ namespace P4_Project
                     new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("none")},
                     new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("none")}
                 };
+                case "Size": return new List<List<BaseType>>
+                {
+                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")) },
+                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")) },
+                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")) },
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")) },
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")) },
+                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")) },
+                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")) },
+                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")) },
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")) },
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")) },
+                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("stack")) },
+                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("stack")) },
+                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("stack")) },
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("stack")) },
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("stack")) },
+                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("queue")) },
+                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("queue")) },
+                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("queue")) },
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue")) },
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue")) }
+                };
+                
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
