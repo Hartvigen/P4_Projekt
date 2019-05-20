@@ -216,8 +216,7 @@ namespace P4_Project.Compiler.Interpreter
                 adder(currentValue.o);
             }
 
-            currentValue = new Value(collec);
-            currentValue.type = node.type;
+            currentValue = new Value(collec, node.type);
         }
 
         

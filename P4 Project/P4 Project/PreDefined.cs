@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using P4_Project.AST;
@@ -485,5 +486,35 @@ namespace P4_Project
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
+
+        public static Dictionary<Type, int> typeMap = new Dictionary<Type, int>()
+        {
+            {typeof(NoneConst), 0},
+            {typeof(bool), 1},
+            {typeof(List<bool>), 2},
+            {typeof(HashSet<bool>), 3},
+            {typeof(Stack<bool>), 4},
+            {typeof(Queue<bool>), 5},
+            {typeof(double), 6},
+            {typeof(List<double>), 7},
+            {typeof(HashSet<double>), 8},
+            {typeof(Stack<double>), 9},
+            {typeof(Queue<double>), 10},
+            {typeof(string), 11},
+            {typeof(List<string>), 12},
+            {typeof(HashSet<string>), 13},
+            {typeof(Stack<string>), 14},
+            {typeof(Queue<string>), 15},
+            {typeof(Vertex), 16},
+            {typeof(List<Vertex>), 17},
+            {typeof(HashSet<Vertex>), 18},
+            {typeof(Stack<Vertex>), 19},
+            {typeof(Queue<Vertex>), 20},
+            {typeof(Edge), 21},
+            {typeof(List<Edge>), 22},
+            {typeof(HashSet<Edge>), 23},
+            {typeof(Stack<Edge>), 24},
+            {typeof(Queue<Edge>), 25},
+        };
     }
 }

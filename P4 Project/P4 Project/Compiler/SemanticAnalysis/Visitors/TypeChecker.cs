@@ -103,10 +103,15 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 ErrorList.Add("BoolConst is always type boolean but was found to be of type: " + node.type.name);
         }
 
-        //Checks if all elements in a collection is the same type, and returns the type
+        //Checks if all elements in a collection is the same type, and returns the type.
         public override void Visit(CollecConst node)
         {
-            //We check that each Expression in the Collection evaluates to the same type as the collection
+            //If the Collection contains no elements it is type correct no matter what.
+            if (node.Expressions.Count == 0)
+                return;
+            
+            
+            //We check that each Expression in the Collection evaluates to the same type as the collection.
             node.Expressions.ForEach(n =>
             {
                 n.Accept(this);
