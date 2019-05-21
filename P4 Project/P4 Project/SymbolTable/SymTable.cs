@@ -200,8 +200,8 @@ namespace P4_Project.SymbolTable
             InnerScopes.ForEach(s => s.ResetScopePositions());
         }
 
-        public void RemoveHeaderScope() {
-            InnerScopes.RemoveAll(scp => scp.name == "Headers");
+        public void RemoveTopHeaderScope() {
+            InnerScopes.RemoveAll(scp => scp.header);
         }
     }
 }
