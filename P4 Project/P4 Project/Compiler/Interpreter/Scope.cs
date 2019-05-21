@@ -24,9 +24,10 @@ namespace P4_Project.Compiler.Interpreter
         }
 
         public void CreateVar(string ident, Value v) {
-            if (_values.ContainsKey(ident))
-                throw new Exception("Cannot create var as it already exists: " + ident);
-            _values.Add(ident, v);
+            //if (_values.ContainsKey(ident))
+            //    throw new Exception("Cannot create var as it already exists: " + ident);
+
+            _values[ident] = v; 
         }
 
         public void TryGetValue(string ident, out Value v)

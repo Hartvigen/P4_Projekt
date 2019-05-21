@@ -4,13 +4,14 @@
 /*-------------------------------------------------------------------------*/
 
 vertex endNode = Initialize()
-Print();
+Print()
 
 set<vertex> processed = set<vertex> { }
 list<vertex> remaining = GetVertices()
 
+vertex current
 while (!IsEmpty(remaining)) {
-    vertex current = ExtractMin(remaining)
+    current = ExtractMin(remaining)
     Add(processed, current)
     foreach (vertex v in GetAdjacent(current)) {
         Relax(current, v)
@@ -32,9 +33,9 @@ func none Relax(vertex start, vertex end) {
 }
 
 func vertex ExtractMin(list<vertex> remaining) {
-    vertex smallest = Get(remaining, 0)
-    number smallestIndex = 0
-    number currentIndex = 0
+    vertex smallest = Get(remaining, 1)
+    number smallestIndex = 1
+    number currentIndex = 1
 
     foreach (vertex v in remaining) {
         if (v.distance < smallest.distance) {
@@ -51,20 +52,20 @@ func vertex ExtractMin(list<vertex> remaining) {
 func vertex Initialize() {
     vertex {
         (A, label = "A", distance = 0),
-        (v1),
-        (v2),
-        (v3),
-        (v4),
-        (v5),
-        (v6),
-        (B, label = "B")
+        (v1, distance = 1000000000),
+        (v2, distance = 1000000000),
+        (v3, distance = 1000000000),
+        (v4, distance = 1000000000),
+        (v5, distance = 1000000000),
+        (v6, distance = 1000000000),
+        (B, distance = 1000000000, label = "B")
     }
 
-    A -- { (v1), (v4) }
-    v2 -- { (v1), (v3) }
-    v3 -- { (v4), (v5) }
-    v5 -- { (B), (v4), (v6) }
-    v6 -- { (B) }
+    A -- { (v1, weight=1), (v4, weight=1) }
+    v2 -- { (v1, weight=1), (v3, weight=1) }
+    v3 -- { (v4, weight=1), (v5, weight=1) }
+    v5 -- { (B, weight=1), (v4, weight=1), (v6, weight=1) }
+    v6 -- { (B, weight=1) }
 
     return B
 }

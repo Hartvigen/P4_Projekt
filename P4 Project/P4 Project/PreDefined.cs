@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using P4_Project.AST;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.Compiler.Interpreter;
@@ -176,7 +177,7 @@ namespace P4_Project
                         Enqueue(parameters, executor);
                         break;
                     case "Remove":
-                        RemoveEdge(parameters, executor);
+                        Remove(parameters, executor);
                         break;
                     case "Pop":
                         //TODO
@@ -301,7 +302,7 @@ namespace P4_Project
         private static void Remove(List<Value> parameters, Interpreter executor)
         {
             if (parameters[0].type.collectionType.name == "list")
-                ((List<object>)parameters[0].o).RemoveAt(((int)parameters[1].o) - 1);
+                ((List<object>)parameters[0].o).RemoveAt((int)((double)parameters[1].o) - 1);
             else if (parameters[0].type.collectionType.name == "set")
                 ((List<object>)parameters[0].o).Remove(parameters[1].o);            
         }
@@ -319,7 +320,7 @@ namespace P4_Project
 
         private static void Get(List<Value> parameters, Interpreter executor)
         {
-            executor.currentValue = new Value(((List<object>)parameters[0].o)[((int) parameters[1].o)]);
+            executor.currentValue = new Value(((List<object>)parameters[0].o)[(int)((double)parameters[1].o) - 1]);
         }
 
         private static void Peek(List<Value> parameters, Interpreter executor)
@@ -342,19 +343,18 @@ namespace P4_Project
 
         private static void GetEdge(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            var v1 = (Vertex)parameters[0].o;
-            var v2 = (Vertex)parameters[1].o;
-            foreach (var v in executor.scene)
+            Vertex v1 = (Vertex)parameters[0].o;
+            Vertex v2 = (Vertex)parameters[1].o;
+
+            foreach (var e in v1.edges)
             {
-                foreach (var e in v.edges)
+                if (e.HasVertex(v1, v2) || (e.opera == Operators.Nonarr && e.HasVertex(v2, v1)))
                 {
-                    if (e.HasVertex(v1, v2))
-                    {
-                        executor.currentValue = new Value(e);
-                        return;
-                    }
+                    executor.currentValue = new Value(e);
+                    return;
                 }
             }
+
             executor.currentValue = new Value(new NoneConst());
         }
 
@@ -372,7 +372,7 @@ namespace P4_Project
             executor.currentValue = null;
             var edgeList = new List<object>();
             foreach (var v in executor.scene)
-                edgeList.AddRange(v.edges);
+                edgeList.AddRange(v.edges.Where(e => !edgeList.Contains(e)));
             executor.currentValue = new Value(edgeList, new BaseType(new BaseType("edge"), new BaseType("list")));
         }
 
@@ -383,7 +383,12 @@ namespace P4_Project
             List<object> adjacentList = new List<object>();
             foreach(Edge adj in from.edges)
             {
-                adjacentList.Add(adj.to);
+                if (!adjacentList.Contains(adj.to) && adj.to != from)
+                    adjacentList.Add(adj.to);
+                else if (!adjacentList.Contains(adj.from) && adj.from != from)
+                    adjacentList.Add(adj.from);
+                else if (adj.to == adj.from && adj.from == from)
+                    adjacentList.Add(from);
             }
 
             executor.currentValue = new Value(adjacentList, new BaseType(new BaseType("vertex"), new BaseType("list")));

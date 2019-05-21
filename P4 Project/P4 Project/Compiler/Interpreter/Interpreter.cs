@@ -92,7 +92,21 @@ namespace P4_Project.Compiler.Interpreter
                     l.Value.Accept(this);
                     e.UpdateAttribute(l.Target.Ident, currentValue);
                 }
-                from.edges.Add(e);
+
+                switch (edge.Operator) {
+                    case Operators.Leftarr:
+                        to.edges.Add(e);
+                        break;
+
+                    case Operators.Nonarr:
+                        from.edges.Add(e);
+                        to.edges.Add(e);
+                        break;
+
+                    case Operators.Rightarr:
+                        from.edges.Add(e);
+                        break;
+                }
             }
         }
 
@@ -156,7 +170,7 @@ namespace P4_Project.Compiler.Interpreter
             }
             else
             {
-                var o = (DecodeReference(node.Source) as Value).o; // Yes, we need the source, in order to change the attribute inside the source
+                var o = ((Value)DecodeReference(node.Source)).o; // Yes, we need the source, in order to change the attribute inside the source
                 switch (o)
                 {
                     case Vertex vertex:
@@ -241,7 +255,10 @@ namespace P4_Project.Compiler.Interpreter
                     currentValue = new Value((double)v1.o - (double)v2.o);
                     break;
                 case Operators.Greater:
-                    currentValue = new Value(((double)v1.o > (double)v2.o));
+                    currentValue = new Value((double)v1.o > (double)v2.o);
+                    break;
+                case Operators.Less:
+                    currentValue = new Value((double)v1.o < (double)v2.o);
                     break;
                 default: 
                     throw new Exception($"Operator '{Operators.GetCodeFromInt(node.OperatorType)}' has not been implemented!");
@@ -316,7 +333,7 @@ namespace P4_Project.Compiler.Interpreter
             }
             else
             {
-                var o = DecodeReference(node.Target.Source); // Yes, we need the source, in order to change the target inside the source
+                var o = ((Value)DecodeReference(node.Target.Source)).o; // Yes, we need the source, in order to change the target inside the source
                 switch (o)
                 {
                     case Vertex vertex:
@@ -343,14 +360,14 @@ namespace P4_Project.Compiler.Interpreter
                 else 
                 {
                     _currentScope.TryGetValue(currentSource.Ident, out var v);
-                    return v.o;
+                    return v;
                 }
 
             }
             
             var vtxOrEdge = DecodeReference(currentSource.Source);
 
-            switch ((vtxOrEdge as Value).o)
+            switch (((Value)vtxOrEdge).o)
             {
                 case Vertex vertex:
                     return vertex.attributes[currentSource.Ident];
@@ -358,7 +375,6 @@ namespace P4_Project.Compiler.Interpreter
                     return edge.attributes[currentSource.Ident];
             }
             
-
             throw new Exception($"Tried to access attribute '{currentSource.Ident}' in type that is not vertex or edge.");
         }
 
@@ -374,7 +390,7 @@ namespace P4_Project.Compiler.Interpreter
 
         public override void Visit(ForeachNode node)
         {
-            var iterationVar = node.IterationVar.SymbolObject.Name;
+            string iterationVar = node.IterationVar.SymbolObject.Name;
             _currentScope.CreateVar(iterationVar, null);
             node.Iterator.Accept(this);
             List<object> l;
@@ -383,13 +399,14 @@ namespace P4_Project.Compiler.Interpreter
                 l = (List<object>)currentValue.o;
             else
                 l = StringToList((currentValue.o as string));
+
             foreach (var i in l)
             {
-                    _currentScope.UpdateVar(iterationVar, new Value(i));
-                    node.Body.Accept(this);
+                _currentScope.UpdateVar(iterationVar, new Value(i));
+                node.Body.Accept(this);
 
-                    if (InterruptHandler())
-                        break;
+                if (InterruptHandler())
+                    break;
             }
          
         }

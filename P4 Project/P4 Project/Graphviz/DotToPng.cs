@@ -73,13 +73,16 @@ namespace P4_Project.Graphviz
             //Sets up the place for all undirected edges to be placed!
             s.AppendLine("subgraph undirected {");
             s.AppendLine("edge [dir=none]");
-            
+
             //Every edge is found and if it is undirected we append it here.
+            List<Edge> processed = new List<Edge>();
             executorScene.ForEach(v =>
             {
                 v.edges.ForEach(e =>
                 {
-                    if (e.opera != Operators.Nonarr) return;
+                    if (e.opera != Operators.Nonarr || processed.Contains(e)) return;
+                    processed.Add(e);
+
                     s.Append(e.from.name);
                     s.Append(" -> ");
                     s.Append(e.to.name + " [");
