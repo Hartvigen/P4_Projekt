@@ -112,11 +112,10 @@ namespace P4_Project
 
         public static string GetTypeOfPreDefinedAttributeVertex(string name)
         {
-            if (!PreDefinedAttributesVertex.Contains(name))
-                throw new Exception(name + " is not a predefined attribute for vertex");
             switch (name) {
                 case "label": return "text";
                 case "color": return "text";
+                case "style": return "text";
                 default: throw new Exception(name + " is a predefined attribute for vertex but no type has been specified for it");
             }
         }
@@ -318,6 +317,7 @@ namespace P4_Project
                         executor.currentValue = new Value(e);
                 }
             }
+            executor.currentValue = new Value(new NoneConst());
         }
 
         private static void GetVertices(Interpreter executor)
@@ -348,7 +348,7 @@ namespace P4_Project
                 adjacentList.Add(adj.to);
             }
 
-            executor.currentValue = new Value(adjacentList);
+            executor.currentValue = new Value(adjacentList, new BaseType(new BaseType("vertex"), new BaseType("list")));
         }
 
         private static void RemoveVertex(IReadOnlyList<Value> parameters, Interpreter executor)
@@ -384,17 +384,11 @@ namespace P4_Project
         {
             switch (name)
             {
-                case "GetEdge": return new BaseType("edge");
-                case "GetAdjacent": return new BaseType(new BaseType("vertex"), new BaseType("list"));
-                case "RemoveEdge": return new BaseType("none");
-                case "GetEdges": return new BaseType(new BaseType("edge"), new BaseType("set"));
-                case "RemoveVertex": return new BaseType("none");
-                case "GetVertices": return new BaseType(new BaseType("vertex"), new BaseType("set"));
-                case "ClearEdges": return new BaseType("none");
-                case "ClearAll": return new BaseType("none");
+                //General
                 case "Print": return new BaseType("none");
-                case "Terminal": return new BaseType("none");
                 case "AsText": return new BaseType("text");
+                case "Terminal": return new BaseType("none");
+                //Collection
                 case "Pop":
                     switch (parameters[0].singleType.name)
                     {
@@ -412,6 +406,17 @@ namespace P4_Project
                     }
                 case "Add": return new BaseType("none");
                 case "Size": return new BaseType("number");
+                //Graph
+                case "GetEdge":
+                    //switch(parameters[0].)
+                    return new BaseType("edge");
+                case "GetVertices": return new BaseType(new BaseType("vertex"), new BaseType("set"));
+                case "GetEdges": return new BaseType(new BaseType("edge"), new BaseType("set"));
+                case "GetAdjacent": return new BaseType(new BaseType("vertex"), new BaseType("list"));
+                case "RemoveVertex": return new BaseType("none");
+                case "RemoveEdge": return new BaseType("none");
+                case "ClearEdges": return new BaseType("none");
+                case "ClearAll": return new BaseType("none");                
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }
         }
@@ -432,34 +437,34 @@ namespace P4_Project
                         new List<BaseType> { new BaseType("text") }
                     };
                 case "Terminal": return new List<List<BaseType>> { new List<BaseType> { new BaseType("text") } };
-                //Collections
-                case "GetEdge": return new List<List<BaseType>>{new List<BaseType> {new BaseType("vertex"), new BaseType("vertex")}};
-                case "GetEdges": return new List<List<BaseType>> { new List<BaseType>() };
-                case "GetAdjacent": return new List<List<BaseType>> { new List<BaseType> { new BaseType("vertex")} };
-                case "RemoveVertex": return new List<List<BaseType>>{new List<BaseType> { new BaseType("vertex") }};
-                case "RemoveEdge": return new List<List<BaseType>> { new List<BaseType> { new BaseType("edge") } };
-                case "ClearEdges": return new List<List<BaseType>>{new List<BaseType>()};
-                case "ClearAll": return new List<List<BaseType>>{new List<BaseType>()};
-                //Graph
-                
-                case "Add": return new List<List<BaseType>>
-                {
-                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")), new BaseType("number")},
-                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")), new BaseType("boolean")},
-                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")), new BaseType("text")},
-                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("vertex")},
-                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("edge")},
-                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("none")},
-                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("none")},
-                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")), new BaseType("number")},
-                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")), new BaseType("boolean")},
-                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")), new BaseType("text")},
-                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("vertex")},
-                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("edge")},
-                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("none")},
-                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("none")}
-                };
-                case "Size": return new List<List<BaseType>>
+
+                //Collection
+                case "Clear":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("queue")) },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("queue")) },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("queue")) },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue")) },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue")) }
+                    };
+                case "Size":
+                    return new List<List<BaseType>>
                 {
                     new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")) },
                     new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")) },
@@ -482,6 +487,179 @@ namespace P4_Project
                     new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue")) },
                     new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue")) }
                 };
+                case "IsEmpty":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")) },
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")) },
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("stack")) },
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("queue")) },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("queue")) },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("queue")) },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue")) },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue")) }
+                    };
+                case "Contains":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")), new BaseType("number") },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")), new BaseType("boolean") },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")), new BaseType("text") },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("vertex") },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("edge") },
+
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")), new BaseType("number") },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")), new BaseType("boolean") },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")), new BaseType("text") },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("vertex") },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("edge") },
+
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("stack")), new BaseType("number") },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("stack")), new BaseType("boolean") },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("stack")), new BaseType("text") },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("stack")), new BaseType("vertex") },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("stack")), new BaseType("edge") },
+
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("queue")), new BaseType("number") },
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("queue")), new BaseType("boolean") },
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("queue")), new BaseType("text") },
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue")), new BaseType("vertex") },
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue")), new BaseType("edge") }
+
+                    };
+                case "Add":
+                    return new List<List<BaseType>>
+                {
+                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")), new BaseType("number")},
+                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")), new BaseType("boolean")},
+                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")), new BaseType("text")},
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("vertex")},
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("edge")},
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("none")},
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("none")},
+                    new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")), new BaseType("number")},
+                    new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")), new BaseType("boolean")},
+                    new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")), new BaseType("text")},
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("vertex")},
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("edge")},
+                    new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("none")},
+                    new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("none")}
+                };
+                case "Push":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("stack")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("stack")), new BaseType("boolean")},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("stack")), new BaseType("text")},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("stack")), new BaseType("vertex")},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("stack")), new BaseType("edge")},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("stack")), new BaseType("none")},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("stack")), new BaseType("none")},
+                    };
+                case "Enqueue":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("queue")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("queue")), new BaseType("boolean")},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("queue")), new BaseType("text")},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue")), new BaseType("vertex")},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue")), new BaseType("edge")},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue")), new BaseType("none")},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue")), new BaseType("none")},
+                    };
+                case "Remove":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")), new BaseType("boolean")},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")), new BaseType("text")},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("vertex")},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("edge")},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType("none")},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType("none")}
+                    };
+
+                case "Pop":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("stack"))},
+                    };
+                case "Dequeue":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("queue"))},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("queue"))},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("queue"))},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue"))},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue"))},
+                    };
+                case "Get":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("list")), new BaseType("number")},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("list")), new BaseType("number")}
+                    };
+                case "Peek":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("stack"))},
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("queue"))},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("queue"))},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("queue"))},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue"))},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue"))},
+                    };
+                case "union":
+                    return new List<List<BaseType>>
+                    {
+                        new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")), new BaseType(new BaseType("number"), new BaseType("set"))},
+                        new List<BaseType> {new BaseType(new BaseType("boolean"), new BaseType("set")), new BaseType(new BaseType("boolean"), new BaseType("set"))},
+                        new List<BaseType> {new BaseType(new BaseType("text"), new BaseType("set")), new BaseType(new BaseType("text"), new BaseType("set"))},
+                        new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("set")), new BaseType(new BaseType("vertex"), new BaseType("set"))},
+                        new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("set")), new BaseType(new BaseType("edge"), new BaseType("set"))},
+
+
+                    };
+                    
+                
+                //Graph
+                case "GetEdge": return new List<List<BaseType>>{new List<BaseType> {new BaseType("vertex"), new BaseType("vertex")}};
+                case "GetVertices": return new List<List<BaseType>> { new List<BaseType>() };
+                case "GetEdges": return new List<List<BaseType>> { new List<BaseType>() };
+                case "GetAdjacent": return new List<List<BaseType>> { new List<BaseType> { new BaseType("vertex")} };
+                case "RemoveVertex": return new List<List<BaseType>>{new List<BaseType> { new BaseType("vertex") }};
+                case "RemoveEdge": return new List<List<BaseType>> { new List<BaseType> { new BaseType("edge") } };
+                case "ClearEdges": return new List<List<BaseType>>{new List<BaseType>()};
+                case "ClearAll": return new List<List<BaseType>>{new List<BaseType>()};
+                
                 
                 default: throw new Exception("the function: " + name + " is not a predefined function");
             }

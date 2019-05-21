@@ -45,9 +45,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             foreach (var parameters in parameterList)
             {
                 validFound = true;
-                for (var i = parameters.Count - 1; i > 0; i--)
+                for (var i = parameters.Count; i > 0; i--)
                 {
-                    if (node.Parameters.Expressions[i].type.name != parameters[i].name)
+                    if (node.Parameters.Expressions[i-1].type.name != parameters[i-1].name)
                     {
                         validFound = false;
                         break;

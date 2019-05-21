@@ -232,7 +232,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(Magia node)
         {
-            node.block.Accept(this);
+           node.block.Accept(this);
         }
 
         public override void Visit(BreakNode node)

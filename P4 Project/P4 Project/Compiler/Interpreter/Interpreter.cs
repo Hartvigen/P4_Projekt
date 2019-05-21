@@ -537,9 +537,11 @@ namespace P4_Project.Compiler.Interpreter
             currentValue = new Value(node.Value);
         }
 
+        
         public override void Visit(TextConst node)
         {
-            currentValue = new Value(node.Value);
+            //Because the qoutation marks are a part of the value of a text constant, these need to be removed.
+            currentValue = new Value(node.Value.Substring(1, node.Value.Length - 2));
         }
         public override void Visit(BoolConst node)
         {
