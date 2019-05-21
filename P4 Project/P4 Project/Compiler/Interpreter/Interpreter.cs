@@ -184,38 +184,21 @@ namespace P4_Project.Compiler.Interpreter
             node.Decls.ForEach(d => d.Accept(this));
         }
 
-
+        /// <summary>
+        /// Since all collections are implemented as lists, then no matter the type, they will all be implemented the same.
+        /// </summary>
+        /// <param name="node"></param>
         public override void Visit(CollecConst node)
         {
-            IEnumerable<object> collec;
-            Action<object> adder;
-
-            switch (node.type.collectionType.name)
-            {
-                case "list":
-                    collec = new List<object>();                   
-                    adder = obj => { (collec as List<object>)?.Add(obj); };
-                    break;
-                case "set":
-                    collec = new HashSet<object>();
-                    adder = obj => { (collec as HashSet<object>)?.Add(obj); };
-                    break;
-                case "stack":
-                    collec = new Stack<object>();
-                    adder = obj => { (collec as Stack<object>)?.Push(obj); };
-                    break;
-                case "queue":
-                    collec = new Queue<object>();
-                    adder = obj => { (collec as Queue<object>)?.Enqueue(obj); };
-                    break;
-                default:
-                    throw new Exception(node.type.collectionType.name + " is not a collection type in MAGIA!");
-            }
-
+            List<object> collec = new List<object>();
+            bool isSet = node.type.collectionType.name == "set" ? true : false;
             foreach (var n in node.Expressions)
-            {
+            {    
                 n.Accept(this);
-                adder(currentValue.o);
+                if(isSet && collec.Contains(currentValue.o))
+                    continue;
+                collec.Add(currentValue.o);
+                
             }
 
             currentValue = new Value(collec, node.type);

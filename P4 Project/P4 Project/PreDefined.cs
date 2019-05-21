@@ -281,23 +281,7 @@ namespace P4_Project
 
         private static void Size(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            switch (parameters[0].type.collectionType.name)
-            {
-                case "list":
-
-                    executor.currentValue = new Value( (double)(parameters[0].o as List<object>).Count);
-                    break;
-                case "set":
-                    executor.currentValue = new Value((double)(parameters[0].o as HashSet<object>).Count);
-                    break;
-                case "stack":
-                    executor.currentValue = new Value((double)(parameters[0].o as Stack<object>).Count);
-                    break;
-                case "queue":
-                    executor.currentValue = new Value((double)(parameters[0].o as Queue<object>).Count);
-                    break;
-                default: throw new Exception(parameters[0].o.ToString() + " has an unknown collection type.");
-            };            
+            executor.currentValue = new Value( (double)(parameters[0].o as List<object>).Count);         
         }
 
         /*
