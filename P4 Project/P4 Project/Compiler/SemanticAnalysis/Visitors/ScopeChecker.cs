@@ -115,14 +115,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 t.Item2.ForEach(s => {
                     //We dont care about the right side of the assign it must still be valid according to all scope rules 
                     s.Value.Accept(this);
-
                     //We find the header scope for edge and if the attribute is not there it is invalid. 
-                    Table.GetScopes().ForEach(h =>
-                    {
-                        if (h.header && h.name == "edge")
-                            if (h.Find(s.Target.Ident) == null && !PreDefined.PreDefinedAttributesEdge.Contains(s.Target.Ident))
-                                ErrorList.Add(s.Target.Ident + " is not a valid attribute for edge");
-                    });
+                    if (Table.edgeAttr.Find(s.Target.Ident) == null && !PreDefined.PreDefinedAttributesEdge.Contains(s.Target.Ident))
+                        ErrorList.Add(s.Target.Ident + " is not a valid attribute for edge");
                 });
             });
         }
@@ -262,7 +257,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         private void EnterFunction(string name)
         {
-            Table.GetScopes().ForEach(s => {
+            Table.GetInnerScopes().ForEach(s => {
                 if (s.name == name)
                 {
                     ActiveScope = s;

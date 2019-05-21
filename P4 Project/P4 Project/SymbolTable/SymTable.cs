@@ -108,7 +108,7 @@ namespace P4_Project.SymbolTable
         }
 
         // return all the innerScopes
-        public List<SymTable> GetScopes()
+        public List<SymTable> GetInnerScopes()
         {
             return InnerScopes;
         }

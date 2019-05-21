@@ -210,7 +210,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     a.Value.Accept(this);
 
                     //We find the header scope for edge take the type of the attribute
-                    Table.GetScopes().ForEach(h =>
+                    Table.GetInnerScopes().ForEach(h =>
                     {
                         if (!h.header || h.name != "edge") return;
                         if (h.Find(a.Target.Ident).Type.name != a.Value.type.name)
@@ -450,7 +450,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         private void EnterFunction(string name)
         {
-            Table.GetScopes().ForEach(s => {
+            Table.GetInnerScopes().ForEach(s => {
                 if (s.name == name)
                 {
                     ActiveScope = s;
