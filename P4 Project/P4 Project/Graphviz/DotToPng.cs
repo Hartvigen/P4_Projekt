@@ -63,7 +63,7 @@ namespace P4_Project.Graphviz
                 {
                     if (PreDefined.PreDefinedAttributesVertex.Contains(keyValuePair.Key))
                     {
-                        s.Append(keyValuePair.Key + " = " + keyValuePair.Value.o + ", ");
+                        s.Append(keyValuePair.Key + " = " + "\"" + keyValuePair.Value.o + "\"" + ", ");
                     }
                 }
                 //To remove the last comma and space.
@@ -88,7 +88,7 @@ namespace P4_Project.Graphviz
                     {
                         if (PreDefined.PreDefinedAttributesEdge.Contains(keyValuePair.Key))
                         {
-                            s.Append(keyValuePair.Key + " = " + (string) keyValuePair.Value.o + ", ");
+                            s.Append(keyValuePair.Key + " = " + "\"" + (string) keyValuePair.Value.o + "\"" + ", ");
                         }
                     }
                     //To remove the last comma and space.
@@ -98,8 +98,8 @@ namespace P4_Project.Graphviz
             //Close the undirected graph
             s.AppendLine("}");
             
+            //Open directed graph
             s.AppendLine("subgraph directed {");
-
             executorScene.ForEach(v =>
             {
                 v.edges.ForEach(e =>
@@ -124,7 +124,7 @@ namespace P4_Project.Graphviz
                     {
                         if (PreDefined.PreDefinedAttributesEdge.Contains(keyValuePair.Key))
                         {
-                            s.Append(keyValuePair.Key + " = " + (string) keyValuePair.Value.o + ", ");
+                            s.Append(keyValuePair.Key + " = " + "\"" + (string) keyValuePair.Value.o + "\"" + ", ");
                         }
                     }
                     //To remove the last comma and space.
