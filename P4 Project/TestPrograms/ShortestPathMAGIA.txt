@@ -1,0 +1,36 @@
+[vertex(number distance = 1000000000, vertex parent)]
+[edge(number weight = 1)]
+
+/*-------------------------------------------------------------------------*/
+
+list<vertex> startAndEnd = Initialize()
+
+Print()
+
+/*-------------------------------------------------------------------------*/
+
+func list<vertex> Initialize() {
+    vertex {
+        (A, label = "A", distance = 0),
+        (v1),
+        (v2),
+        (v3),
+        (v4),
+        (v5),
+        (v6),
+        (B, label = "B")
+    }
+
+    A -> { (v1), (v2) }
+
+
+    return list<vertex> { A, B }
+}
+
+func none Relax(vertex start, vertex end) {
+    number edgeLength = GetEdge(start, end).weight
+    if (end.distance > start.distance + edgeLength) {
+        end.distance = start.distance + edgeLength
+        end.parent = start
+    }
+}

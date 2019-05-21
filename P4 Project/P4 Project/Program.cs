@@ -20,7 +20,7 @@ namespace P4_Project
         {
             //Uncomment these lines if you wanna play with the program            
             Console.WriteLine("Doing custom work!");
-            args = new string[] { "-c", "ShortestPathMAGIA.txt" };
+            args = new string[] { "-c", "MAGIAFile.txt" };
 
             if (args.Length > 0)
             {
