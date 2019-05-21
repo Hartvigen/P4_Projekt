@@ -8,20 +8,14 @@ namespace P4_Project.Compiler.Interpreter.Types
         public readonly Vertex to;
         public readonly int opera;
 
-        public readonly Dictionary<string, Value> attributes = new Dictionary<string, Value>();
+        public readonly Dictionary<string, Value> attributes;
 
-        public Edge(Vertex from, int opera, Vertex to, Dictionary<string, Value> definedAttributes)
+        public Edge(Vertex from, int opera, Vertex to, Dictionary<string, Value> attributes)
         {
             this.from = from;
             this.to = to;
             this.opera = opera;
-
-            //Insert every predefined attribute.
-            foreach (var e in PreDefined.PreDefinedAttributesEdge)
-                attributes.Add(e, new Value(PreDefined.GetPreDefinedValueOfPreDefinedAttributeEdge(e)));
-            //override with every Defined Attribute.
-            foreach (var v in definedAttributes)
-                attributes.Add(v.Key, v.Value);
+            this.attributes = attributes;
         }
         public void UpdateAttribute(string identifier, Value value)
         {

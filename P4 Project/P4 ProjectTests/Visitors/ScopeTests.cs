@@ -36,7 +36,7 @@ namespace P4_ProjectTests.Visitors
                                 "x = 3");
 
             Assert.IsTrue(program.ErrorList.Count == 0);
-            Assert.IsTrue(program.Table.Find("x").Type.name.Equals("number"));
+            Assert.IsTrue(program.Table.FindVar("x").Type.name.Equals("number"));
         }
 
         //we should be able to access a variable from any legal scope 

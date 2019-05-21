@@ -1,4 +1,5 @@
 ﻿using P4_Project.AST;
+using P4_Project.AST.Expressions;
 
 namespace P4_Project.SymbolTable
 {
@@ -8,6 +9,7 @@ namespace P4_Project.SymbolTable
         public BaseType Type { get; set; }      // type of the object
         public int Kind { get; }           // var, func ..
 
+        public ExprNode defaultValue;  //If the symbol has a default value that must be remembered.
         public Obj(string name, BaseType type, int kind)
         {
             Name = name;

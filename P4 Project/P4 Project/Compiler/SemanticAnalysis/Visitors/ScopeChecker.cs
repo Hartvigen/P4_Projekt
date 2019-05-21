@@ -60,18 +60,18 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             else
             {
                 //If the source is null we have to able to find the declaration in the scope and already reached! 
-                Obj obj = ActiveScope.Find(node.Ident);
+                Obj obj = ActiveScope.FindVar(node.Ident);
 
                 if (obj == null)
                     ErrorList.Add($"'{node.Ident}' is not in the scope!");
                 else
                 {
-                    if (!ActiveScope.Find(node.Ident).Type.reached)
+                    if (!ActiveScope.FindVar(node.Ident).Type.reached)
                         ErrorList.Add($"'{node.Ident}' is in the scope, but not declared before use!");
 
                     // If node does not contain the type of the variable, load that type into the node
                     if (node.type == null)
-                        node.type = ActiveScope.Find(node.Ident).Type;
+                        node.type = ActiveScope.FindVar(node.Ident).Type;
                 }
             }
         }
@@ -121,7 +121,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     //We dont care about the right side of the assign it must still be valid according to all scope rules 
                     s.Value.Accept(this);
                     //We find the header scope for edge and if the attribute is not there it is invalid. 
-                    if (Table.edgeAttr.Find(s.Target.Ident) == null && !PreDefined.PreDefinedAttributesEdge.Contains(s.Target.Ident))
+                    if (Table.edgeAttr.FindVar(s.Target.Ident) == null && !PreDefined.PreDefinedAttributesEdge.Contains(s.Target.Ident))
                         ErrorList.Add(s.Target.Ident + " is not a valid attribute for edge");
                 });
             });
@@ -139,7 +139,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             node.DefaultValue?.Accept(this);
 
-            Obj obj = ActiveScope.Find(node.SymbolObject.Name);
+            Obj obj = ActiveScope.FindVar(node.SymbolObject.Name);
             if (obj.Type is null)
                 obj.Type = node.type;
 
@@ -166,7 +166,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             }
 
             //The vertex has not been reached so we set reached to true 
-            ActiveScope.Find(node.SymbolObject.Name).Type.reached = true;
+            ActiveScope.FindVar(node.SymbolObject.Name).Type.reached = true;
         }
 
         public override void Visit(AssignNode node)

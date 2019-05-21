@@ -5,23 +5,17 @@ namespace P4_Project.Compiler.Interpreter.Types
 {
     public class Vertex
     {
-        public readonly Dictionary<string, Value> attributes = new Dictionary<string, Value>();
+        public readonly Dictionary<string, Value> attributes;
 
         public readonly string identifier;
 
         public readonly List<Edge> edges = new List<Edge>();
 
         public string name;
-        public Vertex(DeclNode vertex, Dictionary<string, Value> definedAttributes)
+        public Vertex(DeclNode vertex, Dictionary<string, Value> attributes)
         {
             identifier = vertex.SymbolObject.Name;
-
-            //Insert every predefined attribute.
-            foreach (var v in PreDefined.PreDefinedAttributesVertex)
-                attributes.Add(v, new Value(PreDefined.GetPreDefinedValueOfPreDefinedAttributeVertex(v)));
-            //override with every Defined Attribute.
-            foreach (var v in definedAttributes) 
-                attributes.Add(v.Key, v.Value);
+            this.attributes = attributes;
         }
 
         public void UpdateAttribute(string ident, Value value) {

@@ -21,8 +21,8 @@ namespace P4_Project.Compiler.Interpreter
         private SymTable Table { get; }
 
         //The Definition of a vertex and edge attributions.
-        private readonly Dictionary<string, BaseType> _defVertexAttr = new Dictionary<string, BaseType>();
-        private readonly Dictionary<string, BaseType> _defEdgeAttr = new Dictionary<string, BaseType>();
+        private readonly Dictionary<string, Value> _defVertexAttr = new Dictionary<string, Value>();
+        private readonly Dictionary<string, Value> _defEdgeAttr = new Dictionary<string, Value>();
 
         //The Scene will be printed when a print statement is encountered.
         public readonly List<Vertex> scene = new List<Vertex>();
@@ -51,7 +51,6 @@ namespace P4_Project.Compiler.Interpreter
         {
             Table = table;
             _currentScope = _mainScope;
-            MoveAttrDefinitions();
         }
 
 
@@ -64,13 +63,18 @@ namespace P4_Project.Compiler.Interpreter
             }
         }
 
-        private void CreateNewVertex(DeclNode vertex)
+        private void CreateNewVertex(VertexDeclNode vertex)
         {
-            //The vertex is created
-            var values = new Dictionary<string, Value>();
-            foreach (var keyValuePair in _defVertexAttr) 
-                values.Add(keyValuePair.Key, new Value(PreDefined.GetDefaultValueOfAttributeType(keyValuePair.Value)));
-            var v = new Vertex(vertex, values);
+            //The vertex is created using the specific DeclNode and the Attributes
+            var v = new Vertex(vertex, _defVertexAttr);
+            
+            //After vertex creation any AssignNode in the VertexDeclNode must update the vertex.
+            foreach (var l in vertex.Attributes.Statements)
+            {
+                ((AssignNode)l).Value.Accept(this);
+                v.UpdateAttribute(((AssignNode)l).Target.Ident, currentValue);
+            }
+            
             //We add it to the scene and the currentScope.
             scene.Add(v);
             _currentScope.CreateVar(v.identifier,new Value(v));
@@ -78,15 +82,17 @@ namespace P4_Project.Compiler.Interpreter
 
         private void CreateNewEdge(EdgeCreateNode edge)
         {
+            //We extract the vertex that is placed on the leftSide as it is static for the entire EdgeCreateNode
             _currentScope.TryGetValue(edge.LeftSide.Ident, out var v);
             var from = (Vertex)v.o;
+            
+            //For every RightSide we have to create an edge between from and to vertex.
             foreach (var tuple in edge.RightSide) {
-                var values = new Dictionary<string, Value>();
-                foreach (var keyValuePair in _defEdgeAttr)
-                    values.Add(keyValuePair.Key, new Value(PreDefined.GetDefaultValueOfAttributeType(keyValuePair.Value)));
                 _currentScope.TryGetValue(tuple.Item1.Ident, out var v1);
                 var to = (Vertex)v1.o;
-                var e = new Edge(from, edge.Operator, to, values);
+                var e = new Edge(from, edge.Operator, to, _defEdgeAttr);
+                
+                //After edge creation any assigns following updates the attributes. 
                 foreach (var l in tuple.Item2)
                 {
                     l.Value.Accept(this);
@@ -106,23 +112,51 @@ namespace P4_Project.Compiler.Interpreter
                     case Operators.Rightarr:
                         from.edges.Add(e);
                         break;
+                    default: throw new Exception("Unsupported Operator Type int value " + edge.Operator);
                 }
             }
         }
 
         /// <summary>
         /// Function runs only once in the constructor of executor.
-        /// Its response ability is to move attributes to into the executor from the Table.
+        /// Its response ability is to move attributes to into Interpreter and find appropriate Default Value
+        /// As It is the same for edge and vertex only vertex will be explained.
         /// </summary>
         private void MoveAttrDefinitions()
         {
-            if (Table.vertexAttr is null) return;
+            //Every attribute from the table is individually handled.
                 foreach (var v in Table.vertexAttr.GetVariables())
-                    _defVertexAttr.Add(v.Key, v.Value.Type);
-            
-            if (Table.edgeAttr is null) return;
+                {
+                    //If the user has not set a default value in the HeadNode we check if its a Predefined Attribute.
+                    //If the attribute is predefined it will get the value according the the Predefined Value.
+                    //If the attribute is not predefined a we will get the Value as the default value of the type.
+                    if (v.Value.defaultValue is null)
+                        _defVertexAttr.Add(v.Key,
+                            PreDefined.PreDefinedAttributesVertex.Contains(v.Key)
+                                ? PreDefined.GetPreDefinedValueOfPreDefinedAttributeVertex(v.Key)
+                                : PreDefined.GetDefaultValueOfAttributeType(v.Value.Type));
+                    else
+                    {
+                        //If the user has set a default value in the HeadNode it is evaluated now and chosen as value.
+                        v.Value.defaultValue.Accept(this);
+                        _defVertexAttr.Add(v.Key, currentValue);
+                    }
+                }
+
+                //See vertex comments above as they are almost equivalent.
                 foreach (var v in Table.edgeAttr.GetVariables())
-                    _defEdgeAttr.Add(v.Key, v.Value.Type);
+                {
+                    if (v.Value.defaultValue is null)
+                        _defEdgeAttr.Add(v.Key,
+                            PreDefined.PreDefinedAttributesEdge.Contains(v.Key)
+                                ? PreDefined.GetPreDefinedValueOfPreDefinedAttributeEdge(v.Key)
+                                : PreDefined.GetDefaultValueOfAttributeType(v.Value.Type));
+                    else
+                    {
+                        v.Value.defaultValue.Accept(this);
+                        _defEdgeAttr.Add(v.Key, currentValue);
+                    }
+                }
         }
 
         public override void Visit(CallNode node)
@@ -539,7 +573,7 @@ namespace P4_Project.Compiler.Interpreter
         
         public override void Visit(TextConst node)
         {
-            //Because the qoutation marks are a part of the value of a text constant, these need to be removed.
+            //Because the quotation marks are a part of the value of a text constant, these need to be removed.
             currentValue = new Value(node.Value.Substring(1, node.Value.Length - 2));
         }
         public override void Visit(BoolConst node)
@@ -550,7 +584,9 @@ namespace P4_Project.Compiler.Interpreter
         //The Magia node executes everything in it that is not a funcDeclNode and not a HeadNode.
         public override void Visit(Magia node)
         {
+            //We only move the Attributes and Functions after the other visitors have finished.
             MoveFunctions(node);
+            MoveAttrDefinitions();
             foreach(var n in node.block.Statements)
             {
                 if (n.GetType() != typeof(HeadNode) && n.GetType() != typeof(FuncDeclNode))

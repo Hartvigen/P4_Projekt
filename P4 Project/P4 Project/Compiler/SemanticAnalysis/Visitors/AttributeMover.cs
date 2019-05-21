@@ -1,22 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Markup;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
 using P4_Project.AST.Expressions.Identifier;
 using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
+using P4_Project.Compiler.Interpreter;
 using P4_Project.SymbolTable;
 
 namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
     public sealed class AttributeMover : Visitor
     {
-        //This Visitor will add the predefined attributes.
+        //This Visitor will add the predefined attributes and save Default Value node so it can be evaluated later.
         //1. Remove the function "SymbolObject" and set it as type on function scope.
         //2. Move attributes from top scope to their own special scope.
-        //3. Add the default attributes
+        //3. Add the default attributes and Value ExprNode if exist
         //4. Add the default functions
         public override string AppropriateFileName { get; } = "AttributeMover.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
@@ -82,7 +84,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             Table.GetInnerScopes().ForEach(s => {
                 if (s.name != node.SymbolObject.Name) return;
                 s.type = node.SymbolObject.Type;    // Save the type in the scope that corresponds to the function.
-                Table.RemoveObj(node.SymbolObject); // Remove function symbol  
+                Table.RemoveVar(node.SymbolObject); // Remove function symbol  
             });
             node.Parameters.Accept(this);
             node.Body.Accept(this);
@@ -126,22 +128,24 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(HeadNode node)
         {
-            //2. Move attributes from top scope to their own special scope.
+            //2. Move attributes from top scope to their own vertexAttr and edgeAttr
             switch (node.type.name)
             {
                 //Add default attributes
                 case "vertex":
-                    //Add user defined attributes
+                    //Add user defined attributes and value
                     node.attrDeclBlock.Statements.ForEach(s => {
                         var v = (VarDeclNode)s;
-                        Table.vertexAttr.AddObj(v.SymbolObject);
+                        v.SymbolObject.defaultValue = v.DefaultValue;
+                        Table.vertexAttr.AddVar(v.SymbolObject);
                     });
                     break;
                 case "edge":
-                    //Add user defined attributes
+                    //Add user defined attributes and value
                     node.attrDeclBlock.Statements.ForEach(s => {
                         var v = (VarDeclNode)s;
-                        Table.edgeAttr.AddObj(v.SymbolObject);
+                        v.SymbolObject.defaultValue = v.DefaultValue;
+                        Table.edgeAttr.AddVar(v.SymbolObject);
                     });
                     break;
                 default: 
@@ -178,13 +182,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             Table.vertexAttr = new SymTable(null, null, " ") { header = true };
             PreDefined.PreDefinedAttributesVertex.ForEach(va =>
             {
-                Table.vertexAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0));
+                Table.vertexAttr.AddVar(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeVertex(va)), 0));
             });
 
             Table.edgeAttr = new SymTable(null, null, " ") { header = true };
             PreDefined.PreDefinedAttributesEdge.ForEach(va =>
             {
-                Table.edgeAttr.AddObj(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0));
+                Table.edgeAttr.AddVar(new Obj(va, new BaseType(PreDefined.GetTypeOfPreDefinedAttributeEdge(va)), 0));
             });
 
             node.block.Accept(this);

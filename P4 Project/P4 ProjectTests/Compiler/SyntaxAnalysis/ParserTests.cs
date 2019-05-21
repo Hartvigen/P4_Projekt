@@ -249,7 +249,7 @@ namespace P4_ProjectTests.Compiler.SyntaxAnalysis
 
             var parser  = new Parser(new Scanner(StreamFromString(numDec)));
             parser.Parse();
-            var x = parser.tab.Find("x");
+            var x = parser.tab.FindVar("x");
 
             Assert.IsTrue(x.Name == "x");
             Assert.IsTrue(x.Kind == 0);
@@ -265,9 +265,9 @@ namespace P4_ProjectTests.Compiler.SyntaxAnalysis
 
             Parser parser = new Parser(new Scanner(StreamFromString(scopeTest)));
             parser.Parse();
-            var x = parser.tab.Find("x");
-            var y = parser.tab.GetInnerScopes()[0].Find("y");
-            var x2 = parser.tab.GetInnerScopes()[0].Find("x");
+            var x = parser.tab.FindVar("x");
+            var y = parser.tab.GetInnerScopes()[0].FindVar("y");
+            var x2 = parser.tab.GetInnerScopes()[0].FindVar("x");
 
             Assert.IsTrue(x.Name == "x");
             Assert.IsTrue(x.Kind == 0);

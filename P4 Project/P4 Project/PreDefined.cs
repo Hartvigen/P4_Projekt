@@ -59,48 +59,48 @@ namespace P4_Project
             "style"
         };
 
-        public static object GetPreDefinedValueOfPreDefinedAttributeVertex(string name)
+        public static Value GetPreDefinedValueOfPreDefinedAttributeVertex(string name)
         {
             switch (name)
             {
                 case "label":
-                    return "vertex";
+                    return new Value("");
                 case "color":
-                    return "black";
+                    return new Value("black");
                 default:
                     throw new Exception("Attribute: " + name + " has no predefined value for vertex!");
             }
         }
 
-        public static object GetPreDefinedValueOfPreDefinedAttributeEdge(string name)
+        public static Value GetPreDefinedValueOfPreDefinedAttributeEdge(string name)
         {
             switch (name)
             {
                 case "label":
-                    return "default";
+                    return new Value("");
                 case "color":
-                    return "black";
+                    return new Value("black");
                 case "style":
-                    return "none";
+                    return new Value("none");
                 default:
                     throw new Exception("Attribute: " + name + " has no predefined value for edge!");
             }
         }
 
-        public static object GetDefaultValueOfAttributeType(BaseType type)
+        public static Value GetDefaultValueOfAttributeType(BaseType type)
         {
             switch (type.name)
             {
                 case "number":
-                    return 0.0;
+                    return new Value(0.0);
                 case "text":
-                    return "";
+                    return new Value("");
                 case "boolean":
-                    return false;
+                    return new Value(false);
                 case "vertex":
                 case "edge":
                 case "collec":
-                    return new NoneConst();
+                    return new Value(new NoneConst());
                 default:
                     throw new Exception("Type: " + type.name + " has no predefined value!");
             }

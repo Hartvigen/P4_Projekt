@@ -182,7 +182,7 @@ public class Parser {
 		}
 		ExpectWeak(14, 3);
 		tab = tab.CloseScope(); 
-		Obj funcObj = tab.NewObj(funcName, protocol, Func);
+		Obj funcObj = tab.NewVar(funcName, protocol, Func);
 		funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
 	}
 
@@ -194,7 +194,7 @@ public class Parser {
 		if (la.kind == 28) {
 			Assign(out value);
 		}
-		varDecl = new VarDeclNode(tab.NewObj(name, type, Var), value); 
+		varDecl = new VarDeclNode(tab.NewVar(name, type, Var), value); 
 	}
 
 	void Type(out BaseType type) {
@@ -210,7 +210,7 @@ public class Parser {
 		varDecl = null; BaseType type = null; 
 		Type(out type);
 		Expect(1);
-		varDecl = new VarDeclNode(tab.NewObj(t.val, type, Var), null); 
+		varDecl = new VarDeclNode(tab.NewVar(t.val, type, Var), null); 
 	}
 
 	void StructStmt(out StmtNode stmt) {
@@ -264,7 +264,7 @@ public class Parser {
 			if (la.kind == 28) {
 				Assign(out expr);
 			}
-			stmt = new VarDeclNode(tab.NewObj(name, type, Var), expr); 
+			stmt = new VarDeclNode(tab.NewVar(name, type, Var), expr); 
 		} else if (la.kind == 13) {
 			Get();
 			MultiDecl multiDecl = new MultiDecl(); 
@@ -339,7 +339,7 @@ public class Parser {
 		tab = tab.OpenScope(); 
 		Type(out BaseType type);
 		Expect(1);
-		itrVar = new VarDeclNode(tab.NewObj(t.val, type, Var), null); 
+		itrVar = new VarDeclNode(tab.NewVar(t.val, type, Var), null); 
 		Expect(18);
 		Expr(out ExprNode collection);
 		Expect(9);
@@ -485,7 +485,7 @@ public class Parser {
 		vertexDecl = null; VarNode varNode = null; ExprNode expr = null; 
 		Expect(7);
 		Expect(1);
-		vertexDecl = new VertexDeclNode(tab.NewObj(t.val, new BaseType("vertex"), Var)); 
+		vertexDecl = new VertexDeclNode(tab.NewVar(t.val, new BaseType("vertex"), Var)); 
 		while (WeakSeparator(8,17,5) ) {
 			SymbolRef(out varNode);
 			Assign(out expr);

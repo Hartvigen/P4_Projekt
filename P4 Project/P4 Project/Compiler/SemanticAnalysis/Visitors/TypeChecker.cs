@@ -82,8 +82,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Source?.Accept(this);
 
             //We assign the type found from the table.
-            if(ActiveScope.Find(node.Ident) != null)
-                node.type = ActiveScope.Find(node.Ident).Type;
+            if(ActiveScope.FindVar(node.Ident) != null)
+                node.type = ActiveScope.FindVar(node.Ident).Type;
 
 			//If the Source exist we can find the type as from the attribute that matches from the source
 			if (node.type == null && node.Source?.type != null) {
@@ -222,8 +222,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     a.Value.Accept(this);
 
                     //We find the header scope for edge take the type of the attribute
-                        if (Table.edgeAttr.Find(a.Target.Ident).Type.name != a.Value.type.name)
-                            ErrorList.Add(a.Target.Ident + " is type: " + a.Target.type.name + " so type: " + Table.edgeAttr.Find(a.Target.Ident).Type.name + " is not a valid type to assign.");
+                        if (Table.edgeAttr.FindVar(a.Target.Ident).Type.name != a.Value.type.name)
+                            ErrorList.Add(a.Target.Ident + " is type: " + a.Target.type.name + " so type: " + Table.edgeAttr.FindVar(a.Target.Ident).Type.name + " is not a valid type to assign.");
                 });
             });
         }
@@ -304,7 +304,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Target.Accept(this);
             node.Value.Accept(this);
 
-            if (ActiveScope.Find(node.Target.Ident) == null) {
+            if (ActiveScope.FindVar(node.Target.Ident) == null) {
                 //If there is a source it is not a problem
                 if (node.Target.Source != null)
                     return;
@@ -312,7 +312,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 return;
             }
 
-            var t = ActiveScope.Find(node.Target.Ident).Type;
+            var t = ActiveScope.FindVar(node.Target.Ident).Type;
             var v = node.Value.type;
 
             if (v.name == "func")
@@ -348,8 +348,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Iterator.Accept(this);
             node.Body.Accept(this);
 
-            if (ActiveScope.Find(node.IterationVar.SymbolObject.Name) is null)
-                ActiveScope.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
+            if (ActiveScope.FindVar(node.IterationVar.SymbolObject.Name) is null)
+                ActiveScope.NewVar(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
 
             if (node.Iterator.type.name != "collec" && node.Iterator.type.name != "text")
                 ErrorList.Add("The iterator in a foreach must be a collection or a text!");
