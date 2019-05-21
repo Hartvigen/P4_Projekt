@@ -151,52 +151,52 @@ namespace P4_Project
                     //Collections
                     case "Clear":
                         //TODO
-                        //Clear(parameters, executor);
+                        Clear(parameters, executor);
                         break;
                     case "Size":
                         Size(parameters, executor);
                         break;
                     case "IsEmpty":
                         //TODO
-                        //IsEmpty(parameters, executor);
+                        IsEmpty(parameters, executor);
                         break;
                     case "Contains":
                         //TODO
-                        //Contains(parameters, executor);
+                        Contains(parameters, executor);
                         break;
                     case "Add":
                         Add(parameters, executor);
                         break;
                     case "Push":
                         //TODO
-                        //Push(parameters, executor);
+                        Push(parameters, executor);
                         break;
                     case "Enqueue":
                         //TODO
-                        //Enqueue(parameters, executor);
+                        Enqueue(parameters, executor);
                         break;
                     case "Remove":
                         RemoveEdge(parameters, executor);
                         break;
                     case "Pop":
                         //TODO
-                        //Pop(parameters, executor);
+                        Pop(parameters, executor);                        
                         break;
                     case "Dequeue":
                         //TODO
-                        //Dequeue(parameters, executor);
+                        Dequeue(parameters, executor);
                         break;
                     case "Get":
                         //TODO
-                        //Get(parameters, executor);
+                        Get(parameters, executor);
                         break;
                     case "Peek":
                         //TODO
-                        //Peek(parameters, executor);
+                        Peek(parameters, executor);
                         break;
                     case "Union":
                         //TODO
-                        //Union(parameters, executor);
+                        Union(parameters, executor);
                         break;
                     //Graph
                     case "GetEdge":
@@ -263,32 +263,83 @@ namespace P4_Project
         * Implementation of collection pre-defined functions
         */
 
-        private static void Add(IReadOnlyList<Value> parameters, Interpreter executor)
+        private static void Clear(List<Value> parameters, Interpreter executor)
         {
-            switch (parameters[0].type.collectionType.name)
-            {
-                case "list":
-                    (parameters[0].o as List<object>)?.Add(parameters[1].o);                   
-                    break;
-                case "set":
-                    (parameters[0].o as HashSet<object>)?.Add(parameters[1].o);
-                    break;
-                default:
-                    throw new Exception("Add only works with collections of type list or set");
-            }
-
+            ((List<object>)parameters[0].o).Clear();
         }
 
         private static void Size(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            executor.currentValue = new Value( (double)((List<object>) parameters[0].o).Count);         
+            executor.currentValue = new Value((double)((List<object>)parameters[0].o).Count);
         }
 
+        private static void IsEmpty(IReadOnlyList<Value> parameters, Interpreter executor)
+        {
+            executor.currentValue = new Value( ((List<object>) parameters[0].o).Count == 0? true : false);
+        }
+
+        private static void Contains(IReadOnlyList<Value> parameters, Interpreter executor)
+        {
+            executor.currentValue = new Value(((List<object>) parameters[0].o).Contains(parameters[1].o));
+        }
+
+        private static void Add(List<Value> parameters, Interpreter executor)
+        {
+            ((List<object>)parameters[0].o).Add(parameters[1].o);
+        }
+
+        private static void Push(List<Value> parameters, Interpreter executor)
+        {
+            ((List<object>)parameters[0].o).Insert(0, parameters[1].o);
+        }
+
+        private static void Enqueue(List<Value> parameters, Interpreter executor)
+        {
+            ((List<object>)parameters[0].o).Add(parameters[1].o);
+        }
+
+        private static void Remove(List<Value> parameters, Interpreter executor)
+        {
+            if (parameters[0].type.collectionType.name == "list")
+                ((List<object>)parameters[0].o).RemoveAt(((int)parameters[1].o) - 1);
+            else if (parameters[0].type.collectionType.name == "set")
+                ((List<object>)parameters[0].o).Remove(parameters[1].o);            
+        }
+
+        private static void Pop(List<Value> parameters, Interpreter executor)
+        {
+            executor.currentValue = new Value(((List<object>)parameters[0].o)[0]);
+            ((List<object>)parameters[0].o).RemoveAt(0);
+        }
+        private static void Dequeue(List<Value> parameters, Interpreter executor)
+        {
+            executor.currentValue = new Value(((List<object>)parameters[0].o)[0]);
+            ((List<object>)parameters[0].o).RemoveAt(0);
+        }
+
+        private static void Get(List<Value> parameters, Interpreter executor)
+        {
+            executor.currentValue = new Value(((List<object>)parameters[0].o)[((int) parameters[1].o)]);
+        }
+
+        private static void Peek(List<Value> parameters, Interpreter executor)
+        {
+            executor.currentValue = new Value(((List<object>)parameters[0].o)[0]);
+        }
+
+        private static void Union(List<Value> parameters, Interpreter executor)
+        {
+            foreach (var v in (List<object>)parameters[1].o)
+            {
+                if (!((List<object>)parameters[0].o).Contains(v))
+                    ((List<object>)parameters[0].o).Add(v);
+            }
+        }
         /*
         * Implementation of graph pre-defined functions
         */
 
-       
+
         private static void GetEdge(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             var v1 = (Vertex)parameters[0].o;
@@ -298,7 +349,10 @@ namespace P4_Project
                 foreach (var e in v.edges)
                 {
                     if (e.HasVertex(v1, v2))
+                    {
                         executor.currentValue = new Value(e);
+                        return;
+                    }
                 }
             }
             executor.currentValue = new Value(new NoneConst());
@@ -307,19 +361,19 @@ namespace P4_Project
         private static void GetVertices(Interpreter executor)
         {
             executor.currentValue = null;
-            var vertexList = new List<Vertex>();
+            var vertexList = new List<object>();
             foreach (var v in executor.scene)
                 vertexList.Add(v);
-            executor.currentValue = new Value(vertexList);
+            executor.currentValue = new Value(vertexList, new BaseType(new BaseType("vertex"), new BaseType("list")));
         }
 
         private static void GetEdges(Interpreter executor)
         {
             executor.currentValue = null;
-            var edgeList = new List<Edge>();
+            var edgeList = new List<object>();
             foreach (var v in executor.scene)
                 edgeList.AddRange(v.edges);
-            executor.currentValue = new Value(edgeList);
+            executor.currentValue = new Value(edgeList, new BaseType(new BaseType("edge"), new BaseType("list")));
         }
 
         private static void GetAdjacent(IReadOnlyList<Value> parameters, Interpreter executor)
@@ -373,6 +427,14 @@ namespace P4_Project
                 case "AsText": return new BaseType("text");
                 case "Terminal": return new BaseType("none");
                 //Collection
+                case "Clear": return new BaseType("none");
+                case "Size": return new BaseType("number");
+                case "IsEmpty": return new BaseType("boolean");
+                case "Contains": return new BaseType("boolean");
+                case "Add": return new BaseType("none");
+                case "Push": return new BaseType("none");
+                case "Enqueue": return new BaseType("none");
+                case "Remove": return new BaseType("none");
                 case "Pop":
                     switch (parameters[0].singleType.name)
                     {
@@ -388,12 +450,48 @@ namespace P4_Project
                             return new BaseType("boolean");
                         default: throw new Exception(parameters[0].singleType.name + " is not a valid type to Pop");
                     }
-                case "Add": return new BaseType("none");
-                case "Size": return new BaseType("number");
+                case "Dequeue":
+                    switch (parameters[0].singleType.name)
+                    {
+                        case "number": return new BaseType("number");
+                        case "boolean": return new BaseType("boolean");
+                        case "text": return new BaseType("text");
+                        case "vertex": return new BaseType("vertex");
+                        case "edge": return new BaseType("edge");
+                        default: throw new Exception("A queue with element type " + parameters[0].singleType.name + " does not have a valid return type for Dequeue");
+                    }
+                case "Get":
+                    switch (parameters[0].singleType.name)
+                    {
+                        case "number": return new BaseType("number");
+                        case "boolean": return new BaseType("boolean");
+                        case "text": return new BaseType("text");
+                        case "vertex": return new BaseType("vertex");
+                        case "edge": return new BaseType("edge");
+                        default: throw new Exception("A list with element type " + parameters[0].singleType.name + " does not have a valid return type for Get");
+                    }
+                case "Peek":
+                    switch (parameters[0].singleType.name)
+                    {
+                        case "number": return new BaseType("number");
+                        case "boolean": return new BaseType("boolean");
+                        case "text": return new BaseType("text");
+                        case "vertex": return new BaseType("vertex");
+                        case "edge": return new BaseType("edge");
+                        default: throw new Exception("A " + parameters[0].collectionType.name + " with element type " + parameters[0].singleType.name + " does not have a valid return type for Peek");
+                    }
+                case "Union":
+                    switch (parameters[0].singleType.name)
+                    {
+                        case "number": return new BaseType(new BaseType("number"), new BaseType("set"));
+                        case "boolean": return new BaseType(new BaseType("boolean"), new BaseType("set"));
+                        case "text": return new BaseType(new BaseType("text"), new BaseType("set"));
+                        case "vertex": return new BaseType(new BaseType("vertex"), new BaseType("set"));
+                        case "edge": return new BaseType(new BaseType("edge"), new BaseType("set"));
+                        default: throw new Exception("A set with element type " + parameters[0].singleType.name + " does not have a valid return type for Union");
+                    }                   
                 //Graph
-                case "GetEdge":
-                    //switch(parameters[0].)
-                    return new BaseType("edge");
+                case "GetEdge": return new BaseType("edge");
                 case "GetVertices": return new BaseType(new BaseType("vertex"), new BaseType("set"));
                 case "GetEdges": return new BaseType(new BaseType("edge"), new BaseType("set"));
                 case "GetAdjacent": return new BaseType(new BaseType("vertex"), new BaseType("list"));

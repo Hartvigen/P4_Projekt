@@ -170,6 +170,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
             if (l == null || r == null)
                 return;
+            if ((l.name == "none" && (r.name == "vertex" || r.name == "edge")) || (r.name == "none" && (l.name == "vertex" || l.name == "edge")))
+                return;
 
             if (l.name == "func")
                 l.name = l.returnType.name;
@@ -324,6 +326,10 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     return;
             }
 
+            if ((t.name == "vertex" || t.name == "edge") && v.name == "none")
+                return;
+
+
             if (t.name != v.name)
             {
                 ErrorList.Add("Incompatible types in Assign of variable: " + t.name + " and " + v.name);
@@ -345,10 +351,10 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             if (ActiveScope.Find(node.IterationVar.SymbolObject.Name) is null)
                 ActiveScope.NewObj(node.IterationVar.SymbolObject.Name, node.IterationVar.type, node.IterationVar.SymbolObject.Kind);
 
-            if (node.Iterator.type.name != "collec")
-                ErrorList.Add("The iterator in a foreach must be a collection!");
+            if (node.Iterator.type.name != "collec" && node.Iterator.type.name != "text")
+                ErrorList.Add("The iterator in a foreach must be a collection or a text!");
 
-            if (node.Iterator.type.singleType.name != node.IterationVar.type.name)
+            if (node.Iterator.type.name != "text" && node.Iterator.type.singleType.name != node.IterationVar.type.name)
                 ErrorList.Add("Foreach loop has collection type: " + node.Iterator.type.singleType.name + " and the variable has type: " + node.IterationVar.type.name);
             LeaveThisScope();
         }

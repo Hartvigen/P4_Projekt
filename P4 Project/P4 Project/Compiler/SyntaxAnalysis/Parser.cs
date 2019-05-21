@@ -96,13 +96,14 @@ public class Parser {
 
 	
 	void MAGIA() {
-		mainNode = null; BlockNode mainBlock = new BlockNode(); tab = tab.OpenScope(); tab.header = true; 
+		mainNode = null; BlockNode mainBlock = new BlockNode(); 
 		while (la.kind == 4) {
 			while (!(la.kind == 0 || la.kind == 4)) {SynErr(54); Get();}
+            tab = tab.OpenScope(); tab.header = true;
 			Head(out HeadNode head);
-			mainBlock.Add(head);             
-		}
-		tab = tab.CloseScope();          
+			mainBlock.Add(head);
+            tab = tab.CloseScope();            
+		}       
 		while (StartOf(1)) {
 			while (!(StartOf(2))) {SynErr(55); Get();}
 			Stmt(out StmtNode stmt);
