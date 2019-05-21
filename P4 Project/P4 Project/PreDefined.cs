@@ -492,8 +492,8 @@ namespace P4_Project
                     }                   
                 //Graph
                 case "GetEdge": return new BaseType("edge");
-                case "GetVertices": return new BaseType(new BaseType("vertex"), new BaseType("set"));
-                case "GetEdges": return new BaseType(new BaseType("edge"), new BaseType("set"));
+                case "GetVertices": return new BaseType(new BaseType("vertex"), new BaseType("list"));
+                case "GetEdges": return new BaseType(new BaseType("edge"), new BaseType("list"));
                 case "GetAdjacent": return new BaseType(new BaseType("vertex"), new BaseType("list"));
                 case "RemoveVertex": return new BaseType("none");
                 case "RemoveEdge": return new BaseType("none");

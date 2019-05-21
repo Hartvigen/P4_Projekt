@@ -39,7 +39,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(CallNode node)
         {
             node.Parameters.Accept(this);
-            node.type = Table.FindReturnTypeOfFunction(node.Ident, node.Parameters.Expressions.Select(expr => expr.type).ToList());
+            //node.type = Table.FindReturnTypeOfFunction(node.Ident, node.Parameters.Expressions.Select(expr => expr.type).ToList());
         }
 
         public override void Visit(VarNode node)
@@ -49,11 +49,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             //If the Source is not null this must be an attribute of the source type  
             if (node.Source != null)
             {
+                /*
                 // Check if 'node.Ident' is a valid atribute in the type denoded by 'node.Source.type.name'
                 if (Table.IsAttribute(node.Source.type.name, node.Ident))
                     node.type = Table.GetTypeOfAttribute(node.Source.type.name, node.Ident);
                 else
                     ErrorList.Add(node.Ident + " is not a valid attribute of: " + node.Source.type.name);
+                */
             }
             else
             {

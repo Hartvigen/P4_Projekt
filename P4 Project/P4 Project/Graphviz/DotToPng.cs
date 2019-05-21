@@ -20,7 +20,7 @@ namespace P4_Project.Graphviz
 
         public static void CreatePngFile(string dot, string fileName)
         {
-            var output = Setup().GenerateGraph(dot, Enums.GraphReturnType.Png);
+            byte[] output = Setup().GenerateGraph(dot, Enums.GraphReturnType.Png);
             if (File.Exists(fileName))
                 File.Delete(fileName);
             File.WriteAllBytes(fileName, output);
@@ -28,7 +28,7 @@ namespace P4_Project.Graphviz
 
         public static bool CreatePngFile()
         {
-            var output = Setup().GenerateGraph(DefaultDotCode, Enums.GraphReturnType.Png);
+            byte[] output = Setup().GenerateGraph(DefaultDotCode, Enums.GraphReturnType.Png);
             if (File.Exists(DefaultFilePath))
                 File.Delete(DefaultFilePath);
             File.WriteAllBytes(DefaultFilePath, output);

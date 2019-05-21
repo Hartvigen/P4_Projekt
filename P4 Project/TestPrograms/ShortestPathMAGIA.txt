@@ -3,11 +3,50 @@
 
 /*-------------------------------------------------------------------------*/
 
-list<vertex> startAndEnd = Initialize()
+vertex endNode = Initialize()
+Print();
+
+set<vertex> processed = set<vertex> { }
+list<vertex> remaining = GetVertices()
+
+while (!IsEmpty(remaining)) {
+    vertex current = ExtractMin(remaining)
+    Add(processed, current)
+    foreach (vertex v in GetAdjacent(current)) {
+        Relax(current, v)
+    }
+    Print()
+}
 
 Print()
 
 /*-------------------------------------------------------------------------*/
+
+func none Relax(vertex start, vertex end) {
+    number edgeLength = GetEdge(start, end).weight
+    if (end.distance > start.distance + edgeLength) {
+        end.distance = start.distance + edgeLength
+        end.label = AsText(end.distance)
+        end.parent = start
+    }
+}
+
+func vertex ExtractMin(list<vertex> remaining) {
+    vertex smallest = Get(remaining, 0)
+    number smallestIndex = 0
+    number currentIndex = 0
+
+    foreach (vertex v in remaining) {
+        if (v.distance < smallest.distance) {
+            smallest = v
+            smallestIndex = currentIndex
+        }
+        currentIndex = currentIndex + 1
+    }
+
+    Remove(remaining, smallestIndex)
+    return smallest
+}
 
 func list<vertex> Initialize() {
     vertex {
@@ -21,16 +60,11 @@ func list<vertex> Initialize() {
         (B, label = "B")
     }
 
-    A -> { (v1), (v2) }
-
+    A -- { (v1), (v4) }
+    v2 -- { (v1), (v3) }
+    v3 -- { (v4), (v5) }
+    v5 -- { (B), (v4), (v6) }
+    v6 -- { (B) }
 
     return list<vertex> { A, B }
-}
-
-func none Relax(vertex start, vertex end) {
-    number edgeLength = GetEdge(start, end).weight
-    if (end.distance > start.distance + edgeLength) {
-        end.distance = start.distance + edgeLength
-        end.parent = start
-    }
 }
