@@ -13,8 +13,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
     public sealed class AttributeMover : Visitor
     {
-        //This Visitor will fix attributes and functions
-        //Like:
+        //This Visitor will add the predefined attributes.
         //1. Remove the function "SymbolObject" and set it as type on function scope.
         //2. Move attributes from top scope to their own special scope.
         //3. Add the default attributes
@@ -81,11 +80,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             //1. Remove the function "SymbolObject" from the list of symbols, but register type info in the function's scope.
             Table.GetInnerScopes().ForEach(s => {
-                if (s.name == node.SymbolObject.Name)
-                {
-                    s.type = node.SymbolObject.Type;    // Save function type in scope
-                    Table.RemoveObj(node.SymbolObject); // Remove function symbol
-                }
+                if (s.name != node.SymbolObject.Name) return;
+                s.type = node.SymbolObject.Type;    // Save the type in the scope that corresponds to the function.
+                Table.RemoveObj(node.SymbolObject); // Remove function symbol  
             });
             node.Parameters.Accept(this);
             node.Body.Accept(this);
@@ -130,7 +127,6 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(HeadNode node)
         {
             //2. Move attributes from top scope to their own special scope.
-
             switch (node.type.name)
             {
                 //Add default attributes

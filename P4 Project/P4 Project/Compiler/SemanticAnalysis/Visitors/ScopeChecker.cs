@@ -228,6 +228,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(Magia node)
         {
            node.block.Accept(this);
+           //Scope Positions are reset so other visitors have a clean position tree no matter what.
+           Table.ResetScopePositions();
         }
 
         public override void Visit(BreakNode node)

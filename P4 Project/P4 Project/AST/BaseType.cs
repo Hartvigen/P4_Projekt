@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.CodeDom;
+using System.Collections.Generic;
 
 namespace P4_Project.AST
 {
@@ -12,7 +13,7 @@ namespace P4_Project.AST
         public string name;
 
         //Function Type
-        public readonly string returnType = "none";
+        public readonly BaseType returnType;
         public readonly List<BaseType> parameterTypes;
 
         //CollectionTypes
@@ -38,8 +39,7 @@ namespace P4_Project.AST
         public BaseType(BaseType returnType, List<BaseType> parameterTypes)
         {
             name = "func";
-            if(returnType != null)
-                this.returnType = returnType.name;
+            this.returnType = returnType;
             this.parameterTypes = parameterTypes;
         }
         

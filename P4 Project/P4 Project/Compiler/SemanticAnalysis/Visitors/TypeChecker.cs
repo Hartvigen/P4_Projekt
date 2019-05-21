@@ -11,7 +11,7 @@ using P4_Project.SymbolTable;
 namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
 
-    //The typechecker is responsbile for:
+    //The typeChecker is responsible for:
     //1. Assigning variables a type when they are declared
     //2. Assuring that each expression in a collection is of the same type as the collection itself
     //3. Assuring that an edge can only be declared between two 
@@ -38,29 +38,30 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             node.Parameters.Expressions.ForEach(e => e.Accept(this));
 
-            //We check that parameter types match.
-            var parameterList = Table.FindParameterListOfFunction(node.Ident);
-            bool validFound = false;
+            var validFound = false;
 
-            foreach (var parameters in parameterList)
+            //We check that parameter types match.
+            foreach (var parameters in Table.FindParameterListOfFunction(node.Ident))
             {
                 validFound = true;
                 for (var i = parameters.Count; i > 0; i--)
                 {
-                    if (node.Parameters.Expressions[i - 1].type.name == "collec" && parameters[i - 1].name == "collec")
+                    //If the type is a function call we have to use the return type else we use it's type as is.
+                    var type = node.Parameters.Expressions[i - 1].type.name == "func" ?
+                        node.Parameters.Expressions[i - 1].type.returnType : 
+                        node.Parameters.Expressions[i - 1].type;
+                    
+                    //If its a collection type we check both the collection type and the single type match.
+                    if (type.name == "collec" && parameters[i - 1].name == "collec")
                     {
-                        if (node.Parameters.Expressions[i - 1].type.collectionType.name != parameters[i - 1].collectionType.name 
-                            || node.Parameters.Expressions[i - 1].type.singleType.name != parameters[i - 1].singleType.name)
-                        {
-                            validFound = false;
-                            break;
-                        }
-                    }
-                    else if (node.Parameters.Expressions[i-1].type.name != parameters[i-1].name)
-                    {
-                        validFound = false;
-                        break;
-                    }
+                        if (type.collectionType.name == parameters[i - 1].collectionType.name)
+                            if (type.singleType.name == parameters[i - 1].singleType.name)
+                                continue;
+                    }else if (node.Parameters.Expressions[i - 1].type.name == parameters[i - 1].name) 
+                        continue;
+                    
+                    validFound = false;
+                    break;
                 }
 
                 if (!validFound) 
@@ -71,11 +72,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 node.type = Table.FindReturnTypeOfFunction(node.Ident, parameters);
                 break;
             }
-
             if (!validFound)
-            {
                 ErrorList.Add($"No valid parameter set found for overloaded function: '{node.Ident}'");
-            }
         }
 
         //finds variable type, and returns the type.
@@ -89,7 +87,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
 			//If the Source exist we can find the type as from the attribute that matches from the source
 			if (node.type == null && node.Source?.type != null) {
-                string attrTypeName = node.Source.type.name == "func" ? node.Source.type.returnType : node.Source.type.name;
+                string attrTypeName = node.Source.type.name == "func" ? node.Source.type.returnType.name : node.Source.type.name;
 
                 if (Table.IsAttribute(attrTypeName, node.Ident)) {
 					node.type = Table.GetTypeOfAttribute(attrTypeName, node.Ident);
@@ -174,10 +172,10 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 return;
 
             if (l.name == "func")
-                l.name = l.returnType;
+                l.name = l.returnType.name;
 
             if (r.name == "func")
-                r.name = r.returnType;
+                r.name = r.returnType.name;
 
             if (Operators.GetResultingTypeFromOperandTypeAndOperator(l, node.OperatorType) is null)
                 ErrorList.Add("The operator: " + Operators.GetCodeFromInt(node.OperatorType) + " cannot be used with type: " + l);
@@ -200,7 +198,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         //checks if both types of an EdgeCreateNode is an vertex
         public override void Visit(EdgeCreateNode node)
         {
-            //We visit leftside to assign it a type.
+            //We visit leftSide to assign it a type.
             node.LeftSide.Accept(this);
 
             //We make sure that the left side is a vertex.
@@ -208,7 +206,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 ErrorList.Add("Edge cannot be created with: " + node.LeftSide.Ident + " as it has type: " + node.LeftSide.type);
             
 
-            //Foreach rightside we makesure item1 is vertex and all the attribute types are assigned with correct type.
+            //Foreach rightSide we make sure item1 is vertex and all the attribute types are assigned with correct type.
             node.RightSide.ForEach(t => {
                 t.Item1.Accept(this);
 
@@ -241,7 +239,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 var retNode = (ReturnNode) stmtNode;
 
                 var actualReturnType = retNode.Ret.type.name;
-                var declaredReturnType = node.SymbolObject.Type.returnType;
+                var declaredReturnType = node.SymbolObject.Type.returnType.name;
                 if (actualReturnType != declaredReturnType)
                 {
                     ErrorList.Add(
@@ -266,7 +264,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
             if (node.DefaultValue.type.name == "func")
             {
-                if (node.DefaultValue.type.returnType != node.SymbolObject.Type.name)
+                if (node.DefaultValue.type.returnType.name != node.SymbolObject.Type.name)
                     ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with call that returns: " + node.DefaultValue.type.returnType + " when variable is type: " + node.type);
             }else if (node.DefaultValue.type.name != node.type.name && node.DefaultValue.type.name != "none")
                 ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with of type: " + node.DefaultValue.type + " when variable is type: " + node.type);
@@ -317,7 +315,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
             if (v.name == "func")
             {
-                if (v.returnType != t.name)
+                if (v.returnType.name != t.name)
                 {
                     ErrorList.Add("Call returns a type: " + v.returnType + "but needs type: " + t.name);
                     return;
@@ -421,9 +419,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         
         public override void Visit(Magia node)
         {
-            //We reset the ScopePositions
-            Table.ResetScopePositions();
             node.block.Accept(this);
+            //Scope Positions are reset so other visitors have a clean position tree no matter what.
+            Table.ResetScopePositions();
         }
 
         public override void Visit(BreakNode node)

@@ -12,8 +12,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
     public sealed class Cleaner : Visitor
     {
-        //This Visitor checks for obviously missing/wrong things. 
-        //Like: 
+        //This Visitor checks for obviously missing/wrong things.
         //1. All function calls corresponds to a function. 
         //2. Calls have the correct amount of parameters when calling 
         //3. Expressions aren't outright missing or null 
@@ -41,18 +40,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 ErrorList.Add($"Call made to function '{node.Ident}', which is not a declared function and not a predefined function");
 
             //2. Calls have the correct amount of parameters when calling
-            var valid = false;
             foreach (var baseTypes in Table.FindParameterListOfFunction(node.Ident))
             {
-                if (node.Parameters.Expressions.Count == baseTypes.Count)
-                {
-                    valid = true;
-                    break;
-                }
+                if (node.Parameters.Expressions.Count != baseTypes.Count) continue;
+                return;
             }
             
-            if (!valid)
-                ErrorList.Add($"The function '{node.Ident}' cannot be called with '{node.Parameters.Expressions.Count}' parameters");
+            ErrorList.Add($"The function '{node.Ident}' cannot be called with '{node.Parameters.Expressions.Count}' parameters");
         }
         public override void Visit(VarNode node)
         {
@@ -112,20 +106,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.Parameters.Accept(this);
             node.Body.Accept(this);
 
-            //4. functions with a non "none" return type must have at least one return inside them! 
-            if (node.SymbolObject.Type.returnType != "none")
-            {
-                bool retExists = false;
-                node.Body.Statements.ForEach(n =>
-                {
-                    if (n.GetType() == typeof(ReturnNode))
-                        retExists = true;
-                });
-                if (retExists)
+            //4. functions with a non "none" return type must have at least one return inside them!
+            if (node.SymbolObject.Type.returnType.name == "none") return;
+            foreach (var n in node.Body.Statements)
+                if (n.GetType() == typeof(ReturnNode))
                     return;
-
-                ErrorList.Add($"Function '{node.SymbolObject.Name}' has no return statement in its body and is not declared to return none!");
-            }
+            
+            ErrorList.Add($"Function '{node.SymbolObject.Name}' has no return statement in its body and is not declared to return none!");
         }
 
         public override void Visit(VarDeclNode node)
@@ -168,23 +155,24 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             node.attrDeclBlock.Accept(this);
 
-            //5. Checks that at maximum one of each type header exists! 
-            if (node.type.name == "edge" && !_edgeHeadExists)
+            //5. Checks that at maximum one of each type header exists.
+            switch (node.type.name)
             {
-                _edgeHeadExists = true;
-                return;
+                case "edge" when !_edgeHeadExists:
+                    _edgeHeadExists = true;
+                    return;
+                case "edge" when _edgeHeadExists:
+                    ErrorList.Add("Only one edge-header is allowed!");
+                    return;
+                case "vertex" when !_vertexHeadExists:
+                    _vertexHeadExists = true;
+                    return;
+                case "vertex" when _vertexHeadExists:
+                    ErrorList.Add("Only one vertex-header is allowed!");
+                    return;
+                default: ErrorList.Add("HeadNode must be type edge or vertex");
+                    return;
             }
-
-            if (node.type.name == "vertex" && !_vertexHeadExists)
-            {
-                _vertexHeadExists = true;
-                return;
-            }
-
-            if (_edgeHeadExists && node.type.name == "edge")
-                ErrorList.Add("Only one edge-header is allowed!");
-            else if(_vertexHeadExists && node.type.name == "vertex")
-                ErrorList.Add("Only one vertex-header is allowed!");
         }
 
         public override void Visit(IfNode node)
