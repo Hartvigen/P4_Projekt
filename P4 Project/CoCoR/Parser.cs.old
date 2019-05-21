@@ -421,7 +421,7 @@ public class Parser {
 	}
 
 	void CallOrID(out IdentNode i) {
-		i = null; IdentNode bottom = null; 
+		i = null; 
 		SymbolRef(out VarNode varNode);
 		i = varNode; 
 		if (la.kind == 7) {
@@ -430,10 +430,9 @@ public class Parser {
 			i = new CallNode(i.Ident, collec); 
 			Expect(9);
 		}
-		bottom = i; 
 		while (WeakSeparator(43,17,18) ) {
 			SymbolRef(out VarNode member);
-			bottom.Source = member; bottom = member; 
+			member.Source = i; i = member; 
 		}
 	}
 
