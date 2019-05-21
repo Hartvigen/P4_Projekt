@@ -268,10 +268,10 @@ namespace P4_Project
             switch (parameters[0].type.collectionType.name)
             {
                 case "list":
-                    (parameters[0].o as List<object>).Add(parameters[1].o);                   
+                    (parameters[0].o as List<object>)?.Add(parameters[1].o);                   
                     break;
                 case "set":
-                    (parameters[0].o as HashSet<object>).Add(parameters[1].o);
+                    (parameters[0].o as HashSet<object>)?.Add(parameters[1].o);
                     break;
                 default:
                     throw new Exception("Add only works with collections of type list or set");
@@ -281,7 +281,7 @@ namespace P4_Project
 
         private static void Size(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            executor.currentValue = new Value( (double)(parameters[0].o as List<object>).Count);         
+            executor.currentValue = new Value( (double)((List<object>) parameters[0].o).Count);         
         }
 
         /*
@@ -289,7 +289,7 @@ namespace P4_Project
         */
 
        
-        private static void GetEdge(List<Value> parameters, Interpreter executor)
+        private static void GetEdge(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             var v1 = (Vertex)parameters[0].o;
             var v2 = (Vertex)parameters[1].o;

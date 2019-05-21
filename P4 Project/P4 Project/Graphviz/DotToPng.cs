@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using GraphVizWrapper;
@@ -13,6 +14,9 @@ namespace P4_Project.Graphviz
     {
         public static readonly string DefaultFilePath = AppDomain.CurrentDomain.BaseDirectory + "default.png";
         public const string DefaultDotCode = "digraph{one -> two; two -> three; three -> four; four -> one;}";
+        private static bool _directoryCreated;
+        private static string _currentDirectory;
+        private static int _pictureNumber;
 
         public static void CreatePngFile(string dot, string fileName)
         {
@@ -136,7 +140,16 @@ namespace P4_Project.Graphviz
 
             var finishedDot = s.ToString();
 
-            CreatePngFile(finishedDot, AppDomain.CurrentDomain.BaseDirectory + "done.png");
+            if (!_directoryCreated)
+            {
+                _currentDirectory = "" + DateTimeOffset.UtcNow.ToUnixTimeSeconds() + $"{DateTime.Now.Millisecond}";
+                if (Directory.Exists(_currentDirectory))
+                    throw new Exception("You called the program twice within the same millisecond please dont.");
+                Directory.CreateDirectory(_currentDirectory);
+                _directoryCreated = true;
+            }
+
+            CreatePngFile(finishedDot,  AppDomain.CurrentDomain.BaseDirectory + "/" + _currentDirectory + "/" + "graph-" + _pictureNumber++ + ".png");
         }
     }
 }
