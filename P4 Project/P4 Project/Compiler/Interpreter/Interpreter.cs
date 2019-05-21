@@ -156,7 +156,7 @@ namespace P4_Project.Compiler.Interpreter
             }
             else
             {
-                var o = (DecodeReference(node.Source) as Value).o; // Yes, we need the source, in order to change the attribute inside the source
+                var o = ((Value)DecodeReference(node.Source)).o; // Yes, we need the source, in order to change the attribute inside the source
                 switch (o)
                 {
                     case Vertex vertex:
@@ -343,7 +343,7 @@ namespace P4_Project.Compiler.Interpreter
                 else 
                 {
                     _currentScope.TryGetValue(currentSource.Ident, out var v);
-                    return v.o;
+                    return v;
                 }
 
             }
