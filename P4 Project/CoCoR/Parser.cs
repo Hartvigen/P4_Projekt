@@ -96,7 +96,7 @@ public class Parser {
 
 	
 	void MAGIA() {
-		mainNode = null; BlockNode mainBlock = new BlockNode(); tab = tab.OpenScope("Headers"); 
+		mainNode = null; BlockNode mainBlock = new BlockNode(); tab = tab.OpenScope(); tab.header = true; 
 		while (la.kind == 4) {
 			while (!(la.kind == 0 || la.kind == 4)) {SynErr(54); Get();}
 			Head(out HeadNode head);
@@ -113,7 +113,7 @@ public class Parser {
 			FuncDecl(out FuncDeclNode funcDecl);
 			mainBlock.Add(funcDecl);         
 		}
-		mainNode = new Magia(mainBlock); tab.RemoveHeaderScope(); 
+		mainNode = new Magia(mainBlock); tab.RemoveTopHeaderScope(); 
 	}
 
 	void Head(out HeadNode head) {

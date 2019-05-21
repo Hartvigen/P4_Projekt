@@ -200,9 +200,21 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         //checks if both types of an EdgeCreateNode is an vertex
         public override void Visit(EdgeCreateNode node)
         {
+            //We visit leftside to assign it a type.
             node.LeftSide.Accept(this);
+
+            //We make sure that the left side is a vertex.
+            if (node.LeftSide.type.name != "vertex")
+                ErrorList.Add("Edge cannot be created with: " + node.LeftSide.Ident + " as it has type: " + node.LeftSide.type);
+            
+
+            //Foreach rightside we makesure item1 is vertex and all the attribute types are assigned with correct type.
             node.RightSide.ForEach(t => {
                 t.Item1.Accept(this);
+
+                if(t.Item1.type.name != "vertex")
+                    ErrorList.Add("Edge cannot be created with: " + t.Item1.Ident + " as it has type: " + t.Item1.type.name);
+
                 t.Item2.ForEach(s => {
                     if (s.GetType() != typeof(AssignNode)) return;
                     var a = s;
@@ -210,21 +222,9 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     a.Value.Accept(this);
 
                     //We find the header scope for edge take the type of the attribute
-                    Table.GetInnerScopes().ForEach(h =>
-                    {
-                        if (!h.header || h.name != "edge") return;
-                        if (h.Find(a.Target.Ident).Type.name != a.Value.type.name)
-                            ErrorList.Add(a.Target.Ident + " is type: " + a.Target.type.name + " so type: " + a.Value.type.name + " is not a valid type to assign.");
-                    });
+                        if (Table.edgeAttr.Find(a.Target.Ident).Type.name != a.Value.type.name)
+                            ErrorList.Add(a.Target.Ident + " is type: " + a.Target.type.name + " so type: " + Table.edgeAttr.Find(a.Target.Ident).Type.name + " is not a valid type to assign.");
                 });
-            });
-
-            if (node.LeftSide.type.name != "vertex") {
-                ErrorList.Add("Edge cannot be created with: " + node.LeftSide.Ident + " as it has type: " + node.LeftSide.type);
-            }
-            node.RightSide.ForEach(n => {
-                if (n.Item1.type.name != "vertex")
-                    ErrorList.Add("Edge cannot be created with: " + n.Item1.Ident + " as it has type: " + n.Item1.type.name);
             });
         }
 
