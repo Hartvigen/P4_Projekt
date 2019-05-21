@@ -90,7 +90,9 @@ namespace P4_Project
         
         private static bool ApplyVisitors(IEnumerable<Visitor> visitors, string inputFilePath)
         {
-            if (!TryParse(inputFilePath)) return false;
+            if (!TryParse(inputFilePath)) 
+                return false;
+
             foreach(var vi in visitors)
             {
                 _parser.mainNode.Accept(vi);

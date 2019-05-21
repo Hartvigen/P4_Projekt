@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿ using System.Collections.Generic;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -47,7 +47,16 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 validFound = true;
                 for (var i = parameters.Count; i > 0; i--)
                 {
-                    if (node.Parameters.Expressions[i-1].type.name != parameters[i-1].name)
+                    if (node.Parameters.Expressions[i - 1].type.name == "collec" && parameters[i - 1].name == "collec")
+                    {
+                        if (node.Parameters.Expressions[i - 1].type.collectionType.name != parameters[i - 1].collectionType.name 
+                            || node.Parameters.Expressions[i - 1].type.singleType.name != parameters[i - 1].singleType.name)
+                        {
+                            validFound = false;
+                            break;
+                        }
+                    }
+                    else if (node.Parameters.Expressions[i-1].type.name != parameters[i-1].name)
                     {
                         validFound = false;
                         break;
@@ -80,8 +89,10 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
 			//If the Source exist we can find the type as from the attribute that matches from the source
 			if (node.type == null && node.Source?.type != null) {
-				if (Table.IsAttribute(node.Source.type.name, node.Ident)) {
-					node.type = Table.GetTypeOfAttribute(node.Source.type.name, node.Ident);
+                string attrTypeName = node.Source.type.name == "func" ? node.Source.type.returnType : node.Source.type.name;
+
+                if (Table.IsAttribute(attrTypeName, node.Ident)) {
+					node.type = Table.GetTypeOfAttribute(attrTypeName, node.Ident);
 				}
 			}
 

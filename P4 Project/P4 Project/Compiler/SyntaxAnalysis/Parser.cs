@@ -96,13 +96,13 @@ public class Parser {
 
 	
 	void MAGIA() {
-		mainNode = null; BlockNode mainBlock = new BlockNode(); 
-		while (la.kind == 4) {
-			tab = tab.OpenScope();           
+		mainNode = null; BlockNode mainBlock = new BlockNode(); tab = tab.OpenScope("Headers");
+        while (la.kind == 4) {         
 			while (!(la.kind == 0 || la.kind == 4)) {SynErr(54); Get();}
 			Head(out HeadNode head);
-			mainBlock.Add(head);             
+			mainBlock.Add(head);           
 		}
+        tab = tab.CloseScope(); 
 		
 		while (StartOf(1)) {
 			while (!(StartOf(2))) {SynErr(55); Get();}
@@ -114,7 +114,7 @@ public class Parser {
 			FuncDecl(out FuncDeclNode funcDecl);
 			mainBlock.Add(funcDecl);         
 		}
-		mainNode = new Magia(mainBlock); 
+		mainNode = new Magia(mainBlock); tab.RemoveHeaderScope();
 	}
 
 	void Head(out HeadNode head) {

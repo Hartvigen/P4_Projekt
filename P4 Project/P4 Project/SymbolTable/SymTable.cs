@@ -104,7 +104,7 @@ namespace P4_Project.SymbolTable
         //search for a name in all open scopes and return its object node
         public Obj Find(string objName)
         {
-            return _variables.TryGetValue(objName, out var value) ? value : Parent.Find(objName);
+            return _variables.TryGetValue(objName, out var value) ? value : (Parent?.Find(objName) ?? null);
         }
 
         // return all the innerScopes
@@ -139,7 +139,9 @@ namespace P4_Project.SymbolTable
 
         public List<List<BaseType>> FindParameterListOfFunction(string functionName)
         {
-            if (PreDefined.PreDefinedFunctions.Contains(functionName)) return PreDefined.FindListOfParameterLists(functionName);
+            if (PreDefined.PreDefinedFunctions.Contains(functionName)) 
+                return PreDefined.FindListOfParameterLists(functionName);
+
             //Complicated piece of code that can either find the function in its proper place or in variables because function is used in the cleaner before functions gets cleaned up.
             foreach (var s in InnerScopes)
             {
@@ -196,6 +198,10 @@ namespace P4_Project.SymbolTable
 		public void ResetScopePositions() {
             _position = 0;
             InnerScopes.ForEach(s => s.ResetScopePositions());
+        }
+
+        public void RemoveHeaderScope() {
+            InnerScopes.RemoveAll(scp => scp.name == "Headers");
         }
     }
 }

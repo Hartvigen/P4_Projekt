@@ -139,7 +139,6 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     node.attrDeclBlock.Statements.ForEach(s => {
                         var v = (VarDeclNode)s;
                         Table.vertexAttr.AddObj(v.SymbolObject);
-                        Table.RemoveObj(v.SymbolObject);
                     });
                     break;
                 case "edge":
@@ -147,7 +146,6 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                     node.attrDeclBlock.Statements.ForEach(s => {
                         var v = (VarDeclNode)s;
                         Table.edgeAttr.AddObj(v.SymbolObject);
-                        Table.RemoveObj(v.SymbolObject);
                     });
                     break;
                 default: 
