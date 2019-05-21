@@ -361,19 +361,19 @@ namespace P4_Project
         private static void GetVertices(Interpreter executor)
         {
             executor.currentValue = null;
-            var vertexList = new List<Vertex>();
+            var vertexList = new List<object>();
             foreach (var v in executor.scene)
                 vertexList.Add(v);
-            executor.currentValue = new Value(vertexList);
+            executor.currentValue = new Value(vertexList, new BaseType(new BaseType("vertex"), new BaseType("list")));
         }
 
         private static void GetEdges(Interpreter executor)
         {
             executor.currentValue = null;
-            var edgeList = new List<Edge>();
+            var edgeList = new List<object>();
             foreach (var v in executor.scene)
                 edgeList.AddRange(v.edges);
-            executor.currentValue = new Value(edgeList);
+            executor.currentValue = new Value(edgeList, new BaseType(new BaseType("edge"), new BaseType("list")));
         }
 
         private static void GetAdjacent(IReadOnlyList<Value> parameters, Interpreter executor)
