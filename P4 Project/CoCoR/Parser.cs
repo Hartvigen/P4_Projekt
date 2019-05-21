@@ -96,14 +96,13 @@ public class Parser {
 
 	
 	void MAGIA() {
-		mainNode = null; BlockNode mainBlock = new BlockNode(); 
+		mainNode = null; BlockNode mainBlock = new BlockNode(); tab = tab.OpenScope("Headers"); 
 		while (la.kind == 4) {
-			tab = tab.OpenScope();           
 			while (!(la.kind == 0 || la.kind == 4)) {SynErr(54); Get();}
 			Head(out HeadNode head);
 			mainBlock.Add(head);             
 		}
-		
+		tab = tab.CloseScope();          
 		while (StartOf(1)) {
 			while (!(StartOf(2))) {SynErr(55); Get();}
 			Stmt(out StmtNode stmt);
@@ -114,7 +113,7 @@ public class Parser {
 			FuncDecl(out FuncDeclNode funcDecl);
 			mainBlock.Add(funcDecl);         
 		}
-		mainNode = new Magia(mainBlock); 
+		mainNode = new Magia(mainBlock); tab.RemoveHeaderScope(); 
 	}
 
 	void Head(out HeadNode head) {
@@ -181,8 +180,8 @@ public class Parser {
 			stmtBlock.Add(stmt); 
 		}
 		ExpectWeak(14, 3);
-		SymTable funcScope = tab; tab = tab.CloseScope(); 
-		Obj funcObj = tab.NewObj(funcName, protocol, Func, funcScope); 
+		tab = tab.CloseScope(); 
+		Obj funcObj = tab.NewObj(funcName, protocol, Func);
 		funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
 		
 	}
@@ -625,7 +624,7 @@ public class Parser {
 		} else if (StartOf(12)) {
 			CollecType(out BaseType type);
 			Expect(13);
-			Args(type, out collec);
+			Args(type, out CollecConst collec);
 			e = collec; 
 			Expect(14);
 		} else SynErr(74);
