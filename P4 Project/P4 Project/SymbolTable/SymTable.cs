@@ -108,7 +108,7 @@ namespace P4_Project.SymbolTable
         }
 
         // return all the innerScopes
-        public List<SymTable> GetScopes()
+        public List<SymTable> GetInnerScopes()
         {
             return InnerScopes;
         }
@@ -200,8 +200,8 @@ namespace P4_Project.SymbolTable
             InnerScopes.ForEach(s => s.ResetScopePositions());
         }
 
-        public void RemoveHeaderScope() {
-            InnerScopes.RemoveAll(scp => scp.name == "Headers");
+        public void RemoveTopHeaderScope() {
+            InnerScopes.RemoveAll(scp => scp.header);
         }
     }
 }

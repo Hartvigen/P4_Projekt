@@ -266,8 +266,8 @@ namespace P4_ProjectTests.Compiler.SyntaxAnalysis
             Parser parser = new Parser(new Scanner(StreamFromString(scopeTest)));
             parser.Parse();
             var x = parser.tab.Find("x");
-            var y = parser.tab.GetScopes()[0].Find("y");
-            var x2 = parser.tab.GetScopes()[0].Find("x");
+            var y = parser.tab.GetInnerScopes()[0].Find("y");
+            var x2 = parser.tab.GetInnerScopes()[0].Find("x");
 
             Assert.IsTrue(x.Name == "x");
             Assert.IsTrue(x.Kind == 0);

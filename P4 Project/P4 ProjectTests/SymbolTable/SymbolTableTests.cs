@@ -34,7 +34,7 @@ namespace P4_ProjectTests.SymbolTable
         [Test]
         public void SymbolTableTests01()
         {
-            Assert.IsTrue(_symTable.GetScopes().Count == 0);
+            Assert.IsTrue(_symTable.GetInnerScopes().Count == 0);
         }
 
         //For every time we open a scope another scope should exist in the symbolTable.
@@ -44,7 +44,7 @@ namespace P4_ProjectTests.SymbolTable
             const int numberOfScopes = 42;
             for(var i = numberOfScopes; i > 0; i--)
                 _symTable.OpenScope();
-            Assert.IsTrue(_symTable.GetScopes().Count == numberOfScopes);
+            Assert.IsTrue(_symTable.GetInnerScopes().Count == numberOfScopes);
         }
 
         //Closing the scope will return the parent.
