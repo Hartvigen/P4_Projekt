@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using P4_Project.AST;
 using P4_Project.AST.Expressions;
@@ -37,7 +38,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(CallNode node)
         {
-            node.Parameters.Accept(this);   
+            node.Parameters.Accept(this);
+            node.type = Table.FindReturnTypeOfFunction(node.Ident, node.Parameters.Expressions.Select(expr => expr.type).ToList());
         }
 
         public override void Visit(VarNode node)
@@ -47,28 +49,29 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             //If the Source is not null this must be an attribute of the source type  
             if (node.Source != null)
             {
-                if (ActiveScope.Find(node.Source.Ident) == null)
-                {
-                    ErrorList.Add(node.Source.Ident + " has no declaration in scope.");
-                    return;
-                }
-
-                // If node does not contain the type of the variable, load that type into the node
-                if (node.Source.type == null)
-                    node.Source.type = ActiveScope.Find(node.Source.Ident).Type;
-
                 // Check if 'node.Ident' is a valid atribute in the type denoded by 'node.Source.type.name'
-                if (!Table.IsAttribute(node.Source.type.name, node.Ident))
+                if (Table.IsAttribute(node.Source.type.name, node.Ident))
+                    node.type = Table.GetTypeOfAttribute(node.Source.type.name, node.Ident);
+                else
                     ErrorList.Add(node.Ident + " is not a valid attribute of: " + node.Source.type.name);
-
-                return;
             }
+            else
+            {
+                //If the source is null we have to able to find the declaration in the scope and already reached! 
+                Obj obj = ActiveScope.Find(node.Ident);
 
-            //If the source is null we have to able to find the declaration in the scope and already reached! 
-            if (ActiveScope.Find(node.Ident) == null)
-                ErrorList.Add($"'{node.Ident}' is not in the scope!");
-            else if (!ActiveScope.Find(node.Ident).Type.reached)
-                ErrorList.Add($"'{node.Ident}' is in the scope, but not declared before use!");
+                if (obj == null)
+                    ErrorList.Add($"'{node.Ident}' is not in the scope!");
+                else
+                {
+                    if (!ActiveScope.Find(node.Ident).Type.reached)
+                        ErrorList.Add($"'{node.Ident}' is in the scope, but not declared before use!");
+
+                    // If node does not contain the type of the variable, load that type into the node
+                    if (node.type == null)
+                        node.type = ActiveScope.Find(node.Ident).Type;
+                }
+            }
         }
 
         public override void Visit(BoolConst node)
@@ -139,7 +142,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 obj.Type = node.type;
 
             //It is marked that this declaration has been reached! 
-            ActiveScope.Find(node.SymbolObject.Name).Type.reached = true;
+            obj.Type.reached = true;
         }
         public override void Visit(VertexDeclNode node)
         {

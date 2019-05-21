@@ -269,11 +269,11 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
                 if (node.DefaultValue.type.returnType.name != node.SymbolObject.Type.name)
                     ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with call that returns: " + node.DefaultValue.type.returnType + " when variable is type: " + node.type);
             }else if (node.DefaultValue.type.name != node.type.name && node.DefaultValue.type.name != "none")
-                ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with of type: " + node.DefaultValue.type + " when variable is type: " + node.type);
+                ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " with type: " + node.DefaultValue.type.name + " when variable is type: " + node.type.name);
             else if(node.DefaultValue.type.name == "collec" && node.type.name == "collec")
             {
                 if (node.type.collectionType.name != node.DefaultValue.type.collectionType.name || node.type.singleType.name != node.DefaultValue.type.singleType.name)
-                    ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " of type " + node.type.collectionType.name + "<"+node.type.singleType.name + ">" +
+                    ErrorList.Add("Cannot initialize variable " + node.SymbolObject.Name + " type " + node.type.collectionType.name + "<"+node.type.singleType.name + ">" +
                         " with a default value of " + node.DefaultValue.type.collectionType.name + "<" + node.DefaultValue.type.singleType.name + ">");
             }
 

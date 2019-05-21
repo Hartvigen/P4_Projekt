@@ -10,12 +10,16 @@ namespace P4_Project.AST.Stmts.Decls
     {
         public BlockNode Parameters { get; }
         public BlockNode Body { get; }
+
+
         public FuncDeclNode(Obj symbolObject, BlockNode parameters, BlockNode body) 
             : base(symbolObject)
         {
             Parameters = parameters;
             Body = body;
         }
+
+
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);

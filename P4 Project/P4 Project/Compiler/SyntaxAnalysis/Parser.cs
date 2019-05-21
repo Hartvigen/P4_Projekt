@@ -152,7 +152,7 @@ public class Parser {
 	}
 
 	void FuncDecl(out FuncDeclNode funcNode) {
-		funcNode = null; string funcName = ""; BaseType returnType = null; BaseType protocol = null; 
+		funcNode = null; string funcName = ""; BaseType returnType = new BaseType("none"); BaseType protocol = null; 
 		Expect(11);
 		if (StartOf(4)) {
 			Type(out returnType);
@@ -184,7 +184,6 @@ public class Parser {
 		tab = tab.CloseScope(); 
 		Obj funcObj = tab.NewObj(funcName, protocol, Func);
 		funcNode = new FuncDeclNode(funcObj, paramBlock, stmtBlock); 
-		
 	}
 
 	void VarDecl(out VarDeclNode varDecl) {

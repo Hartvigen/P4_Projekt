@@ -11,12 +11,16 @@ namespace P4_Project.AST.Stmts.Decls
     {
         public ExprNode DefaultValue { get; }
         public readonly BaseType type;
+
+
         public VarDeclNode(Obj symbolObject, ExprNode defaultValue)
             : base(symbolObject)
         {
             DefaultValue = defaultValue;
             type = symbolObject.Type;
         }
+
+
         public override void Accept(Visitor vi)
         {
             vi.Visit(this);

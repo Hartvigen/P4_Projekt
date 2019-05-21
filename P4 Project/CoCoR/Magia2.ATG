@@ -70,7 +70,7 @@ Head<out HeadNode head> =                       (. head = null; VarDeclNode attr
 
 
 /*------------------------------------------------------------------------*/
-FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string funcName = ""; BaseType returnType = null; BaseType protocol = null; .)
+FuncDecl<out FuncDeclNode funcNode> =               (. funcNode = null; string funcName = ""; BaseType returnType = new BaseType("none"); BaseType protocol = null; .)
     "func" (Type<out returnType> | "none") IDENT    (. funcName = t.val; BlockNode paramBlock = new BlockNode(); BlockNode stmtBlock = new BlockNode(); .)
     WEAK '('                                        (. tab = tab.OpenScope(funcName); VarDeclNode paramDecl = null; List<BaseType> parameterTypes = new List<BaseType>(); .)
         [ IF(la.val != ")" && la.val != "{") 
