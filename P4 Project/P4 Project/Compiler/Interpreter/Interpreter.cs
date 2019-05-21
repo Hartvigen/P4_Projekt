@@ -215,11 +215,14 @@ namespace P4_Project.Compiler.Interpreter
 
             switch (node.OperatorType)
             {
-                case Operators.Eq when v2.o == v1.o:
+                case Operators.Eq when v2.o.Equals(v1.o):
                     currentValue = new Value(true);
                     break;
                 case Operators.Eq:
                     currentValue = new Value(false);
+                    break;
+                case Operators.Mult:
+                    currentValue = new Value(((double) v1.o) * ((double) v2.o));
                     break;
                 case Operators.Plus:
                     switch (v1.type.name)
@@ -374,35 +377,31 @@ namespace P4_Project.Compiler.Interpreter
             var iterationVar = node.IterationVar.SymbolObject.Name;
             _currentScope.CreateVar(iterationVar, null);
             node.Iterator.Accept(this);
+            List<object> l;
 
-            IEnumerable<object> l;
-
-            switch (currentValue.type.collectionType.name)
-            {
-                case "list":
-                    l = (List<object>)currentValue.o;
-                    break;
-                case "set":
-                    l = (HashSet<object>)currentValue.o;
-                    break;
-                case "stack":
-                    l = (Stack<object>)currentValue.o;
-                    break;
-                case "queue":
-                    l = (Queue<object>)currentValue.o;
-                    break;
-                default:
-                    throw new Exception("Cannot iterate over collection type: " + currentValue.type.collectionType.name);
-            }
-
+            if (node.Iterator.type.name == "collec")
+                l = (List<object>)currentValue.o;
+            else
+                l = StringToList((currentValue.o as string));
             foreach (var i in l)
             {
-                _currentScope.UpdateVar(iterationVar, new Value(i));
-                node.Body.Accept(this);
+                    _currentScope.UpdateVar(iterationVar, new Value(i));
+                    node.Body.Accept(this);
 
-                if (InterruptHandler())
-                    break;
+                    if (InterruptHandler())
+                        break;
             }
+         
+        }
+
+        private List<object> StringToList(string iterator)
+        {
+            List<object> text = new List<object>();
+            foreach(char c in iterator.ToCharArray())
+            {
+                text.Add(c.ToString());
+            }
+            return text;
         }
 
         public override void Visit(ForNode node)

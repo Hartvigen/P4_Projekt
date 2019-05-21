@@ -17,5 +17,10 @@ namespace P4_Project.AST.Stmts.Decls
         {
             return "none";
         }
+
+        public override bool Equals(object obj)
+        {
+            return (obj is NoneConst);
+        }
     }
 }
