@@ -1,0 +1,87 @@
+[vertex(text label = "0", number size = 1)]
+[edge(number weight = 10)]
+
+vertex (v6, label ="v1", size = 10)
+vertex (v5, label ="v2")
+vertex (v4, label ="v3")
+v6 -> (v5, weight = 120)
+v6 -- (v5, weight = 120)
+
+Terminal(AsText(numberOfVertex()))
+
+vertex v8 = v6
+
+text sentence = "This text need to be looped over"
+
+foreach (text n in sentence){
+  sentence =  n + "Hej"
+  Terminal(sentence)
+}
+
+number q = AddAVertex() + 10
+number qq = PlusNum(q)
+
+number totalsize = TotalSize()
+
+list<vertex> vertexs = GetAdjacent(v6) 
+number nthElement = UnimportList()
+UnimportSet()
+number heyy = UnimportQueue()
+number heyyyyy = UnimportStack()
+
+func number numberOfVertex(){
+    set<vertex> set1 = GetVertices()
+    return Size(set1)
+}
+
+func number AddAVertex(){
+    set<vertex> all = GetVertices()
+    return Size(all)
+}
+
+func number PlusNum(number a){
+    number b = a + 20
+    return b
+}
+
+func number TotalSize(){
+    number total
+    foreach(vertex v in GetVertices()){
+        total = v.size + total
+    }
+    return total
+}
+
+func number UnimportList(){
+    list<number> listnum ={1,2,3,4,5}
+    Add(listnum, number 7)
+    Remove(listnum, 3)
+    number ret = Get(listnum, 3)
+    return ret
+}
+func none UnimportSet(){
+    set<number> setnum1 ={1,2,3,4,5}
+    set<number> setnum2 ={6,7,8}
+    Add(setnum2, number 9)
+    Remove(setnum1, 3)
+    set<number> onion = Union(setnum1,setnum2)
+}
+
+func number UnimportQueue(){
+    queue<number> queuenum ={1,2,3,4,5}
+    Enqueue(queuenum, number 7)
+    number x = Dequeue(queuenum)
+    number y = Peek(queuenum)
+    return x + y
+
+}
+
+func number UnimportStack(){
+    stack<number> stacknum ={1,2,3,4,5}
+    Push(stacknum, number 7)
+    number xx = Pop(stacknum)
+    number yy = Peek(stacknum)
+    return yy + xx
+
+}
+

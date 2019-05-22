@@ -90,7 +90,7 @@ namespace P4_Project
             }
         }
 
-        public static Value GetDefaultValueOfAttributeType(BaseType type)
+        public static Value GetDefaultValueOfType(BaseType type)
         {
             switch (type.name)
             {
@@ -274,7 +274,9 @@ namespace P4_Project
 
         private static void Size(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            executor.currentValue = new Value((double)((List<object>)parameters[0].o).Count);
+        
+                executor.currentValue = new Value((double)((List<object>)parameters[0].o).Count);
+            
         }
 
         private static void IsEmpty(IReadOnlyList<Value> parameters, Interpreter executor)
@@ -289,7 +291,13 @@ namespace P4_Project
 
         private static void Add(List<Value> parameters, Interpreter executor)
         {
-            ((List<object>)parameters[0].o).Add(parameters[1].o);
+            if(parameters[0].type.collectionType.name == "list")
+                ((List<object>)parameters[0].o).Add(parameters[1].o);
+            else if(parameters[0].type.collectionType.name == "set")
+            {
+                if(!((List<object>)parameters[0].o).Contains(parameters[1].o))
+                ((List<object>)parameters[0].o).Add(parameters[1].o);
+            }
         }
 
         private static void Push(List<Value> parameters, Interpreter executor)
@@ -323,7 +331,7 @@ namespace P4_Project
 
         private static void Get(List<Value> parameters, Interpreter executor)
         {
-            executor.currentValue = new Value(((List<object>)parameters[0].o)[(int)((double)parameters[1].o) - 1]);
+            executor.currentValue = new Value(((List<object>)parameters[0].o)[(int)((double) parameters[1].o)-1]);
         }
 
         private static void Peek(List<Value> parameters, Interpreter executor)
@@ -333,11 +341,93 @@ namespace P4_Project
 
         private static void Union(List<Value> parameters, Interpreter executor)
         {
+            List<object> union = new List<object>();
+            foreach (var v in (List<object>)parameters[0].o)
+            {
+                union.Add(v);
+            }
+
             foreach (var v in (List<object>)parameters[1].o)
             {
-                if (!((List<object>)parameters[0].o).Contains(v))
-                    ((List<object>)parameters[0].o).Add(v);
+                if (!union.Contains(v))
+                    union.Add(v);
             }
+            executor.currentValue = new Value(union, new BaseType(new BaseType(parameters[0].type.singleType.name), new BaseType(parameters[0].type.collectionType.name)));
+            /*
+            switch (parameters[0].type.singleType.name)
+            {
+                case "number":
+                    List<object> union = new List<object>();
+                    foreach(var v in (List<object>) parameters[0].o)
+                    {
+                        union.Add(v);
+                    }
+
+                    foreach (var v in (List<object>)parameters[1].o)
+                    {
+                        if (!union.Contains(v))
+                            union.Add(v);
+                    }
+                    executor.currentValue = new Value(union);
+                    break;
+                case "boolean":
+                    List<bool> boolunion = new List<bool>();
+                    foreach (var v in (List<object>)parameters[0].o)
+                    {
+                        boolunion.Add((bool)v);
+                    }
+
+                    foreach (var v in (List<object>)parameters[1].o)
+                    {
+                        if (!boolunion.Contains((bool)v))
+                            boolunion.Add((bool)v);
+                    }
+                    executor.currentValue = new Value(boolunion);
+                    break;
+                case "text":
+                    List<string> textunion = new List<string>();
+                    foreach (var v in (List<object>)parameters[0].o)
+                    {
+                        textunion.Add((string)v);
+                    }
+
+                    foreach (var v in (List<object>)parameters[1].o)
+                    {
+                        if (!textunion.Contains((string)v))
+                            textunion.Add((string)v);
+                    }
+                    executor.currentValue = new Value(textunion);
+                    break;
+                case "vertex":
+                    List<Vertex> VertexUnion = new List<Vertex>();
+                    foreach (var v in (List<object>)parameters[0].o)
+                    {
+                        VertexUnion.Add((Vertex)v);
+                    }
+
+                    foreach (var v in (List<object>)parameters[1].o)
+                    {
+                        if (!VertexUnion.Contains((Vertex)v))
+                            VertexUnion.Add((Vertex)v);
+                    }
+                    executor.currentValue = new Value(VertexUnion);
+                    break;
+                case "edge":
+                    List<Edge> EdgeUnion = new List<Edge>();
+                    foreach (var v in (List<Edge>)parameters[0].o)
+                    {
+                        EdgeUnion.Add((Edge)v);
+                    }
+
+                    foreach (var v in (List<Edge>)parameters[1].o)
+                    {
+                        if (!EdgeUnion.Contains((Edge)v))
+                            EdgeUnion.Add((Edge)v);
+                    }
+                    executor.currentValue = new Value(EdgeUnion);
+                    break;
+            }   
+            */
         }
         /*
         * Implementation of graph pre-defined functions
@@ -367,7 +457,7 @@ namespace P4_Project
             var vertexList = new List<object>();
             foreach (var v in executor.scene)
                 vertexList.Add(v);
-            executor.currentValue = new Value(vertexList, new BaseType(new BaseType("vertex"), new BaseType("list")));
+            executor.currentValue = new Value(vertexList, new BaseType(new BaseType("vertex"), new BaseType("set")));
         }
 
         private static void GetEdges(Interpreter executor)
@@ -376,7 +466,7 @@ namespace P4_Project
             var edgeList = new List<object>();
             foreach (var v in executor.scene)
                 edgeList.AddRange(v.edges.Where(e => !edgeList.Contains(e)));
-            executor.currentValue = new Value(edgeList, new BaseType(new BaseType("edge"), new BaseType("list")));
+            executor.currentValue = new Value(edgeList, new BaseType(new BaseType("edge"), new BaseType("set")));
         }
 
         private static void GetAdjacent(IReadOnlyList<Value> parameters, Interpreter executor)
@@ -500,8 +590,8 @@ namespace P4_Project
                     }                   
                 //Graph
                 case "GetEdge": return new BaseType("edge");
-                case "GetVertices": return new BaseType(new BaseType("vertex"), new BaseType("list"));
-                case "GetEdges": return new BaseType(new BaseType("edge"), new BaseType("list"));
+                case "GetVertices": return new BaseType(new BaseType("vertex"), new BaseType("set"));
+                case "GetEdges": return new BaseType(new BaseType("edge"), new BaseType("set"));
                 case "GetAdjacent": return new BaseType(new BaseType("vertex"), new BaseType("list"));
                 case "RemoveVertex": return new BaseType("none");
                 case "RemoveEdge": return new BaseType("none");
@@ -727,7 +817,7 @@ namespace P4_Project
                         new List<BaseType> {new BaseType(new BaseType("vertex"), new BaseType("queue"))},
                         new List<BaseType> {new BaseType(new BaseType("edge"), new BaseType("queue"))},
                     };
-                case "union":
+                case "Union":
                     return new List<List<BaseType>>
                     {
                         new List<BaseType> {new BaseType(new BaseType("number"), new BaseType("set")), new BaseType(new BaseType("number"), new BaseType("set"))},

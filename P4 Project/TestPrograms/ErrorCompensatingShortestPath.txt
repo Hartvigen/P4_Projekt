@@ -9,9 +9,8 @@ Print()
 set<vertex> processed = set<vertex> { }
 list<vertex> remaining = GetVertices()
 
-vertex current
 while (!IsEmpty(remaining)) {
-    current = ExtractMin(remaining)
+    vertex current = ExtractMin(remaining)
     Add(processed, current)
     foreach (vertex v in GetAdjacent(current)) {
         Relax(current, v)
