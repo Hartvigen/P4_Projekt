@@ -7,7 +7,7 @@ vertex endNode = Initialize()
 Print()
 
 set<vertex> processed = set<vertex> { }
-list<vertex> remaining = GetVertices()
+set<vertex> remaining = GetVertices()
 
 while (!IsEmpty(remaining)) {
     vertex current = ExtractMin(remaining)
@@ -31,20 +31,18 @@ func none Relax(vertex start, vertex end) {
     }
 }
 
-func vertex ExtractMin(list<vertex> remaining) {
-    vertex smallest = Get(remaining, 1)
-    number smallestIndex = 1
-    number currentIndex = 1
+func vertex ExtractMin(set<vertex> remaining) {
+    vertex smallest = none
 
     foreach (vertex v in remaining) {
-        if (v.distance < smallest.distance) {
+        if (smallest == none)
             smallest = v
-            smallestIndex = currentIndex
+        else if (v.distance < smallest.distance) {
+            smallest = v
         }
-        currentIndex = currentIndex + 1
     }
 
-    Remove(remaining, smallestIndex)
+    Remove(remaining, smallest)
     return smallest
 }
 
