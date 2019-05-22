@@ -334,7 +334,7 @@ namespace P4_Project.Compiler.Interpreter
             Value value;
 
             if (node.DefaultValue is null) {
-                value = new Value(PreDefined.GetDefaultValueOfAttributeType(node.type));
+                value = PreDefined.GetDefaultValueOfAttributeType(node.type);
             } else {
                 node.DefaultValue.Accept(this);
                 value = currentValue;
