@@ -272,6 +272,12 @@ namespace P4_Project.Compiler.Interpreter
                 case Operators.Mult:
                     currentValue = new Value(((double) v1.o) * ((double) v2.o));
                     break;
+                case Operators.Div:
+                    currentValue = new Value(((double)v1.o) / ((double) v2.o));
+                    break;
+                case Operators.Mod:
+                    currentValue = new Value(((double)v1.o) % ((double)v2.o));
+                    break;
                 case Operators.Plus:
                     switch (v1.type.name)
                     {
@@ -293,6 +299,18 @@ namespace P4_Project.Compiler.Interpreter
                     break;
                 case Operators.Less:
                     currentValue = new Value((double)v1.o < (double)v2.o);
+                    break;
+                case Operators.Or:
+                    currentValue = new Value((bool)v1.o || (bool)v2.o);
+                    break;
+                case Operators.And:
+                    currentValue = new Value((bool)v1.o && (bool)v2.o);
+                    break;
+                case Operators.Greateq:
+                    currentValue = new Value((double)v1.o > (double)v2.o || ((double)v1.o).Equals((double)v2.o));
+                    break;
+                case Operators.Lesseq:
+                    currentValue = new Value((double)v1.o < (double)v2.o || ((double)v1.o).Equals((double)v2.o));
                     break;
                 default: 
                     throw new Exception($"Operator '{Operators.GetCodeFromInt(node.OperatorType)}' has not been implemented!");
