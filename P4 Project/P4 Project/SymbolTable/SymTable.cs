@@ -168,7 +168,7 @@ namespace P4_Project.SymbolTable
         /// <returns>Returns the Obj information of the Var</returns>
         public Obj FindVar(string VarName)
         {
-            return _variables.TryGetValue(VarName, out var value) ? value : (Parent?.FindVar(VarName) ?? null);
+            return _variables.TryGetValue(VarName, out var value) ? value : Parent?.FindVar(VarName);
         }
 
         /// <summary>
