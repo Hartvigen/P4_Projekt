@@ -17,7 +17,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         //2. Calls have the correct amount of parameters when calling 
         //3. Expressions aren't outright missing or null 
         //4. functions with a non "none" return type must have at least one return inside them! 
-        //5. Checks that at maximum one of each type header exists! 
+        //5. Checks that at maximum one of each type header exists!
         public override string AppropriateFileName { get; } = "Clean.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();

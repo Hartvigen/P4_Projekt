@@ -1,143 +1,23 @@
-﻿[vertex(number distance = 1, vertex parent = none, boolean bval = false)]
-[edge(number weight = 1, text t)]
+﻿[vertex(number weight = 10, text title = "hello")]
+[edge(boolean istrue, text small = "asd")]
 
-vertex(v42, bval = true)
-hello("hello")
-vertex(v156)
-tester()
-number x = whileifs()
-set<vertex> vset = graph.GetVertices()
-graph.ClearVertices()
-VEDecls()
-expr()
-manyparams(v156, 10, false, "hello")
-number fortytwo = 24
+/*Just a random comment*/
 
-func number GetVal(number a)
-{
-    if (true)
-    {
-        text t = "asdasd"
-    } else
-    {
-        text r = "ddgfdfs"
-    } 
-    return 3 + 4 + a
-}
+vertex(v1, weight = 11)
+vertex(v2)
+dostuff(v2)
+vertex(v3, title = "lol")
+vertex(v4, label = "hedd")
+Print()
 
-func number whileifs()
-{
-    number total = 2
-    number sum
-    boolean b = false
-    while(!b)
+func none dostuff(vertex v3){
+    v3.weight = v3.weight + 1
+    v3.label = AsText(v3.weight)
+    if(1 == 3)
     {
-        if (total == 1)
+        if(v3 == v3)
         {
-            total = total + 1
-            if (total == 1000)
-            {
-                 break 
-            } else
-            {
-                 continue 
-            } 
-            if (total == 7)
-            {
-                total = total + GetVal(total)
-      } elseif (total == 10)
-            {
-                total = GetVal(total)
-            } else
-            {     total = 0
-            } 
-            b = true
-        } 
-        total = total - 1
+            Print()
+        }
     }
-    while(total > 0)
-    {
-        sum = sum + total
-    }
-    number i
-    for(i = sum, i > 0, i = i - 1)
-    {
-        total = total + sum / i
-    }
-    return total
-}
-
-func none tester()
-{
-    number p = 1.5
-    list<number> nlist = {1, 2, 3, 4, 5}
-    VEDecls()
-    foreach(number n in nlist)
-    {
-        p = p + n
-    }
-    if (true)
-    {
-        number k = 58
-        p = p + k
-    } 
-}
-
-func none VEDecls()
-{
-    vertex(v1)
-    vertex(v2, distance = 4, parent = v1, bval = true)
-    vertex(v3, bval = true)
-    vertex{(v4), (v5, parent = v3), (v6, distance = 1, parent = v1, bval = true)}
-    v1 -- v2
-    v2 -- (v3, t = "Hello my lady")
-    edge e = graph.GetEdge(v2, v3)
-    vertex var = v2
-    graph.RemoveEdge(v1, v2)
-    graph.RemoveEdge(v2, v3)
-    v2 -> v3
-    v3 -> {(v4), (v5, weight = 42, t = "The Answer")}
-    v1 <- v6
-    v2 <- {(v3), (v5, t = "the world")}
-    graph.ClearEdges()
-    graph.ClearVertices()
-    vertex(v1_2)
-    vertex(v2_2, distance = 4, parent = v1, bval = true)
-    v1 -> v2
-    v1.distance = 5
-    ClearAll()
-}
-
-func none expr()
-{
-    vertex(v2_3, distance = 4, bval = true)
-    vertex(v2)
-    boolean b = 5 != 6 && 5 - 8 + 9 * (v2.distance) > -8 + 11 % 3 || 5 == 8 || 11 * (54 - 6) < -4
-}
-func boolean manyparams(vertex v1, number n, boolean mightbetrue, text greeting)
-{
-return false
-}
-func boolean hello(text greet)
-{
-    if (false)
-    {
-        if (false)
-        {
-            number x = 0
-        } 
-    } 
-    if (1 == 0)
-    {
-        return true
-    } 
-    return false
-}
-
-func vertex funckingbreaks(vertex v1)
-{
-    text t = "true" + "false"
-    vertex(v32)
-    vertex a2 = v32
-    return v32
 }

@@ -52,21 +52,25 @@ namespace P4_ProjectTests.Visitors
             var parser = new Parser(new Scanner(StreamFromString(program)));
             parser.Parse();
             var cleaner = new Cleaner(parser.tab);
-			var attr = new AttributeMover(parser.tab);
+			var attributeMover = new AttributeMover(parser.tab);
+            var scopeChecker = new ScopeChecker(parser.tab);
             var typeVisitor = new TypeChecker(parser.tab);
             var prettyPrinter = new PrettyPrinter();
 
             parser.mainNode.Accept(cleaner);
 			cleaner.ErrorList.ForEach(Console.WriteLine);
 
-			parser.mainNode.Accept(attr);
-			attr.ErrorList.ForEach(Console.WriteLine);
+			parser.mainNode.Accept(attributeMover);
+            attributeMover.ErrorList.ForEach(Console.WriteLine);
+
+			parser.mainNode.Accept(scopeChecker);
+            scopeChecker.ErrorList.ForEach(Console.WriteLine);
 
 			parser.mainNode.Accept(typeVisitor);
-			typeVisitor.ErrorList.ForEach(Console.WriteLine);
-
-			parser.mainNode.Accept(prettyPrinter);
-			prettyPrinter.ErrorList.ForEach(Console.WriteLine);
+            typeVisitor.ErrorList.ForEach(Console.WriteLine);
+            
+            parser.mainNode.Accept(prettyPrinter);
+            prettyPrinter.ErrorList.ForEach(Console.WriteLine);
 
             return prettyPrinter.Result.ToString();
         }

@@ -1,4 +1,4 @@
-using P4_Project.Compiler.SyntaxAnalysis;
+﻿using P4_Project.Compiler.SyntaxAnalysis;
 using System;
 using System.IO;
 using P4_Project.Graphviz;
@@ -20,7 +20,7 @@ namespace P4_Project
         {
             //Uncomment these lines if you wanna play with the program            
             Console.WriteLine("Doing custom work!");
-            args = new string[] { "-c", "MAGIAFile.txt" };
+            args = new string[] { "-i", "MAGIAFile.txt" };
 
             if (args.Length > 0)
             {
@@ -31,8 +31,8 @@ namespace P4_Project
                 else
                     switch (args[0])
                     {
-                        case "-c":
-                        case "--compile":
+                        case "-i":
+                        case "--image":
                             DotOutputGenerator.printMode = "png";
                             Console.WriteLine("Doing a complete compile on " + args[1]);
                             _parser.tab.name = "top";
@@ -86,7 +86,7 @@ namespace P4_Project
                         case "-t":
                         case "--test":
                             Console.WriteLine("Printing test png called: test.png ");
-                            Console.WriteLine(DotOutputGenerator.CreatePngFile() ? "print succeeded!" : "print failed!");
+                            Console.WriteLine(DotOutputGenerator.CreateDefaultPngFile() ? "print succeeded!" : "print failed!");
                             break;
                         case "-h":
                         case "--help":

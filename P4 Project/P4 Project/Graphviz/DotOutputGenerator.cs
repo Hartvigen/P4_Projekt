@@ -18,17 +18,16 @@ namespace P4_Project.Graphviz
         private static bool _directoryCreated;
         private static string _currentDirectory;
         private static int _pictureNumber;
-        public static string finishedDot;
-        public static List<string> finishedDotHistory = new List<string>();
+        private static readonly List<string> FinishedDotHistory = new List<string>();
 
-        private static void CreateDotFile(string dot, string fileName)
+        private static void CreateCustomDotFile(string dot, string fileName)
         {
             if (File.Exists(fileName))
                 File.Delete(fileName);
             File.WriteAllText(dot, fileName);
         }
 
-        public static void CreatePngFile(string dot, string fileName)
+        public static void CreateCustomPngFile(string dot, string fileName)
         {
             var output = Setup().GenerateGraph(dot, Enums.GraphReturnType.Png);
             if (File.Exists(fileName))
@@ -36,7 +35,7 @@ namespace P4_Project.Graphviz
             File.WriteAllBytes(fileName, output);
         }
 
-        public static bool CreatePngFile()
+        public static bool CreateDefaultPngFile()
         {
             var output = Setup().GenerateGraph(DefaultDotCode, Enums.GraphReturnType.Png);
             if (File.Exists(DefaultFilePath))
@@ -56,6 +55,12 @@ namespace P4_Project.Graphviz
                 );
         }
 
+        /// <summary>
+        /// Creates output from a list of vertex and depending on the printMode it can be either made into
+        /// Dot code or into a PNG file.
+        /// </summary>
+        /// <param name="executorScene">The list of vertex to be printed. the vertex contains edges if any.</param>
+        /// <exception cref="Exception">Throws an exception if printMode is invalid or if you call the program twice within the same millisecond</exception>
         public static void CreateOutputFromScene(List<Vertex> executorScene)
         {
             var s = new StringBuilder();
@@ -151,8 +156,8 @@ namespace P4_Project.Graphviz
             //The main graph is ended.
             s.AppendLine("}");
 
-            finishedDot = s.ToString();
-            finishedDotHistory.Add(finishedDot);
+            var finishedDot = s.ToString();
+            FinishedDotHistory.Add(finishedDot);
 
             if (!_directoryCreated)
             {
@@ -163,18 +168,28 @@ namespace P4_Project.Graphviz
                 _directoryCreated = true;
             }
             
-            var fileName = AppDomain.CurrentDomain.BaseDirectory + "/" + _currentDirectory + "/" + "graph-" + _pictureNumber++ + ".png";
+            var fileName = AppDomain.CurrentDomain.BaseDirectory + "/" + _currentDirectory + "/" + "graph-" + _pictureNumber++;
             switch (printMode)
             {   
                 case "dot":
-                    CreateDotFile(finishedDot, fileName);
+                    fileName += ".gv";
+                    CreateCustomDotFile(finishedDot, fileName);
                     break;
                 case "png":
-                    CreatePngFile(finishedDot, fileName);
+                    fileName += ".png";
+                    CreateCustomPngFile(finishedDot, fileName);
                     break;
                 default:
                     throw new Exception($"The print mode '{printMode ?? "null"}' is not valid");
             }
+        }
+        /// <summary>
+        /// Used in testing to get a history of all the printed Dot code
+        /// </summary>
+        /// <returns>Returns a list of strings where each string is dot code produced from a print statement.</returns>
+        public static List<string> GetOutputs()
+        {
+            return FinishedDotHistory;
         }
     }
 }

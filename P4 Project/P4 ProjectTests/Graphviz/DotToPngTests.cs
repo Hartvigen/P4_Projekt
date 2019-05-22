@@ -71,7 +71,7 @@ namespace P4_ProjectTests.Graphviz
         public void DotToPngTestSuccess01()
         {
             if (IsLinux()) return;
-            DotOutputGenerator.CreatePngFile();
+            DotOutputGenerator.CreateDefaultPngFile();
             Assert.IsTrue(File.Exists(DotOutputGenerator.DefaultFilePath));
         }
 
@@ -80,7 +80,7 @@ namespace P4_ProjectTests.Graphviz
         public void DotToPngTestSuccess02()
         {
             if (IsLinux()) return;
-            DotOutputGenerator.CreatePngFile(CustomDotCode, CustomFilePath);
+            DotOutputGenerator.CreateCustomPngFile(CustomDotCode, CustomFilePath);
             Assert.IsTrue(File.Exists(CustomFilePath));
         }
 
@@ -106,10 +106,10 @@ namespace P4_ProjectTests.Graphviz
         {
             if (IsLinux()) return;
             //The default picture
-            DotOutputGenerator.CreatePngFile();
+            DotOutputGenerator.CreateDefaultPngFile();
 
             //Should be the same picture just at another filepath
-            DotOutputGenerator.CreatePngFile(DotOutputGenerator.DefaultDotCode, CustomFilePath);
+            DotOutputGenerator.CreateCustomPngFile(DotOutputGenerator.DefaultDotCode, CustomFilePath);
 
             Assert.IsTrue(FileEquals(CustomFilePath, DotOutputGenerator.DefaultFilePath));
         }
@@ -120,10 +120,10 @@ namespace P4_ProjectTests.Graphviz
         {
             if (IsLinux()) return;
             //The default picture
-            DotOutputGenerator.CreatePngFile();
+            DotOutputGenerator.CreateDefaultPngFile();
 
             //Should be the same picture just at another filepath
-            DotOutputGenerator.CreatePngFile(CustomDotCode, CustomFilePath);
+            DotOutputGenerator.CreateCustomPngFile(CustomDotCode, CustomFilePath);
 
             Assert.IsTrue(!FileEquals(CustomFilePath, DotOutputGenerator.DefaultFilePath));
         }
@@ -134,10 +134,10 @@ namespace P4_ProjectTests.Graphviz
         {
             if (IsLinux()) return;
             //The default picture
-            DotOutputGenerator.CreatePngFile(CustomDotCode, DotOutputGenerator.DefaultFilePath);
+            DotOutputGenerator.CreateCustomPngFile(CustomDotCode, DotOutputGenerator.DefaultFilePath);
 
             //Should be the same picture just at another filepath
-            DotOutputGenerator.CreatePngFile(CustomDotCode, CustomFilePath);
+            DotOutputGenerator.CreateCustomPngFile(CustomDotCode, CustomFilePath);
 
             Assert.IsTrue(FileEquals(CustomFilePath, DotOutputGenerator.DefaultFilePath));
         }

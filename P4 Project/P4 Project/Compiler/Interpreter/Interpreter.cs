@@ -481,13 +481,10 @@ namespace P4_Project.Compiler.Interpreter
                 return;
             }
 
+            //Accept Condition and CurrentValue will contain the result.
             node.Condition.Accept(this);
-            if (currentValue.o.GetType() != typeof(bool)) return;
-            var b = (bool)currentValue.o;
-            if (b)
-                node.Body.Accept(this);
-            else
-                node.ElseNode?.Accept(this);
+            if ((bool)currentValue.o) node.Body.Accept(this);
+            else node.ElseNode?.Accept(this);
         }
 
         public override void Visit(LoneCallNode node)
