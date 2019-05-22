@@ -75,7 +75,7 @@ namespace P4_Project.Graphviz
             s.AppendLine("edge [dir=none]");
 
             //Every edge is found and if it is undirected we append it here.
-            List<Edge> processed = new List<Edge>();
+            HashSet<Edge> processed = new HashSet<Edge>();
             executorScene.ForEach(v =>
             {
                 v.edges.ForEach(e =>

@@ -12,10 +12,15 @@ namespace P4_Project.Compiler.Interpreter.Types
         public readonly List<Edge> edges = new List<Edge>();
 
         public string name;
-        public Vertex(DeclNode vertex, Dictionary<string, Value> attributes)
+        public Vertex(DeclNode vertex, Dictionary<string, Value> _attributes)
         {
             identifier = vertex.SymbolObject.Name;
-            this.attributes = attributes;
+
+            attributes = new Dictionary<string, Value>();
+            foreach(var attr in _attributes)
+            {
+                attributes[attr.Key] = new Value(attr.Value.o);
+            }
         }
 
         public void UpdateAttribute(string ident, Value value) {
