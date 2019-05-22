@@ -1,4 +1,4 @@
-﻿using P4_Project.Compiler.SyntaxAnalysis;
+using P4_Project.Compiler.SyntaxAnalysis;
 using System;
 using System.IO;
 using P4_Project.Graphviz;
@@ -33,10 +33,60 @@ namespace P4_Project
                     {
                         case "-c":
                         case "--compile":
+                            DotOutputGenerator.printMode = "png";
                             Console.WriteLine("Doing a complete compile on " + args[1]);
                             _parser.tab.name = "top";
-                            var list = new List<Visitor> {new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new Interpreter(_parser.tab)};
-                            Console.WriteLine(ApplyVisitors(list,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
+                            Console.WriteLine(ApplyVisitors(
+                                new List<Visitor>
+                                {
+                                    new Cleaner(_parser.tab), 
+                                    new AttributeMover(_parser.tab), 
+                                    new ScopeChecker(_parser.tab), 
+                                    new TypeChecker(_parser.tab), 
+                                    new Interpreter(_parser.tab)
+                                },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
+                            break;
+                        case "-d":
+                        case "--dot":
+                            DotOutputGenerator.printMode = "dot";
+                            Console.WriteLine("Doing a complete compile on " + args[1] + " and delivering dot code.");
+                            _parser.tab.name = "top";
+                            Console.WriteLine(ApplyVisitors(
+                                new List<Visitor>
+                                {
+                                    new Cleaner(_parser.tab), 
+                                    new AttributeMover(_parser.tab), 
+                                    new ScopeChecker(_parser.tab), 
+                                    new TypeChecker(_parser.tab), 
+                                    new Interpreter(_parser.tab)
+                                },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
+                            break;
+                        case "-p":
+                        case "--prettyprint":
+                            _parser.tab.name = "top";
+                            Console.WriteLine(ApplyVisitors(
+                                new List<Visitor>
+                                {
+                                    new Cleaner(_parser.tab), 
+                                    new AttributeMover(_parser.tab), 
+                                    new ScopeChecker(_parser.tab), 
+                                    new TypeChecker(_parser.tab), 
+                                    new PrettyPrinter()
+                                },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
+                            break;
+                        case "-x":
+                        case "--xmlprint":
+                            Console.WriteLine("Parsing input file and printing XML: " + args[1]);
+                            Console.WriteLine(ApplyVisitors(
+                                new List<Visitor>
+                                {
+                                    new XmlTreeBuilder()
+                                },args[1]) ? "Compile succeeded!" : "Compile failed!");
+                            break;
+                        case "-t":
+                        case "--test":
+                            Console.WriteLine("Printing test png called: test.png ");
+                            Console.WriteLine(DotOutputGenerator.CreatePngFile() ? "print succeeded!" : "print failed!");
                             break;
                         case "-h":
                         case "--help":
@@ -46,22 +96,6 @@ namespace P4_Project
                             Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath] || --xmlprint [filepath]");
                             Console.WriteLine("Create Test Png: MagiaC.exe -t || MagiaC.exe --test");
                             Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defaultFile + "\" in its directory and compile compile that.");
-                            break;
-                        case "-p":
-                        case "--prettyprint":
-                            _parser.tab.name = "top";
-                            var list1 = new List<Visitor> { new Cleaner(_parser.tab), new AttributeMover(_parser.tab), new ScopeChecker(_parser.tab), new TypeChecker(_parser.tab), new PrettyPrinter() };
-                            Console.WriteLine(ApplyVisitors(list1,args[1]) ? "Compile succeeded!" : "Compile failed!");                        
-                            break;
-                        case "-x":
-                        case "--xmlprint":
-                            Console.WriteLine("Parsing input file and printing XML: " + args[1]);
-                            Console.WriteLine(ApplyVisitors(new List<Visitor>{new XmlTreeBuilder()},args[1]) ? "Compile succeeded!" : "Compile failed!");
-                            break;
-                        case "-t":
-                        case "--test":
-                            Console.WriteLine("Printing test png called: test.png ");
-                            Console.WriteLine(DotToPng.CreatePngFile() ? "print succeeded!" : "print failed!");
                             break;
                         default:
                             Console.WriteLine("Parsing input file: " + args[0]);

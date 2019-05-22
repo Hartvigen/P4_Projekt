@@ -43,8 +43,8 @@ namespace P4_ProjectTests.Graphviz
         [SetUp]
         public void Initialize()
         {
-            if (File.Exists(DotToPng.DefaultFilePath))
-                File.Delete(DotToPng.DefaultFilePath);
+            if (File.Exists(DotOutputGenerator.DefaultFilePath))
+                File.Delete(DotOutputGenerator.DefaultFilePath);
             if (File.Exists(CustomFilePath))
                 File.Delete(CustomFilePath);
         }
@@ -71,8 +71,8 @@ namespace P4_ProjectTests.Graphviz
         public void DotToPngTestSuccess01()
         {
             if (IsLinux()) return;
-            DotToPng.CreatePngFile();
-            Assert.IsTrue(File.Exists(DotToPng.DefaultFilePath));
+            DotOutputGenerator.CreatePngFile();
+            Assert.IsTrue(File.Exists(DotOutputGenerator.DefaultFilePath));
         }
 
         //The custom DOT code at a custom filepath will create an PNG file at the custom path.
@@ -80,7 +80,7 @@ namespace P4_ProjectTests.Graphviz
         public void DotToPngTestSuccess02()
         {
             if (IsLinux()) return;
-            DotToPng.CreatePngFile(CustomDotCode, CustomFilePath);
+            DotOutputGenerator.CreatePngFile(CustomDotCode, CustomFilePath);
             Assert.IsTrue(File.Exists(CustomFilePath));
         }
 
@@ -89,7 +89,7 @@ namespace P4_ProjectTests.Graphviz
         public void DotToPngTestSuccess03()
         {
             if (IsLinux()) return;
-            Assert.IsTrue(CustomDotCode != DotToPng.DefaultDotCode);
+            Assert.IsTrue(CustomDotCode != DotOutputGenerator.DefaultDotCode);
         }
 
         //The custom path and default path is not the same.
@@ -97,7 +97,7 @@ namespace P4_ProjectTests.Graphviz
         public void DotToPngTestSuccess04()
         {
             if (IsLinux()) return;
-            Assert.IsTrue(CustomFilePath != DotToPng.DefaultFilePath);
+            Assert.IsTrue(CustomFilePath != DotOutputGenerator.DefaultFilePath);
         }
 
         //The same picture will be generate given the same code.
@@ -106,12 +106,12 @@ namespace P4_ProjectTests.Graphviz
         {
             if (IsLinux()) return;
             //The default picture
-            DotToPng.CreatePngFile();
+            DotOutputGenerator.CreatePngFile();
 
             //Should be the same picture just at another filepath
-            DotToPng.CreatePngFile(DotToPng.DefaultDotCode, CustomFilePath);
+            DotOutputGenerator.CreatePngFile(DotOutputGenerator.DefaultDotCode, CustomFilePath);
 
-            Assert.IsTrue(FileEquals(CustomFilePath, DotToPng.DefaultFilePath));
+            Assert.IsTrue(FileEquals(CustomFilePath, DotOutputGenerator.DefaultFilePath));
         }
 
         //The pictures are different if different Dot code is given.
@@ -120,12 +120,12 @@ namespace P4_ProjectTests.Graphviz
         {
             if (IsLinux()) return;
             //The default picture
-            DotToPng.CreatePngFile();
+            DotOutputGenerator.CreatePngFile();
 
             //Should be the same picture just at another filepath
-            DotToPng.CreatePngFile(CustomDotCode, CustomFilePath);
+            DotOutputGenerator.CreatePngFile(CustomDotCode, CustomFilePath);
 
-            Assert.IsTrue(!FileEquals(CustomFilePath, DotToPng.DefaultFilePath));
+            Assert.IsTrue(!FileEquals(CustomFilePath, DotOutputGenerator.DefaultFilePath));
         }
 
         //The pictures are the same if same Dot code is given even if it is custom code.
@@ -134,12 +134,12 @@ namespace P4_ProjectTests.Graphviz
         {
             if (IsLinux()) return;
             //The default picture
-            DotToPng.CreatePngFile(CustomDotCode, DotToPng.DefaultFilePath);
+            DotOutputGenerator.CreatePngFile(CustomDotCode, DotOutputGenerator.DefaultFilePath);
 
             //Should be the same picture just at another filepath
-            DotToPng.CreatePngFile(CustomDotCode, CustomFilePath);
+            DotOutputGenerator.CreatePngFile(CustomDotCode, CustomFilePath);
 
-            Assert.IsTrue(FileEquals(CustomFilePath, DotToPng.DefaultFilePath));
+            Assert.IsTrue(FileEquals(CustomFilePath, DotOutputGenerator.DefaultFilePath));
         }
     }
 }

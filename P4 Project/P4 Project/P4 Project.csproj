@@ -77,7 +77,7 @@
     <Compile Include="Compiler\Interpreter\Value.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\Parser.cs" />
     <Compile Include="Compiler\SyntaxAnalysis\Scanner.cs" />
-    <Compile Include="Graphviz\DotToPng.cs" />
+    <Compile Include="Graphviz\DotOutputGenerator.cs" />
     <Compile Include="Operators.cs" />
     <Compile Include="PreDefined.cs" />
     <Compile Include="Program.cs" />

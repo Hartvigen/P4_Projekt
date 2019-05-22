@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using GraphVizWrapper;
@@ -10,17 +9,28 @@ using P4_Project.Compiler.Interpreter.Types;
 
 namespace P4_Project.Graphviz
 {
-    public abstract class DotToPng
+    public abstract class DotOutputGenerator
     {
+        public static string printMode = null;
+        
         public static readonly string DefaultFilePath = AppDomain.CurrentDomain.BaseDirectory + "default.png";
         public const string DefaultDotCode = "digraph{one -> two; two -> three; three -> four; four -> one;}";
         private static bool _directoryCreated;
         private static string _currentDirectory;
         private static int _pictureNumber;
+        public static string finishedDot;
+        public static List<string> finishedDotHistory = new List<string>();
+
+        private static void CreateDotFile(string dot, string fileName)
+        {
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+            File.WriteAllText(dot, fileName);
+        }
 
         public static void CreatePngFile(string dot, string fileName)
         {
-            byte[] output = Setup().GenerateGraph(dot, Enums.GraphReturnType.Png);
+            var output = Setup().GenerateGraph(dot, Enums.GraphReturnType.Png);
             if (File.Exists(fileName))
                 File.Delete(fileName);
             File.WriteAllBytes(fileName, output);
@@ -28,7 +38,7 @@ namespace P4_Project.Graphviz
 
         public static bool CreatePngFile()
         {
-            byte[] output = Setup().GenerateGraph(DefaultDotCode, Enums.GraphReturnType.Png);
+            var output = Setup().GenerateGraph(DefaultDotCode, Enums.GraphReturnType.Png);
             if (File.Exists(DefaultFilePath))
                 File.Delete(DefaultFilePath);
             File.WriteAllBytes(DefaultFilePath, output);
@@ -46,7 +56,7 @@ namespace P4_Project.Graphviz
                 );
         }
 
-        public static void CreatePngFileFromScene(List<Vertex> executorScene)
+        public static void CreateOutputFromScene(List<Vertex> executorScene)
         {
             var s = new StringBuilder();
             //Every graph is a directed graph and if a undirected edge
@@ -141,7 +151,8 @@ namespace P4_Project.Graphviz
             //The main graph is ended.
             s.AppendLine("}");
 
-            var finishedDot = s.ToString();
+            finishedDot = s.ToString();
+            finishedDotHistory.Add(finishedDot);
 
             if (!_directoryCreated)
             {
@@ -151,8 +162,19 @@ namespace P4_Project.Graphviz
                 Directory.CreateDirectory(_currentDirectory);
                 _directoryCreated = true;
             }
-
-            CreatePngFile(finishedDot,  AppDomain.CurrentDomain.BaseDirectory + "/" + _currentDirectory + "/" + "graph-" + _pictureNumber++ + ".png");
+            
+            var fileName = AppDomain.CurrentDomain.BaseDirectory + "/" + _currentDirectory + "/" + "graph-" + _pictureNumber++ + ".png";
+            switch (printMode)
+            {   
+                case "dot":
+                    CreateDotFile(finishedDot, fileName);
+                    break;
+                case "png":
+                    CreatePngFile(finishedDot, fileName);
+                    break;
+                default:
+                    throw new Exception($"The print mode '{printMode ?? "null"}' is not valid");
+            }
         }
     }
 }

@@ -49,7 +49,8 @@ namespace P4_Project
         public static readonly List<string> PreDefinedAttributesVertex = new List<string>
         {
             "label",
-            "color"
+            "color",
+            "style"
         };
 
         public static readonly List<string> PreDefinedAttributesEdge = new List<string>
@@ -67,6 +68,8 @@ namespace P4_Project
                     return new Value("");
                 case "color":
                     return new Value("black");
+                case "style":
+                    return new Value("none");
                 default:
                     throw new Exception("Attribute: " + name + " has no predefined value for vertex!");
             }
@@ -136,19 +139,20 @@ namespace P4_Project
 
         internal static void DoPreDefFunction(string function, Interpreter executor, List<Value> parameters)
         {
-            if (PreDefinedFunctions.Contains(function))
-                switch (function)
-                {
-                    //General
-                    case "Print":
-                        Print(executor);
-                        break;
-                    case "AsText":
-                        AsText(parameters, executor);
-                        break;
-                    case "Terminal":
-                        Terminal(parameters, executor);
-                        break;
+            if (!PreDefinedFunctions.Contains(function))
+                throw new Exception(function + " is not a pre-defined Function!");
+            switch (function)
+            {
+                //General
+                case "Print":
+                    Print(executor);
+                    break;
+                case "AsText":
+                    AsText(parameters, executor);
+                    break;
+                case "Terminal":
+                    Terminal(parameters, executor);
+                   break;
                     //Collections
                     case "Clear":
                         //TODO
@@ -226,7 +230,6 @@ namespace P4_Project
                         break;                    
                     default: throw new Exception("Missing implementation of the PreDefFunction: " + function);
                 }
-            else throw new Exception(function + " is not a pre-defined Function!");
         }
 
         /*
@@ -235,7 +238,7 @@ namespace P4_Project
 
         private static void Print(Interpreter executor)
         {
-            DotToPng.CreatePngFileFromScene(executor.scene);
+            DotOutputGenerator.CreateOutputFromScene(executor.scene);
         }
 
         private static void AsText(IReadOnlyList<Value> parameters, Interpreter executor)

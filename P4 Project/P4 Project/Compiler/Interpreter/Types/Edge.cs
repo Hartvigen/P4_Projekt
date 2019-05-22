@@ -24,12 +24,14 @@ namespace P4_Project.Compiler.Interpreter.Types
             attributes.Add(identifier, value);
         }
 
-        public bool HasVertex(Vertex v1, Vertex v2) {
-            if (v1 == from && v2 == to)
-                return true;
-            else if (v1 == to && v2 == from)
-                return true;
-            else return false;
+        /// <summary>
+        /// Will check if given vertex pair matches this edges vertex pair.
+        /// </summary>
+        /// <param name="from">The vertex the edge comes from.</param>
+        /// <param name="to">The vertex the edge goes to.</param>
+        /// <returns>Returns true if they match the edge's from and to vertex references, false otherwise.</returns>
+        public bool HasVertex(Vertex from, Vertex to) {
+            return this.to == to && this.from == from;
         }
 
         public override string ToString()
