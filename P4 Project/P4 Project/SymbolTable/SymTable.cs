@@ -145,7 +145,7 @@ namespace P4_Project.SymbolTable
         {
             if (!_variables.ContainsKey(obj.Name))
                 _variables.Add(obj.Name, obj);
-            else throw new Exception(obj.Name + " is already added to symDecls");
+            
         }
 
         /// <summary>

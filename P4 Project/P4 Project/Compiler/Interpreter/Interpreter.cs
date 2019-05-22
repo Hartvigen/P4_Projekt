@@ -134,7 +134,7 @@ namespace P4_Project.Compiler.Interpreter
                         _defVertexAttr.Add(v.Key,
                             PreDefined.PreDefinedAttributesVertex.Contains(v.Key)
                                 ? PreDefined.GetPreDefinedValueOfPreDefinedAttributeVertex(v.Key)
-                                : PreDefined.GetDefaultValueOfAttributeType(v.Value.Type));
+                                : PreDefined.GetDefaultValueOfType(v.Value.Type));
                     else
                     {
                         //If the user has set a default value in the HeadNode it is evaluated now and chosen as value.
@@ -150,7 +150,7 @@ namespace P4_Project.Compiler.Interpreter
                         _defEdgeAttr.Add(v.Key,
                             PreDefined.PreDefinedAttributesEdge.Contains(v.Key)
                                 ? PreDefined.GetPreDefinedValueOfPreDefinedAttributeEdge(v.Key)
-                                : PreDefined.GetDefaultValueOfAttributeType(v.Value.Type));
+                                : PreDefined.GetDefaultValueOfType(v.Value.Type));
                     else
                     {
                         v.Value.defaultValue.Accept(this);
@@ -334,7 +334,7 @@ namespace P4_Project.Compiler.Interpreter
             Value value;
 
             if (node.DefaultValue is null) {
-                value = PreDefined.GetDefaultValueOfAttributeType(node.type);
+                value = PreDefined.GetDefaultValueOfType(node.type);
             } else {
                 node.DefaultValue.Accept(this);
                 value = currentValue;
