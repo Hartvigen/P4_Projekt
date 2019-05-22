@@ -20,7 +20,7 @@ while (!IsEmpty(remaining)) {
     current.style = "none"
 }
 
-HighlightPath(endNode);
+HighlightPath(endNode)
 Print()
 
 /*-------------------------------------------------------------------------*/

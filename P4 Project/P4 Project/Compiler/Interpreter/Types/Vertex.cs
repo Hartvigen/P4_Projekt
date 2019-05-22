@@ -18,9 +18,7 @@ namespace P4_Project.Compiler.Interpreter.Types
 
             attributes = new Dictionary<string, Value>();
             foreach(var attr in _attributes)
-            {
                 attributes[attr.Key] = new Value(attr.Value.o);
-            }
         }
 
         public void UpdateAttribute(string ident, Value value) {

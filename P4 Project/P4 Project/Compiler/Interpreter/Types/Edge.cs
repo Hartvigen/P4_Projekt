@@ -10,12 +10,15 @@ namespace P4_Project.Compiler.Interpreter.Types
 
         public readonly Dictionary<string, Value> attributes;
 
-        public Edge(Vertex from, int opera, Vertex to, Dictionary<string, Value> attributes)
+        public Edge(Vertex from, int opera, Vertex to, Dictionary<string, Value> _attributes)
         {
             this.from = from;
             this.to = to;
             this.opera = opera;
-            this.attributes = attributes;
+
+            attributes = new Dictionary<string, Value>();
+            foreach (var attr in _attributes)
+                attributes[attr.Key] = new Value(attr.Value.o);
         }
         public void UpdateAttribute(string identifier, Value value)
         {
