@@ -12,12 +12,15 @@ set<vertex> remaining = GetVertices()
 while (!IsEmpty(remaining)) {
     vertex current = ExtractMin(remaining)
     Add(processed, current)
+    current.style = "bold"
     foreach (vertex v in GetAdjacent(current)) {
         Relax(current, v)
     }
     Print()
+    current.style = "none"
 }
 
+HighlightPath(endNode);
 Print()
 
 /*-------------------------------------------------------------------------*/
@@ -38,13 +41,20 @@ func vertex ExtractMin(set<vertex> remaining) {
         if (smallest == none) {
             smallest = v
         }
-        else if (v.distance < smallest.distance) {
+        elseif (v.distance < smallest.distance) {
             smallest = v
         }
     }
 
     Remove(remaining, smallest)
     return smallest
+}
+
+func none HighlightPath(vertex endNode) {
+    if (endNode.parent != none) {
+        GetEdge(endNode.parent, endNode).style = "bold"
+        HighlightPath(endNode.parent)
+    }
 }
 
 func vertex Initialize() {
