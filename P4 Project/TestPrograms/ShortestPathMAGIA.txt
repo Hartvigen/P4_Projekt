@@ -35,8 +35,9 @@ func vertex ExtractMin(set<vertex> remaining) {
     vertex smallest = none
 
     foreach (vertex v in remaining) {
-        if (smallest == none)
+        if (smallest == none) {
             smallest = v
+        }
         else if (v.distance < smallest.distance) {
             smallest = v
         }
