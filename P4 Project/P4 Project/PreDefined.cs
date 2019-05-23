@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using P4_Project.AST;
 using P4_Project.AST.Stmts.Decls;
@@ -151,12 +149,12 @@ namespace P4_Project
                     AsText(parameters, executor);
                     break;
                 case "Terminal":
-                    Terminal(parameters, executor);
+                    Terminal(parameters);
                    break;
                     //Collections
                     case "Clear":
                         //TODO
-                        Clear(parameters, executor);
+                        Clear(parameters);
                         break;
                     case "Size":
                         Size(parameters, executor);
@@ -170,18 +168,18 @@ namespace P4_Project
                         Contains(parameters, executor);
                         break;
                     case "Add":
-                        Add(parameters, executor);
+                        Add(parameters);
                         break;
                     case "Push":
                         //TODO
-                        Push(parameters, executor);
+                        Push(parameters);
                         break;
                     case "Enqueue":
                         //TODO
-                        Enqueue(parameters, executor);
+                        Enqueue(parameters);
                         break;
                     case "Remove":
-                        Remove(parameters, executor);
+                        Remove(parameters);
                         break;
                     case "Pop":
                         //TODO
@@ -258,7 +256,7 @@ namespace P4_Project
             }
         }
 
-        private static void Terminal(IReadOnlyList<Value> parameters, Interpreter executor)
+        private static void Terminal(IReadOnlyList<Value> parameters)
         {
             Console.WriteLine(parameters[0].o.ToString());
         }
@@ -267,7 +265,7 @@ namespace P4_Project
         * Implementation of collection pre-defined functions
         */
 
-        private static void Clear(List<Value> parameters, Interpreter executor)
+        private static void Clear(IReadOnlyList<Value> parameters)
         {
             ((List<object>)parameters[0].o).Clear();
         }
@@ -281,7 +279,7 @@ namespace P4_Project
 
         private static void IsEmpty(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            executor.currentValue = new Value( ((List<object>) parameters[0].o).Count == 0? true : false);
+            executor.currentValue = new Value( ((List<object>) parameters[0].o).Count == 0);
         }
 
         private static void Contains(IReadOnlyList<Value> parameters, Interpreter executor)
@@ -289,59 +287,71 @@ namespace P4_Project
             executor.currentValue = new Value(((List<object>) parameters[0].o).Contains(parameters[1].o));
         }
 
-        private static void Add(List<Value> parameters, Interpreter executor)
+        private static void Add(IReadOnlyList<Value> parameters)
         {
-            if(parameters[0].type.collectionType.name == "list")
-                ((List<object>)parameters[0].o).Add(parameters[1].o);
-            else if(parameters[0].type.collectionType.name == "set")
+            switch (parameters[0].type.collectionType.name)
             {
-                if(!((List<object>)parameters[0].o).Contains(parameters[1].o))
-                ((List<object>)parameters[0].o).Add(parameters[1].o);
+                case "list":
+                    ((List<object>)parameters[0].o).Add(parameters[1].o);
+                    break;
+                case "set":
+                {
+                    if(!((List<object>)parameters[0].o).Contains(parameters[1].o))
+                        ((List<object>)parameters[0].o).Add(parameters[1].o);
+                    break;
+                }
+                default: throw new Exception(parameters[0].type.collectionType.name + " is not a valid type to use Add function on.");
             }
         }
 
-        private static void Push(List<Value> parameters, Interpreter executor)
+        private static void Push(IReadOnlyList<Value> parameters)
         {
             ((List<object>)parameters[0].o).Insert(0, parameters[1].o);
         }
 
-        private static void Enqueue(List<Value> parameters, Interpreter executor)
+        private static void Enqueue(IReadOnlyList<Value> parameters)
         {
             ((List<object>)parameters[0].o).Add(parameters[1].o);
         }
 
-        private static void Remove(List<Value> parameters, Interpreter executor)
+        private static void Remove(IReadOnlyList<Value> parameters)
         {
-            if (parameters[0].type.collectionType.name == "list")
-                ((List<object>)parameters[0].o).RemoveAt((int)((double)parameters[1].o) - 1);
-            else if (parameters[0].type.collectionType.name == "set")
-                ((List<object>)parameters[0].o).Remove(parameters[1].o);            
+            switch (parameters[0].type.collectionType.name)
+            {
+                case "list":
+                    ((List<object>)parameters[0].o).RemoveAt((int)((double)parameters[1].o) - 1);
+                    break;
+                case "set":
+                    ((List<object>)parameters[0].o).Remove(parameters[1].o);
+                    break;
+                default: throw new Exception(parameters[0].type.collectionType.name + " is not a valid type to use Remove function on.");
+            }
         }
 
-        private static void Pop(List<Value> parameters, Interpreter executor)
+        private static void Pop(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             executor.currentValue = new Value(((List<object>)parameters[0].o)[0]);
             ((List<object>)parameters[0].o).RemoveAt(0);
         }
-        private static void Dequeue(List<Value> parameters, Interpreter executor)
+        private static void Dequeue(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             executor.currentValue = new Value(((List<object>)parameters[0].o)[0]);
             ((List<object>)parameters[0].o).RemoveAt(0);
         }
 
-        private static void Get(List<Value> parameters, Interpreter executor)
+        private static void Get(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             executor.currentValue = new Value(((List<object>)parameters[0].o)[(int)((double) parameters[1].o)-1]);
         }
 
-        private static void Peek(List<Value> parameters, Interpreter executor)
+        private static void Peek(IReadOnlyList<Value> parameters, Interpreter executor)
         {
             executor.currentValue = new Value(((List<object>)parameters[0].o)[0]);
         }
 
-        private static void Union(List<Value> parameters, Interpreter executor)
+        private static void Union(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            List<object> union = new List<object>();
+            var union = new List<object>();
             foreach (var v in (List<object>)parameters[0].o)
             {
                 union.Add(v);
@@ -471,10 +481,11 @@ namespace P4_Project
 
         private static void GetAdjacent(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            Vertex from = (parameters[0].o as Vertex);
+            if (!(parameters[0].o is Vertex from))
+                throw new Exception("The vertex was null in GetAdjacent call");
             
-            List<object> adjacentList = new List<object>();
-            foreach(Edge adj in from.edges)
+            var adjacentList = new List<object>();
+            foreach(var adj in from.edges)
             {
                 if (!adjacentList.Contains(adj.to) && adj.to != from)
                     adjacentList.Add(adj.to);
@@ -845,7 +856,7 @@ namespace P4_Project
             }
         }
 
-        public static Dictionary<Type, int> typeMap = new Dictionary<Type, int>()
+        public static readonly Dictionary<Type, int> TypeMap = new Dictionary<Type, int>()
         {
             {typeof(NoneConst), 0},
             {typeof(bool), 1},
