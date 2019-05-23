@@ -37,7 +37,7 @@ namespace P4_Project.Compiler.Interpreter
         private void IdentifyType(object v)
         {
             Type vType = v.GetType();
-            switch (PreDefined.typeMap[vType])
+            switch (PreDefined.TypeMap[vType])
             {
                 case 0: type = new BaseType("none"); break;
                 case 1: type = new BaseType("boolean"); break;
