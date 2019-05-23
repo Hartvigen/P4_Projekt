@@ -398,6 +398,7 @@ namespace P4_Project.Compiler.Interpreter
                         throw new Exception($"Tried to access attribute {node.Target.Ident} in type that is not vertex or edge.");
                 }
             }
+            currentValue = null;
         }
 
         private object DecodeReference(IdentNode currentSource)

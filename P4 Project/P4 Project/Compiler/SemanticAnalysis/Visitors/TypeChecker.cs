@@ -170,7 +170,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
             if (l == null || r == null)
                 return;
-            if ((l.name == "none" && (r.name == "vertex" || r.name == "edge")) || (r.name == "none" && (l.name == "vertex" || l.name == "edge")))
+            if ((l.name == "none" && (r.name == "vertex" || r.name == "edge" || r.name == "collec")) || (r.name == "none" && (l.name == "vertex" || l.name == "edge" || l.name == "collec")))
                 return;
 
             if (l.name == "func")

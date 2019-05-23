@@ -26,6 +26,8 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         private bool _vertexHeadExists;
         private bool _edgeHeadExists;
 
+        private int _directionType = 0;
+
 
         public Cleaner(SymTable table) {
             Table = table;
@@ -96,9 +98,24 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             node.LeftSide.Accept(this);
             node.RightSide.ForEach(t => { t.Item1.Accept(this); t.Item2.ForEach(l => l.Accept(this)); });
 
+            //The function checks if the direction of the graph has been set, sets it if not,
+            //and if the node will create edges of the same type as the graph.
+            if (_directionType == 0)
+                if (node.Operator == 17)
+                    _directionType = 1;
+                else
+                    _directionType = 2;
+            else if (node.Operator != 17 && _directionType == 1)
+                ErrorList.Add("The direction type of the program is " + Operators.GetCodeFromInt(_directionType) + ", but the direction type of the edge from " + node.LeftSide.Ident + " to " + node.RightSide[0].Item1.Ident +  " and more is " + node.GetCodeOfOperator());
+            else if(node.Operator == 17 && _directionType == 2)
+                ErrorList.Add("The direction type of the program is " + Operators.GetCodeFromInt(_directionType) + ", but the direction type of the edge from " + node.LeftSide.Ident + " to " + node.RightSide[0].Item1.Ident + " and more is " + node.GetCodeOfOperator());
+
+
+
             //3. Expressions aren't outright missing or null 
             if (node.RightSide.Count == 0)
                 ErrorList.Add("The right side of an edge creation exists, but have no expressions inside: " + node.GetCodeOfOperator());
+            //
         }
 
         public override void Visit(FuncDeclNode node)
