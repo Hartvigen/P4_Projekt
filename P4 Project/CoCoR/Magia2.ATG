@@ -270,7 +270,7 @@ VarDecl<out VarDeclNode varDecl> =  (. varDecl = null; BaseType type = null; str
 .
 
 /*------------------------------------------------------------------------*/
-Assign<out ExprNode expr> = (. expr = null; CollecConst collec = null; .)
+Assign<out ExprNode expr> = (. expr = null; .)
     '=' Expr<out expr>
 .
 

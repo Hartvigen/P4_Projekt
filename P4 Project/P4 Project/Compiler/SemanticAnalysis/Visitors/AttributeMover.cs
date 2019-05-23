@@ -80,12 +80,6 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(FuncDeclNode node)
         {
-            //1. Remove the function "SymbolObject" from the list of symbols, but register type info in the function's scope.
-            Table.GetInnerScopes().ForEach(s => {
-                if (s.name != node.SymbolObject.Name) return;
-                s.type = node.SymbolObject.Type;    // Save the type in the scope that corresponds to the function.
-                Table.RemoveVar(node.SymbolObject); // Remove function symbol  
-            });
             node.Parameters.Accept(this);
             node.Body.Accept(this);
         }

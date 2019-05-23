@@ -19,8 +19,8 @@ namespace P4_Project
         public static void Main(string[] args)
         {
             //Uncomment these lines if you wanna play with the program            
-            Console.WriteLine("Doing custom work!");
-            args = new string[] { "-i", "MAGIAFile.txt" };
+            if (args.Length == 0)
+                args = new string[] { "-i", "MAGIAFile.txt" };
 
             if (args.Length > 0)
             {
@@ -46,6 +46,7 @@ namespace P4_Project
                                     new Interpreter(_parser.tab)
                                 },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
                             break;
+
                         case "-d":
                         case "--dot":
                             DotOutputGenerator.printMode = "dot";
@@ -61,6 +62,7 @@ namespace P4_Project
                                     new Interpreter(_parser.tab)
                                 },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
                             break;
+
                         case "-p":
                         case "--prettyprint":
                             _parser.tab.name = "top";
@@ -74,6 +76,7 @@ namespace P4_Project
                                     new PrettyPrinter()
                                 },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
                             break;
+
                         case "-x":
                         case "--xmlprint":
                             Console.WriteLine("Parsing input file and printing XML: " + args[1]);
@@ -83,23 +86,20 @@ namespace P4_Project
                                     new XmlTreeBuilder()
                                 },args[1]) ? "Compile succeeded!" : "Compile failed!");
                             break;
+
                         case "-t":
                         case "--test":
                             Console.WriteLine("Printing test png called: test.png ");
                             Console.WriteLine(DotOutputGenerator.CreateDefaultPngFile() ? "print succeeded!" : "print failed!");
                             break;
-                        case "-h":
-                        case "--help":
+
+                        default:
                             Console.WriteLine("Compile file: MagiaC.exe [filePath]");
                             Console.WriteLine("For help: MagiaC.exe -h || MagiaC.exe --help");
                             Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath] || MagiaC.exe --prettyprint [filepath]");
                             Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath] || --xmlprint [filepath]");
                             Console.WriteLine("Create Test Png: MagiaC.exe -t || MagiaC.exe --test");
                             Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defaultFile + "\" in its directory and compile compile that.");
-                            break;
-                        default:
-                            Console.WriteLine("Parsing input file: " + args[0]);
-                            Console.WriteLine(TryParse(args[0]) ? "Compile succeeded!" : "Compile failed!");
                             break;
                     }
             }

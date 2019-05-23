@@ -7,6 +7,7 @@ using P4_Project.AST.Expressions.Values;
 using P4_Project.AST.Stmts;
 using P4_Project.AST.Stmts.Decls;
 using P4_Project.SymbolTable;
+using System.Linq;
 
 namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 {
@@ -18,6 +19,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         //3. Expressions aren't outright missing or null 
         //4. functions with a non "none" return type must have at least one return inside them! 
         //5. Checks that at maximum one of each type header exists!
+        //6. Remove the function "SymbolObject" from the list of symbols, but register type info in the function's scope.
         public override string AppropriateFileName { get; } = "Clean.txt";
         public override StringBuilder Result { get; } = new StringBuilder();
         public override List<string> ErrorList { get; } = new List<string>();
@@ -217,7 +219,16 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
         public override void Visit(Magia node)
         {
-            node.block.Accept(this);            
+            node.block.Accept(this); 
+            
+            //6. Remove the function "SymbolObject" from the list of symbols, but register type info in the function's scope.
+            foreach(FuncDeclNode fdecl in node.block.Statements.Where(stmt => stmt is FuncDeclNode).Cast<FuncDeclNode>())
+            {
+                // Save the type in the scope that corresponds to the function.
+                Table.GetInnerScopes().First(s => s.name == fdecl.SymbolObject.Name).type = fdecl.SymbolObject.Type;
+                // Remove function symbol  
+                Table.RemoveVar(fdecl.SymbolObject);
+            }
         }
 
         public override void Visit(BreakNode node)
