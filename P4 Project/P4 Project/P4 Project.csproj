@@ -58,11 +58,11 @@
     <Compile Include="AST\Expressions\BinExprNode.cs" />
     <Compile Include="AST\Expressions\Identifier\CallNode.cs" />
     <Compile Include="AST\Expressions\Identifier\VarNode.cs" />
-    <Compile Include="AST\Expressions\Values\BoolConst.cs" />
-    <Compile Include="AST\Expressions\Values\CollecConst.cs" />
-    <Compile Include="AST\Expressions\Values\NumConst.cs" />
+    <Compile Include="AST\Expressions\Values\BoolConstNode.cs" />
+    <Compile Include="AST\Expressions\Values\CollecConstNode.cs" />
+    <Compile Include="AST\Expressions\Values\NumConstNode.cs" />
     <Compile Include="AST\Expressions\Identifier\IdentNode.cs" />
-    <Compile Include="AST\Expressions\Values\TextConst.cs" />
+    <Compile Include="AST\Expressions\Values\TextConstNode.cs" />
     <Compile Include="AST\Expressions\ExprNode.cs" />
     <Compile Include="AST\Expressions\UnaExprNode.cs" />
     <Compile Include="AST\Magia.cs" />
@@ -104,9 +104,9 @@
     <Compile Include="AST\Stmts\ForNode.cs" />
     <Compile Include="AST\Stmts\IfNode.cs" />
     <Compile Include="AST\Stmts\WhileNode.cs" />
-    <Compile Include="AST\Stmts\Decls\MultiDecl.cs" />
+    <Compile Include="AST\Stmts\Decls\MultiDeclNode.cs" />
     <Compile Include="Compiler\SemanticAnalysis\Visitors\Extra\XmlTreeBuilder.cs" />
-    <Compile Include="AST\Expressions\Values\NoneConst.cs" />
+    <Compile Include="AST\Expressions\Values\NoneConstNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

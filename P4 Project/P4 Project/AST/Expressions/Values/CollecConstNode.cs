@@ -7,11 +7,11 @@ namespace P4_Project.AST.Expressions.Values
     /// As the name suggests, this node represents a collection of expressions,
     /// made with the syntax Collection&lt;Type&gt; col = {expr1, ..., exprn}, symbolizing the {expr1, ..., exprn} part.
     /// </summary>
-    public class CollecConst : ExprNode
+    public class CollecConstNode : ExprNode
     {
         public List<ExprNode> Expressions { get; } = new List<ExprNode>();
         
-        public CollecConst(BaseType type)
+        public CollecConstNode(BaseType type)
         {
             this.type = type;
         }

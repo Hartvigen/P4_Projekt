@@ -56,12 +56,12 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
                 Result.Append(")");
         }
 
-        public override void Visit(BoolConst node)
+        public override void Visit(BoolConstNode node)
         {
             Result.Append(node);
         }
 
-        public override void Visit(CollecConst node)
+        public override void Visit(CollecConstNode node)
         {
             if (node.Expressions.Count == 0)
                 return;
@@ -74,17 +74,17 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
             RemoveLastCommaAndSpace();
         }
 
-        public override void Visit(NoneConst node)
+        public override void Visit(NoneConstNode node)
         {
             Result.Append("none");
         }
 
-        public override void Visit(NumConst node)
+        public override void Visit(NumConstNode node)
         {
             Result.Append(node.GetString());
         }
 
-        public override void Visit(TextConst node)
+        public override void Visit(TextConstNode node)
         {
             Result.Append(node.Value);
         }
@@ -203,10 +203,10 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
             {
                 Result.Append(" = ");
 
-                if (node.DefaultValue.type.name == "collec" && node.DefaultValue.GetType() == typeof(CollecConst))
+                if (node.DefaultValue.type.name == "collec" && node.DefaultValue.GetType() == typeof(CollecConstNode))
                     Result.Append("{");
                 node.DefaultValue.Accept(this);
-                if (node.DefaultValue.type.name == "collec" && node.DefaultValue.GetType() == typeof(CollecConst))
+                if (node.DefaultValue.type.name == "collec" && node.DefaultValue.GetType() == typeof(CollecConstNode))
                     Result.Append("}");
             }
             IndentAndNewline();
@@ -378,7 +378,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
             node.block.Accept(this);
         }
 
-        public override void Visit(MultiDecl node)
+        public override void Visit(MultiDeclNode node)
         {
             if (node.Decls[0].SymbolObject.Type.name == "vertex")
             {

@@ -35,27 +35,27 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
             CreateXmlTag(node, Xml.END);
         }
 
-        public override void Visit(BoolConst node)
+        public override void Visit(BoolConstNode node)
         {
             CreateXmlTag(node, Xml.BOTH);
         }
 
-        public override void Visit(CollecConst node)
+        public override void Visit(CollecConstNode node)
         {
             CreateXmlTag(node, Xml.BOTH);
         }
 
-        public override void Visit(NoneConst node)
+        public override void Visit(NoneConstNode node)
         {
             CreateXmlTag(node, Xml.BOTH);
         }
 
-        public override void Visit(NumConst node)
+        public override void Visit(NumConstNode node)
         {
             CreateXmlTag(node, Xml.BOTH);
         }
 
-        public override void Visit(TextConst node)
+        public override void Visit(TextConstNode node)
         {
             CreateXmlTag(node, Xml.BOTH);
         }
@@ -194,7 +194,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors.Extra
             CreateXmlTag(node, Xml.BOTH);
         }
 
-        public override void Visit(MultiDecl node)
+        public override void Visit(MultiDeclNode node)
         {
             CreateXmlTag(node, Xml.START);
             node.Decls.ForEach(n => n.Accept(this));

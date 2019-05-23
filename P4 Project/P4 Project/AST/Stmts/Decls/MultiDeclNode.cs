@@ -3,10 +3,10 @@ using P4_Project.Compiler.SemanticAnalysis.Visitors;
 
 namespace P4_Project.AST.Stmts.Decls
 {
-    public class MultiDecl : StmtNode
+    public class MultiDeclNode : StmtNode
     {
         public List<DeclNode> Decls { get; }
-        public MultiDecl()
+        public MultiDeclNode()
         {
             Decls = new List<DeclNode>();
         }

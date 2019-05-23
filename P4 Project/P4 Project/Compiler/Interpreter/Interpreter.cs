@@ -207,9 +207,8 @@ namespace P4_Project.Compiler.Interpreter
                 var o = ((Value)DecodeReference(node.Source)).o; // Yes, we need the source, in order to change the attribute inside the source
                 switch (o)
                 {
-                    case Vertex vertex:
+                    case Vertex v:
                     {
-                        var v = vertex;
                         currentValue = v.attributes[node.Ident];
                         break;
                     }
@@ -227,7 +226,7 @@ namespace P4_Project.Compiler.Interpreter
                 throw new Exception("current value cannot be null after var node");
         }
 
-        public override void Visit(MultiDecl node)
+        public override void Visit(MultiDeclNode node)
         {
             node.Decls.ForEach(d => d.Accept(this));
         }
@@ -236,7 +235,7 @@ namespace P4_Project.Compiler.Interpreter
         /// Since all collections are implemented as lists, then no matter the type, they will all be implemented the same.
         /// </summary>
         /// <param name="node"></param>
-        public override void Visit(CollecConst node)
+        public override void Visit(CollecConstNode node)
         {
             List<object> collec = new List<object>();
             bool isSet = node.type.collectionType.name == "set" ? true : false;
@@ -577,23 +576,23 @@ namespace P4_Project.Compiler.Interpreter
             _executionInterrupted = ExeContinue;
         }
 
-        public override void Visit(NoneConst node)
+        public override void Visit(NoneConstNode node)
         {
-            currentValue = new Value(new NoneConst());
+            currentValue = new Value(new NoneConstNode());
         }
 
-        public override void Visit(NumConst node)
+        public override void Visit(NumConstNode node)
         {
             currentValue = new Value(node.Value);
         }
 
         
-        public override void Visit(TextConst node)
+        public override void Visit(TextConstNode node)
         {
             //Because the quotation marks are a part of the value of a text constant, these need to be removed.
             currentValue = new Value(node.Value.Substring(1, node.Value.Length - 2));
         }
-        public override void Visit(BoolConst node)
+        public override void Visit(BoolConstNode node)
         {
             currentValue = new Value(node.Value);
         }

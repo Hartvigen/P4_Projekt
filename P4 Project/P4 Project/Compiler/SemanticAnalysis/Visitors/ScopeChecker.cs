@@ -80,27 +80,27 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             }
         }
 
-        public override void Visit(BoolConst node)
+        public override void Visit(BoolConstNode node)
         {
             
         }
 
-        public override void Visit(CollecConst node)
+        public override void Visit(CollecConstNode node)
         {
             
         }
 
-        public override void Visit(NoneConst node)
+        public override void Visit(NoneConstNode node)
         {
             
         }
 
-        public override void Visit(NumConst node)
+        public override void Visit(NumConstNode node)
         {
             
         }
 
-        public override void Visit(TextConst node)
+        public override void Visit(TextConstNode node)
         {
             
         }
@@ -248,7 +248,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             
         }
 
-        public override void Visit(MultiDecl node)
+        public override void Visit(MultiDeclNode node)
         {
             node.Decls.ForEach(n => n.Accept(this));
         }

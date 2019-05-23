@@ -8,8 +8,8 @@ namespace P4_Project.AST.Expressions.Identifier
     /// </summary>
     public class CallNode : IdentNode
     {
-        public CollecConst Parameters { get; }
-        public CallNode(string ident, CollecConst parameters) 
+        public CollecConstNode Parameters { get; }
+        public CallNode(string ident, CollecConstNode parameters) 
             : base(ident)
         {
             Parameters = parameters;

@@ -107,7 +107,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         }
 
         //returns a Bool type
-        public override void Visit(BoolConst node)
+        public override void Visit(BoolConstNode node)
         {
             if (node.type is null)
                 node.type = new BaseType("boolean");
@@ -116,7 +116,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         }
 
         //Checks if all elements in a collection is the same type, and returns the type.
-        public override void Visit(CollecConst node)
+        public override void Visit(CollecConstNode node)
         {
             //If the Collection contains no elements it is type correct no matter what.
             if (node.Expressions.Count == 0)
@@ -133,7 +133,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         }
 
         //returns null
-        public override void Visit(NoneConst node)
+        public override void Visit(NoneConstNode node)
         {
             if (node.type is null)
                 node.type = new BaseType("none");
@@ -142,7 +142,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         }
 
         //returns a numberType
-        public override void Visit(NumConst node)
+        public override void Visit(NumConstNode node)
         {
             if(node.type is null)
                 node.type = new BaseType("number");
@@ -151,7 +151,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         }
 
         //returns a text
-        public override void Visit(TextConst node)
+        public override void Visit(TextConstNode node)
         {
             if (node.type is null)
                 node.type = new BaseType("text");
@@ -437,7 +437,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(ContinueNode node)
         {
         }
-        public override void Visit(MultiDecl node)
+        public override void Visit(MultiDeclNode node)
         {
             node.Decls.ForEach(n => n.Accept(this));
         }

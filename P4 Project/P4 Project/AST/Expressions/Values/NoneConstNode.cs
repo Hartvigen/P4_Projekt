@@ -6,7 +6,7 @@ namespace P4_Project.AST.Expressions.Values
     /// <summary>
     /// As MAGIA uses none instead of null, this const represents the none constant.
     /// </summary>
-    public class NoneConst : ExprNode
+    public class NoneConstNode : ExprNode
     {
         public override void Accept(Visitor vi)
         {
@@ -20,7 +20,7 @@ namespace P4_Project.AST.Expressions.Values
 
         public override bool Equals(object obj)
         {
-            return (obj is NoneConst);
+            return (obj is NoneConstNode);
         }
 
         public override int GetHashCode()

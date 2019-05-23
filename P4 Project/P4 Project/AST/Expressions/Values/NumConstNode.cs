@@ -6,10 +6,10 @@ namespace P4_Project.AST.Expressions.Values
     /// <summary>
     /// As the name suggests, this node represents a constant of the type 'number'.
     /// </summary>
-    public class NumConst : ExprNode
+    public class NumConstNode : ExprNode
     {
         public double Value { get; }
-        public NumConst(double value)
+        public NumConstNode(double value)
         {
             Value = value;
         }

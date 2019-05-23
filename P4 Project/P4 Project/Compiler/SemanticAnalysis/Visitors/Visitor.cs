@@ -19,14 +19,14 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public abstract void Visit(CallNode node);
         public abstract void Visit(VarNode node);
 
-        public abstract void Visit(MultiDecl node);
+        public abstract void Visit(MultiDeclNode node);
 
         //Values
-        public abstract void Visit(BoolConst node);
-        public abstract void Visit(CollecConst node);
-        public abstract void Visit(NoneConst node);
-        public abstract void Visit(NumConst node);
-        public abstract void Visit(TextConst node);
+        public abstract void Visit(BoolConstNode node);
+        public abstract void Visit(CollecConstNode node);
+        public abstract void Visit(NoneConstNode node);
+        public abstract void Visit(NumConstNode node);
+        public abstract void Visit(TextConstNode node);
 
         //Expressions
         public abstract void Visit(BinExprNode node);

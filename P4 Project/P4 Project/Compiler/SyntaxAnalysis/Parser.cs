@@ -267,7 +267,7 @@ public class Parser {
 			stmt = new VarDeclNode(tab.NewVar(name, type, Var), expr); 
 		} else if (la.kind == 13) {
 			Get();
-			MultiDecl multiDecl = new MultiDecl(); 
+			MultiDeclNode multiDecl = new MultiDeclNode(); 
 			VtxDecl(out vertexDecl);
 			multiDecl.AddDecl(vertexDecl); 
 			while (WeakSeparator(8,14,15) ) {
@@ -414,7 +414,7 @@ public class Parser {
 	}
 
 	void Assign(out ExprNode expr) {
-		expr = null; CollecConst collec = null; 
+		expr = null; CollecConstNode collec = null; 
 		Expect(28);
 		Expr(out expr);
 	}
@@ -425,7 +425,7 @@ public class Parser {
 		i = varNode; 
 		if (la.kind == 7) {
 			Get();
-			Args(null, out CollecConst collec);
+			Args(null, out CollecConstNode collec);
 			i = new CallNode(i.Ident, collec); 
 			Expect(9);
 		}
@@ -624,7 +624,7 @@ public class Parser {
 		} else if (StartOf(12)) {
 			CollecType(out BaseType type);
 			Expect(13);
-			Args(type, out CollecConst collec);
+			Args(type, out CollecConstNode collec);
 			e = collec; 
 			Expect(14);
 		} else SynErr(74);
@@ -634,19 +634,19 @@ public class Parser {
 		e = null; 
 		if (la.kind == 2) {
 			Get();
-			e = new NumConst(Convert.ToDouble(t.val, System.Globalization.CultureInfo.InvariantCulture));    
+			e = new NumConstNode(Convert.ToDouble(t.val, System.Globalization.CultureInfo.InvariantCulture));    
 		} else if (la.kind == 3) {
 			Get();
-			e = new TextConst(t.val);                    
+			e = new TextConstNode(t.val);                    
 		} else if (la.kind == 44) {
 			Get();
-			e = new BoolConst(Convert.ToBoolean(t.val)); 
+			e = new BoolConstNode(Convert.ToBoolean(t.val)); 
 		} else if (la.kind == 45) {
 			Get();
-			e = new BoolConst(Convert.ToBoolean(t.val)); 
+			e = new BoolConstNode(Convert.ToBoolean(t.val)); 
 		} else if (la.kind == 12) {
 			Get();
-			e = new NoneConst();                         
+			e = new NoneConstNode();                         
 		} else SynErr(75);
 	}
 
@@ -679,8 +679,8 @@ public class Parser {
 		} else SynErr(76);
 	}
 
-	void Args(BaseType type, out CollecConst collec) {
-		collec = new CollecConst(type); ExprNode expr; 
+	void Args(BaseType type, out CollecConstNode collec) {
+		collec = new CollecConstNode(type); ExprNode expr; 
 		if (StartOf(22)) {
 			Expr(out expr);
 			collec.Add(expr); 

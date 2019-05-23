@@ -102,7 +102,7 @@ namespace P4_Project
                 case "vertex":
                 case "edge":
                 case "collec":
-                    return new Value(new NoneConst());
+                    return new Value(new NoneConstNode());
                 default:
                     throw new Exception("Type: " + type.name + " has no predefined value!");
             }
@@ -372,7 +372,7 @@ namespace P4_Project
                 return;
             }
 
-            executor.currentValue = new Value(new NoneConst());
+            executor.currentValue = new Value(new NoneConstNode());
         }
 
         private static void GetVertices(Interpreter executor)
@@ -772,7 +772,7 @@ namespace P4_Project
 
         public static readonly Dictionary<Type, int> TypeMap = new Dictionary<Type, int>()
         {
-            {typeof(NoneConst), 0},
+            {typeof(NoneConstNode), 0},
             {typeof(bool), 1},
             {typeof(List<bool>), 2},
             {typeof(HashSet<bool>), 3},
