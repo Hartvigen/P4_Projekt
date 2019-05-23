@@ -1,7 +1,7 @@
 ﻿using P4_Project.AST.Expressions;
 using P4_Project.Compiler.SemanticAnalysis.Visitors;
 
-namespace P4_Project.AST.Stmts.Decls
+namespace P4_Project.AST.Expressions.Values
 {
     /// <summary>
     /// As MAGIA uses none instead of null, this const represents the none constant.
@@ -21,6 +21,11 @@ namespace P4_Project.AST.Stmts.Decls
         public override bool Equals(object obj)
         {
             return (obj is NoneConst);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

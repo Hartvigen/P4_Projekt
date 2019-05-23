@@ -60,7 +60,6 @@
     <Compile Include="AST\Expressions\Identifier\VarNode.cs" />
     <Compile Include="AST\Expressions\Values\BoolConst.cs" />
     <Compile Include="AST\Expressions\Values\CollecConst.cs" />
-    <Compile Include="AST\Stmts\Decls\NoneConst.cs" />
     <Compile Include="AST\Expressions\Values\NumConst.cs" />
     <Compile Include="AST\Expressions\Identifier\IdentNode.cs" />
     <Compile Include="AST\Expressions\Values\TextConst.cs" />
@@ -107,6 +106,7 @@
     <Compile Include="AST\Stmts\WhileNode.cs" />
     <Compile Include="AST\Stmts\Decls\MultiDecl.cs" />
     <Compile Include="Compiler\SemanticAnalysis\Visitors\Extra\XmlTreeBuilder.cs" />
+    <Compile Include="AST\Expressions\Values\NoneConst.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
