@@ -377,11 +377,12 @@ namespace P4_Project.Compiler.Interpreter
         public override void Visit(AssignNode node)
         {
             node.Value.Accept(this);
+            Value newValue = currentValue;
 
             //If there is a source the value should not actually be assigned to this variable but rather as an attribute of the source.
             if (node.Target.Source == null)
             {
-                _currentScope.UpdateVar(node.Target.Ident, currentValue);
+                _currentScope.UpdateVar(node.Target.Ident, newValue);
             }
             else
             {
@@ -389,10 +390,10 @@ namespace P4_Project.Compiler.Interpreter
                 switch (o)
                 {
                     case Vertex vertex:
-                        vertex.UpdateAttribute(node.Target.Ident, currentValue);
+                        vertex.UpdateAttribute(node.Target.Ident, newValue);
                         break;
                     case Edge edge:
-                        edge.UpdateAttribute(node.Target.Ident, currentValue);
+                        edge.UpdateAttribute(node.Target.Ident, newValue);
                         break;
                     default:
                         throw new Exception($"Tried to access attribute {node.Target.Ident} in type that is not vertex or edge.");

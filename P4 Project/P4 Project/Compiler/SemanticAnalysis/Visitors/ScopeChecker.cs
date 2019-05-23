@@ -39,7 +39,11 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         public override void Visit(CallNode node)
         {
             node.Parameters.Accept(this);
-            //node.type = Table.FindReturnTypeOfFunction(node.Ident, node.Parameters.Expressions.Select(expr => expr.type).ToList());
+
+            // We had to do this here, so that something like "function().attribute" can be scope checked
+            TypeChecker tempTypeChecker = new TypeChecker(Table);
+            node.Parameters.Expressions.ForEach(exp => exp.Accept(tempTypeChecker));
+            node.type = Table.FindReturnTypeOfFunction(node.Ident, node.Parameters.Expressions.Select(exp => exp.type).ToList());
         }
 
         public override void Visit(VarNode node)
@@ -49,13 +53,13 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
             //If the Source is not null this must be an attribute of the source type  
             if (node.Source != null)
             {
-                /*
                 // Check if 'node.Ident' is a valid atribute in the type denoded by 'node.Source.type.name'
-                if (Table.IsAttribute(node.Source.type.name, node.Ident))
+                if (node.Source.type.name == "func" && Table.IsAttribute(node.Source.type.returnType.name, node.Ident))
+                    node.type = Table.GetTypeOfAttribute(node.Source.type.returnType.name, node.Ident);
+                else if (Table.IsAttribute(node.Source.type.name, node.Ident))
                     node.type = Table.GetTypeOfAttribute(node.Source.type.name, node.Ident);
                 else
                     ErrorList.Add(node.Ident + " is not a valid attribute of: " + node.Source.type.name);
-                */
             }
             else
             {
