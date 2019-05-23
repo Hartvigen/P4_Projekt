@@ -153,52 +153,42 @@ namespace P4_Project
                    break;
                     //Collections
                     case "Clear":
-                        //TODO
                         Clear(parameters);
                         break;
                     case "Size":
                         Size(parameters, executor);
                         break;
                     case "IsEmpty":
-                        //TODO
                         IsEmpty(parameters, executor);
                         break;
                     case "Contains":
-                        //TODO
                         Contains(parameters, executor);
                         break;
                     case "Add":
                         Add(parameters);
                         break;
                     case "Push":
-                        //TODO
                         Push(parameters);
                         break;
                     case "Enqueue":
-                        //TODO
                         Enqueue(parameters);
                         break;
                     case "Remove":
                         Remove(parameters);
                         break;
                     case "Pop":
-                        //TODO
                         Pop(parameters, executor);                        
                         break;
                     case "Dequeue":
-                        //TODO
                         Dequeue(parameters, executor);
                         break;
                     case "Get":
-                        //TODO
                         Get(parameters, executor);
                         break;
                     case "Peek":
-                        //TODO
                         Peek(parameters, executor);
                         break;
                     case "Union":
-                        //TODO
                         Union(parameters, executor);
                         break;
                     //Graph
@@ -363,81 +353,6 @@ namespace P4_Project
                     union.Add(v);
             }
             executor.currentValue = new Value(union, new BaseType(new BaseType(parameters[0].type.singleType.name), new BaseType(parameters[0].type.collectionType.name)));
-            /*
-            switch (parameters[0].type.singleType.name)
-            {
-                case "number":
-                    List<object> union = new List<object>();
-                    foreach(var v in (List<object>) parameters[0].o)
-                    {
-                        union.Add(v);
-                    }
-
-                    foreach (var v in (List<object>)parameters[1].o)
-                    {
-                        if (!union.Contains(v))
-                            union.Add(v);
-                    }
-                    executor.currentValue = new Value(union);
-                    break;
-                case "boolean":
-                    List<bool> boolunion = new List<bool>();
-                    foreach (var v in (List<object>)parameters[0].o)
-                    {
-                        boolunion.Add((bool)v);
-                    }
-
-                    foreach (var v in (List<object>)parameters[1].o)
-                    {
-                        if (!boolunion.Contains((bool)v))
-                            boolunion.Add((bool)v);
-                    }
-                    executor.currentValue = new Value(boolunion);
-                    break;
-                case "text":
-                    List<string> textunion = new List<string>();
-                    foreach (var v in (List<object>)parameters[0].o)
-                    {
-                        textunion.Add((string)v);
-                    }
-
-                    foreach (var v in (List<object>)parameters[1].o)
-                    {
-                        if (!textunion.Contains((string)v))
-                            textunion.Add((string)v);
-                    }
-                    executor.currentValue = new Value(textunion);
-                    break;
-                case "vertex":
-                    List<Vertex> VertexUnion = new List<Vertex>();
-                    foreach (var v in (List<object>)parameters[0].o)
-                    {
-                        VertexUnion.Add((Vertex)v);
-                    }
-
-                    foreach (var v in (List<object>)parameters[1].o)
-                    {
-                        if (!VertexUnion.Contains((Vertex)v))
-                            VertexUnion.Add((Vertex)v);
-                    }
-                    executor.currentValue = new Value(VertexUnion);
-                    break;
-                case "edge":
-                    List<Edge> EdgeUnion = new List<Edge>();
-                    foreach (var v in (List<Edge>)parameters[0].o)
-                    {
-                        EdgeUnion.Add((Edge)v);
-                    }
-
-                    foreach (var v in (List<Edge>)parameters[1].o)
-                    {
-                        if (!EdgeUnion.Contains((Edge)v))
-                            EdgeUnion.Add((Edge)v);
-                    }
-                    executor.currentValue = new Value(EdgeUnion);
-                    break;
-            }   
-            */
         }
         /*
         * Implementation of graph pre-defined functions
@@ -446,16 +361,14 @@ namespace P4_Project
 
         private static void GetEdge(IReadOnlyList<Value> parameters, Interpreter executor)
         {
-            Vertex v1 = (Vertex)parameters[0].o;
-            Vertex v2 = (Vertex)parameters[1].o;
+            var v1 = (Vertex)parameters[0].o;
+            var v2 = (Vertex)parameters[1].o;
 
             foreach (var e in v1.edges)
             {
-                if (e.HasVertex(v1, v2) || (e.opera == Operators.Nonarr && e.HasVertex(v2, v1)))
-                {
-                    executor.currentValue = new Value(e);
-                    return;
-                }
+                if (!e.HasVertex(v1, v2) && (e.opera != Operators.Nonarr || !e.HasVertex(v2, v1))) continue;
+                executor.currentValue = new Value(e);
+                return;
             }
 
             executor.currentValue = new Value(new NoneConst());
