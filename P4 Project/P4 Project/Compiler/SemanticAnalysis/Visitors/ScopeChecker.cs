@@ -150,9 +150,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
         {
             if (node.Attributes.Statements.Count != 0)
             {
-                node.Attributes.Statements.ForEach(s => {
-                    if (s.GetType() == typeof(AssignNode))
-                    {
+                node.Attributes.Statements.ForEach(s => {                   
                         AssignNode a = (AssignNode)s;
 
                         //We dont care about the right side of the assign it must still be valid according to all scope rules 
@@ -160,8 +158,7 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
                         //We find the header scope for vertex and if the attribute is not there it is invalid. 
                         if(!Table.vertexAttr.GetVariables().ContainsKey(a.Target.Ident) && !PreDefined.PreDefinedAttributesVertex.Contains(a.Target.Ident))
-                            ErrorList.Add(a.Target.Ident + " is not a valid attribute for vertex");
-                    }
+                            ErrorList.Add(a.Target.Ident + " is not a valid attribute for vertex");                    
                 });
             }
 
