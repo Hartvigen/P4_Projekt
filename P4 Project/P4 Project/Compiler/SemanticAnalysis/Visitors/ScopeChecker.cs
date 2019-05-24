@@ -42,7 +42,11 @@ namespace P4_Project.Compiler.SemanticAnalysis.Visitors
 
             // We had to do this here, so that something like "function().attribute" can be scope checked
             TypeChecker tempTypeChecker = new TypeChecker(Table);
-            node.Parameters.Expressions.ForEach(exp => exp.Accept(tempTypeChecker));
+            node.Parameters.Expressions.ForEach(exp => {
+                exp.Accept(tempTypeChecker); // Get its type
+                exp.Accept(this); // Scope check it
+            });
+
             node.type = Table.FindReturnTypeOfFunction(node.Ident, node.Parameters.Expressions.Select(exp => exp.type).ToList());
         }
 
