@@ -1,0 +1,74 @@
+[vertex(boolean acceptstate = false)]
+[edge(set<text> accepts)]
+
+/*-------------------------------------------------------------------*/
+
+vertex CurrentVertex  = Initialize()
+vertex(Display)
+text input = "12345.67890"
+
+Print() 
+Display.label = ""
+foreach(text char in input){
+    Display.label = Display.label + char
+    CurrentVertex.style = ""
+    foreach(vertex v in GetAdjacent(CurrentVertex)){      
+        if(Contains(GetEdge(CurrentVertex, v).accepts, char)){
+            CurrentVertex = v
+            CurrentVertex.style = "bold"
+            break
+        }
+    }
+
+    if(CurrentVertex.style != "bold"){
+        CurrentVertex.acceptstate = false
+        CurrentVertex.style = "dashed"
+        CurrentVertex.color = "red"
+        Print()
+        break
+    }
+
+    Print()
+}
+
+if(CurrentVertex.acceptstate){
+    Display.label = "The DFA recognizes " + input
+}else{
+    Display.label = "The DFA rejected " + input
+}
+Print()
+
+/*-------------------------------------------------------------------*/
+
+func vertex Initialize(){
+    vertex{
+        (start, label = "Start", style = "bold"),
+        (BeforeDotNum, label = "Accept", acceptstate = true),
+        (Dot), 
+        (AfterDotNum, label = "Accept", acceptstate = true)
+    }
+
+    start -> {
+        (BeforeDotNum, label = "0-9", 
+            accepts = set<text> {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+        ), 
+        (Dot, label = "Dot", accepts = set<text> {"."})
+    }
+
+    BeforeDotNum -> {
+        (BeforeDotNum, label = "0-9", 
+            accepts = set<text> {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+        ), 
+        (Dot, label = "Dot", accepts = set<text> {"."})
+    }
+
+    Dot -> (AfterDotNum, label = "0-9", 
+        accepts = set<text> {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+    )
+
+    AfterDotNum -> (AfterDotNum, label = "0-9",
+       accepts = set<text> {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+    )
+
+    return start
+}
