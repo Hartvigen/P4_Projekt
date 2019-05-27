@@ -12,105 +12,89 @@ namespace P4_Project
 {
     public static class Program
     {
-        const string defaultFile = "MAGIAFile.txt";
         private static Parser _parser;
 
 
         public static void Main(string[] args)
-        {
-            //Uncomment these lines if you wanna play with the program            
-            if (args.Length == 0)
-                args = new string[] { "-i", "MAGIAFile.txt" };
-
-            if (args.Length > 0)
+        {            
+            switch (args.Length > 0 ? args[0] : "-h")
             {
-                if (!TryParse(args[1]))
-                {
-                    Console.WriteLine("Couldn't even parse the file!");
-                }
-                else
-                    switch (args[0])
-                    {
-                        case "-i":
-                        case "--image":
-                            DotOutputGenerator.printMode = "png";
-                            Console.WriteLine("Doing a complete compile on " + args[1]);
-                            _parser.tab.name = "top";
-                            Console.WriteLine(ApplyVisitors(
-                                new List<Visitor>
-                                {
-                                    new Cleaner(_parser.tab), 
-                                    new AttributeMover(_parser.tab), 
-                                    new ScopeChecker(_parser.tab), 
-                                    new TypeChecker(_parser.tab), 
+                case "-i":
+                case "--image":
+                    TryParse(args[1]);
+                    DotOutputGenerator.printMode = "png";
+                    Console.WriteLine("Doing a complete compile on " + args[1]);
+                    _parser.tab.name = "top";
+                    Console.WriteLine(ApplyVisitors(
+                        new List<Visitor>
+                        {                                    
+                                    new Cleaner(_parser.tab),
+                                    new AttributeMover(_parser.tab),
+                                    new ScopeChecker(_parser.tab),
+                                    new TypeChecker(_parser.tab),
                                     new Interpreter(_parser.tab)
-                                },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
-                            break;
+                        }, args[1]) ? "Compile succeeded!" : "Compile failed!");
+                    break;
 
-                        case "-d":
-                        case "--dot":
-                            DotOutputGenerator.printMode = "dot";
-                            Console.WriteLine("Doing a complete compile on " + args[1] + " and delivering dot code.");
-                            _parser.tab.name = "top";
-                            Console.WriteLine(ApplyVisitors(
-                                new List<Visitor>
-                                {
-                                    new Cleaner(_parser.tab), 
-                                    new AttributeMover(_parser.tab), 
-                                    new ScopeChecker(_parser.tab), 
-                                    new TypeChecker(_parser.tab), 
+                case "-d":
+                case "--dot":
+                    TryParse(args[1]);
+                    DotOutputGenerator.printMode = "dot";
+                    Console.WriteLine("Doing a complete compile on " + args[1] + " and delivering dot code.");
+                    _parser.tab.name = "top";
+                    Console.WriteLine(ApplyVisitors(
+                        new List<Visitor>
+                        {
+                                    new Cleaner(_parser.tab),
+                                    new AttributeMover(_parser.tab),
+                                    new ScopeChecker(_parser.tab),
+                                    new TypeChecker(_parser.tab),
                                     new Interpreter(_parser.tab)
-                                },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
-                            break;
+                        }, args[1]) ? "Compile succeeded!" : "Compile failed!");
+                    break;
 
-                        case "-p":
-                        case "--prettyprint":
-                            _parser.tab.name = "top";
-                            Console.WriteLine(ApplyVisitors(
-                                new List<Visitor>
-                                {
-                                    new Cleaner(_parser.tab), 
-                                    new AttributeMover(_parser.tab), 
-                                    new ScopeChecker(_parser.tab), 
-                                    new TypeChecker(_parser.tab), 
+                case "-p":
+                case "--prettyprint":
+                    TryParse(args[1]);
+                    _parser.tab.name = "top";
+                    Console.WriteLine(ApplyVisitors(
+                        new List<Visitor>
+                        {
+                                    new Cleaner(_parser.tab),
+                                    new AttributeMover(_parser.tab),
+                                    new ScopeChecker(_parser.tab),
+                                    new TypeChecker(_parser.tab),
                                     new PrettyPrinter()
-                                },args[1]) ? "Compile succeeded!" : "Compile failed!");                        
-                            break;
+                        }, args[1]) ? "Compile succeeded!" : "Compile failed!");
+                    break;
 
-                        case "-x":
-                        case "--xmlprint":
-                            Console.WriteLine("Parsing input file and printing XML: " + args[1]);
-                            Console.WriteLine(ApplyVisitors(
-                                new List<Visitor>
-                                {
+                case "-x":
+                case "--xmlprint":
+                    TryParse(args[1]);
+                    Console.WriteLine("Parsing input file and printing XML: " + args[1]);
+                    Console.WriteLine(ApplyVisitors(
+                        new List<Visitor>
+                        {
                                     new XmlTreeBuilder()
-                                },args[1]) ? "Compile succeeded!" : "Compile failed!");
-                            break;
+                        }, args[1]) ? "Compile succeeded!" : "Compile failed!");
+                    break;
 
-                        case "-t":
-                        case "--test":
-                            Console.WriteLine("Printing test png called: test.png ");
-                            Console.WriteLine(DotOutputGenerator.CreateDefaultPngFile() ? "print succeeded!" : "print failed!");
-                            break;
-
-                        default:
-                            Console.WriteLine("Compile file: MagiaC.exe [filePath]");
-                            Console.WriteLine("For help: MagiaC.exe -h || MagiaC.exe --help");
-                            Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath] || MagiaC.exe --prettyprint [filepath]");
-                            Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath] || --xmlprint [filepath]");
-                            Console.WriteLine("Create Test Png: MagiaC.exe -t || MagiaC.exe --test");
-                            Console.WriteLine("If no arguments are given the compiler will look for default file called: \"" + defaultFile + "\" in its directory and compile compile that.");
-                            break;
-                    }
-            }
-            else if (File.Exists(defaultFile))
-            {
-                Console.WriteLine("Compiling standard file: " + defaultFile);
-                Console.WriteLine(TryParse(defaultFile) ? "Compile succeeded!" : "Compile failed!");
-            }
-            else
-            {
-                Console.WriteLine("for help type: MagiaC.exe --help or: MagiaC.exe -h");
+                case "-t":
+                case "--test":
+                    Console.WriteLine("Printing test png called: test.png ");
+                    Console.WriteLine(DotOutputGenerator.CreateDefaultPngFile() ? "print succeeded!" : "print failed!");
+                    break;
+                case "-h":
+                case "--help":
+                default:
+                    Console.WriteLine("Compile file into DOT: MagiaC.exe -d [filePath] || MagiaC.exe --dot [filePath]");
+                    Console.WriteLine("Compile file into images: MagiaC.exe -i [filePath] || MagiaC.exe --image [filePath]");
+                    Console.WriteLine("For help: MagiaC.exe -h || MagiaC.exe --help");
+                    Console.WriteLine("PrettyPrint AST: MagiaC.exe -p [filepath] || MagiaC.exe --prettyprint [filepath]");
+                    Console.WriteLine("XmlTree AST: MagiaC.exe -x [filepath] || --xmlprint [filepath]");
+                    Console.WriteLine("Create Test Png: MagiaC.exe -t || MagiaC.exe --test");
+   
+                    break;
             }
             Console.ReadKey();
         }
